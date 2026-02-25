@@ -1,0 +1,28 @@
+[package]
+name = "sapphire"
+version = "0.1.0"
+authors = ["Sapphire Contributors"]
+license = "MIT"
+description = "A universal programming language combining the best of all worlds"
+repository = "https://github.com/sapphire-lang/sapphire"
+homepage = "https://sapphire-lang.org"
+keywords = ["compiler", "programming-language", "systems", "web", "ml"]
+
+[dependencies]
+# Core dependencies will be listed here
+
+[dev-dependencies]
+# Test and development dependencies
+
+[build]
+target = "native"
+optimization = "release"
+parallel = true
+
+[features]
+default = ["std", "async", "gc"]
+std = []
+async = []
+gc = []
+jit = []
+no-std = []

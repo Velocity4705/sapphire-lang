@@ -1,0 +1,24 @@
+# Type system test
+
+# Type inference
+let x = 42
+let y = 3.14
+let name = "Alice"
+
+print(x)
+print(y)
+print(name)
+
+# Explicit types
+let count: int = 100
+let ratio: float = 0.5
+
+print(count)
+print(ratio)
+
+# Arithmetic with type checking
+let sum = x + 50
+let product = count * 2
+
+print(sum)
+print(product)

@@ -1,0 +1,28 @@
+# Type inference test
+
+# Simple inference
+let x = 42
+let y = 3.14
+let name = "Bob"
+
+print(x)
+print(y)
+print(name)
+
+# Arithmetic inference
+let sum = x + 10
+let product = x * 2
+
+print(sum)
+print(product)
+
+# List inference
+let numbers = [1, 2, 3, 4, 5]
+print(numbers)
+
+# Function with inference
+fn double(n):
+    return n * 2
+
+let result = double(21)
+print(result)

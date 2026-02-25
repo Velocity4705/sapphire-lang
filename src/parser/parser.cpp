@@ -1,0 +1,444 @@
+#include "parser.h"
+#include <iostream>
+
+namespace sapphire {
+
+Parser::Parser(const std::vector<Token>& tokens) : tokens(tokens), current(0) {}
+
+std::vector<std::unique_ptr<Stmt>> Parser::parse() {
+    std::vector<std::unique_ptr<Stmt>> statements;
+    
+    while (!isAtEnd()) {
+        try {
+            skipNewlines();
+            if (!isAtEnd()) {
+                statements.push_back(declaration());
+            }
+        } catch (const ParseError& e) {
+            std::cerr << "Parse error: " << e.what() << std::endl;
+            synchronize();
+        }
+    }
+    
+    return statements;
+}
+
+Token Parser::peek() const {
+    return tokens[current];
+}
+
+Token Parser::previous() const {
+    return tokens[current - 1];
+}
+
+Token Parser::advance() {
+    if (!isAtEnd()) current++;
+    return previous();
+}
+
+bool Parser::isAtEnd() const {
+    return peek().type == TokenType::END_OF_FILE;
+}
+
+bool Parser::check(TokenType type) const {
+    if (isAtEnd()) return false;
+    return peek().type == type;
+}
+
+bool Parser::match(const std::vector<TokenType>& types) {
+    for (TokenType type : types) {
+        if (check(type)) {
+            advance();
+            return true;
+        }
+    }
+    return false;
+}
+
+void Parser::consume(TokenType type, const std::string& message) {
+    if (check(type)) {
+        advance();
+        return;
+    }
+    throw error(peek(), message);
+}
+
+Token Parser::consumeToken(TokenType type, const std::string& message) {
+    if (check(type)) {
+        return advance();
+    }
+    throw error(peek(), message);
+}
+
+void Parser::skipNewlines() {
+    while (match({TokenType::NEWLINE})) {}
+}
+
+ParseError Parser::error(const Token& token, const std::string& message) {
+    std::string error_msg = "Line " + std::to_string(token.line) + ": " + message;
+    return ParseError(error_msg);
+}
+
+void Parser::synchronize() {
+    advance();
+    
+    while (!isAtEnd()) {
+        if (previous().type == TokenType::NEWLINE) return;
+        
+        switch (peek().type) {
+            case TokenType::FN:
+            case TokenType::LET:
+            case TokenType::CONST:
+            case TokenType::FOR:
+            case TokenType::IF:
+            case TokenType::WHILE:
+            case TokenType::RETURN:
+                return;
+            default:
+                break;
+        }
+        
+        advance();
+    }
+}
+
+// Statement parsing
+
+std::unique_ptr<Stmt> Parser::declaration() {
+    if (match({TokenType::LET, TokenType::CONST})) {
+        return varDeclaration();
+    }
+    if (match({TokenType::FN, TokenType::ASYNC})) {
+        return functionDeclaration();
+    }
+    return statement();
+}
+
+std::unique_ptr<Stmt> Parser::varDeclaration() {
+    bool is_const = previous().type == TokenType::CONST;
+    
+    Token name = consumeToken(TokenType::IDENTIFIER, "Expected variable name");
+    
+    std::string type_name;
+    if (match({TokenType::COLON})) {
+        Token type = consumeToken(TokenType::IDENTIFIER, "Expected type name");
+        type_name = type.lexeme;
+    }
+    
+    std::unique_ptr<Expr> initializer = nullptr;
+    if (match({TokenType::EQUAL})) {
+        initializer = expression();
+    }
+    
+    skipNewlines();
+    
+    return std::make_unique<VarDeclStmt>(name.lexeme, type_name, 
+                                         std::move(initializer), is_const);
+}
+
+std::unique_ptr<Stmt> Parser::functionDeclaration() {
+    bool is_async = previous().type == TokenType::ASYNC;
+    if (is_async) {
+        consume(TokenType::FN, "Expected 'fn' after 'async'");
+    }
+    
+    Token name = consumeToken(TokenType::IDENTIFIER, "Expected function name");
+    
+    consume(TokenType::LPAREN, "Expected '(' after function name");
+    
+    std::vector<std::pair<std::string, std::string>> parameters;
+    if (!check(TokenType::RPAREN)) {
+        do {
+            Token param_name = consumeToken(TokenType::IDENTIFIER, "Expected parameter name");
+            std::string param_type;
+            
+            if (match({TokenType::COLON})) {
+                Token type = consumeToken(TokenType::IDENTIFIER, "Expected parameter type");
+                param_type = type.lexeme;
+            }
+            
+            parameters.push_back({param_name.lexeme, param_type});
+        } while (match({TokenType::COMMA}));
+    }
+    
+    consume(TokenType::RPAREN, "Expected ')' after parameters");
+    
+    std::string return_type;
+    if (match({TokenType::ARROW})) {
+        Token type = consumeToken(TokenType::IDENTIFIER, "Expected return type");
+        return_type = type.lexeme;
+    }
+    
+    consume(TokenType::COLON, "Expected ':' before function body");
+    skipNewlines();
+    consume(TokenType::INDENT, "Expected indented block");
+    
+    auto body = block();
+    
+    return std::make_unique<FunctionDecl>(name.lexeme, std::move(parameters),
+                                          return_type, std::move(body), is_async);
+}
+
+std::unique_ptr<Stmt> Parser::statement() {
+    if (match({TokenType::RETURN})) return returnStatement();
+    if (match({TokenType::IF})) return ifStatement();
+    if (match({TokenType::WHILE})) return whileStatement();
+    if (match({TokenType::FOR})) return forStatement();
+    
+    return exprStatement();
+}
+
+std::unique_ptr<Stmt> Parser::exprStatement() {
+    auto expr = expression();
+    skipNewlines();
+    return std::make_unique<ExprStmt>(std::move(expr));
+}
+
+std::unique_ptr<Stmt> Parser::returnStatement() {
+    std::unique_ptr<Expr> value = nullptr;
+    
+    if (!check(TokenType::NEWLINE) && !isAtEnd()) {
+        value = expression();
+    }
+    
+    skipNewlines();
+    return std::make_unique<ReturnStmt>(std::move(value));
+}
+
+std::unique_ptr<Stmt> Parser::ifStatement() {
+    auto condition = expression();
+    consume(TokenType::COLON, "Expected ':' after if condition");
+    skipNewlines();
+    consume(TokenType::INDENT, "Expected indented block");
+    
+    auto then_branch = block();
+    
+    std::vector<std::unique_ptr<Stmt>> else_branch;
+    if (match({TokenType::ELSE})) {
+        consume(TokenType::COLON, "Expected ':' after else");
+        skipNewlines();
+        consume(TokenType::INDENT, "Expected indented block");
+        else_branch = block();
+    }
+    
+    return std::make_unique<IfStmt>(std::move(condition), std::move(then_branch),
+                                    std::move(else_branch));
+}
+
+std::unique_ptr<Stmt> Parser::whileStatement() {
+    auto condition = expression();
+    consume(TokenType::COLON, "Expected ':' after while condition");
+    skipNewlines();
+    consume(TokenType::INDENT, "Expected indented block");
+    
+    auto body = block();
+    
+    return std::make_unique<WhileStmt>(std::move(condition), std::move(body));
+}
+
+std::unique_ptr<Stmt> Parser::forStatement() {
+    Token var = consumeToken(TokenType::IDENTIFIER, "Expected variable name");
+    consume(TokenType::IN, "Expected 'in' in for loop");
+    auto iterable = expression();
+    consume(TokenType::COLON, "Expected ':' after for clause");
+    skipNewlines();
+    consume(TokenType::INDENT, "Expected indented block");
+    
+    auto body = block();
+    
+    return std::make_unique<ForStmt>(var.lexeme, std::move(iterable), std::move(body));
+}
+
+std::vector<std::unique_ptr<Stmt>> Parser::block() {
+    std::vector<std::unique_ptr<Stmt>> statements;
+    
+    while (!check(TokenType::DEDENT) && !isAtEnd()) {
+        skipNewlines();
+        if (!check(TokenType::DEDENT) && !isAtEnd()) {
+            statements.push_back(declaration());
+        }
+    }
+    
+    consume(TokenType::DEDENT, "Expected dedent");
+    return statements;
+}
+
+// Expression parsing
+
+std::unique_ptr<Expr> Parser::expression() {
+    return assignment();
+}
+
+std::unique_ptr<Expr> Parser::assignment() {
+    return logicalOr();
+}
+
+std::unique_ptr<Expr> Parser::logicalOr() {
+    auto expr = logicalAnd();
+    
+    while (match({TokenType::OR})) {
+        std::string op = previous().lexeme;
+        auto right = logicalAnd();
+        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+    }
+    
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::logicalAnd() {
+    auto expr = equality();
+    
+    while (match({TokenType::AND})) {
+        std::string op = previous().lexeme;
+        auto right = equality();
+        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+    }
+    
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::equality() {
+    auto expr = comparison();
+    
+    while (match({TokenType::EQUAL_EQUAL, TokenType::NOT_EQUAL})) {
+        std::string op = previous().lexeme;
+        auto right = comparison();
+        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+    }
+    
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::comparison() {
+    auto expr = term();
+    
+    while (match({TokenType::GREATER, TokenType::GREATER_EQUAL,
+                  TokenType::LESS, TokenType::LESS_EQUAL})) {
+        std::string op = previous().lexeme;
+        auto right = term();
+        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+    }
+    
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::term() {
+    auto expr = factor();
+    
+    while (match({TokenType::PLUS, TokenType::MINUS})) {
+        std::string op = previous().lexeme;
+        auto right = factor();
+        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+    }
+    
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::factor() {
+    auto expr = unary();
+    
+    while (match({TokenType::STAR, TokenType::SLASH, TokenType::PERCENT})) {
+        std::string op = previous().lexeme;
+        auto right = unary();
+        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+    }
+    
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::unary() {
+    if (match({TokenType::NOT, TokenType::MINUS})) {
+        std::string op = previous().lexeme;
+        auto right = unary();
+        return std::make_unique<UnaryExpr>(op, std::move(right));
+    }
+    
+    return power();
+}
+
+std::unique_ptr<Expr> Parser::power() {
+    auto expr = call();
+    
+    if (match({TokenType::POWER})) {
+        auto right = power();
+        return std::make_unique<BinaryExpr>(std::move(expr), "**", std::move(right));
+    }
+    
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::call() {
+    auto expr = primary();
+    
+    while (true) {
+        if (match({TokenType::LPAREN})) {
+            std::vector<std::unique_ptr<Expr>> arguments;
+            
+            if (!check(TokenType::RPAREN)) {
+                do {
+                    arguments.push_back(expression());
+                } while (match({TokenType::COMMA}));
+            }
+            
+            consume(TokenType::RPAREN, "Expected ')' after arguments");
+            expr = std::make_unique<CallExpr>(std::move(expr), std::move(arguments));
+        } else if (match({TokenType::LBRACKET})) {
+            auto index = expression();
+            consume(TokenType::RBRACKET, "Expected ']' after index");
+            expr = std::make_unique<IndexExpr>(std::move(expr), std::move(index));
+        } else {
+            break;
+        }
+    }
+    
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::primary() {
+    if (match({TokenType::TRUE})) {
+        return std::make_unique<LiteralExpr>(LiteralExpr::Type::BOOLEAN, "true");
+    }
+    if (match({TokenType::FALSE})) {
+        return std::make_unique<LiteralExpr>(LiteralExpr::Type::BOOLEAN, "false");
+    }
+    if (match({TokenType::NONE})) {
+        return std::make_unique<LiteralExpr>(LiteralExpr::Type::NONE, "none");
+    }
+    
+    if (match({TokenType::INTEGER})) {
+        return std::make_unique<LiteralExpr>(LiteralExpr::Type::INTEGER, previous().lexeme);
+    }
+    if (match({TokenType::FLOAT})) {
+        return std::make_unique<LiteralExpr>(LiteralExpr::Type::FLOAT, previous().lexeme);
+    }
+    if (match({TokenType::STRING})) {
+        return std::make_unique<LiteralExpr>(LiteralExpr::Type::STRING, previous().lexeme);
+    }
+    
+    if (match({TokenType::IDENTIFIER})) {
+        return std::make_unique<VariableExpr>(previous().lexeme);
+    }
+    
+    if (match({TokenType::LBRACKET})) {
+        std::vector<std::unique_ptr<Expr>> elements;
+        
+        if (!check(TokenType::RBRACKET)) {
+            do {
+                elements.push_back(expression());
+            } while (match({TokenType::COMMA}));
+        }
+        
+        consume(TokenType::RBRACKET, "Expected ']' after list elements");
+        return std::make_unique<ListExpr>(std::move(elements));
+    }
+    
+    if (match({TokenType::LPAREN})) {
+        auto expr = expression();
+        consume(TokenType::RPAREN, "Expected ')' after expression");
+        return expr;
+    }
+    
+    throw error(peek(), "Expected expression");
+}
+
+} // namespace sapphire

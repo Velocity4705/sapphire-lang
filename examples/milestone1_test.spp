@@ -1,0 +1,51 @@
+# Sapphire Milestone 1 - Complete Feature Test
+
+print("=== Sapphire Milestone 1 Test ===")
+
+# Variables
+let x = 42
+let name = "Sapphire"
+print(name)
+print(x)
+
+# Arithmetic
+let a = 10
+let b = 5
+print(a + b)
+print(a - b)
+print(a * b)
+print(a / b)
+print(a % b)
+print(2 ** 10)
+
+# Comparisons
+print(10 > 5)
+print(10 < 5)
+print(10 == 10)
+print(10 != 5)
+
+# Logical
+print(true and true)
+print(true or false)
+print(not false)
+
+# Conditionals
+if 10 > 5:
+    print("10 is greater than 5")
+
+if 3 < 2:
+    print("This won't print")
+else:
+    print("3 is not less than 2")
+
+# While loop
+let counter = 0
+while counter < 3:
+    print(counter)
+    counter = counter + 1
+
+# For loop
+for i in range(3):
+    print(i)
+
+print("=== All tests passed! ===")

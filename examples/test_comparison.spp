@@ -1,0 +1,7 @@
+# Test comparison operations
+let x = 15
+let y = 10
+let gt = x > y
+let lt = x < y
+let eq = x == y
+let ne = x != y

@@ -1,0 +1,43 @@
+# Generic functions test
+
+# Generic identity function
+fn identity<T>(x: T) -> T:
+    return x
+
+# Generic max function with constraint
+fn max<T: Comparable>(a: T, b: T) -> T:
+    if a > b:
+        return a
+    else:
+        return b
+
+# Generic list operations
+fn first<T>(list: List<T>) -> T:
+    return list[0]
+
+fn map<T, U>(f: fn(T) -> U, list: List<T>) -> List<U>:
+    let result = []
+    for item in list:
+        result.append(f(item))
+    return result
+
+# Test usage
+let x = identity(42)
+let y = identity("hello")
+
+print(x)
+print(y)
+
+let bigger = max(10, 20)
+print(bigger)
+
+let numbers = [1, 2, 3, 4, 5]
+let first_num = first(numbers)
+print(first_num)
+
+# Map with lambda
+fn square(n: int) -> int:
+    return n * n
+
+let squared = map(square, numbers)
+print(squared)

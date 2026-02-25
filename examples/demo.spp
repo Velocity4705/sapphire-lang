@@ -1,0 +1,35 @@
+# Sapphire Demo - Milestone 1
+
+# Variables and arithmetic
+let x = 10
+let y = 20
+let sum = x + y
+print(sum)
+
+# More operations
+let product = x * y
+let power = 2 ** 8
+print(product)
+print(power)
+
+# Comparisons
+let is_greater = x > 5
+print(is_greater)
+
+# Conditionals
+if x > 15:
+    print("x is greater than 15")
+else:
+    print("x is 15 or less")
+
+# While loop
+let counter = 0
+while counter < 3:
+    print(counter)
+    counter = counter + 1
+
+# For loop with range
+for i in range(5):
+    print(i)
+
+print("Demo complete!")

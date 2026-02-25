@@ -1,0 +1,101 @@
+# Data Science & Machine Learning in Sapphire
+
+import ml::{tensor, nn, optim, metrics}
+import data::{DataFrame, Series, plot}
+import numpy as np
+
+# ============ Data Processing ============
+fn load_and_clean_data(path: str) -> DataFrame:
+    let df = DataFrame.read_csv(path)
+    
+    # Pandas-like operations
+    df = df.dropna()
+    df["age_group"] = df["age"].apply(lambda x: 
+        "young" if x < 30 else "middle" if x < 60 else "senior"
+    )
+    
+    # Feature engineering
+    df["total_spend"] = df["quantity"] * df["price"]
+    
+    return df
+
+# ============ Statistical Analysis ============
+fn analyze_sales(df: DataFrame):
+    # Group by and aggregate
+    let summary = df.groupby("category").agg({
+        "sales": ["mean", "sum", "std"],
+        "quantity": "count"
+    })
+    
+    # Correlation matrix
+    let corr = df[["price", "quantity", "sales"]].corr()
+    
+    # Visualization
+    plot.figure(figsize=(12, 6))
+    plot.subplot(1, 2, 1)
+    plot.bar(summary.index, summary["sales"]["sum"])
+    plot.title("Sales by Category")
+    
+    plot.subplot(1, 2, 2)
+    plot.heatmap(corr, annot=true)
+    plot.title("Correlation Matrix")
+    plot.show()
+
+# ============ Machine Learning Model ============
+
+class NeuralNetwork:
+    impl nn.Module:
+        fn __init__(self, input_size: int, hidden_size: int, output_size: int):
+            self.fc1 = nn.Linear(input_size, hidden_size)
+            self.dropout = nn.Dropout(0.2)
+            self.fc2 = nn.Linear(hidden_size, hidden_size)
+            self.fc3 = nn.Linear(hidden_size, output_size)
+        
+        fn forward(self, x: Tensor) -> Tensor:
+            x = self.fc1(x).relu()
+            x = self.dropout(x)
+            x = self.fc2(x).relu()
+            return self.fc3(x)
+
+# ============ Training Pipeline ============
+async fn train_model(X_train: Tensor, y_train: Tensor, epochs: int = 100):
+    let model = NeuralNetwork(input_size=X_train.shape[1], hidden_size=128, output_size=10)
+    let optimizer = optim.Adam(model.parameters(), lr=0.001)
+    let criterion = nn.CrossEntropyLoss()
+    
+    for epoch in range(epochs):
+        # Forward pass
+        let outputs = model(X_train)
+        let loss = criterion(outputs, y_train)
+        
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        if epoch % 10 == 0:
+            let accuracy = metrics.accuracy(outputs.argmax(dim=1), y_train)
+            print(f"Epoch {epoch}, Loss: {loss.item():.4f}, Accuracy: {accuracy:.4f}")
+    
+    return model
+
+# ============ Main Analysis ============
+async fn main():
+    # Load data
+    let df = load_and_clean_data("sales_data.csv")
+    print(f"Loaded {len(df)} records")
+    
+    # Statistical analysis
+    analyze_sales(df)
+    
+    # Prepare ML data
+    let X = tensor.from_numpy(df[["feature1", "feature2", "feature3"]].values)
+    let y = tensor.from_numpy(df["target"].values)
+    
+    # Train model
+    let model = await train_model(X, y, epochs=100)
+    
+    # Evaluate
+    let predictions = model(X).argmax(dim=1)
+    let accuracy = metrics.accuracy(predictions, y)
+    print(f"Final Accuracy: {accuracy:.4f}")

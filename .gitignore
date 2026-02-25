@@ -1,0 +1,68 @@
+# Build artifacts
+build/
+bin/
+lib/
+obj/
+*.o
+*.so
+*.dylib
+*.dll
+*.a
+
+# Executables
+sapphire
+sapp
+spm
+sapphire-lsp
+sapphire-debug
+test_lexer
+test_type_inference
+
+# Compiler outputs
+*.ll
+*.bc
+*.s
+*.out
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Package manager
+.spm/
+spm.lock
+vendor/
+
+# Test outputs
+test_results/
+coverage/
+*.gcov
+*.gcda
+*.gcno
+
+# Profiling
+*.prof
+*.perf
+flamegraph.svg
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
+__pycache__/
+*.pyc
+
+# Documentation build
+docs/_build/
+site/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

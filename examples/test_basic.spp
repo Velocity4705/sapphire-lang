@@ -1,0 +1,29 @@
+# Basic Sapphire test
+
+# Variables
+let x = 42
+let y = 10
+let z = x + y
+print(z)
+
+# Arithmetic
+let a = 5 * 3
+let b = 20 / 4
+print(a)
+print(b)
+
+# Conditionals
+if x > 40:
+    print("x is large")
+else:
+    print("x is small")
+
+# Loops
+let i = 0
+while i < 5:
+    print(i)
+    i = i + 1
+
+# For loop
+for j in range(3):
+    print(j)

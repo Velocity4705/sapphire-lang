@@ -1,0 +1,82 @@
+# Sapphire Language Showcase
+# Demonstrating features from multiple languages
+
+# ============ Python-style syntax ============
+fn fibonacci(n: int) -> int:
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+# ============ Rust-style error handling ============
+fn divide(a: int, b: int) -> Result<float, str>:
+    if b == 0:
+        return Err("Division by zero")
+    return Ok(a / b)
+
+# ============ Go-style concurrency ============
+async fn fetch_data(url: str) -> str:
+    # Goroutine-style lightweight threads
+    response = await http.get(url)
+    return response.body
+
+# ============ Pattern matching (Rust/Kotlin) ============
+fn process_result(result: Result<int, str>) -> str:
+    match result:
+        Ok(value) if value > 100:
+            return f"Large value: {value}"
+        Ok(value):
+            return f"Value: {value}"
+        Err(msg):
+            return f"Error: {msg}"
+
+# ============ List comprehensions (Python) ============
+fn get_evens(numbers: List<int>) -> List<int>:
+    return [x for x in numbers if x % 2 == 0]
+
+# ============ Generics (C++/Rust) ============
+fn max<T: Comparable>(a: T, b: T) -> T:
+    return a if a > b else b
+
+# ============ Ownership (Rust-inspired, optional) ============
+fn process_data(data: owned String) -> String:
+    # 'owned' means this function takes ownership
+    let processed = data.to_uppercase()
+    return processed  # ownership transferred to caller
+
+# ============ Async/await (JavaScript/C#) ============
+async fn main():
+    # Concurrent execution
+    let urls = ["https://api1.com", "https://api2.com"]
+    let results = await Promise.all([fetch_data(url) for url in urls])
+    
+    # Pattern matching
+    for result in results:
+        match result:
+            Ok(data):
+                print(f"Success: {data}")
+            Err(e):
+                print(f"Failed: {e}")
+    
+    # Channels (Go-style)
+    let (sender, receiver) = channel<int>()
+    
+    spawn:
+        for i in range(10):
+            sender.send(i)
+        sender.close()
+    
+    for value in receiver:
+        print(value)
+    
+    # Optional chaining (TypeScript)
+    let user = get_user()
+    let email = user?.profile?.email ?? "no-email@example.com"
+    
+    # Context manager (Python)
+    with open("file.txt") as f:
+        content = f.read()
+    
+    # Defer (Go)
+    defer print("Cleanup executed")
+    
+    print("Program finished")
