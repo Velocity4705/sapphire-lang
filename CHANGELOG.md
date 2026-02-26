@@ -65,6 +65,8 @@ This is the first stable release of Sapphire, a modern programming language comb
 - ✅ Enhanced REPL with auto-completion
 - ✅ Debugger integration
 - ✅ Professional development workflow
+- ✅ Auto-update system (`sapp --update`)
+- ✅ One-line installer
 
 #### Multi-Platform Support (Milestone 8)
 - ✅ WASM backend for web deployment

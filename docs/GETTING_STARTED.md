@@ -16,14 +16,32 @@ Sapphire is a modern programming language that combines:
 - C++20 compiler (g++ or clang++)
 - LLVM (optional, for code generation)
 - Make
+- Git
 
 ### Build from Source
 
+**Option 1: SSH (Recommended - No password needed)**
+
 ```bash
+# First time setup (run once)
+bash <(curl -s https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/scripts/setup_git_ssh.sh)
+
+# Clone and build
+git clone git@github.com:Velocity4705/sapphire-lang.git
+cd sapphire-lang
+make quick
+```
+
+**Option 2: HTTPS (Requires Personal Access Token)**
+
+```bash
+# Clone and build
 git clone https://github.com/Velocity4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```
+
+**Having authentication issues?** See [Git Setup Guide](GIT_SETUP.md) for detailed help.
 
 This creates the `sapp` compiler.
 

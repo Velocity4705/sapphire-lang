@@ -18,9 +18,68 @@ void printUsage(const char* program) {
     std::cout << "  sapp <file.spp>              # Run a program (interpreter)\n";
     std::cout << "  sapp compile <file.spp>      # Compile and show LLVM IR\n";
     std::cout << "  sapp --version               # Show version\n";
+    std::cout << "  sapp --update                # Update to latest version\n";
     std::cout << "  sapp --help                  # Show this help\n";
     std::cout << "\nNote: 'sapphire' is an alias for 'sapp'\n";
     std::cout << "\nMilestone 4 COMPLETE - Memory Management! 🎉\n";
+}
+
+void checkForUpdates() {
+    std::cout << "Checking for updates...\n";
+    int result = system("git fetch origin main 2>/dev/null");
+    if (result != 0) {
+        std::cout << "✗ Could not check for updates (not in git repository)\n";
+        return;
+    }
+    
+    result = system("git rev-list HEAD...origin/main --count 2>/dev/null | grep -q '^0$'");
+    if (result == 0) {
+        std::cout << "✓ You're already on the latest version!\n";
+    } else {
+        std::cout << "⚠ Updates available!\n";
+        std::cout << "\nRun: sapp --update\n";
+    }
+}
+
+void updateSapphire() {
+    std::cout << "╔══════════════════════════════════════════════════════════════╗\n";
+    std::cout << "║         Updating Sapphire...                                  ║\n";
+    std::cout << "╚══════════════════════════════════════════════════════════════╝\n\n";
+    
+    // Check if in git repository
+    int result = system("git rev-parse --git-dir >/dev/null 2>&1");
+    if (result != 0) {
+        std::cout << "✗ Not in a git repository. Please reinstall:\n";
+        std::cout << "  curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash\n";
+        return;
+    }
+    
+    // Stash local changes
+    std::cout << "Saving local changes...\n";
+    system("git stash >/dev/null 2>&1");
+    
+    // Pull latest
+    std::cout << "Downloading updates...\n";
+    result = system("git pull origin main");
+    if (result != 0) {
+        std::cout << "✗ Update failed. Try manually:\n";
+        std::cout << "  git pull origin main\n";
+        std::cout << "  make quick\n";
+        return;
+    }
+    
+    // Rebuild
+    std::cout << "\nRebuilding...\n";
+    result = system("make quick");
+    if (result != 0) {
+        std::cout << "✗ Build failed. Check errors above.\n";
+        return;
+    }
+    
+    std::cout << "\n╔══════════════════════════════════════════════════════════════╗\n";
+    std::cout << "║  ✓ Sapphire updated successfully!                            ║\n";
+    std::cout << "╚══════════════════════════════════════════════════════════════╝\n";
+    std::cout << "\nRun: sapp --version\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -33,6 +92,16 @@ int main(int argc, char* argv[]) {
     
     if (arg == "--version") {
         std::cout << "Sapphire v1.0.0 (Production Release)\n";
+        return 0;
+    }
+    
+    if (arg == "--update") {
+        updateSapphire();
+        return 0;
+    }
+    
+    if (arg == "--check-updates") {
+        checkForUpdates();
         return 0;
     }
     

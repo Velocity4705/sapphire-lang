@@ -68,6 +68,7 @@ Complete development workflow:
 - Documentation generator
 - Enhanced REPL with auto-completion
 - Debugger integration
+- **Auto-update system** (`sapp --update`)
 
 ### Multi-Platform Support
 
@@ -91,12 +92,24 @@ Cutting-edge language capabilities:
 
 ## Getting Started
 
-### Installation
+### One-Line Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash
+```
+
+### Manual Installation
 
 ```bash
 git clone https://github.com/Velocity4705/sapphire-lang.git
 cd sapphire-lang
 make quick
+```
+
+### Update
+
+```bash
+sapp --update
 ```
 
 ### Hello World

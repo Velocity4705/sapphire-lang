@@ -55,27 +55,86 @@ One language for everything: web apps, systems programming, ML, mobile, CLI tool
 ### 🔧 Complete Tooling
 Package manager (`spm`), code formatter, build system, test runner. Everything you need, nothing you don't.
 
+**Auto-update:** `sapp --update` keeps you on the latest version.
+
 ### 📚 Rich Standard Library
 String, Vec, HashMap, File I/O, Math, JSON, Base64, CLI parsing. Batteries included.
 
 ---
 
-## Quick Start
+## Installation
+
+### One-Line Install (Recommended)
 
 ```bash
-# Clone and build
+curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash
+```
+
+This will:
+- Check prerequisites (g++, make, git)
+- Clone the repository
+- Build Sapphire automatically
+- Optionally install system-wide
+
+**See [INSTALL.md](INSTALL.md) for detailed installation instructions.**
+
+### Build from Source
+
+```bash
+# Clone the repository
 git clone https://github.com/Velocity4705/sapphire-lang.git
 cd sapphire-lang
+
+# Build
 make quick
 
-# Run your first program
+# Run
 ./sapp examples/hello.spp
 ```
+
+### System-Wide Installation
+
+```bash
+# After building, install to /usr/local/bin
+sudo cp sapp /usr/local/bin/
+sudo cp sapphire /usr/local/bin/
+sudo cp spm /usr/local/bin/
+sudo cp sapphire-fmt /usr/local/bin/
+
+# Now run from anywhere
+sapp --version
+```
+
+### Prerequisites
+
+- C++20 compiler (g++ or clang++)
+- Make
+- Git
+- LLVM (optional, for native compilation)
+
+### Update
+
+```bash
+# Check for updates
+sapp --check-updates
+
+# Update to latest version
+sapp --update
+```
+
+---
+
+## Quick Start
 
 ### Hello World
 
 ```sapphire
 print("Hello, Sapphire! 💎")
+```
+
+Run it:
+```bash
+./sapp examples/hello.spp
 ```
 
 ### Basic Operations
@@ -90,14 +149,6 @@ print(sum)  # 30
 # Comparisons
 let is_greater = x > 5
 print(is_greater)  # true
-```
-
-**Try it now:**
-```bash
-git clone https://github.com/Velocity4705/sapphire-lang.git
-cd sapphire-lang
-make quick
-./sapp examples/hello.spp
 ```
 
 ---
