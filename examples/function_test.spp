@@ -1,0 +1,9 @@
+# Test function definitions and calls
+fn add(x, y):
+    return x + y
+
+fn multiply(a, b):
+    return a * b
+
+let result1 = add(10, 20)
+let result2 = multiply(5, 6)

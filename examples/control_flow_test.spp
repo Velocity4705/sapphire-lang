@@ -1,0 +1,13 @@
+# Test control flow
+let x = 10
+let y = 20
+
+if x < y:
+    let bigger = y
+else:
+    let bigger = x
+
+let i = 0
+while i < 5:
+    let temp = i * 2
+    i = i + 1

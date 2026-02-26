@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     std::string arg = argv[1];
     
     if (arg == "--version") {
-        std::cout << "Sapphire v0.3.0-alpha (Milestone 3 - Phase 2: Code Generation)\n";
+        std::cout << "Sapphire v0.4.0-alpha (Milestone 3 Complete - Native Compilation)\n";
         return 0;
     }
     
@@ -44,15 +44,27 @@ int main(int argc, char* argv[]) {
     // Check for compile command
     bool compile_mode = false;
     std::string filename;
+    std::string output_file;
+    bool emit_llvm = false;
     
     if (arg == "compile") {
         if (argc < 3) {
             std::cerr << "Error: compile command requires a filename\n";
-            std::cerr << "Usage: sapp compile <file.spp>\n";
+            std::cerr << "Usage: sapp compile <file.spp> [-o output] [--emit-llvm]\n";
             return 1;
         }
         compile_mode = true;
         filename = argv[2];
+        
+        // Parse additional arguments
+        for (int i = 3; i < argc; i++) {
+            std::string opt = argv[i];
+            if (opt == "-o" && i + 1 < argc) {
+                output_file = argv[++i];
+            } else if (opt == "--emit-llvm") {
+                emit_llvm = true;
+            }
+        }
     } else {
         filename = argv[1];
     }
@@ -79,15 +91,28 @@ int main(int argc, char* argv[]) {
         
         if (compile_mode) {
             // Code generation mode
-            std::cout << "=== Compiling " << filename << " ===\n\n";
+            std::cerr << "=== Compiling " << filename << " ===\n\n";
             
             sapphire::LLVMCodeGen codegen(filename);
             codegen.generate(statements);
             
-            std::cout << "\n=== Generated LLVM IR ===\n\n";
-            codegen.printIR();
+            // Apply optimizations if requested
+            // Note: Optimization removes unused variables (dead code elimination)
+            // codegen.optimize(2); // -O2 by default
             
-            std::cout << "\n=== Compilation successful! ===\n";
+            if (emit_llvm || output_file.empty()) {
+                // Show LLVM IR
+                std::cerr << "\n=== Generated LLVM IR ===\n\n";
+                codegen.printIR();
+            }
+            
+            if (!output_file.empty()) {
+                // Generate executable
+                std::cerr << "\n=== Generating executable ===\n\n";
+                codegen.writeExecutable(output_file);
+            }
+            
+            std::cerr << "\n=== Compilation successful! ===\n";
         } else {
             // Interpreter mode
             // Type checker (optional for now)

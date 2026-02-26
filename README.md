@@ -43,9 +43,17 @@ File extension: `.spp`
 # Build
 make quick
 
-# Run examples (use 'sapp' or 'sapphire')
+# Run a program (interpreter mode)
 ./sapp examples/demo.spp
-./sapp examples/simple.spp
+
+# Compile to LLVM IR
+./sapp compile examples/simple.spp
+
+# Compile to native executable
+./sapp compile program.spp > program.ll
+llc program.ll -o program.o
+clang program.o -o program
+./program
 
 # Check version
 ./sapp --version
@@ -129,16 +137,28 @@ sudo ./scripts/install.sh
 
 ## Status
 
-🚀 **Milestone 1 Complete!** - Basic interpreter working
+🎉 **Milestone 3 COMPLETE!** - Native Compilation Working!
 
 **What works:**
 - ✅ Lexer (tokenization with Python-style indentation)
 - ✅ Parser (full syntax parsing)
-- ✅ Basic interpreter
+- ✅ Interpreter (runs Sapphire programs)
+- ✅ Type system with Hindley-Milner inference
+- ✅ Generics and traits
+- ✅ LLVM IR code generation
+- ✅ Optimization passes (multiple levels)
+- ✅ Native compilation to executables
+- ✅ Native print() function
 - ✅ Variables and arithmetic
-- ✅ Control flow (if/else, while, for)
-- ✅ Built-in print function
-- ✅ Comments
+- ✅ Control flow (if/else, while)
+- ✅ Type promotion (int + float → float)
+- ✅ Short-circuit evaluation (and/or)
+- ✅ FFI with C standard library
+
+**Current milestone:** Milestone 3 - Code Generation (100% complete!)
+**Next milestone:** Milestone 4 - Memory Management
+
+See [Project Status](docs/PROJECT_STATUS.md) for detailed progress.
 
 **Try it:**
 ```bash

@@ -9,6 +9,7 @@
 // Forward declarations for LLVM types
 namespace llvm {
     class Value;
+    class Function;
 }
 
 namespace sapphire {
@@ -25,6 +26,8 @@ class VarDeclStmt;
 class IfStmt;
 class WhileStmt;
 class ForStmt;
+class FunctionDecl;
+class ReturnStmt;
 
 /**
  * LLVM Code Generator
@@ -68,6 +71,12 @@ private:
     void generateIfStmt(IfStmt* stmt);
     void generateWhileStmt(WhileStmt* stmt);
     void generateForStmt(ForStmt* stmt);
+    void generateFunctionDecl(FunctionDecl* stmt);
+    void generateReturnStmt(ReturnStmt* stmt);
+    
+    // Built-in functions
+    llvm::Value* generatePrintCall(CallExpr* expr);
+    llvm::Function* getPrintfFunction();
     
     // Module name
     std::string module_name_;

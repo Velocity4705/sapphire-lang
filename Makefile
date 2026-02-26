@@ -42,9 +42,18 @@ endif
 
 OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
-.PHONY: all build test install clean help run
+.PHONY: all build test install clean help run test-allocator
 
 all: help
+
+test-allocator: runtime/allocator.cpp runtime/allocator.h tests/runtime/test_allocator.cpp
+	@echo "Building allocator test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/allocator.cpp tests/runtime/test_allocator.cpp -o build/tests/test_allocator -lpthread
+	@echo "✓ Test built: build/tests/test_allocator"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_allocator
 
 help:
 	@echo "Sapphire Build System"

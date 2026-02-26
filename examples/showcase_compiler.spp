@@ -1,0 +1,38 @@
+# Sapphire Compiler Showcase
+# Demonstrates all working features in compiled mode
+
+# Integer arithmetic
+let a = 100
+let b = 50
+print(a)
+print(b)
+print(a + b)
+print(a - b)
+print(a * b)
+print(a / b)
+
+# Float arithmetic
+let x = 3.14
+let y = 2.0
+print(x)
+print(y)
+print(x + y)
+print(x * y)
+
+# Type promotion (int + float)
+let mixed = a + x
+print(mixed)
+
+# Comparisons
+let is_greater = a > b
+let is_equal = a == 100
+let is_less = b < a
+print(is_greater)
+print(is_equal)
+print(is_less)
+
+# Logical operations
+let both = is_greater and is_equal
+let either = is_less or is_equal
+print(both)
+print(either)

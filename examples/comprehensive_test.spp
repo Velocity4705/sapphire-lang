@@ -1,0 +1,25 @@
+# Comprehensive code generation test
+# Tests: variables, arithmetic, comparisons, type promotion
+
+# Integer arithmetic
+let a = 100
+let b = 50
+let sum = a + b
+let diff = a - b
+let prod = a * b
+let quot = a / b
+
+# Float arithmetic and type promotion
+let x = 3.14
+let y = 2.0
+let float_sum = x + y
+let mixed = a + x
+
+# Comparisons
+let is_greater = a > b
+let is_equal = sum == 150
+let is_less = b < a
+
+# Logical operations
+let both_true = is_greater and is_equal
+let either_true = is_less or is_equal

@@ -1,4 +1,5 @@
 #include "codegen_impl.h"
+#include <iostream>
 
 #ifdef HAVE_LLVM
 

@@ -37,6 +37,9 @@ struct LLVMCodeGenImpl {
     std::map<std::string, llvm::Value*> named_values;
     std::map<std::string, llvm::Type*> named_types;
     
+    // Function table: function name -> function
+    std::map<std::string, llvm::Function*> functions;
+    
     // Current function being generated
     llvm::Function* current_function;
     

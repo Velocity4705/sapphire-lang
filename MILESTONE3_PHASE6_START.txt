@@ -1,0 +1,295 @@
+================================================================================
+MILESTONE 3 - PHASE 6: STANDARD LIBRARY CORE
+================================================================================
+
+Date: February 26, 2026
+Phase: Standard Library Core
+Status: 🚀 STARTING
+
+================================================================================
+OBJECTIVE
+================================================================================
+
+Implement essential standard library functions so compiled Sapphire programs
+can perform I/O operations, especially print() for output.
+
+Current Problem:
+- Compiled programs can compute values but can't output anything
+- print() only works in interpreter mode
+- Need native implementation that works in compiled code
+
+Goal:
+- Native print() function that works in compiled executables
+- Basic I/O operations
+- Foundation for full standard library
+
+================================================================================
+PHASE 6 TASKS
+================================================================================
+
+Week 11-12 Plan:
+
+1. ✅ Print Function (Native Implementation)
+   - Declare printf from C stdlib
+   - Generate format strings for different types
+   - Handle int, float, bool, string
+   - Support multiple arguments
+
+2. ⏳ String Operations
+   - String concatenation
+   - String length
+   - String comparison
+   - Basic string methods
+
+3. ⏳ Math Functions
+   - Declare math.h functions
+   - sin, cos, tan, sqrt, pow, etc.
+   - Constants (PI, E)
+
+4. ⏳ I/O Basics
+   - File open/close
+   - File read/write
+   - stdin/stdout/stderr
+
+5. ⏳ Type Conversion
+   - int_to_string
+   - float_to_string
+   - string_to_int
+   - string_to_float
+
+6. ⏳ Memory Helpers
+   - malloc/free wrappers
+   - Array allocation
+   - String allocation
+
+================================================================================
+TECHNICAL APPROACH
+================================================================================
+
+Strategy: FFI (Foreign Function Interface) with C stdlib
+
+1. Declare External Functions
+   - Use LLVM's external function declarations
+   - Link with C standard library
+   - No need to reimplement everything
+
+2. Type Mapping
+   - Sapphire int → C int64_t
+   - Sapphire float → C double
+   - Sapphire string → C char*
+   - Sapphire bool → C bool
+
+3. Format String Generation
+   - int: "%lld\n"
+   - float: "%f\n"
+   - bool: "true\n" or "false\n"
+   - string: "%s\n"
+
+4. Variadic Functions
+   - printf is variadic (variable arguments)
+   - LLVM supports variadic function calls
+   - Need to handle different types
+
+================================================================================
+IMPLEMENTATION PLAN
+================================================================================
+
+Step 1: Declare printf
+```cpp
+// In codegen, declare external printf
+llvm::FunctionType* printf_type = llvm::FunctionType::get(
+    llvm::Type::getInt32Ty(context),
+    {llvm::PointerType::get(context, 0)},  // format string
+    true  // variadic
+);
+llvm::Function* printf_func = llvm::Function::Create(
+    printf_type,
+    llvm::Function::ExternalLinkage,
+    "printf",
+    module
+);
+```
+
+Step 2: Generate Format Strings
+```cpp
+// Create global constant strings for formats
+llvm::Constant* int_format = builder->CreateGlobalStringPtr("%lld\n");
+llvm::Constant* float_format = builder->CreateGlobalStringPtr("%f\n");
+llvm::Constant* str_format = builder->CreateGlobalStringPtr("%s\n");
+```
+
+Step 3: Generate Print Calls
+```cpp
+// For print(42)
+llvm::Value* format = int_format;
+llvm::Value* value = /* the value to print */;
+builder->CreateCall(printf_func, {format, value});
+```
+
+Step 4: Handle Different Types
+```cpp
+// Check the type of the argument
+if (value->getType()->isIntegerTy(64)) {
+    // Use int format
+} else if (value->getType()->isDoubleTy()) {
+    // Use float format
+} else if (value->getType()->isPointerTy()) {
+    // Use string format
+}
+```
+
+================================================================================
+CODE STRUCTURE
+================================================================================
+
+New Files:
+- src/codegen/stdlib.h - Stdlib function declarations
+- src/codegen/stdlib.cpp - Stdlib implementation
+- runtime/runtime.h - Runtime support
+- runtime/runtime.cpp - Runtime functions
+
+Modified Files:
+- src/codegen/llvm_codegen.cpp - Add stdlib support
+- src/codegen/codegen_impl.h - Add stdlib declarations
+- src/parser/parser.cpp - Recognize print as special
+
+================================================================================
+SUCCESS CRITERIA
+================================================================================
+
+✅ Phase 6 Complete When:
+1. print(42) works in compiled code
+2. print(3.14) works in compiled code
+3. print("hello") works in compiled code
+4. print(true) works in compiled code
+5. Can compile and run programs with output
+6. Output matches interpreter mode
+
+Example Test:
+```sapphire
+# test_print.spp
+print(42)
+print(3.14)
+print("Hello, World!")
+print(true)
+
+let x = 10
+let y = 20
+print(x + y)
+```
+
+Expected Output:
+```
+42
+3.14
+Hello, World!
+true
+30
+```
+
+================================================================================
+CHALLENGES
+================================================================================
+
+1. Variadic Functions
+   - printf takes variable arguments
+   - LLVM supports this but needs careful handling
+   - Solution: Use LLVM's variadic function support
+
+2. Type Detection
+   - Need to know type of argument at compile time
+   - Solution: Use LLVM type information
+
+3. String Literals
+   - Need to create global string constants
+   - Solution: CreateGlobalStringPtr
+
+4. Multiple Arguments
+   - print(x, y, z) should print all
+   - Solution: Generate multiple printf calls
+
+5. Format String Safety
+   - Must match format to type
+   - Solution: Generate correct format at compile time
+
+================================================================================
+TESTING PLAN
+================================================================================
+
+Test 1: Basic Print
+```sapphire
+print(42)
+```
+Expected: "42\n"
+
+Test 2: Float Print
+```sapphire
+print(3.14)
+```
+Expected: "3.14\n"
+
+Test 3: String Print
+```sapphire
+print("hello")
+```
+Expected: "hello\n"
+
+Test 4: Expression Print
+```sapphire
+let x = 10
+let y = 20
+print(x + y)
+```
+Expected: "30\n"
+
+Test 5: Multiple Prints
+```sapphire
+print(1)
+print(2)
+print(3)
+```
+Expected: "1\n2\n3\n"
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+Immediate:
+1. Add printf declaration to codegen
+2. Create format string constants
+3. Implement generateCallExpr for print
+4. Test with simple examples
+
+Then:
+5. Add more stdlib functions
+6. Implement string operations
+7. Add math functions
+8. Complete Phase 6
+
+Finally:
+9. Complete Milestone 3 (100%)
+10. Move to Milestone 4 (Memory Management)
+
+================================================================================
+ESTIMATED TIME
+================================================================================
+
+- printf implementation: 2-3 hours
+- Testing and debugging: 1-2 hours
+- Additional stdlib functions: 3-4 hours
+- Documentation: 1 hour
+
+Total: 7-10 hours (1-2 days)
+
+================================================================================
+LET'S BEGIN!
+================================================================================
+
+Starting with the most important function: print()
+
+This will unlock the ability to see output from compiled programs, making
+the compiler actually useful for real programs!
+
+🚀 Phase 6 - Standard Library Core - Starting Now!
+
+================================================================================
