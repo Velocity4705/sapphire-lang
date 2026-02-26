@@ -111,10 +111,12 @@ Allocator::Allocator()
 }
 
 Allocator::~Allocator() {
-    // Clean up size classes
+    // Clean up size classes (they will handle their own memory)
     for (size_t i = 0; i < NUM_SIZE_CLASSES; i++) {
         delete size_classes_[i];
     }
+    // Note: We don't free individual allocations here
+    // They should be freed explicitly or by GC
 }
 
 int Allocator::get_size_class_index(size_t size) const {
