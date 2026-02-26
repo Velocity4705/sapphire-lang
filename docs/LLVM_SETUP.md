@@ -290,19 +290,6 @@ After LLVM is installed and working:
 - [Kaleidoscope Tutorial](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/index.html)
 - [LLVM Language Reference](https://llvm.org/docs/LangRef.html)
 
-## Support
-
-If you encounter issues:
-
-1. Check this troubleshooting guide
-2. Search GitHub issues
-3. Ask on Discord (coming soon)
-4. Open a new GitHub issue with:
-   - Your OS and version
-   - LLVM version (`llvm-config --version`)
-   - Error messages
-   - Steps to reproduce
-
 ---
 
 **Ready to compile?** Install LLVM and let's build the second-fastest language! 🚀

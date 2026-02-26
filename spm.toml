@@ -4,8 +4,8 @@ version = "0.1.0"
 authors = ["Sapphire Contributors"]
 license = "MIT"
 description = "A universal programming language combining the best of all worlds"
-repository = "https://github.com/sapphire-lang/sapphire"
-homepage = "https://sapphire-lang.org"
+repository = "https://github.com/Velocity4705/sapphire-lang"
+homepage = "https://github.com/Velocity4705/sapphire-lang"
 keywords = ["compiler", "programming-language", "systems", "web", "ml"]
 
 [dependencies]

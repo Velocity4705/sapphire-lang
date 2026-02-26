@@ -96,10 +96,9 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ## Community
 
-- GitHub: https://github.com/sapphire-lang/sapphire
-- Discord: https://discord.gg/sapphire (coming soon)
-- Forum: https://forum.sapphire-lang.org (coming soon)
-- Twitter: @sapphire_lang (coming soon)
+- GitHub: https://github.com/Velocity4705/sapphire-lang
+- Issues: Report bugs and request features
+- Discussions: Ask questions and share ideas
 
 ## Performance Goals
 

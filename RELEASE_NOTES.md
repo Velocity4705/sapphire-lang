@@ -65,7 +65,7 @@ Complete development workflow:
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/sapphire-lang.git
+git clone https://github.com/Velocity4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```
@@ -177,7 +177,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Community
 
-- **GitHub**: github.com/yourusername/sapphire-lang
+- **GitHub**: github.com/Velocity4705/sapphire-lang
 - **Issues**: Report bugs and request features
 - **Discussions**: Ask questions and share ideas
 
@@ -203,17 +203,10 @@ Start building with Sapphire today!
 3. Try the examples
 4. Build something amazing!
 
-## Support
-
-- Documentation: `docs/` directory
-- Examples: `examples/` directory
-- Issues: GitHub Issues
-- Community: Coming soon!
-
 ---
 
 **Sapphire 1.0.0** - A modern programming language for the future.
 
-Built with 💎 by the Sapphire team.
+Built with 💎 by Velocity4705.
 
 Released: February 26, 2026

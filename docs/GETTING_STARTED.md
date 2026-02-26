@@ -20,7 +20,7 @@ Sapphire is a modern programming language that combines:
 ### Build from Source
 
 ```bash
-git clone https://github.com/yourusername/sapphire-lang.git
+git clone https://github.com/Velocity4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```

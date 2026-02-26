@@ -355,10 +355,9 @@ Combines features from:
 - Bug fixes
 
 ### Community Resources
-- GitHub: github.com/yourusername/sapphire-lang
+- GitHub: github.com/Velocity4705/sapphire-lang
 - Issues: Bug reports and feature requests
 - Discussions: Questions and ideas
-- Wiki: Community documentation
 
 ## Acknowledgments
 
@@ -397,7 +396,7 @@ We've built a modern, fast, safe, and practical programming language with:
 ### Start Using Sapphire Today!
 
 ```bash
-git clone https://github.com/yourusername/sapphire-lang.git
+git clone https://github.com/Velocity4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ./spm init my-project
@@ -415,7 +414,7 @@ make quick
 
 **Sapphire 1.0.0** - A modern programming language for the future.
 
-Built with 💎 by the Sapphire team.
+Built with 💎 by Velocity4705.
 
 **Status**: ✅ COMPLETE  
 **Version**: 1.0.0  

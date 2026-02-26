@@ -5,7 +5,7 @@ Thank you for your interest in contributing to Sapphire! This project aims to co
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/yourusername/sapphire.git`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/sapphire-lang.git`
 3. Create a branch: `git checkout -b feature/your-feature`
 4. Make your changes
 5. Run tests: `make test`

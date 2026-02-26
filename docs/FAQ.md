@@ -155,13 +155,13 @@ You choose based on your needs.
 
 **A:** Currently build from source:
 ```bash
-git clone https://github.com/sapphire-lang/sapphire.git
-cd sapphire
+git clone https://github.com/Velocity4705/sapphire-lang.git
+cd sapphire-lang
 make quick
 ./sapp examples/demo.spp
 ```
 
-Binary releases coming after Milestone 3.
+Binary releases coming soon.
 
 ### Q: Where can I learn Sapphire?
 

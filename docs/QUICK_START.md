@@ -6,8 +6,8 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/sapphire-lang/sapphire.git
-cd sapphire
+git clone https://github.com/Velocity4705/sapphire-lang.git
+cd sapphire-lang
 
 # Build (requires C++20 compiler)
 make quick
