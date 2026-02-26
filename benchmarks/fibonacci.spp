@@ -1,0 +1,19 @@
+# Fibonacci benchmark - Sapphire
+# Compute fibonacci numbers recursively
+
+let n = 35
+let result = 0
+
+# Simple iterative fibonacci
+let a = 0
+let b = 1
+let i = 0
+
+while i < n:
+    let temp = a + b
+    a = b
+    b = temp
+    i = i + 1
+
+result = b
+print(result)

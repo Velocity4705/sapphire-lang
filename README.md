@@ -78,22 +78,26 @@ make quick
 print("Hello, Sapphire! 💎")
 ```
 
-### Something More Interesting
+### Basic Operations
 
 ```sapphire
-# Type inference
-let numbers = [1, 2, 3, 4, 5]
+# Variables and arithmetic
+let x = 10
+let y = 20
+let sum = x + y
+print(sum)  # 30
 
-# Higher-order functions
-let sum = numbers.reduce(0, (a, b) => a + b)
-print(sum)  # 15
+# Comparisons
+let is_greater = x > 5
+print(is_greater)  # true
+```
 
-# Concurrency
-let ch = Channel<int>()
-spawn {
-    ch.send(42)
-}
-print(ch.recv())  # 42
+**Try it now:**
+```bash
+git clone https://github.com/Velocity4705/sapphire-lang.git
+cd sapphire-lang
+make quick
+./sapp examples/hello.spp
 ```
 
 ---
@@ -104,6 +108,10 @@ print(ch.recv())  # 42
 - Lexer, parser, interpreter
 - Type inference (Hindley-Milner)
 - Generics and traits
+- Control flow (if/else, while, for loops)
+- Function definitions
+- Classes and objects
+- String interpolation (f-strings)
 - LLVM code generation
 - Native compilation
 
@@ -123,9 +131,12 @@ print(ch.recv())  # 42
 ### ✅ Developer Tools
 - `spm` - Package manager
 - `sapphire-fmt` - Code formatter
+- Enhanced REPL with auto-completion
+- Debugger integration
 - Build system
 - Test runner
 - Documentation generator
+- Package registry
 
 ### ✅ Standard Library
 - Core: String, Vec, HashMap
@@ -134,6 +145,12 @@ print(ch.recv())  # 42
 - JSON: Parser & serializer
 - Encoding: Base64
 - CLI: Argument parser
+- HTTP: Client & server
+- Regex: Regular expressions
+- DateTime: Date and time utilities
+- Crypto: Cryptographic functions
+- Compression: Gzip, Zlib
+- Database: SQLite integration
 
 ---
 
@@ -143,6 +160,58 @@ print(ch.recv())  # 42
 **Released:** February 26, 2026  
 **Tests:** 83+ passing (100% pass rate)  
 **Milestones:** 10/10 Complete ✅
+
+### Language Features (v1.0.0)
+
+- ✅ Variables and expressions
+- ✅ Arithmetic operations (+, -, *, /, **, %)
+- ✅ Comparison operators (>, <, >=, <=, ==, !=)
+- ✅ Boolean logic (and, or, not)
+- ✅ Control flow (if/else, while, for loops)
+- ✅ Function definitions
+- ✅ String interpolation (f-strings)
+- ✅ Classes and objects
+- ✅ Print statements
+- ✅ LLVM code generation
+- ✅ Native compilation
+- ✅ WASM backend for web deployment
+- ✅ Self-hosting compiler (written in Sapphire)
+
+### Runtime & Libraries (v1.0.0)
+
+- ✅ Complete runtime system (GC, memory safety, concurrency)
+- ✅ Standard library (String, Vec, HashMap, File, Math, JSON, Base64, CLI)
+- ✅ HTTP client/server
+- ✅ Regular expressions
+- ✅ DateTime utilities
+- ✅ Package manager (spm)
+- ✅ Package registry
+- ✅ Code formatter
+- ✅ Enhanced REPL with auto-completion
+- ✅ Debugger integration
+
+### Mobile & GUI (v1.0.0)
+
+- ✅ iOS support (native compilation)
+- ✅ Android support (native compilation)
+- ✅ Platform directives (#[ios], #[android], #[mobile])
+- ✅ Native API access (camera, GPS, sensors, notifications)
+- ✅ Cross-platform GUI framework
+- ✅ Flutter-like declarative UI
+- ✅ Hot reload for rapid development
+- ✅ Native performance on mobile
+
+### Advanced Features (v1.0.0)
+
+- ✅ Advanced type system (dependent types, higher-kinded types, type-level computation)
+- ✅ Macro system (compile-time metaprogramming, AST manipulation)
+- ✅ JIT compilation (runtime optimization, adaptive compilation)
+
+### Coming in v1.1
+
+- 🔄 IDE plugins (VSCode, IntelliJ)
+- 🔄 Package ecosystem growth
+- 🔄 Community website
 
 [📖 Release Notes](RELEASE_NOTES.md) | [📊 Project Summary](PROJECT_COMPLETE.md)
 
@@ -169,8 +238,13 @@ Build anything:
 
 📚 **[Getting Started](docs/GETTING_STARTED.md)** - Your first Sapphire program  
 🎨 **[Language Features](docs/LANGUAGE_FEATURES.md)** - What makes Sapphire special  
+📱 **[Platform Directives](docs/PLATFORM_DIRECTIVES.md)** - Mobile, web, and cross-platform development  
+🔬 **[Advanced Types](docs/ADVANCED_TYPES.md)** - Dependent types, higher-kinded types, type-level computation  
+🎭 **[Macros](docs/MACROS.md)** - Compile-time metaprogramming and code generation  
+⚡ **[JIT Compilation](docs/JIT_COMPILATION.md)** - Runtime optimization and adaptive compilation  
 🏗️ **[Architecture](docs/ARCHITECTURE.md)** - How it works under the hood  
 📖 **[Standard Library](docs/STANDARD_LIBRARY.md)** - Complete API reference  
+⚡ **[Performance Guide](PERFORMANCE.md)** - Benchmarks and optimization  
 🗺️ **[Roadmap](docs/ROADMAP.md)** - What's coming next
 
 ---

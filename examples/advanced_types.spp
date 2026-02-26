@@ -1,0 +1,132 @@
+// Advanced Type System Examples
+// Demonstrates dependent types, higher-kinded types, and type-level computation
+
+// Dependent Types - Types that depend on values
+type Vec<T, n: usize> {
+    data: [T; n]  // Array of exactly n elements
+}
+
+fn create_vec3() -> Vec<f64, 3> {
+    return Vec { data: [1.0, 2.0, 3.0] }
+}
+
+// Type-safe matrix multiplication with dimension checking
+fn matrix_multiply<T, m: usize, n: usize, p: usize>(
+    a: Matrix<T, m, n>,
+    b: Matrix<T, n, p>
+) -> Matrix<T, m, p> {
+    // Compiler ensures dimensions match at compile time
+    // n must be the same in both matrices
+    let result = Matrix::zeros()
+    for i in 0..m {
+        for j in 0..p {
+            for k in 0..n {
+                result[i][j] += a[i][k] * b[k][j]
+            }
+        }
+    }
+    return result
+}
+
+// Higher-Kinded Types - Types that take type constructors as parameters
+trait Functor<F<_>> {
+    fn map<A, B>(self: F<A>, f: fn(A) -> B) -> F<B>
+}
+
+trait Monad<M<_>>: Functor<M> {
+    fn pure<A>(value: A) -> M<A>
+    fn flat_map<A, B>(self: M<A>, f: fn(A) -> M<B>) -> M<B>
+}
+
+// Implement Monad for Option
+impl Monad<Option> for Option<T> {
+    fn pure<A>(value: A) -> Option<A> {
+        return Some(value)
+    }
+    
+    fn flat_map<A, B>(self: Option<A>, f: fn(A) -> Option<B>) -> Option<B> {
+        match self {
+            Some(x) => f(x),
+            None => None
+        }
+    }
+}
+
+// Type-Level Computation - Compute types at compile time
+type family Add(a: Nat, b: Nat) -> Nat {
+    Add(Zero, n) = n
+    Add(Succ(m), n) = Succ(Add(m, n))
+}
+
+// Proof that vector concatenation preserves length
+fn concat<T, m: usize, n: usize>(
+    a: Vec<T, m>,
+    b: Vec<T, n>
+) -> Vec<T, Add(m, n)> {
+    // Type system proves result has length m + n
+    let result = Vec::new()
+    result.extend(a)
+    result.extend(b)
+    return result
+}
+
+// Phantom types for compile-time state tracking
+type State<S> = phantom
+
+type Locked = State<"locked">
+type Unlocked = State<"unlocked">
+
+type Door<S> {
+    state: S
+}
+
+fn lock(door: Door<Unlocked>) -> Door<Locked> {
+    print("Door locked")
+    return Door { state: Locked }
+}
+
+fn unlock(door: Door<Locked>) -> Door<Unlocked> {
+    print("Door unlocked")
+    return Door { state: Unlocked }
+}
+
+// This won't compile - can't lock an already locked door
+// fn double_lock(door: Door<Locked>) -> Door<Locked> {
+//     return lock(door)  // Type error!
+// }
+
+// Refinement types - Types with predicates
+type NonZero = { x: i64 | x != 0 }
+type Positive = { x: i64 | x > 0 }
+type Range<min: i64, max: i64> = { x: i64 | min <= x && x <= max }
+
+fn safe_divide(a: i64, b: NonZero) -> i64 {
+    // Compiler guarantees b is never zero
+    return a / b
+}
+
+fn main() {
+    // Dependent types example
+    let v = create_vec3()
+    print(f"Vector: {v}")
+    
+    // Higher-kinded types example
+    let opt = Some(42)
+    let result = opt.flat_map(|x| Some(x * 2))
+    print(f"Result: {result}")
+    
+    // Type-level computation example
+    let a = Vec { data: [1, 2, 3] }
+    let b = Vec { data: [4, 5] }
+    let c = concat(a, b)  // Type is Vec<i64, 5>
+    
+    // Phantom types example
+    let door = Door { state: Unlocked }
+    let locked_door = lock(door)
+    let unlocked_door = unlock(locked_door)
+    
+    // Refinement types example
+    let divisor: NonZero = 5
+    let result = safe_divide(10, divisor)
+    print(f"10 / 5 = {result}")
+}

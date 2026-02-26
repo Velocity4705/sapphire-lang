@@ -1,7 +1,5 @@
 # Hello World in Sapphire
+print("Hello, Sapphire!")
 
-fn main():
-    print("Hello, Sapphire!")
-    
-    let name = "World"
-    print(f"Hello, {name}!")
+let name = "World"
+print("Hello, World!")

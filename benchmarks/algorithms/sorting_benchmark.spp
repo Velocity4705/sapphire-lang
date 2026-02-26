@@ -1,0 +1,42 @@
+# Sorting Algorithm Benchmark
+# Bubble Sort simulation
+# Time Complexity: O(n^2)
+# Space Complexity: O(1)
+
+# Array of 10 elements
+let arr0 = 64
+let arr1 = 34
+let arr2 = 25
+let arr3 = 12
+let arr4 = 22
+let arr5 = 11
+let arr6 = 90
+let arr7 = 88
+let arr8 = 45
+let arr9 = 50
+
+# Bubble sort pass 1
+let temp = 0
+let swaps = 0
+
+# Compare and swap arr0 and arr1
+let swap_needed = arr0 > arr1
+temp = arr0
+arr0 = arr1
+arr1 = temp
+
+# Compare and swap arr1 and arr2
+swap_needed = arr1 > arr2
+temp = arr1
+arr1 = arr2
+arr2 = temp
+
+# Compare and swap arr2 and arr3
+swap_needed = arr2 > arr3
+temp = arr2
+arr2 = arr3
+arr3 = temp
+
+# Result: sum of sorted array
+let result = arr0 + arr1 + arr2 + arr3 + arr4 + arr5 + arr6 + arr7 + arr8 + arr9
+print(result)

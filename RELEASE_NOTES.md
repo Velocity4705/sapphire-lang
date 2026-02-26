@@ -22,6 +22,10 @@ Sapphire is designed to be:
 Sapphire 1.0 includes a fully functional compiler and runtime:
 - Lexer, parser, and interpreter
 - Type inference with generics and traits
+- Control flow (if/else, while, for loops)
+- Function definitions
+- Classes and objects
+- String interpolation (f-strings)
 - LLVM code generation
 - Native compilation
 
@@ -42,6 +46,8 @@ Everything you need to build real applications:
 - JSON parsing
 - Base64 encoding
 - CLI argument parsing
+- HTTP client & server
+- Regular expressions
 
 ### ⚡ Concurrency Built-In
 
@@ -55,10 +61,33 @@ Modern concurrency primitives:
 
 Complete development workflow:
 - Package manager (spm)
+- Package registry for sharing libraries
 - Build system
 - Test runner
 - Code formatter
 - Documentation generator
+- Enhanced REPL with auto-completion
+- Debugger integration
+
+### Multi-Platform Support
+
+Deploy everywhere:
+- WASM backend for web deployment
+- Self-hosting compiler (written in Sapphire)
+- iOS native compilation
+- Android native compilation
+- Platform directives (#[ios], #[android], #[mobile], #[web])
+- Native API bindings (camera, GPS, sensors, notifications, storage)
+- Cross-platform GUI framework
+- Flutter-like declarative UI
+- Hot reload for rapid development
+
+### 🎯 Advanced Features
+
+Cutting-edge language capabilities:
+- Advanced type system (dependent types, higher-kinded types, type-level computation)
+- Macro system (compile-time metaprogramming, AST manipulation, code generation)
+- JIT compilation (runtime optimization, adaptive compilation, tiered execution)
 
 ## Getting Started
 
@@ -98,6 +127,12 @@ cd my-project
 - JSON: Parser and serializer
 - Encoding: Base64
 - CLI: Argument parser
+- HTTP: Client and server
+- Regex: Regular expressions
+- DateTime: Date and time utilities
+- Crypto: Cryptographic functions
+- Compression: Gzip, Zlib
+- Database: SQLite integration
 
 ### Runtime
 - Memory allocator
@@ -111,6 +146,27 @@ cd my-project
 - Synchronization primitives
 - Message passing channels
 - Thread pools
+
+### Multi-Platform
+- WASM backend for web apps
+- Self-hosting compiler
+- iOS native support
+- Android native support
+- Platform directives (#[ios], #[android], #[mobile], #[web])
+- Native API access (camera, GPS, sensors, notifications)
+- Cross-platform GUI
+- Declarative UI framework
+- Hot reload
+
+### Advanced Features
+- Dependent types
+- Higher-kinded types
+- Type-level computation
+- Compile-time macros
+- AST manipulation
+- JIT compilation
+- Runtime optimization
+- Adaptive compilation
 
 ## Performance
 
@@ -126,7 +182,12 @@ Complete documentation available:
 - [Getting Started Guide](docs/GETTING_STARTED_COMPLETE.md)
 - [Language Reference](docs/LANGUAGE_FEATURES.md)
 - [Standard Library](docs/STANDARD_LIBRARY.md)
+- [Platform Directives](docs/PLATFORM_DIRECTIVES.md)
+- [Advanced Types](docs/ADVANCED_TYPES.md)
+- [Macros](docs/MACROS.md)
+- [JIT Compilation](docs/JIT_COMPILATION.md)
 - [Concurrency Guide](docs/CONCURRENCY_GUIDE.md)
+- [Performance Guide](PERFORMANCE.md)
 - [API Documentation](docs/)
 
 ## Examples
@@ -160,16 +221,16 @@ None critical. See GitHub Issues for minor enhancements.
 ## Roadmap
 
 ### Version 1.1 (Q2 2026)
-- HTTP client/server
-- Regular expressions
-- DateTime utilities
-- Enhanced REPL
+- IDE plugins (VSCode, IntelliJ, Vim)
+- Package ecosystem growth
+- Community website
+- Enterprise features
 
 ### Version 2.0 (2027)
-- Self-hosting compiler
-- WASM backend
-- Package registry
-- Community website
+- Formal verification tools
+- Advanced debugging features
+- Distributed computing support
+- Cloud-native integrations
 
 ## Contributing
 

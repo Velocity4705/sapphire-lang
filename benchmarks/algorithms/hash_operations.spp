@@ -1,0 +1,33 @@
+# Hash Operations Benchmark
+# Time Complexity: O(1) average for insert/lookup
+# Space Complexity: O(n)
+
+# Simulate hash operations with arithmetic
+let key1 = 12345
+let key2 = 67890
+let key3 = 11111
+let key4 = 22222
+let key5 = 33333
+
+# Hash function simulation (modulo)
+let hash1 = key1 % 1000
+let hash2 = key2 % 1000
+let hash3 = key3 % 1000
+let hash4 = key4 % 1000
+let hash5 = key5 % 1000
+
+# Store values
+let val1 = hash1 * 2
+let val2 = hash2 * 2
+let val3 = hash3 * 2
+let val4 = hash4 * 2
+let val5 = hash5 * 2
+
+# Lookup and compute
+let result = val1 + val2 + val3 + val4 + val5
+
+# Collision handling simulation
+let collision_check = hash1 == hash2
+let collision_count = 0
+
+print(result)

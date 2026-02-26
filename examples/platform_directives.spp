@@ -1,0 +1,67 @@
+// Platform Directives Example
+// Shows how to write platform-specific code
+
+// Conditional compilation based on platform
+#[web]
+fn get_platform() -> String {
+    return "Web (WASM)"
+}
+
+#[ios]
+fn get_platform() -> String {
+    return "iOS"
+}
+
+#[android]
+fn get_platform() -> String {
+    return "Android"
+}
+
+#[desktop]
+fn get_platform() -> String {
+    return "Desktop"
+}
+
+// Platform-specific features
+#[mobile]
+fn use_mobile_features() {
+    // Access sensors
+    let accel = Accelerometer.new()
+    let data = accel.read()
+    print(f"Acceleration: x={data.x}, y={data.y}, z={data.z}")
+    
+    // Access storage
+    let storage = Storage.new()
+    storage.set("key", "value")
+    let value = storage.get("key")
+    
+    // Vibrate device
+    Haptics.vibrate(duration: 100)
+}
+
+#[web]
+fn use_web_features() {
+    // Access browser APIs
+    let window = Window.current()
+    window.alert("Hello from Sapphire!")
+    
+    // Local storage
+    let storage = LocalStorage.new()
+    storage.set("key", "value")
+}
+
+// Multi-platform code (runs everywhere)
+fn common_logic() {
+    print(f"Running on: {get_platform()}")
+    
+    // Platform-specific execution
+    #[mobile]
+    use_mobile_features()
+    
+    #[web]
+    use_web_features()
+}
+
+fn main() {
+    common_logic()
+}

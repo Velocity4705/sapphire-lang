@@ -1,0 +1,226 @@
+// JIT Compilation Examples
+// Demonstrates runtime optimization and adaptive compilation
+
+// Enable JIT compilation for hot functions
+#[jit]
+fn fibonacci(n: i64) -> i64 {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+// JIT with optimization hints
+#[jit(inline_threshold: 100, unroll_loops: true)]
+fn matrix_multiply(a: Matrix, b: Matrix) -> Matrix {
+    let result = Matrix::zeros(a.rows, b.cols)
+    for i in 0..a.rows {
+        for j in 0..b.cols {
+            for k in 0..a.cols {
+                result[i][j] += a[i][k] * b[k][j]
+            }
+        }
+    }
+    return result
+}
+
+// Tiered compilation - starts interpreted, compiles hot paths
+#[tiered_compilation]
+fn process_data(data: Vec<i64>) -> i64 {
+    let sum = 0
+    for x in data {
+        sum += x * x
+    }
+    return sum
+}
+
+// Profile-guided optimization
+#[pgo]
+fn search(arr: Vec<i64>, target: i64) -> Option<usize> {
+    // JIT compiler collects runtime statistics
+    // and optimizes based on actual usage patterns
+    for i in 0..arr.len() {
+        if arr[i] == target {
+            return Some(i)
+        }
+    }
+    return None
+}
+
+// Adaptive compilation - optimizes based on runtime behavior
+#[adaptive]
+fn sort(arr: Vec<i64>) -> Vec<i64> {
+    // JIT chooses best algorithm based on:
+    // - Array size
+    // - Data distribution
+    // - Hardware capabilities
+    
+    if arr.len() < 10 {
+        return insertion_sort(arr)
+    } else if is_nearly_sorted(arr) {
+        return tim_sort(arr)
+    } else {
+        return quick_sort(arr)
+    }
+}
+
+// Speculative optimization
+#[speculative]
+fn polymorphic_call(obj: Any) -> i64 {
+    // JIT speculatively optimizes for common types
+    // Falls back to generic path if speculation fails
+    return obj.compute()
+}
+
+// Runtime code generation
+fn create_specialized_function(operation: String) -> fn(i64, i64) -> i64 {
+    // Generate and compile function at runtime
+    let code = match operation {
+        "add" => "fn(a, b) { return a + b }",
+        "mul" => "fn(a, b) { return a * b }",
+        "pow" => "fn(a, b) { return a ** b }",
+        _ => "fn(a, b) { return 0 }"
+    }
+    
+    // JIT compile the generated code
+    return jit::compile(code)
+}
+
+// Inline caching for dynamic dispatch
+type Animal {
+    fn speak(self) -> String
+}
+
+type Dog: Animal {
+    fn speak(self) -> String {
+        return "Woof!"
+    }
+}
+
+type Cat: Animal {
+    fn speak(self) -> String {
+        return "Meow!"
+    }
+}
+
+#[inline_cache]
+fn make_sound(animal: Animal) {
+    // First call: polymorphic dispatch
+    // Subsequent calls: cached monomorphic dispatch
+    print(animal.speak())
+}
+
+// Deoptimization support
+#[jit(deopt_on_type_change: true)]
+fn process_value(value: Any) -> i64 {
+    // Optimized for specific type
+    // Deoptimizes if type changes
+    return value.to_int() * 2
+}
+
+// Loop optimization
+#[jit(vectorize: true, unroll: 4)]
+fn sum_array(arr: Vec<f64>) -> f64 {
+    let sum = 0.0
+    // JIT vectorizes this loop using SIMD
+    for x in arr {
+        sum += x
+    }
+    return sum
+}
+
+// Escape analysis and stack allocation
+#[jit(escape_analysis: true)]
+fn create_point(x: f64, y: f64) -> Point {
+    // JIT determines if Point escapes
+    // Allocates on stack if it doesn't escape
+    let p = Point { x, y }
+    return p
+}
+
+// Branch prediction hints
+fn predict_branch(condition: bool) {
+    if likely!(condition) {
+        // Hot path - JIT optimizes this branch
+        fast_operation()
+    } else {
+        // Cold path
+        slow_operation()
+    }
+}
+
+// JIT compilation statistics
+fn print_jit_stats() {
+    let stats = jit::get_stats()
+    print(f"Compiled functions: {stats.compiled_count}")
+    print(f"Compilation time: {stats.compile_time_ms}ms")
+    print(f"Speedup: {stats.speedup}x")
+    print(f"Deoptimizations: {stats.deopt_count}")
+}
+
+// Manual JIT control
+fn manual_jit_example() {
+    // Disable JIT for specific section
+    jit::disable()
+    slow_debug_code()
+    jit::enable()
+    
+    // Force compilation
+    jit::compile_function(hot_function)
+    
+    // Warm up JIT
+    for _ in 0..1000 {
+        hot_function()
+    }
+}
+
+// Benchmark JIT vs interpreted
+fn benchmark_jit() {
+    let data = Vec::range(0, 1000000)
+    
+    // Interpreted mode
+    jit::disable()
+    let start = time::now()
+    let result1 = process_data(data)
+    let interpreted_time = time::now() - start
+    
+    // JIT mode
+    jit::enable()
+    let start = time::now()
+    let result2 = process_data(data)
+    let jit_time = time::now() - start
+    
+    print(f"Interpreted: {interpreted_time}ms")
+    print(f"JIT: {jit_time}ms")
+    print(f"Speedup: {interpreted_time / jit_time}x")
+}
+
+fn main() {
+    print("=== JIT Compilation Demo ===\n")
+    
+    // Fibonacci with JIT
+    print("Computing fibonacci(35)...")
+    let start = time::now()
+    let result = fibonacci(35)
+    let elapsed = time::now() - start
+    print(f"Result: {result}, Time: {elapsed}ms\n")
+    
+    // Runtime code generation
+    let add_fn = create_specialized_function("add")
+    print(f"5 + 3 = {add_fn(5, 3)}\n")
+    
+    // Polymorphic dispatch with inline caching
+    let dog = Dog {}
+    let cat = Cat {}
+    make_sound(dog)  // First call - cache miss
+    make_sound(dog)  // Second call - cache hit
+    make_sound(cat)  // Different type - cache miss
+    
+    // JIT statistics
+    print("\n=== JIT Statistics ===")
+    print_jit_stats()
+    
+    // Benchmark
+    print("\n=== Benchmark ===")
+    benchmark_jit()
+}

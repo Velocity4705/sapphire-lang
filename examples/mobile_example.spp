@@ -1,0 +1,54 @@
+// Mobile Platform Example
+// Demonstrates platform-specific directives and native API access
+
+// Platform-specific code using directives
+#[mobile]
+fn get_device_info() -> String {
+    #[ios]
+    return "Running on iOS"
+    
+    #[android]
+    return "Running on Android"
+}
+
+// Access native mobile APIs
+#[mobile]
+fn capture_photo() {
+    let camera = Camera.new()
+    let photo = camera.capture()
+    photo.save("photo.jpg")
+}
+
+#[mobile]
+fn get_location() {
+    let gps = GPS.new()
+    let location = gps.current_location()
+    print(f"Latitude: {location.lat}, Longitude: {location.lon}")
+}
+
+#[mobile]
+fn send_notification() {
+    let notif = Notification.new()
+    notif.title = "Hello from Sapphire!"
+    notif.body = "Your app is running"
+    notif.send()
+}
+
+// Cross-platform GUI using declarative UI
+fn build_ui() -> Widget {
+    return Column([
+        Text("Welcome to Sapphire Mobile!"),
+        Button("Take Photo", on_click: capture_photo),
+        Button("Get Location", on_click: get_location),
+        Button("Send Notification", on_click: send_notification),
+        Text(get_device_info())
+    ])
+}
+
+// Main entry point
+fn main() {
+    let app = App.new()
+    app.title = "Sapphire Mobile Demo"
+    app.root = build_ui()
+    app.run()
+}

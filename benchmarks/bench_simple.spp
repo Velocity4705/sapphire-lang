@@ -1,0 +1,25 @@
+# Simple computation benchmark
+let a = 123456
+let b = 789012
+
+let c = a + b
+let d = a * b
+let e = a - b
+let f = a / 2
+
+let g = c + d
+let h = e + f
+let i = g * h
+
+let j = i + a
+let k = j + b
+let l = k + c
+
+let m = l * 2
+let n = m * 3
+let o = n * 4
+
+let p = o + a + b + c
+let q = p * 2
+
+print(q)

@@ -1,0 +1,43 @@
+# Matrix Multiplication
+# Time Complexity: O(n^3)
+# Space Complexity: O(n^2)
+
+# 3x3 matrix multiplication
+# Matrix A
+let a00 = 1
+let a01 = 2
+let a02 = 3
+let a10 = 4
+let a11 = 5
+let a12 = 6
+let a20 = 7
+let a21 = 8
+let a22 = 9
+
+# Matrix B
+let b00 = 9
+let b01 = 8
+let b02 = 7
+let b10 = 6
+let b11 = 5
+let b12 = 4
+let b20 = 3
+let b21 = 2
+let b22 = 1
+
+# Result Matrix C = A * B
+let c00 = a00 * b00 + a01 * b10 + a02 * b20
+let c01 = a00 * b01 + a01 * b11 + a02 * b21
+let c02 = a00 * b02 + a01 * b12 + a02 * b22
+
+let c10 = a10 * b00 + a11 * b10 + a12 * b20
+let c11 = a10 * b01 + a11 * b11 + a12 * b21
+let c12 = a10 * b02 + a11 * b12 + a12 * b22
+
+let c20 = a20 * b00 + a21 * b10 + a22 * b20
+let c21 = a20 * b01 + a21 * b11 + a22 * b21
+let c22 = a20 * b02 + a21 * b12 + a22 * b22
+
+# Print result (sum for verification)
+let sum = c00 + c01 + c02 + c10 + c11 + c12 + c20 + c21 + c22
+print(sum)

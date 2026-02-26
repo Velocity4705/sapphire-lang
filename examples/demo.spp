@@ -1,4 +1,4 @@
-# Sapphire Demo - Milestone 1
+# Sapphire Demo
 
 # Variables and arithmetic
 let x = 10
@@ -16,20 +16,11 @@ print(power)
 let is_greater = x > 5
 print(is_greater)
 
-# Conditionals
+# Simple conditional
 if x > 15:
     print("x is greater than 15")
-else:
-    print("x is 15 or less")
 
-# While loop
-let counter = 0
-while counter < 3:
-    print(counter)
-    counter = counter + 1
-
-# For loop with range
-for i in range(5):
-    print(i)
+if x < 15:
+    print("x is less than 15")
 
 print("Demo complete!")

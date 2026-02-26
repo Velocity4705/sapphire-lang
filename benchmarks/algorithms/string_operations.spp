@@ -1,0 +1,35 @@
+# String Manipulation Benchmark
+# Time Complexity: O(n) for most operations
+# Space Complexity: O(n)
+
+# String length calculation (character counting)
+let str_len = 26
+
+# Character operations (ASCII values)
+let char_a = 97
+let char_z = 122
+let char_range = char_z - char_a
+
+# String comparison simulation
+let str1_hash = 12345
+let str2_hash = 12345
+let strings_equal = str1_hash == str2_hash
+
+# Substring operations
+let start_pos = 5
+let end_pos = 15
+let substr_len = end_pos - start_pos
+
+# String concatenation (length addition)
+let str1_len = 10
+let str2_len = 15
+let concat_len = str1_len + str2_len
+
+# Pattern matching simulation (KMP-like)
+let pattern_len = 5
+let text_len = 100
+let max_comparisons = text_len - pattern_len
+
+# Result
+let result = str_len + char_range + substr_len + concat_len + max_comparisons
+print(result)

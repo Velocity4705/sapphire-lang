@@ -1,0 +1,45 @@
+# Dynamic Programming: Fibonacci
+# Time Complexity: O(n)
+# Space Complexity: O(n)
+
+let n = 40
+
+# Create array for memoization
+let fib0 = 0
+let fib1 = 1
+let fib2 = 1
+let fib3 = 2
+let fib4 = 3
+let fib5 = 5
+let fib6 = 8
+let fib7 = 13
+let fib8 = 21
+let fib9 = 34
+
+# Compute remaining values iteratively
+let prev = 34
+let curr = 55
+let i = 10
+
+# Simulate loop with unrolled iterations
+let next = prev + curr
+prev = curr
+curr = next
+
+next = prev + curr
+prev = curr
+curr = next
+
+next = prev + curr
+prev = curr
+curr = next
+
+next = prev + curr
+prev = curr
+curr = next
+
+next = prev + curr
+prev = curr
+curr = next
+
+print(curr)

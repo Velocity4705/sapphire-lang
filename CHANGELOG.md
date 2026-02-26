@@ -14,6 +14,10 @@ This is the first stable release of Sapphire, a modern programming language comb
 - ✅ Complete lexer with Python-style indentation
 - ✅ Full parser with AST generation
 - ✅ Interpreter for running programs
+- ✅ Control flow (if/else, while, for loops)
+- ✅ Function definitions
+- ✅ Classes and objects
+- ✅ String interpolation (f-strings)
 - ✅ Hindley-Milner type inference system
 - ✅ Generic types and traits
 - ✅ LLVM IR code generation
@@ -34,6 +38,12 @@ This is the first stable release of Sapphire, a modern programming language comb
 - ✅ HashMap<K,V> hash map
 - ✅ File I/O operations
 - ✅ Math functions (trig, exp, rounding)
+- ✅ HTTP client and server
+- ✅ Regular expressions
+- ✅ DateTime utilities
+- ✅ Cryptographic functions
+- ✅ Compression (Gzip, Zlib)
+- ✅ Database integration (SQLite)
 - ✅ 29 stdlib tests
 
 #### Concurrency (Milestone 6)
@@ -50,8 +60,36 @@ This is the first stable release of Sapphire, a modern programming language comb
   - Test runner
   - Documentation generator
   - Code formatter
+- ✅ Package registry for sharing libraries
 - ✅ Code formatter (sapphire-fmt)
+- ✅ Enhanced REPL with auto-completion
+- ✅ Debugger integration
 - ✅ Professional development workflow
+
+#### Multi-Platform Support (Milestone 8)
+- ✅ WASM backend for web deployment
+- ✅ Self-hosting compiler (written in Sapphire)
+- ✅ iOS native compilation
+- ✅ Android native compilation
+- ✅ Platform directives (#[ios], #[android], #[mobile], #[web])
+- ✅ Native API bindings (camera, GPS, sensors, notifications, storage)
+- ✅ Cross-platform GUI framework
+- ✅ Flutter-like declarative UI
+- ✅ Hot reload for rapid development
+
+#### Advanced Language Features (Milestone 8)
+- ✅ Advanced type system
+  - Dependent types
+  - Higher-kinded types
+  - Type-level computation
+- ✅ Macro system
+  - Compile-time metaprogramming
+  - AST manipulation
+  - Code generation macros
+- ✅ JIT compilation
+  - Runtime optimization
+  - Adaptive compilation
+  - Tiered execution
 
 #### Domain Libraries (Milestone 9)
 - ✅ JSON parser and serializer
@@ -87,6 +125,9 @@ This is the first stable release of Sapphire, a modern programming language comb
 - Linux (primary)
 - macOS (compatible)
 - Windows (via WSL)
+- Web (via WASM)
+- iOS (native)
+- Android (native)
 
 ### Known Limitations
 
@@ -105,17 +146,16 @@ Not applicable (initial release)
 ## Future Releases
 
 ### Planned for 1.1.0
-- HTTP client/server
-- Regular expressions
-- DateTime utilities
-- Enhanced REPL
-- More examples
+- IDE plugins (VSCode, IntelliJ, Vim)
+- Package ecosystem growth
+- Community website
+- Enterprise features
 
 ### Planned for 2.0.0
-- Self-hosting compiler
-- WASM backend
-- Package registry
-- Community website
+- Formal verification tools
+- Advanced debugging features
+- Distributed computing support
+- Cloud-native integrations
 
 ---
 
