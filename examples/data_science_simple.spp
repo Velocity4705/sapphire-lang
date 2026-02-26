@@ -1,0 +1,44 @@
+# Data Science Example (Simplified for Current Parser)
+# Demonstrates basic data processing concepts
+
+print("=== Sapphire Data Science Demo ===")
+print("")
+
+# Basic statistics
+let data = 100
+let count = 10
+let mean = data / count
+print("Mean:")
+print(mean)
+
+# Simple calculations
+let x1 = 5
+let x2 = 10
+let x3 = 15
+let sum = x1 + x2 + x3
+print("Sum:")
+print(sum)
+
+let avg = sum / 3
+print("Average:")
+print(avg)
+
+# Variance calculation
+let diff1 = x1 - avg
+let diff2 = x2 - avg
+let diff3 = x3 - avg
+let sq1 = diff1 * diff1
+let sq2 = diff2 * diff2
+let sq3 = diff3 * diff3
+let variance = (sq1 + sq2 + sq3) / 3
+print("Variance:")
+print(variance)
+
+# Conditional analysis
+let threshold = 10
+let above = x3 > threshold
+print("Value above threshold:")
+print(above)
+
+print("")
+print("✓ Data analysis complete!")

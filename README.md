@@ -143,6 +143,8 @@ Run it:
 ./sapp examples/hello.spp
 ```
 
+**More examples:** See [examples/README.md](examples/README.md) for a list of working examples and future vision demos.
+
 ### Basic Operations
 
 ```sapphire

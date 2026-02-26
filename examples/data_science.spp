@@ -1,4 +1,13 @@
 # Data Science & Machine Learning in Sapphire
+# NOTE: This is a FUTURE VISION example showing planned features
+# For working examples, see: data_science_simple.spp
+# 
+# Features shown here will be available in future versions:
+# - import statements
+# - classes and methods
+# - async/await
+# - advanced data structures
+# - ML libraries
 
 import ml::{tensor, nn, optim, metrics}
 import data::{DataFrame, Series, plot}
