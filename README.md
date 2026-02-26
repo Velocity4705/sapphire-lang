@@ -85,8 +85,12 @@ This will:
 git clone https://github.com/Velocity4705/sapphire-lang.git
 cd sapphire-lang
 
-# Build
+# Build compiler
 make quick
+
+# Build additional tools (optional)
+make spm           # Package manager
+make sapphire-fmt  # Code formatter
 
 # Run
 ./sapp examples/hello.spp
@@ -98,8 +102,10 @@ make quick
 # After building, install to /usr/local/bin
 sudo cp sapp /usr/local/bin/
 sudo cp sapphire /usr/local/bin/
-sudo cp spm /usr/local/bin/
-sudo cp sapphire-fmt /usr/local/bin/
+
+# Optional tools (if built)
+sudo cp spm /usr/local/bin/           # Package manager
+sudo cp sapphire-fmt /usr/local/bin/  # Code formatter
 
 # Now run from anywhere
 sapp --version
@@ -331,6 +337,8 @@ MIT License - see [LICENSE](LICENSE)
 Built with inspiration from Python, C++, Rust, Go, Java, TypeScript, C#, Kotlin, Swift, and the amazing open-source community.
 
 Powered by LLVM.
+
+Made in Open-Source.
 
 ---
 

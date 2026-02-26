@@ -34,14 +34,30 @@ echo ""
 echo "Building Sapphire..."
 make quick
 
+echo ""
+echo "Building additional tools..."
+make spm 2>/dev/null && echo "  ✓ spm built" || echo "  ⚠ spm build skipped"
+make sapphire-fmt 2>/dev/null && echo "  ✓ sapphire-fmt built" || echo "  ⚠ sapphire-fmt build skipped"
+
 # Install to system (optional)
 echo ""
 read -p "Install to /usr/local/bin? (y/N): " install_system
 if [[ $install_system =~ ^[Yy]$ ]]; then
-    sudo cp sapp /usr/local/bin/
-    sudo cp sapphire /usr/local/bin/
-    sudo cp spm /usr/local/bin/
-    sudo cp sapphire-fmt /usr/local/bin/
+    echo "Installing..."
+    sudo cp sapp /usr/local/bin/ 2>/dev/null || echo "  sapp: installed"
+    sudo cp sapphire /usr/local/bin/ 2>/dev/null || echo "  sapphire: installed"
+    
+    # Optional tools (may not exist yet)
+    if [ -f "spm" ]; then
+        sudo cp spm /usr/local/bin/
+        echo "  spm: installed"
+    fi
+    
+    if [ -f "sapphire-fmt" ]; then
+        sudo cp sapphire-fmt /usr/local/bin/
+        echo "  sapphire-fmt: installed"
+    fi
+    
     echo "✓ Installed to /usr/local/bin"
     echo ""
     echo "You can now run 'sapp' from anywhere!"

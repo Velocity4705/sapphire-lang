@@ -51,14 +51,19 @@ cd sapphire-lang
 ### Step 2: Build
 
 ```bash
+# Build the compiler
 make quick
+
+# Build additional tools (optional)
+make spm           # Package manager
+make sapphire-fmt  # Code formatter
 ```
 
 This creates:
 - `./sapp` - Sapphire compiler/interpreter
 - `./sapphire` - Alias for sapp
-- `./spm` - Package manager
-- `./sapphire-fmt` - Code formatter
+- `./spm` - Package manager (if built)
+- `./sapphire-fmt` - Code formatter (if built)
 
 ### Step 3: Test
 
@@ -74,8 +79,12 @@ To use Sapphire from anywhere:
 ```bash
 sudo cp sapp /usr/local/bin/
 sudo cp sapphire /usr/local/bin/
-sudo cp spm /usr/local/bin/
-sudo cp sapphire-fmt /usr/local/bin/
+```
+
+Optional tools (if available):
+```bash
+sudo cp spm /usr/local/bin/           # Package manager
+sudo cp sapphire-fmt /usr/local/bin/  # Code formatter
 ```
 
 Now you can run:
@@ -118,8 +127,10 @@ make quick
 ```bash
 sudo rm /usr/local/bin/sapp
 sudo rm /usr/local/bin/sapphire
-sudo rm /usr/local/bin/spm
-sudo rm /usr/local/bin/sapphire-fmt
+
+# If you installed optional tools
+sudo rm /usr/local/bin/spm 2>/dev/null
+sudo rm /usr/local/bin/sapphire-fmt 2>/dev/null
 ```
 
 ### Remove Source
