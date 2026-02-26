@@ -13,6 +13,7 @@ obj/
 sapphire
 sapp
 spm
+sapphire-fmt
 sapphire-lsp
 sapphire-debug
 test_lexer
@@ -66,3 +67,11 @@ site/
 tmp/
 temp/
 *.tmp
+
+# Development tracking files (not needed in repo)
+MILESTONE*_*.txt
+SESSION_SUMMARY*.txt
+CURRENT_STATUS.txt
+PROJECT_STATUS_*.txt
+PROJECT_SUMMARY.txt
+FINAL_SESSION_SUMMARY.txt

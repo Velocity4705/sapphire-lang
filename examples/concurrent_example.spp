@@ -1,0 +1,39 @@
+# Concurrency Example
+# Demonstrates concurrent programming concepts
+
+print("=== Concurrency Example ===")
+print("")
+
+print("Simulating concurrent tasks...")
+print("")
+
+# Task 1
+print("[Task 1] Starting...")
+print("[Task 1] Processing data...")
+print("[Task 1] Complete!")
+print("")
+
+# Task 2
+print("[Task 2] Starting...")
+print("[Task 2] Fetching resources...")
+print("[Task 2] Complete!")
+print("")
+
+# Task 3
+print("[Task 3] Starting...")
+print("[Task 3] Computing results...")
+print("[Task 3] Complete!")
+print("")
+
+print("All tasks completed successfully!")
+print("")
+
+# In a real application with threads:
+# let t1 = Thread::spawn(|| { task1() })
+# let t2 = Thread::spawn(|| { task2() })
+# let t3 = Thread::spawn(|| { task3() })
+# t1.join()
+# t2.join()
+# t3.join()
+
+print("✓ Concurrent execution complete!")

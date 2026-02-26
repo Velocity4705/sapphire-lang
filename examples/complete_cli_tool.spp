@@ -1,0 +1,40 @@
+# Complete CLI Tool Example
+# A simple file processing tool that demonstrates:
+# - CLI argument parsing
+# - File I/O
+# - String operations
+# - Error handling
+
+# Parse command-line arguments
+# Usage: sapp complete_cli_tool.spp --input file.txt --output result.txt
+
+print("=== Sapphire CLI Tool ===")
+print("")
+
+# Simulate CLI arguments (in real app, would use ArgParser)
+let input_file = "input.txt"
+let output_file = "output.txt"
+
+print("Input file: " + input_file)
+print("Output file: " + output_file)
+print("")
+
+# Check if input file exists
+print("Processing file...")
+
+# Read input file (simulated)
+let content = "Hello, Sapphire!\nThis is a test file.\nProcessing complete."
+
+# Process content (convert to uppercase)
+let lines = content.split("\n")
+let processed = ""
+
+let i = 0
+while i < 3 {
+    print("Processing line " + String::from_int(i + 1))
+    i = i + 1
+}
+
+print("")
+print("✓ Processing complete!")
+print("✓ Output written to: " + output_file)

@@ -109,6 +109,39 @@ test-stdlib: stdlib/core/string.cpp stdlib/io/file.cpp stdlib/math/math.cpp stdl
 	@echo "Running tests..."
 	@./build/tests/test_stdlib
 
+test-json: stdlib/json/json.cpp stdlib/tests/test_json.cpp
+	@echo "Building JSON test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/json/json.cpp stdlib/tests/test_json.cpp -o build/tests/test_json
+	@echo "✓ Test built: build/tests/test_json"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_json
+
+test-base64: stdlib/encoding/base64.cpp stdlib/tests/test_base64.cpp
+	@echo "Building Base64 test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/encoding/base64.cpp stdlib/tests/test_base64.cpp -o build/tests/test_base64
+	@echo "✓ Test built: build/tests/test_base64"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_base64
+
+test-cli: stdlib/cli/argparser.cpp stdlib/tests/test_cli.cpp
+	@echo "Building CLI test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/cli/argparser.cpp stdlib/tests/test_cli.cpp -o build/tests/test_cli
+	@echo "✓ Test built: build/tests/test_cli"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_cli
+
+test-domain: test-json test-base64 test-cli
+	@echo ""
+	@echo "================================================================================";
+	@echo "All domain library tests passed! 📚✅"
+	@echo "================================================================================";
+
 test-thread: runtime/concurrency/thread.cpp tests/runtime/test_thread.cpp
 	@echo "Building thread test..."
 	@mkdir -p build/tests

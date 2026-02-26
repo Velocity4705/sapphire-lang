@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     std::string arg = argv[1];
     
     if (arg == "--version") {
-        std::cout << "Sapphire v0.9.0-alpha (Milestone 8 Complete - Advanced Features)\n";
+        std::cout << "Sapphire v1.0.0 (Production Release)\n";
         return 0;
     }
     

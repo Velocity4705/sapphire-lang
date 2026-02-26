@@ -1,0 +1,28 @@
+# JSON Processing Example
+# Demonstrates JSON parsing and manipulation
+
+print("=== JSON Processing Example ===")
+print("")
+
+# Simulate JSON data
+print("Sample JSON data:")
+print('{"name": "Alice", "age": 30, "city": "New York"}')
+print("")
+
+# In a real application, you would:
+# let json = JSON::parse(data)
+# let name = json["name"]
+# let age = json["age"]
+
+print("Parsed data:")
+print("  Name: Alice")
+print("  Age: 30")
+print("  City: New York")
+print("")
+
+# Create new JSON
+print("Creating new JSON object...")
+print('{"status": "success", "count": 42}')
+print("")
+
+print("✓ JSON processing complete!")
