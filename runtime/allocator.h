@@ -24,6 +24,8 @@ struct ObjectHeader {
     static constexpr uint32_t MARK_BIT = 0x01;
     static constexpr uint32_t LARGE_BIT = 0x02;
     static constexpr uint32_t PINNED_BIT = 0x04;
+    static constexpr uint32_t FREED_BIT = 0x08;
+    static constexpr uint32_t POISONED_BIT = 0x10;
     
     // Flag accessors
     bool is_marked() const { return gc_flags & MARK_BIT; }
@@ -50,6 +52,24 @@ struct ObjectHeader {
             gc_flags |= PINNED_BIT;
         } else {
             gc_flags &= ~PINNED_BIT;
+        }
+    }
+    
+    bool is_freed() const { return gc_flags & FREED_BIT; }
+    void set_freed(bool freed) {
+        if (freed) {
+            gc_flags |= FREED_BIT;
+        } else {
+            gc_flags &= ~FREED_BIT;
+        }
+    }
+    
+    bool is_poisoned() const { return gc_flags & POISONED_BIT; }
+    void set_poisoned(bool poisoned) {
+        if (poisoned) {
+            gc_flags |= POISONED_BIT;
+        } else {
+            gc_flags &= ~POISONED_BIT;
         }
     }
     

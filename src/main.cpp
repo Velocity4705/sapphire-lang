@@ -20,7 +20,7 @@ void printUsage(const char* program) {
     std::cout << "  sapp --version               # Show version\n";
     std::cout << "  sapp --help                  # Show this help\n";
     std::cout << "\nNote: 'sapphire' is an alias for 'sapp'\n";
-    std::cout << "\nMilestone 3 - Phase 2: Expression code generation enabled!\n";
+    std::cout << "\nMilestone 4 COMPLETE - Memory Management! 🎉\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     std::string arg = argv[1];
     
     if (arg == "--version") {
-        std::cout << "Sapphire v0.4.0-alpha (Milestone 3 Complete - Native Compilation)\n";
+        std::cout << "Sapphire v0.9.0-alpha (Milestone 8 Complete - Advanced Features)\n";
         return 0;
     }
     

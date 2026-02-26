@@ -42,29 +42,125 @@ endif
 
 OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
-.PHONY: all build test install clean help run test-allocator test-gc test-runtime
+.PHONY: all build test install clean help run test-allocator test-gc test-safety test-refcount test-ownership test-profiler test-stdlib test-runtime
 
 all: help
 
-test-allocator: runtime/allocator.cpp runtime/allocator.h tests/runtime/test_allocator.cpp
+test-allocator: runtime/allocator.cpp runtime/allocator.h runtime/safety.cpp runtime/safety.h tests/runtime/test_allocator.cpp
 	@echo "Building allocator test..."
 	@mkdir -p build/tests
-	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/allocator.cpp tests/runtime/test_allocator.cpp -o build/tests/test_allocator -lpthread
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/allocator.cpp runtime/safety.cpp tests/runtime/test_allocator.cpp -o build/tests/test_allocator -lpthread
 	@echo "✓ Test built: build/tests/test_allocator"
 	@echo ""
 	@echo "Running tests..."
 	@./build/tests/test_allocator
 
-test-gc: runtime/allocator.cpp runtime/allocator.h runtime/gc.cpp runtime/gc.h tests/runtime/test_gc.cpp
+test-gc: runtime/allocator.cpp runtime/allocator.h runtime/safety.cpp runtime/safety.h runtime/gc.cpp runtime/gc.h tests/runtime/test_gc.cpp
 	@echo "Building GC test..."
 	@mkdir -p build/tests
-	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/allocator.cpp runtime/gc.cpp tests/runtime/test_gc.cpp -o build/tests/test_gc -lpthread
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/allocator.cpp runtime/safety.cpp runtime/gc.cpp tests/runtime/test_gc.cpp -o build/tests/test_gc -lpthread
 	@echo "✓ Test built: build/tests/test_gc"
 	@echo ""
 	@echo "Running tests..."
 	@./build/tests/test_gc
 
-test-runtime: test-allocator test-gc
+test-safety: runtime/allocator.cpp runtime/allocator.h runtime/safety.cpp runtime/safety.h tests/runtime/test_safety.cpp
+	@echo "Building safety test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/allocator.cpp runtime/safety.cpp tests/runtime/test_safety.cpp -o build/tests/test_safety -lpthread
+	@echo "✓ Test built: build/tests/test_safety"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_safety
+
+test-refcount: runtime/refcount.cpp runtime/refcount.h tests/runtime/test_refcount.cpp
+	@echo "Building refcount test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/refcount.cpp tests/runtime/test_refcount.cpp -o build/tests/test_refcount -lpthread
+	@echo "✓ Test built: build/tests/test_refcount"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_refcount
+
+test-ownership: runtime/ownership.cpp runtime/ownership.h tests/runtime/test_ownership.cpp
+	@echo "Building ownership test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/ownership.cpp tests/runtime/test_ownership.cpp -o build/tests/test_ownership -lpthread
+	@echo "✓ Test built: build/tests/test_ownership"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_ownership
+
+test-profiler: runtime/profiler.cpp runtime/profiler.h tests/runtime/test_profiler.cpp
+	@echo "Building profiler test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/profiler.cpp tests/runtime/test_profiler.cpp -o build/tests/test_profiler -lpthread
+	@echo "✓ Test built: build/tests/test_profiler"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_profiler
+
+test-stdlib: stdlib/core/string.cpp stdlib/io/file.cpp stdlib/math/math.cpp stdlib/tests/test_stdlib.cpp
+	@echo "Building stdlib test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/core/string.cpp stdlib/io/file.cpp stdlib/math/math.cpp stdlib/tests/test_stdlib.cpp -o build/tests/test_stdlib -lpthread
+	@echo "✓ Test built: build/tests/test_stdlib"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_stdlib
+
+test-thread: runtime/concurrency/thread.cpp tests/runtime/test_thread.cpp
+	@echo "Building thread test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/concurrency/thread.cpp tests/runtime/test_thread.cpp -o build/tests/test_thread -lpthread
+	@echo "✓ Test built: build/tests/test_thread"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_thread
+
+test-mutex: runtime/concurrency/mutex.cpp tests/runtime/test_mutex.cpp
+	@echo "Building mutex test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/concurrency/mutex.cpp runtime/concurrency/thread.cpp tests/runtime/test_mutex.cpp -o build/tests/test_mutex -lpthread
+	@echo "✓ Test built: build/tests/test_mutex"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_mutex
+
+test-rwlock: runtime/concurrency/rwlock.cpp tests/runtime/test_rwlock.cpp
+	@echo "Building rwlock test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/concurrency/rwlock.cpp runtime/concurrency/thread.cpp tests/runtime/test_rwlock.cpp -o build/tests/test_rwlock -lpthread
+	@echo "✓ Test built: build/tests/test_rwlock"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_rwlock
+
+test-channel: tests/runtime/test_channel.cpp
+	@echo "Building channel test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/concurrency/thread.cpp tests/runtime/test_channel.cpp -o build/tests/test_channel -lpthread
+	@echo "✓ Test built: build/tests/test_channel"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_channel
+
+test-threadpool: runtime/concurrency/threadpool.cpp tests/runtime/test_threadpool.cpp
+	@echo "Building threadpool test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. runtime/concurrency/threadpool.cpp tests/runtime/test_threadpool.cpp -o build/tests/test_threadpool -lpthread
+	@echo "✓ Test built: build/tests/test_threadpool"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_threadpool
+
+test-concurrency: test-thread test-mutex test-rwlock test-channel test-threadpool
+	@echo ""
+	@echo "================================================================================";
+	@echo "All concurrency tests passed! ⚡✅"
+	@echo "================================================================================";
+
+test-runtime: test-allocator test-gc test-safety test-refcount test-ownership test-profiler
 	@echo ""
 	@echo "================================================================================";
 	@echo "All runtime tests passed! ✅"
@@ -75,6 +171,7 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  make quick      - Quick build (no CMake)"
+	@echo "  make spm        - Build package manager"
 	@echo "  make run        - Build and run hello.spp"
 	@echo "  make clean      - Clean build artifacts"
 	@echo ""
@@ -82,6 +179,33 @@ help:
 	@echo "  $(LLVM_STATUS)"
 	@echo ""
 	@echo "For full build, use: ./scripts/build.sh"
+
+spm:
+	@echo "Building spm (Sapphire Package Manager)..."
+	@mkdir -p build/spm
+	$(CXX) -std=c++20 -Wall -Wextra -O2 \
+		tools/spm/main.cpp \
+		tools/spm/commands/init.cpp \
+		tools/spm/commands/build.cpp \
+		tools/spm/commands/run.cpp \
+		tools/spm/commands/test.cpp \
+		tools/spm/commands/clean.cpp \
+		tools/spm/commands/doc.cpp \
+		tools/spm/commands/fmt.cpp \
+		tools/spm/utils/fs.cpp \
+		-o spm
+	@echo "✓ Build complete: ./spm"
+
+sapphire-fmt:
+	@echo "Building sapphire-fmt (Code Formatter)..."
+	$(CXX) -std=c++20 -Wall -Wextra -O2 \
+		tools/fmt/main.cpp \
+		src/formatter/formatter.cpp \
+		-o sapphire-fmt
+	@echo "✓ Build complete: ./sapphire-fmt"
+
+tools: spm sapphire-fmt
+	@echo "✓ All tools built successfully!"
 
 quick: $(TARGET)
 	@ln -sf $(TARGET) $(ALIAS)

@@ -1,4 +1,5 @@
 #include "allocator.h"
+#include "safety.h"
 #include <cstdlib>
 #include <cstring>
 #include <new>
@@ -196,6 +197,9 @@ void Allocator::free(void* ptr) {
     
     // Get header
     ObjectHeader* header = get_header(ptr);
+    
+    // Mark as freed for safety checks (detects double-free)
+    SafetyChecker::mark_freed(ptr);
     
     // Update statistics
     total_freed_.fetch_add(header->size);

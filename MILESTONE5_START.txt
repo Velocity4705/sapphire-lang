@@ -1,0 +1,492 @@
+================================================================================
+MILESTONE 5: STANDARD LIBRARY - STARTING NOW! 📚
+================================================================================
+
+Date: February 26, 2026
+Milestone: Standard Library (Core Essentials)
+Status: 🚀 STARTING
+Duration: 4-6 weeks
+
+================================================================================
+OBJECTIVE
+================================================================================
+
+Implement essential standard library modules for Sapphire:
+- Core data structures (String, Vec, HashMap)
+- Basic I/O (File, print, read)
+- Math functions
+- String operations
+- Essential utilities
+
+Goal: Make Sapphire practical for real programs!
+
+================================================================================
+PRAGMATIC APPROACH
+================================================================================
+
+Full Standard Library (from docs):
+❌ 15+ modules
+❌ 100+ types and functions
+❌ Would take months
+❌ Too ambitious for now
+
+Pragmatic Core Library:
+✅ Essential data structures
+✅ Basic I/O
+✅ String operations
+✅ Math functions
+✅ Core utilities
+✅ Can be implemented in 4-6 weeks
+✅ Provides real value
+
+What We'll Build:
+1. String type (UTF-8)
+2. Vec<T> (dynamic array)
+3. HashMap<K, V> (hash map)
+4. File I/O
+5. Math functions
+6. Print/format functions
+7. Basic utilities
+
+What We Won't Build (Yet):
+- Async/concurrency
+- HTTP/networking
+- Database drivers
+- ML/data science
+- Advanced collections
+
+We can add these in future milestones!
+
+================================================================================
+IMPLEMENTATION PLAN
+================================================================================
+
+Week 1-2: Core Data Structures
+- String type
+- Vec<T> dynamic array
+- HashMap<K, V> hash map
+
+Week 3-4: I/O and Math
+- File I/O
+- Math functions
+- Format/print
+
+Week 5-6: Integration and Testing
+- Integration with compiler
+- Comprehensive tests
+- Documentation
+- Examples
+
+================================================================================
+MILESTONE 5 PHASES
+================================================================================
+
+Phase 1: String Type (Week 1)
+- UTF-8 string implementation
+- String operations (concat, slice, etc.)
+- String formatting
+- Integration with runtime
+
+Phase 2: Vec<T> Dynamic Array (Week 2)
+- Generic vector implementation
+- Push, pop, insert, remove
+- Iteration
+- Memory management
+
+Phase 3: HashMap<K, V> (Week 3)
+- Hash map implementation
+- Insert, get, remove
+- Iteration
+- Collision handling
+
+Phase 4: File I/O (Week 4)
+- File open/close
+- Read/write operations
+- Buffered I/O
+- Error handling
+
+Phase 5: Math Functions (Week 5)
+- Basic math (abs, min, max)
+- Trigonometry (sin, cos, tan)
+- Exponential (exp, log, pow)
+- Constants (PI, E)
+
+Phase 6: Integration (Week 6)
+- Compiler integration
+- Standard library linking
+- Tests and examples
+- Documentation
+
+================================================================================
+TECHNICAL DESIGN
+================================================================================
+
+1. String Type
+```cpp
+class String {
+private:
+    char* data_;
+    size_t length_;
+    size_t capacity_;
+    
+public:
+    String();
+    String(const char* str);
+    String(const String& other);
+    String(String&& other);
+    ~String();
+    
+    size_t length() const;
+    const char* c_str() const;
+    
+    String operator+(const String& other) const;
+    char operator[](size_t index) const;
+    
+    String substring(size_t start, size_t length) const;
+    bool contains(const String& substr) const;
+    int index_of(const String& substr) const;
+    
+    String to_upper() const;
+    String to_lower() const;
+    String trim() const;
+    
+    std::vector<String> split(const String& delimiter) const;
+    static String join(const std::vector<String>& strings, const String& delimiter);
+};
+```
+
+2. Vec<T> Dynamic Array
+```cpp
+template<typename T>
+class Vec {
+private:
+    T* data_;
+    size_t size_;
+    size_t capacity_;
+    
+public:
+    Vec();
+    ~Vec();
+    
+    void push(const T& value);
+    T pop();
+    void insert(size_t index, const T& value);
+    void remove(size_t index);
+    
+    T& operator[](size_t index);
+    const T& operator[](size_t index) const;
+    
+    size_t size() const;
+    size_t capacity() const;
+    bool empty() const;
+    
+    void clear();
+    void reserve(size_t capacity);
+    void resize(size_t size);
+    
+    // Iteration
+    T* begin();
+    T* end();
+};
+```
+
+3. HashMap<K, V>
+```cpp
+template<typename K, typename V>
+class HashMap {
+private:
+    struct Entry {
+        K key;
+        V value;
+        Entry* next;
+    };
+    
+    Entry** buckets_;
+    size_t size_;
+    size_t capacity_;
+    
+    size_t hash(const K& key) const;
+    
+public:
+    HashMap();
+    ~HashMap();
+    
+    void insert(const K& key, const V& value);
+    V* get(const K& key);
+    bool contains(const K& key) const;
+    void remove(const K& key);
+    
+    size_t size() const;
+    bool empty() const;
+    void clear();
+    
+    // Iteration
+    class Iterator {
+        // ...
+    };
+    
+    Iterator begin();
+    Iterator end();
+};
+```
+
+4. File I/O
+```cpp
+class File {
+private:
+    FILE* file_;
+    std::string path_;
+    bool is_open_;
+    
+public:
+    static File open(const std::string& path, const std::string& mode);
+    
+    void close();
+    bool is_open() const;
+    
+    std::string read();
+    std::string read_line();
+    std::vector<std::string> read_lines();
+    
+    void write(const std::string& data);
+    void write_line(const std::string& line);
+    
+    void flush();
+    
+    ~File();
+};
+```
+
+5. Math Functions
+```cpp
+namespace Math {
+    // Basic
+    double abs(double x);
+    double min(double a, double b);
+    double max(double a, double b);
+    double clamp(double x, double min, double max);
+    
+    // Trigonometry
+    double sin(double x);
+    double cos(double x);
+    double tan(double x);
+    double asin(double x);
+    double acos(double x);
+    double atan(double x);
+    double atan2(double y, double x);
+    
+    // Exponential
+    double exp(double x);
+    double log(double x);
+    double log10(double x);
+    double pow(double x, double y);
+    double sqrt(double x);
+    
+    // Rounding
+    double floor(double x);
+    double ceil(double x);
+    double round(double x);
+    double trunc(double x);
+    
+    // Constants
+    const double PI = 3.14159265358979323846;
+    const double E = 2.71828182845904523536;
+    const double TAU = 6.28318530717958647692;
+}
+```
+
+================================================================================
+DIRECTORY STRUCTURE
+================================================================================
+
+stdlib/
+  core/
+    string.h
+    string.cpp
+    vec.h
+    vec.cpp
+    hashmap.h
+    hashmap.cpp
+  io/
+    file.h
+    file.cpp
+  math/
+    math.h
+    math.cpp
+  tests/
+    test_string.cpp
+    test_vec.cpp
+    test_hashmap.cpp
+    test_file.cpp
+    test_math.cpp
+
+================================================================================
+INTEGRATION WITH COMPILER
+================================================================================
+
+1. Standard Library Linking
+```cpp
+// In compiler
+void link_stdlib() {
+    // Link string functions
+    link_function("String_new", stdlib_string_new);
+    link_function("String_concat", stdlib_string_concat);
+    
+    // Link vec functions
+    link_function("Vec_new", stdlib_vec_new);
+    link_function("Vec_push", stdlib_vec_push);
+    
+    // Link hashmap functions
+    link_function("HashMap_new", stdlib_hashmap_new);
+    link_function("HashMap_insert", stdlib_hashmap_insert);
+    
+    // Link file functions
+    link_function("File_open", stdlib_file_open);
+    link_function("File_read", stdlib_file_read);
+    
+    // Link math functions
+    link_function("Math_sin", stdlib_math_sin);
+    link_function("Math_cos", stdlib_math_cos);
+}
+```
+
+2. Sapphire Language Syntax
+```sapphire
+// String
+let s = "Hello, World!"
+let upper = s.to_upper()
+let parts = s.split(", ")
+
+// Vec
+let v = Vec::new()
+v.push(1)
+v.push(2)
+v.push(3)
+print(v[0])  // 1
+
+// HashMap
+let map = HashMap::new()
+map.insert("key", "value")
+print(map.get("key"))  // "value"
+
+// File
+let file = File::open("data.txt", "r")
+let content = file.read()
+file.close()
+
+// Math
+let x = Math::sin(Math::PI / 2)  // 1.0
+let y = Math::sqrt(16.0)  // 4.0
+```
+
+================================================================================
+TESTING STRATEGY
+================================================================================
+
+Unit Tests:
+✅ String operations
+✅ Vec operations
+✅ HashMap operations
+✅ File I/O
+✅ Math functions
+
+Integration Tests:
+✅ Use stdlib from Sapphire code
+✅ Compile and run programs
+✅ Memory management
+✅ Error handling
+
+Performance Tests:
+✅ String operations
+✅ Vec operations
+✅ HashMap operations
+✅ File I/O
+
+================================================================================
+SUCCESS CRITERIA
+================================================================================
+
+Milestone 5 Complete When:
+✅ String type implemented
+✅ Vec<T> implemented
+✅ HashMap<K, V> implemented
+✅ File I/O working
+✅ Math functions working
+✅ All tests passing (50+ tests)
+✅ Integration with compiler
+✅ Example programs work
+✅ Documentation complete
+
+Quality Targets:
+✅ Correct implementations
+✅ Good performance
+✅ Memory safe
+✅ Easy to use
+
+================================================================================
+DELIVERABLES
+================================================================================
+
+Files to Create:
+- stdlib/core/string.h, string.cpp
+- stdlib/core/vec.h, vec.cpp
+- stdlib/core/hashmap.h, hashmap.cpp
+- stdlib/io/file.h, file.cpp
+- stdlib/math/math.h, math.cpp
+- stdlib/tests/*.cpp (tests)
+- examples/stdlib_demo.spp
+
+Expected Lines of Code:
+- String: ~500 lines
+- Vec: ~400 lines
+- HashMap: ~600 lines
+- File: ~300 lines
+- Math: ~200 lines
+- Tests: ~1000 lines
+- Total: ~3000 lines
+
+================================================================================
+MOTIVATION
+================================================================================
+
+Why This Matters:
+
+Current State:
+- Have compiler, runtime, memory management
+- No standard library
+- Can't write real programs
+- Limited functionality
+
+After Milestone 5:
+- Essential data structures ✅
+- File I/O ✅
+- Math functions ✅
+- Can write real programs ✅
+- Production-ready ✅
+
+This will make Sapphire:
+✅ Practical for real use
+✅ Competitive with other languages
+✅ Ready for applications
+✅ Professional quality
+
+Real-World Benefits:
+- Write real applications
+- Process files
+- Manipulate strings
+- Use data structures
+- Perform calculations
+
+================================================================================
+LET'S BEGIN!
+================================================================================
+
+Starting with Phase 1: String Type
+
+This is a big milestone, but we'll take it step by step!
+
+Let's build a practical standard library! 📚💎
+
+================================================================================
+END OF KICKOFF - MILESTONE 5 STARTING NOW!
+================================================================================

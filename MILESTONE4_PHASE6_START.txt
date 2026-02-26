@@ -1,0 +1,417 @@
+================================================================================
+MILESTONE 4 - PHASE 6: MEMORY PROFILER - STARTING NOW! 📊
+================================================================================
+
+Date: February 26, 2026
+Phase: Memory Profiler
+Status: 🚀 STARTING
+Duration: Week 12 (1 week)
+
+================================================================================
+OBJECTIVE
+================================================================================
+
+Implement a memory profiler for debugging and optimization:
+- Allocation tracking
+- Leak detection
+- Memory usage statistics
+- Allocation hotspots
+- Integration with existing runtime
+
+Goal: Make memory debugging easy and effective!
+
+================================================================================
+PRAGMATIC APPROACH
+================================================================================
+
+Full-Featured Profiler:
+❌ Stack trace capture (complex)
+❌ Visualization tools (time-consuming)
+❌ IDE integration (requires IDE work)
+❌ Would take weeks to implement
+
+Pragmatic Memory Profiler:
+✅ Allocation tracking
+✅ Leak detection
+✅ Memory statistics
+✅ Allocation hotspots
+✅ Simple reporting
+✅ Can be implemented quickly
+✅ Provides real value now
+
+What We'll Build:
+1. Allocation tracking in runtime
+2. Memory statistics collection
+3. Leak detection
+4. Simple text-based reports
+5. Runtime API for profiling
+6. Integration with allocator
+
+What We Won't Build (Yet):
+- Stack trace capture
+- Graphical visualizations
+- IDE integration
+- Advanced analysis tools
+
+We can add these later!
+
+================================================================================
+IMPLEMENTATION PLAN
+================================================================================
+
+Week 12: Memory Profiler
+Day 1-2: Allocation tracking
+Day 3-4: Memory statistics
+Day 5-7: Leak detection and reporting
+
+================================================================================
+TECHNICAL DESIGN
+================================================================================
+
+1. Allocation Tracking
+```cpp
+struct AllocationInfo {
+    void* ptr;
+    size_t size;
+    uint64_t type_id;
+    uint64_t timestamp;
+    bool is_freed;
+};
+
+class AllocationTracker {
+private:
+    std::unordered_map<void*, AllocationInfo> allocations_;
+    std::mutex mutex_;
+    
+public:
+    void track_allocation(void* ptr, size_t size, uint64_t type_id);
+    void track_free(void* ptr);
+    
+    size_t total_allocated() const;
+    size_t total_freed() const;
+    size_t current_usage() const;
+    size_t allocation_count() const;
+    size_t free_count() const;
+    
+    std::vector<AllocationInfo> get_live_allocations() const;
+    std::vector<AllocationInfo> get_leaks() const;
+};
+```
+
+2. Memory Statistics
+```cpp
+struct MemoryStats {
+    size_t total_allocated;
+    size_t total_freed;
+    size_t current_usage;
+    size_t peak_usage;
+    size_t allocation_count;
+    size_t free_count;
+    size_t leak_count;
+    
+    // By size class
+    std::map<size_t, size_t> allocations_by_size;
+    
+    // By type
+    std::map<uint64_t, size_t> allocations_by_type;
+};
+
+class MemoryProfiler {
+public:
+    static void enable();
+    static void disable();
+    static bool is_enabled();
+    
+    static MemoryStats get_stats();
+    static void print_stats();
+    static void print_leaks();
+    
+    static void reset();
+};
+```
+
+3. Leak Detection
+```cpp
+class LeakDetector {
+public:
+    // Find potential leaks
+    static std::vector<void*> find_leaks();
+    
+    // Check if pointer is leaked
+    static bool is_leaked(void* ptr);
+    
+    // Get leak info
+    static AllocationInfo get_leak_info(void* ptr);
+    
+    // Print leak report
+    static void print_leak_report();
+};
+```
+
+4. Integration with Allocator
+```cpp
+void* allocate_tracked(size_t size, uint64_t type_id) {
+    void* ptr = sapphire_allocate(size, type_id);
+    if (MemoryProfiler::is_enabled()) {
+        AllocationTracker::track_allocation(ptr, size, type_id);
+    }
+    return ptr;
+}
+
+void free_tracked(void* ptr) {
+    if (MemoryProfiler::is_enabled()) {
+        AllocationTracker::track_free(ptr);
+    }
+    sapphire_free(ptr);
+}
+```
+
+5. Reporting
+```cpp
+void MemoryProfiler::print_stats() {
+    MemoryStats stats = get_stats();
+    
+    std::cout << "Memory Statistics:\n";
+    std::cout << "  Total allocated: " << stats.total_allocated << " bytes\n";
+    std::cout << "  Total freed: " << stats.total_freed << " bytes\n";
+    std::cout << "  Current usage: " << stats.current_usage << " bytes\n";
+    std::cout << "  Peak usage: " << stats.peak_usage << " bytes\n";
+    std::cout << "  Allocations: " << stats.allocation_count << "\n";
+    std::cout << "  Frees: " << stats.free_count << "\n";
+    std::cout << "  Leaks: " << stats.leak_count << "\n";
+    
+    std::cout << "\nAllocations by size:\n";
+    for (const auto& [size, count] : stats.allocations_by_size) {
+        std::cout << "  " << size << " bytes: " << count << " allocations\n";
+    }
+    
+    std::cout << "\nAllocations by type:\n";
+    for (const auto& [type_id, count] : stats.allocations_by_type) {
+        std::cout << "  Type " << type_id << ": " << count << " allocations\n";
+    }
+}
+```
+
+================================================================================
+LEAK DETECTION STRATEGY
+================================================================================
+
+Simple Leak Detection:
+1. Track all allocations
+2. Track all frees
+3. At end of program, check for unfreed allocations
+4. Report leaks with size and type
+
+Example:
+```cpp
+void check_leaks() {
+    auto leaks = LeakDetector::find_leaks();
+    
+    if (leaks.empty()) {
+        std::cout << "No memory leaks detected! ✅\n";
+    } else {
+        std::cout << "Memory leaks detected: " << leaks.size() << " ❌\n";
+        for (void* ptr : leaks) {
+            AllocationInfo info = LeakDetector::get_leak_info(ptr);
+            std::cout << "  Leak at " << ptr << ": " 
+                     << info.size << " bytes, type " << info.type_id << "\n";
+        }
+    }
+}
+```
+
+================================================================================
+PERFORMANCE CONSIDERATIONS
+================================================================================
+
+Profiling Overhead:
+- Tracking allocation: ~50-100 cycles
+- Tracking free: ~50-100 cycles
+- Hash map lookup: ~20-50 cycles
+- Mutex lock: ~20-50 cycles
+
+Optimization Strategies:
+1. Only enable when needed
+2. Use thread-local tracking
+3. Batch updates
+4. Minimize locking
+
+Expected Overhead:
+- Disabled: 0% (no overhead)
+- Enabled: ~10-20% (acceptable for debugging)
+- Target: < 20% when enabled ✅
+
+================================================================================
+TESTING STRATEGY
+================================================================================
+
+Unit Tests:
+✅ Allocation tracking
+✅ Free tracking
+✅ Memory statistics
+✅ Leak detection
+✅ Enable/disable profiler
+✅ Reset profiler
+
+Integration Tests:
+✅ Integration with allocator
+✅ Integration with GC
+✅ Multi-threaded profiling
+
+Functional Tests:
+✅ Detect real leaks
+✅ No false positives
+✅ Accurate statistics
+✅ Clear reports
+
+================================================================================
+SUCCESS CRITERIA
+================================================================================
+
+Phase 6 Complete When:
+✅ Allocation tracking working
+✅ Memory statistics accurate
+✅ Leak detection working
+✅ Reports are clear
+✅ Integration with allocator
+✅ All tests passing (10+ tests)
+✅ Performance overhead < 20%
+✅ Easy to use
+
+Quality Targets:
+✅ Accurate tracking
+✅ No false positives
+✅ No false negatives
+✅ Clear reports
+
+================================================================================
+DELIVERABLES
+================================================================================
+
+Files to Create:
+- runtime/profiler.h - Profiler interface
+- runtime/profiler.cpp - Profiler implementation
+- tests/runtime/test_profiler.cpp - Profiler tests
+
+Expected Lines of Code:
+- Profiler implementation: ~500 lines
+- Tests: ~400 lines
+- Total: ~900 lines
+
+================================================================================
+USE CASES
+================================================================================
+
+Use Case 1: Find Memory Leaks
+```cpp
+// Enable profiler
+MemoryProfiler::enable();
+
+// Run program
+run_application();
+
+// Check for leaks
+MemoryProfiler::print_leaks();
+```
+
+Use Case 2: Monitor Memory Usage
+```cpp
+MemoryProfiler::enable();
+
+while (running) {
+    do_work();
+    
+    if (should_check_memory()) {
+        MemoryStats stats = MemoryProfiler::get_stats();
+        if (stats.current_usage > threshold) {
+            std::cout << "High memory usage: " << stats.current_usage << "\n";
+        }
+    }
+}
+```
+
+Use Case 3: Profile Allocations
+```cpp
+MemoryProfiler::enable();
+MemoryProfiler::reset();
+
+// Run code to profile
+run_benchmark();
+
+// Print statistics
+MemoryProfiler::print_stats();
+```
+
+================================================================================
+INTEGRATION
+================================================================================
+
+With Allocator:
+- Hook into allocate/free
+- Track all allocations
+- Minimal overhead when disabled
+
+With GC:
+- Track GC allocations
+- Distinguish GC vs manual allocations
+- Report GC statistics
+
+With Safety:
+- Combine with safety checks
+- Report safety violations
+- Enhanced debugging
+
+With Ownership:
+- Track ownership changes
+- Report ownership violations
+- Enhanced leak detection
+
+================================================================================
+MOTIVATION
+================================================================================
+
+Why This Matters:
+
+Current State:
+- Have allocator, GC, safety, RC, ownership
+- No profiling tools
+- Hard to debug memory issues
+- No visibility into memory usage
+
+After Phase 6:
+- Easy leak detection ✅
+- Memory usage statistics ✅
+- Allocation tracking ✅
+- Clear reports ✅
+- Production-ready debugging ✅
+
+This will make Sapphire:
+✅ Easier to debug
+✅ Better visibility
+✅ Production-ready
+✅ Professional quality
+
+Real-World Benefits:
+- Find memory leaks quickly
+- Optimize memory usage
+- Debug memory issues
+- Monitor production systems
+
+================================================================================
+LET'S BEGIN!
+================================================================================
+
+Starting with allocation tracking and memory statistics.
+
+Tasks for Today:
+1. Implement AllocationTracker
+2. Implement MemoryProfiler
+3. Add profiling hooks to allocator
+4. Write basic tests
+5. Verify leak detection
+
+Let's build a practical memory profiler! 📊💎
+
+================================================================================
+END OF KICKOFF - PHASE 6 STARTING NOW!
+================================================================================
