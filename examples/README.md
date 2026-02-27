@@ -132,7 +132,7 @@ Demonstrates compiler directives and optimization concepts.
 ./test_examples.sh
 ```
 
-All 11 examples pass! ✅
+All 24 examples pass! ✅
 
 ## 🔮 Future Vision Examples
 

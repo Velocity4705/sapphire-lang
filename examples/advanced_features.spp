@@ -1,5 +1,9 @@
 # Advanced Sapphire Features Demo
 
+# NOTE: This is a FUTURE VISION example
+# Current parser doesn't support all these features yet
+# For working examples, see: hello.spp, simple.spp, showcase.spp
+
 # ============ Traits (Rust-style) ============
 trait Drawable:
     fn draw(self) -> str

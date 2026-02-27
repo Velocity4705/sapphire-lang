@@ -22,6 +22,19 @@ EXAMPLES=(
     "examples/user_input_example.spp"
     "examples/system_programming_example.spp"
     "examples/directives_example.spp"
+    "examples/codegen_test.spp"
+    "examples/comprehensive_test.spp"
+    "examples/concurrent_example.spp"
+    "examples/expr_test.spp"
+    "examples/float_test.spp"
+    "examples/json_example.spp"
+    "examples/showcase_compiler.spp"
+    "examples/simple_test.spp"
+    "examples/test_print_advanced.spp"
+    "examples/test_print_compile.spp"
+    "examples/test_type_promotion.spp"
+    "examples/test_with_print.spp"
+    "examples/type_test.spp"
 )
 
 for example in "${EXAMPLES[@]}"; do

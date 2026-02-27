@@ -1,4 +1,9 @@
 # Test function definitions and calls
+
+# NOTE: This is a FUTURE VISION example
+# Current parser doesn't support all these features yet
+# For working examples, see: hello.spp, simple.spp, showcase.spp
+
 fn add(x, y):
     return x + y
 
