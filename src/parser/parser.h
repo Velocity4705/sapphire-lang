@@ -43,6 +43,8 @@ private:
     std::unique_ptr<Stmt> ifStatement();
     std::unique_ptr<Stmt> whileStatement();
     std::unique_ptr<Stmt> forStatement();
+    std::unique_ptr<Stmt> tryStatement();
+    std::unique_ptr<Stmt> throwStatement();
     std::vector<std::unique_ptr<Stmt>> block();
     
     // Expression parsing

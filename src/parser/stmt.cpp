@@ -30,4 +30,12 @@ void ForStmt::accept(StmtVisitor& visitor) {
     visitor.visitForStmt(*this);
 }
 
+void TryStmt::accept(StmtVisitor& visitor) {
+    visitor.visitTryStmt(*this);
+}
+
+void ThrowStmt::accept(StmtVisitor& visitor) {
+    visitor.visitThrowStmt(*this);
+}
+
 } // namespace sapphire

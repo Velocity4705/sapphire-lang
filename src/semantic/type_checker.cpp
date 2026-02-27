@@ -161,6 +161,28 @@ void TypeChecker::visitIndexExpr(IndexExpr& expr) {
     current_type = list_type->getElementType();
 }
 
+void TypeChecker::visitAssignExpr(AssignExpr& expr) {
+    // Get the type of the variable being assigned to
+    std::shared_ptr<Type> var_type;
+    try {
+        var_type = env->get(expr.name);
+    } catch (const std::exception& e) {
+        error("Undefined variable '" + expr.name + "'");
+        var_type = std::make_shared<TypeVariable>();
+    }
+    
+    // Check the type of the value being assigned
+    auto value_type = checkExpr(*expr.value);
+    
+    // Check type compatibility
+    if (!var_type->isTypeVar() && !value_type->equals(*var_type)) {
+        error("Type mismatch: cannot assign " + value_type->toString() + 
+              " to variable '" + expr.name + "' of type " + var_type->toString());
+    }
+    
+    current_type = value_type;
+}
+
 // Statement visitors
 
 void TypeChecker::visitExprStmt(ExprStmt& stmt) {

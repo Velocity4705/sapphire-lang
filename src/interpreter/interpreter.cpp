@@ -1,5 +1,8 @@
 #include "interpreter.h"
+#include "../error/exception.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <cmath>
 
 namespace sapphire {
@@ -41,9 +44,13 @@ void Environment::assign(const std::string& name, const Value& value) {
 Interpreter::Interpreter() {
     environment = std::make_shared<Environment>();
     
-    // Built-in print function
+    // Built-in functions
     environment->define("print", std::string("__builtin_print__"));
     environment->define("range", std::string("__builtin_range__"));
+    environment->define("len", std::string("__builtin_len__"));
+    environment->define("input", std::string("__builtin_input__"));
+    environment->define("read_file", std::string("__builtin_read_file__"));
+    environment->define("write_file", std::string("__builtin_write_file__"));
 }
 
 void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements) {
@@ -69,6 +76,20 @@ std::string Interpreter::valueToString(const Value& value) {
         return std::get<bool>(value) ? "true" : "false";
     } else if (std::holds_alternative<std::nullptr_t>(value)) {
         return "none";
+    } else if (std::holds_alternative<std::shared_ptr<Function>>(value)) {
+        auto func = std::get<std::shared_ptr<Function>>(value);
+        return "<function " + func->name + ">";
+    } else if (std::holds_alternative<std::shared_ptr<ArrayValue>>(value)) {
+        auto array = std::get<std::shared_ptr<ArrayValue>>(value);
+        std::string result = "[";
+        for (size_t i = 0; i < array->elements.size(); i++) {
+            result += valueToString(array->elements[i]);
+            if (i < array->elements.size() - 1) {
+                result += ", ";
+            }
+        }
+        result += "]";
+        return result;
     }
     return "unknown";
 }
@@ -117,6 +138,13 @@ void Interpreter::visitLiteralExpr(LiteralExpr& expr) {
 
 void Interpreter::visitVariableExpr(VariableExpr& expr) {
     last_value = environment->get(expr.name);
+}
+
+void Interpreter::visitAssignExpr(AssignExpr& expr) {
+    Value value = evaluateExpr(*expr.value);
+    // In Python-like languages, assignment creates the variable if it doesn't exist
+    environment->define(expr.name, value);
+    last_value = value;
 }
 
 void Interpreter::visitBinaryExpr(BinaryExpr& expr) {
@@ -216,15 +244,61 @@ void Interpreter::visitUnaryExpr(UnaryExpr& expr) {
 void Interpreter::visitCallExpr(CallExpr& expr) {
     Value callee = evaluateExpr(*expr.callee);
     
+    // Evaluate arguments
+    std::vector<Value> arguments;
+    for (auto& arg : expr.arguments) {
+        arguments.push_back(evaluateExpr(*arg));
+    }
+    
+    // Handle user-defined functions
+    if (std::holds_alternative<std::shared_ptr<Function>>(callee)) {
+        auto func = std::get<std::shared_ptr<Function>>(callee);
+        
+        // Check argument count
+        if (arguments.size() != func->parameters.size()) {
+            throw std::runtime_error("Function '" + func->name + "' expects " + 
+                                   std::to_string(func->parameters.size()) + 
+                                   " arguments but got " + 
+                                   std::to_string(arguments.size()));
+        }
+        
+        // Create new environment for function execution
+        auto func_env = std::make_shared<Environment>(func->closure);
+        
+        // Bind parameters to arguments
+        for (size_t i = 0; i < func->parameters.size(); i++) {
+            func_env->define(func->parameters[i].first, arguments[i]);
+        }
+        
+        // Save current environment
+        auto previous_env = environment;
+        environment = func_env;
+        
+        // Execute function body
+        try {
+            for (auto& stmt : *func->body) {
+                stmt->accept(*this);
+            }
+            // If no return statement, return null
+            last_value = nullptr;
+        } catch (const ReturnException& ret) {
+            // Function returned a value
+            last_value = ret.value;
+        }
+        
+        // Restore previous environment
+        environment = previous_env;
+        return;
+    }
+    
     // Handle built-in functions
     if (std::holds_alternative<std::string>(callee)) {
         std::string func_name = std::get<std::string>(callee);
         
         if (func_name == "__builtin_print__") {
-            for (auto& arg : expr.arguments) {
-                Value val = evaluateExpr(*arg);
-                std::cout << valueToString(val);
-                if (&arg != &expr.arguments.back()) {
+            for (size_t i = 0; i < arguments.size(); i++) {
+                std::cout << valueToString(arguments[i]);
+                if (i < arguments.size() - 1) {
                     std::cout << " ";
                 }
             }
@@ -232,23 +306,121 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
             last_value = nullptr;
         } else if (func_name == "__builtin_range__") {
             // Simple range implementation
-            int end = std::get<int>(evaluateExpr(*expr.arguments[0]));
-            std::vector<std::shared_ptr<void>> range_list;
-            // For now, just return the end value
+            int end = std::get<int>(arguments[0]);
             last_value = end;
+        } else if (func_name == "__builtin_len__") {
+            // Get length of array or string
+            if (arguments.empty()) {
+                throw std::runtime_error("len() requires 1 argument");
+            }
+            
+            Value arg = arguments[0];
+            if (std::holds_alternative<std::shared_ptr<ArrayValue>>(arg)) {
+                auto array = std::get<std::shared_ptr<ArrayValue>>(arg);
+                last_value = static_cast<int>(array->elements.size());
+            } else if (std::holds_alternative<std::string>(arg)) {
+                std::string str = std::get<std::string>(arg);
+                last_value = static_cast<int>(str.length());
+            } else {
+                throw std::runtime_error("len() requires an array or string");
+            }
+        } else if (func_name == "__builtin_input__") {
+            // Get user input
+            // Optional prompt argument
+            if (!arguments.empty()) {
+                std::cout << valueToString(arguments[0]);
+            }
+            
+            std::string input_line;
+            std::getline(std::cin, input_line);
+            last_value = input_line;
+        } else if (func_name == "__builtin_read_file__") {
+            // Read file contents
+            if (arguments.empty()) {
+                throw std::runtime_error("read_file() requires 1 argument (filename)");
+            }
+            
+            std::string filename = std::get<std::string>(arguments[0]);
+            std::ifstream file(filename);
+            
+            if (!file.is_open()) {
+                throw std::runtime_error("Failed to open file: " + filename);
+            }
+            
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            file.close();
+            
+            last_value = buffer.str();
+        } else if (func_name == "__builtin_write_file__") {
+            // Write content to file
+            if (arguments.size() < 2) {
+                throw std::runtime_error("write_file() requires 2 arguments (filename, content)");
+            }
+            
+            std::string filename = std::get<std::string>(arguments[0]);
+            std::string content = valueToString(arguments[1]);
+            
+            std::ofstream file(filename);
+            
+            if (!file.is_open()) {
+                throw std::runtime_error("Failed to open file for writing: " + filename);
+            }
+            
+            file << content;
+            file.close();
+            
+            last_value = true;  // Return true on success
         }
     }
 }
 
 void Interpreter::visitListExpr(ListExpr& expr) {
-    std::vector<std::shared_ptr<void>> elements;
-    // Simplified list implementation
-    last_value = 0; // Placeholder
+    auto array = std::make_shared<ArrayValue>();
+    
+    for (auto& element : expr.elements) {
+        array->elements.push_back(evaluateExpr(*element));
+    }
+    
+    last_value = array;
 }
 
 void Interpreter::visitIndexExpr(IndexExpr& expr) {
-    // Simplified index implementation
-    last_value = 0; // Placeholder
+    Value object = evaluateExpr(*expr.object);
+    Value index = evaluateExpr(*expr.index);
+    
+    if (std::holds_alternative<std::shared_ptr<ArrayValue>>(object)) {
+        auto array = std::get<std::shared_ptr<ArrayValue>>(object);
+        
+        if (!std::holds_alternative<int>(index)) {
+            throw std::runtime_error("Array index must be an integer");
+        }
+        
+        int idx = std::get<int>(index);
+        
+        if (idx < 0 || idx >= static_cast<int>(array->elements.size())) {
+            throw std::runtime_error("Array index out of bounds: " + std::to_string(idx));
+        }
+        
+        last_value = array->elements[idx];
+    } else if (std::holds_alternative<std::string>(object)) {
+        // String indexing
+        std::string str = std::get<std::string>(object);
+        
+        if (!std::holds_alternative<int>(index)) {
+            throw std::runtime_error("String index must be an integer");
+        }
+        
+        int idx = std::get<int>(index);
+        
+        if (idx < 0 || idx >= static_cast<int>(str.length())) {
+            throw std::runtime_error("String index out of bounds: " + std::to_string(idx));
+        }
+        
+        last_value = std::string(1, str[idx]);
+    } else {
+        throw std::runtime_error("Cannot index non-array/non-string type");
+    }
 }
 
 // Statement visitors
@@ -266,8 +438,16 @@ void Interpreter::visitVarDeclStmt(VarDeclStmt& stmt) {
 }
 
 void Interpreter::visitFunctionDecl(FunctionDecl& stmt) {
-    // Store function in environment (simplified)
-    environment->define(stmt.name, std::string("__function__" + stmt.name));
+    // Create a function object and store it in the environment
+    auto func = std::make_shared<Function>(
+        stmt.name,
+        stmt.parameters,
+        stmt.return_type,
+        &stmt.body,
+        environment  // Capture current environment as closure
+    );
+    
+    environment->define(stmt.name, func);
 }
 
 void Interpreter::visitReturnStmt(ReturnStmt& stmt) {

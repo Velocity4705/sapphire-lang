@@ -1,0 +1,98 @@
+# Functions Examples - Now Working!
+
+print("=== Simple Function ===")
+
+fn add(a, b):
+    return a + b
+
+let result = add(10, 20)
+print(result)
+
+print("=== Function with Multiple Statements ===")
+
+fn greet(name):
+    print("Hello")
+    print(name)
+    print("Welcome to Sapphire!")
+
+greet("World")
+
+print("=== Function with Calculations ===")
+
+fn calculate(x, y):
+    let sum = x + y
+    let product = x * y
+    let diff = x - y
+    return product
+
+let answer = calculate(8, 4)
+print(answer)
+
+print("=== Recursive Function - Factorial ===")
+
+fn factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+
+print(factorial(5))
+print(factorial(6))
+print(factorial(7))
+
+print("=== Recursive Function - Fibonacci ===")
+
+fn fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+print("Fibonacci sequence:")
+let i = 0
+while i < 10:
+    print(fibonacci(i))
+    i = i + 1
+
+print("=== Function Calling Function ===")
+
+fn square(x):
+    return x * x
+
+fn sum_of_squares(a, b):
+    return square(a) + square(b)
+
+print(sum_of_squares(3, 4))
+
+print("=== Nested Function Calls ===")
+
+fn double(x):
+    return x * 2
+
+fn triple(x):
+    return x * 3
+
+print(double(triple(5)))
+
+print("=== Function with Conditionals ===")
+
+fn max(a, b):
+    if a > b:
+        return a
+    return b
+
+print(max(10, 20))
+print(max(50, 30))
+
+print("=== Function with Loops ===")
+
+fn sum_to_n(n):
+    let total = 0
+    let i = 1
+    while i <= n:
+        total = total + i
+        i = i + 1
+    return total
+
+print(sum_to_n(10))
+print(sum_to_n(100))
+
+print("=== Functions Complete! ===")

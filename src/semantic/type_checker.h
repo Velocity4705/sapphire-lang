@@ -71,6 +71,7 @@ public:
     void visitCallExpr(CallExpr& expr) override;
     void visitListExpr(ListExpr& expr) override;
     void visitIndexExpr(IndexExpr& expr) override;
+    void visitAssignExpr(AssignExpr& expr) override;
     
     // Statement visitors
     void visitExprStmt(ExprStmt& stmt) override;

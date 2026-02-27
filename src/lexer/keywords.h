@@ -36,7 +36,11 @@ static const std::map<std::string, TokenType> KEYWORDS = {
     {"continue", TokenType::CONTINUE},
     {"pass", TokenType::PASS},
     {"async", TokenType::ASYNC},
-    {"await", TokenType::AWAIT}
+    {"await", TokenType::AWAIT},
+    {"try", TokenType::TRY},
+    {"catch", TokenType::CATCH},
+    {"finally", TokenType::FINALLY},
+    {"throw", TokenType::THROW}
 };
 
 } // namespace sapphire

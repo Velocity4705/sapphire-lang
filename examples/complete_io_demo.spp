@@ -1,0 +1,72 @@
+# Complete I/O Demo - Showcasing all I/O features
+
+print("=== Sapphire I/O Demonstration ===")
+print()
+
+# 1. Console Output
+print("1. Console Output")
+print("Hello, World!")
+print("Numbers:", 42, 3.14)
+print("Boolean:", true)
+print()
+
+# 2. User Input (commented out for automated testing)
+# print("2. User Input")
+# name = input("What's your name? ")
+# age = input("How old are you? ")
+# print("Nice to meet you, " + name + "!")
+# print()
+
+# 3. File Writing
+print("3. File Writing")
+write_file("/tmp/sapphire_demo.txt", "This is a test file created by Sapphire!")
+print("File written to /tmp/sapphire_demo.txt")
+print()
+
+# 4. File Reading
+print("4. File Reading")
+content = read_file("/tmp/sapphire_demo.txt")
+print("File content: " + content)
+print()
+
+# 5. Working with Arrays and Files
+print("5. Arrays and File I/O")
+numbers = [10, 20, 30, 40, 50]
+print("Array:", numbers)
+write_file("/tmp/array_data.txt", "Array length: 5")
+array_info = read_file("/tmp/array_data.txt")
+print(array_info)
+print()
+
+# 6. Multi-line File Content
+print("6. Multi-line Files")
+multiline = "Line 1: Hello
+Line 2: From
+Line 3: Sapphire"
+write_file("/tmp/multiline.txt", multiline)
+result = read_file("/tmp/multiline.txt")
+print("Multi-line content:")
+print(result)
+print()
+
+# 7. Functions with I/O
+print("7. Functions with I/O")
+fn save_and_load(filename, data):
+    write_file(filename, data)
+    return read_file(filename)
+
+saved_data = save_and_load("/tmp/function_test.txt", "Function I/O test")
+print("Saved and loaded: " + saved_data)
+print()
+
+# 8. Loops with I/O
+print("8. Loops with File I/O")
+for i in range(3):
+    filename = "/tmp/loop_file.txt"
+    write_file(filename, "Iteration: " + filename)
+
+final_content = read_file("/tmp/loop_file.txt")
+print("Final file content: " + final_content)
+print()
+
+print("=== I/O Demo Complete ===")

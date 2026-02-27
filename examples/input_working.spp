@@ -1,0 +1,25 @@
+# User Input Examples - Milestone 5
+
+# Test 1: Simple input with prompt
+print("Test 1: Simple input")
+name = input("Enter your name: ")
+print("Hello, " + name + "!")
+
+# Test 2: Input without prompt
+print("Test 2: Input without prompt")
+value = input()
+print("You entered: " + value)
+
+# Test 3: Multiple inputs
+print("Test 3: Multiple inputs")
+first = input("First name: ")
+last = input("Last name: ")
+print("Full name: " + first + " " + last)
+
+# Test 4: Input in a loop
+print("Test 4: Input in loop")
+for i in range(3):
+    item = input("Enter item: ")
+    print("Got: " + item)
+
+print("All input tests completed!")

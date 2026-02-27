@@ -1,0 +1,34 @@
+# File I/O Examples - Milestone 5
+
+print("Test 1: Write to file")
+write_file("/tmp/test_sapphire.txt", "Hello, Sapphire!")
+print("File written successfully")
+
+print("Test 2: Read from file")
+content = read_file("/tmp/test_sapphire.txt")
+print("File content: " + content)
+
+print("Test 3: Write multiple lines")
+text = "Line 1
+Line 2
+Line 3"
+write_file("/tmp/test_multiline.txt", text)
+print("Multiline file written")
+
+print("Test 4: Read multiline file")
+multiline = read_file("/tmp/test_multiline.txt")
+print("Multiline content:")
+print(multiline)
+
+print("Test 5: Write array as string")
+arr = [1, 2, 3, 4, 5]
+write_file("/tmp/test_array.txt", "Array: [1, 2, 3, 4, 5]")
+array_content = read_file("/tmp/test_array.txt")
+print(array_content)
+
+print("Test 6: Write and read numbers")
+write_file("/tmp/test_numbers.txt", "42")
+num_str = read_file("/tmp/test_numbers.txt")
+print("Number from file: " + num_str)
+
+print("All file I/O tests completed!")

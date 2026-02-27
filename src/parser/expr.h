@@ -37,6 +37,17 @@ public:
     void accept(ExprVisitor& visitor) override;
 };
 
+// Assignment expression
+class AssignExpr : public Expr {
+public:
+    std::string name;
+    std::unique_ptr<Expr> value;
+    
+    AssignExpr(const std::string& n, std::unique_ptr<Expr> v)
+        : name(n), value(std::move(v)) {}
+    void accept(ExprVisitor& visitor) override;
+};
+
 // Binary expression
 class BinaryExpr : public Expr {
 public:
@@ -98,6 +109,7 @@ public:
     virtual ~ExprVisitor() = default;
     virtual void visitLiteralExpr(LiteralExpr& expr) = 0;
     virtual void visitVariableExpr(VariableExpr& expr) = 0;
+    virtual void visitAssignExpr(AssignExpr& expr) = 0;
     virtual void visitBinaryExpr(BinaryExpr& expr) = 0;
     virtual void visitUnaryExpr(UnaryExpr& expr) = 0;
     virtual void visitCallExpr(CallExpr& expr) = 0;

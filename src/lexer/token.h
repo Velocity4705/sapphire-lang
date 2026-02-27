@@ -40,6 +40,10 @@ enum class TokenType {
     PASS,
     ASYNC,
     AWAIT,
+    TRY,
+    CATCH,
+    FINALLY,
+    THROW,
     
     // Operators
     PLUS,

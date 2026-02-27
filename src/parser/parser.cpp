@@ -184,6 +184,8 @@ std::unique_ptr<Stmt> Parser::statement() {
     if (match({TokenType::IF})) return ifStatement();
     if (match({TokenType::WHILE})) return whileStatement();
     if (match({TokenType::FOR})) return forStatement();
+    if (match({TokenType::TRY})) return tryStatement();
+    if (match({TokenType::THROW})) return throwStatement();
     
     return exprStatement();
 }
@@ -270,7 +272,21 @@ std::unique_ptr<Expr> Parser::expression() {
 }
 
 std::unique_ptr<Expr> Parser::assignment() {
-    return logicalOr();
+    auto expr = logicalOr();
+    
+    if (match({TokenType::EQUAL})) {
+        Token equals = previous();
+        auto value = assignment();
+        
+        // Check if left side is a variable
+        if (auto* var = dynamic_cast<VariableExpr*>(expr.get())) {
+            return std::make_unique<AssignExpr>(var->name, std::move(value));
+        }
+        
+        throw error(equals, "Invalid assignment target");
+    }
+    
+    return expr;
 }
 
 std::unique_ptr<Expr> Parser::logicalOr() {
@@ -439,6 +455,105 @@ std::unique_ptr<Expr> Parser::primary() {
     }
     
     throw error(peek(), "Expected expression");
+}
+
+std::unique_ptr<Stmt> Parser::tryStatement() {
+    // try:
+    consume(TokenType::COLON, "Expected ':' after 'try'");
+    skipNewlines();
+    consume(TokenType::INDENT, "Expected indentation after 'try:'");
+    
+    // Parse try body
+    std::vector<std::unique_ptr<Stmt>> try_body;
+    while (!check(TokenType::DEDENT) && !isAtEnd()) {
+        try_body.push_back(statement());
+        skipNewlines();
+    }
+    consume(TokenType::DEDENT, "Expected dedent after try block");
+    
+    // Parse catch clauses
+    std::vector<CatchClause> catch_clauses;
+    while (match({TokenType::CATCH})) {
+        std::string exception_type;
+        std::string variable_name;
+        
+        // Check for exception type and variable binding
+        if (check(TokenType::IDENTIFIER)) {
+            Token first = advance();
+            
+            if (match({TokenType::AS})) {
+                // catch ExceptionType as e:
+                exception_type = first.lexeme;
+                variable_name = consume(TokenType::IDENTIFIER, "Expected variable name after 'as'").lexeme;
+            } else {
+                // catch e:
+                variable_name = first.lexeme;
+            }
+        }
+        
+        consume(TokenType::COLON, "Expected ':' after catch clause");
+        skipNewlines();
+        consume(TokenType::INDENT, "Expected indentation after catch:");
+        
+        std::vector<std::unique_ptr<Stmt>> catch_body;
+        while (!check(TokenType::DEDENT) && !isAtEnd()) {
+            catch_body.push_back(statement());
+            skipNewlines();
+        }
+        consume(TokenType::DEDENT, "Expected dedent after catch block");
+        
+        catch_clauses.emplace_back(exception_type, variable_name, std::move(catch_body));
+    }
+    
+    // Parse finally clause
+    std::vector<std::unique_ptr<Stmt>> finally_body;
+    if (match({TokenType::FINALLY})) {
+        consume(TokenType::COLON, "Expected ':' after 'finally'");
+        skipNewlines();
+        consume(TokenType::INDENT, "Expected indentation after finally:");
+        
+        while (!check(TokenType::DEDENT) && !isAtEnd()) {
+            finally_body.push_back(statement());
+            skipNewlines();
+        }
+        consume(TokenType::DEDENT, "Expected dedent after finally block");
+    }
+    
+    // Validate: must have at least one catch or finally
+    if (catch_clauses.empty() && finally_body.empty()) {
+        throw error(previous(), "Try statement must have at least one catch or finally clause");
+    }
+    
+    return std::make_unique<TryStmt>(std::move(try_body),
+                                     std::move(catch_clauses),
+                                     std::move(finally_body));
+}
+
+std::unique_ptr<Stmt> Parser::throwStatement() {
+    std::string exception_type = "RuntimeError";  // Default
+    std::unique_ptr<Expr> message;
+    
+    // Check if exception type is specified: throw ValueError("message")
+    if (check(TokenType::IDENTIFIER) && peek().lexeme[0] >= 'A' && peek().lexeme[0] <= 'Z') {
+        // Looks like an exception type (starts with capital letter)
+        Token type_token = advance();
+        
+        if (match({TokenType::LPAREN})) {
+            exception_type = type_token.lexeme;
+            message = expression();
+            consume(TokenType::RPAREN, "Expected ')' after exception message");
+        } else {
+            // Not a function call, treat as regular expression
+            current--;  // Back up
+            message = expression();
+        }
+    } else {
+        // throw "message"
+        message = expression();
+    }
+    
+    skipNewlines();
+    return std::make_unique<ThrowStmt>(exception_type, std::move(message));
 }
 
 } // namespace sapphire

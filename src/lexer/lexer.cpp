@@ -9,9 +9,25 @@ Lexer::Lexer(const std::string& src)
     : source(src), current(0), line(1), column(1), indent_stack({0}) {}
 
 std::vector<Token> Lexer::tokenize() {
+    bool at_line_start = true;
+    
     while (!isAtEnd()) {
+        // Handle indentation at the start of a line
+        if (at_line_start) {
+            handleIndentation();
+            at_line_start = false;
+        }
+        
         skipWhitespaceAndComments();
         if (isAtEnd()) break;
+        
+        // Check if we just consumed a newline
+        if (peek() == '\n') {
+            advance();
+            tokens.push_back(makeToken(TokenType::NEWLINE, "\\n"));
+            at_line_start = true;
+            continue;
+        }
         
         scanToken();
     }
@@ -76,50 +92,57 @@ void Lexer::skipWhitespaceAndComments() {
 }
 
 void Lexer::handleIndentation() {
-    if (current == 0 || source[current - 1] == '\n') {
-        int spaces = 0;
-        size_t start = current;
-        
-        while (!isAtEnd() && (peek() == ' ' || peek() == '\t')) {
-            if (peek() == ' ') {
-                spaces++;
-            } else {
-                spaces += 4; // Tab = 4 spaces
+    int spaces = 0;
+    
+    // Count leading spaces/tabs
+    while (!isAtEnd() && (peek() == ' ' || peek() == '\t')) {
+        if (peek() == ' ') {
+            spaces++;
+        } else {
+            spaces += 4; // Tab = 4 spaces
+        }
+        advance();
+    }
+    
+    // Skip empty lines and comment-only lines
+    if (isAtEnd() || peek() == '\n' || peek() == '#') {
+        // Skip the rest of the line if it's a comment
+        if (peek() == '#') {
+            while (!isAtEnd() && peek() != '\n') {
+                advance();
             }
-            advance();
+        }
+        return;
+    }
+    
+    int current_indent = indent_stack.back();
+    
+    if (spaces > current_indent) {
+        // Increase indentation
+        indent_stack.push_back(spaces);
+        tokens.push_back(makeToken(TokenType::INDENT, ""));
+    } else if (spaces < current_indent) {
+        // Decrease indentation (may be multiple levels)
+        while (!indent_stack.empty() && indent_stack.back() > spaces) {
+            indent_stack.pop_back();
+            tokens.push_back(makeToken(TokenType::DEDENT, ""));
         }
         
-        // Skip empty lines
-        if (peek() == '\n' || peek() == '#') {
-            return;
-        }
-        
-        int current_indent = indent_stack.back();
-        
-        if (spaces > current_indent) {
-            indent_stack.push_back(spaces);
-            tokens.push_back(makeToken(TokenType::INDENT, ""));
-        } else if (spaces < current_indent) {
-            while (!indent_stack.empty() && indent_stack.back() > spaces) {
-                indent_stack.pop_back();
-                tokens.push_back(makeToken(TokenType::DEDENT, ""));
-            }
+        // Check for indentation error
+        if (indent_stack.empty() || indent_stack.back() != spaces) {
+            std::cerr << "Indentation error at line " << line << std::endl;
         }
     }
+    // If spaces == current_indent, no change in indentation
 }
 
 void Lexer::scanToken() {
-    handleIndentation();
-    
     if (isAtEnd()) return;
     
     size_t start = current;
     char c = advance();
     
     switch (c) {
-        case '\n':
-            tokens.push_back(makeToken(TokenType::NEWLINE, "\\n"));
-            break;
         case '(': tokens.push_back(makeToken(TokenType::LPAREN, "(")); break;
         case ')': tokens.push_back(makeToken(TokenType::RPAREN, ")")); break;
         case '{': tokens.push_back(makeToken(TokenType::LBRACE, "{")); break;

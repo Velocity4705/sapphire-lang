@@ -35,6 +35,11 @@ EXAMPLES=(
     "examples/test_type_promotion.spp"
     "examples/test_with_print.spp"
     "examples/type_test.spp"
+    "examples/control_flow_working.spp"
+    "examples/functions_working.spp"
+    "examples/arrays_working.spp"
+    "examples/file_io_working.spp"
+    "examples/complete_io_demo.spp"
 )
 
 for example in "${EXAMPLES[@]}"; do

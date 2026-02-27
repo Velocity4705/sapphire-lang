@@ -111,6 +111,45 @@ public:
     void accept(StmtVisitor& visitor) override;
 };
 
+// Catch clause for try statement
+class CatchClause {
+public:
+    std::string exception_type;  // Empty string means catch all
+    std::string variable_name;   // Variable to bind exception to
+    std::vector<std::unique_ptr<Stmt>> body;
+    
+    CatchClause(const std::string& type, const std::string& var,
+                std::vector<std::unique_ptr<Stmt>> b)
+        : exception_type(type), variable_name(var), body(std::move(b)) {}
+};
+
+// Try statement
+class TryStmt : public Stmt {
+public:
+    std::vector<std::unique_ptr<Stmt>> try_body;
+    std::vector<CatchClause> catch_clauses;
+    std::vector<std::unique_ptr<Stmt>> finally_body;
+    
+    TryStmt(std::vector<std::unique_ptr<Stmt>> try_b,
+            std::vector<CatchClause> catches,
+            std::vector<std::unique_ptr<Stmt>> finally_b)
+        : try_body(std::move(try_b)),
+          catch_clauses(std::move(catches)),
+          finally_body(std::move(finally_b)) {}
+    void accept(StmtVisitor& visitor) override;
+};
+
+// Throw statement
+class ThrowStmt : public Stmt {
+public:
+    std::string exception_type;
+    std::unique_ptr<Expr> message;
+    
+    ThrowStmt(const std::string& type, std::unique_ptr<Expr> msg)
+        : exception_type(type), message(std::move(msg)) {}
+    void accept(StmtVisitor& visitor) override;
+};
+
 // Visitor interface
 class StmtVisitor {
 public:
@@ -122,6 +161,8 @@ public:
     virtual void visitIfStmt(IfStmt& stmt) = 0;
     virtual void visitWhileStmt(WhileStmt& stmt) = 0;
     virtual void visitForStmt(ForStmt& stmt) = 0;
+    virtual void visitTryStmt(TryStmt& stmt) = 0;
+    virtual void visitThrowStmt(ThrowStmt& stmt) = 0;
 };
 
 } // namespace sapphire

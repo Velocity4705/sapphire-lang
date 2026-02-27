@@ -1,0 +1,53 @@
+# Array Examples - Milestone 3
+
+# Test 1: Array creation and printing
+print("Test 1: Array creation")
+arr = [1, 2, 3, 4, 5]
+print(arr)
+
+# Test 2: Array indexing
+print("Test 2: Array indexing")
+print(arr[0])
+print(arr[2])
+print(arr[4])
+
+# Test 3: Array length
+print("Test 3: Array length")
+print(len(arr))
+
+# Test 4: Empty array
+print("Test 4: Empty array")
+empty = []
+print(empty)
+print(len(empty))
+
+# Test 5: String array
+print("Test 5: String array")
+names = ["Alice", "Bob", "Charlie"]
+print(names)
+print(names[1])
+print(len(names))
+
+# Test 6: Mixed operations
+print("Test 6: Array with expressions")
+nums = [1 + 1, 2 * 3, 10 - 5]
+print(nums)
+print(nums[0])
+print(nums[1])
+print(nums[2])
+
+# Test 7: Array in loop
+print("Test 7: Iterating over array")
+for i in range(3):
+    print(arr[i])
+
+# Test 8: Nested arrays
+print("Test 8: Nested arrays")
+matrix = [[1, 2], [3, 4], [5, 6]]
+print(matrix)
+print(matrix[0])
+print(matrix[1])
+print(matrix[0][0])
+print(matrix[1][1])
+
+print("All array tests completed!")

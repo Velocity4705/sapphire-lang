@@ -38,6 +38,10 @@ std::string tokenTypeToString(TokenType type) {
         {TokenType::PASS, "PASS"},
         {TokenType::ASYNC, "ASYNC"},
         {TokenType::AWAIT, "AWAIT"},
+        {TokenType::TRY, "TRY"},
+        {TokenType::CATCH, "CATCH"},
+        {TokenType::FINALLY, "FINALLY"},
+        {TokenType::THROW, "THROW"},
         
         // Operators
         {TokenType::PLUS, "PLUS"},

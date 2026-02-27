@@ -1,0 +1,8 @@
+# Simple input test that can be automated
+print("Testing input function...")
+
+# Test with prompt
+name = input("Name: ")
+print("Hello, " + name)
+
+print("Input test complete!")

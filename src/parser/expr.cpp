@@ -10,6 +10,10 @@ void VariableExpr::accept(ExprVisitor& visitor) {
     visitor.visitVariableExpr(*this);
 }
 
+void AssignExpr::accept(ExprVisitor& visitor) {
+    visitor.visitAssignExpr(*this);
+}
+
 void BinaryExpr::accept(ExprVisitor& visitor) {
     visitor.visitBinaryExpr(*this);
 }
