@@ -34,4 +34,12 @@ void IndexExpr::accept(ExprVisitor& visitor) {
     visitor.visitIndexExpr(*this);
 }
 
+void GetExpr::accept(ExprVisitor& visitor) {
+    visitor.visitGetExpr(*this);
+}
+
+void SetExpr::accept(ExprVisitor& visitor) {
+    visitor.visitSetExpr(*this);
+}
+
 } // namespace sapphire

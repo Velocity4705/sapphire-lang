@@ -62,6 +62,12 @@ public:
         : SapphireException(msg, "ValueError") {}
 };
 
+class PermissionError : public SapphireException {
+public:
+    explicit PermissionError(const std::string& msg)
+        : SapphireException(msg, "PermissionError") {}
+};
+
 } // namespace sapphire
 
 #endif // SAPPHIRE_EXCEPTION_H

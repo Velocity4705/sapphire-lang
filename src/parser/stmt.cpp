@@ -38,4 +38,8 @@ void ThrowStmt::accept(StmtVisitor& visitor) {
     visitor.visitThrowStmt(*this);
 }
 
+void ClassDecl::accept(StmtVisitor& visitor) {
+    visitor.visitClassDecl(*this);
+}
+
 } // namespace sapphire

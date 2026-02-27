@@ -150,6 +150,20 @@ public:
     void accept(StmtVisitor& visitor) override;
 };
 
+// Class declaration
+class ClassDecl : public Stmt {
+public:
+    std::string name;
+    std::string superclass_name; // Empty if no base class
+    std::vector<std::unique_ptr<FunctionDecl>> methods;
+    
+    ClassDecl(const std::string& n,
+              const std::string& super,
+              std::vector<std::unique_ptr<FunctionDecl>> m)
+        : name(n), superclass_name(super), methods(std::move(m)) {}
+    void accept(StmtVisitor& visitor) override;
+};
+
 // Visitor interface
 class StmtVisitor {
 public:
@@ -163,6 +177,7 @@ public:
     virtual void visitForStmt(ForStmt& stmt) = 0;
     virtual void visitTryStmt(TryStmt& stmt) = 0;
     virtual void visitThrowStmt(ThrowStmt& stmt) = 0;
+    virtual void visitClassDecl(ClassDecl& stmt) = 0;
 };
 
 } // namespace sapphire

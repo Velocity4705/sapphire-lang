@@ -15,6 +15,9 @@ namespace sapphire {
 class Environment;
 class Interpreter;
 class Function;
+class Class;
+class Instance;
+class BoundMethod;
 struct ArrayValue;
 
 // Function object to store function definitions
@@ -34,14 +37,51 @@ public:
         : name(n), parameters(params), return_type(ret_type), body(b), closure(c) {}
 };
 
-// Value type for runtime values (forward declare Array)
+// Class object representing a user-defined class
+class Class {
+public:
+    std::string name;
+    std::shared_ptr<Class> superclass;
+    std::map<std::string, std::shared_ptr<Function>> methods;
+    
+    Class(const std::string& n,
+          std::shared_ptr<Class> super,
+          const std::map<std::string, std::shared_ptr<Function>>& m)
+        : name(n), superclass(std::move(super)), methods(m) {}
+    
+    std::shared_ptr<Function> findMethod(const std::string& method_name) const;
+};
+
+// Forward declare Value for use in Instance
 using Value = std::variant<int, double, std::string, bool, std::nullptr_t, 
                            std::shared_ptr<ArrayValue>,
-                           std::shared_ptr<Function>>;
+                           std::shared_ptr<Function>,
+                           std::shared_ptr<Class>,
+                           std::shared_ptr<Instance>,
+                           std::shared_ptr<BoundMethod>>;
 
 // Array type (defined after Value)
 struct ArrayValue {
     std::vector<Value> elements;
+};
+
+// Instance of a class
+class Instance {
+public:
+    std::shared_ptr<Class> klass;
+    std::map<std::string, Value> fields;
+    
+    explicit Instance(std::shared_ptr<Class> k) : klass(std::move(k)) {}
+};
+
+// Bound method (instance + function)
+class BoundMethod {
+public:
+    std::shared_ptr<Instance> instance;
+    std::shared_ptr<Function> method;
+    
+    BoundMethod(std::shared_ptr<Instance> inst, std::shared_ptr<Function> m)
+        : instance(std::move(inst)), method(std::move(m)) {}
 };
 
 class Environment {
@@ -72,6 +112,7 @@ private:
     std::string valueToString(const Value& value);
     bool isTruthy(const Value& value);
     Value evaluateExpr(Expr& expr);
+    void throwException(const std::string& type, const std::string& message);
 
 public:
     Interpreter();
@@ -86,6 +127,8 @@ public:
     void visitCallExpr(CallExpr& expr) override;
     void visitListExpr(ListExpr& expr) override;
     void visitIndexExpr(IndexExpr& expr) override;
+    void visitGetExpr(GetExpr& expr) override;
+    void visitSetExpr(SetExpr& expr) override;
     
     // Statement visitors
     void visitExprStmt(ExprStmt& stmt) override;
@@ -95,6 +138,9 @@ public:
     void visitIfStmt(IfStmt& stmt) override;
     void visitWhileStmt(WhileStmt& stmt) override;
     void visitForStmt(ForStmt& stmt) override;
+    void visitTryStmt(TryStmt& stmt) override;
+    void visitThrowStmt(ThrowStmt& stmt) override;
+    void visitClassDecl(ClassDecl& stmt) override;
 };
 
 } // namespace sapphire

@@ -103,6 +103,29 @@ public:
     void accept(ExprVisitor& visitor) override;
 };
 
+// Property access expression: object.name
+class GetExpr : public Expr {
+public:
+    std::unique_ptr<Expr> object;
+    std::string name;
+    
+    GetExpr(std::unique_ptr<Expr> obj, const std::string& n)
+        : object(std::move(obj)), name(n) {}
+    void accept(ExprVisitor& visitor) override;
+};
+
+// Property assignment expression: object.name = value
+class SetExpr : public Expr {
+public:
+    std::unique_ptr<Expr> object;
+    std::string name;
+    std::unique_ptr<Expr> value;
+    
+    SetExpr(std::unique_ptr<Expr> obj, const std::string& n, std::unique_ptr<Expr> v)
+        : object(std::move(obj)), name(n), value(std::move(v)) {}
+    void accept(ExprVisitor& visitor) override;
+};
+
 // Visitor interface
 class ExprVisitor {
 public:
@@ -115,6 +138,8 @@ public:
     virtual void visitCallExpr(CallExpr& expr) = 0;
     virtual void visitListExpr(ListExpr& expr) = 0;
     virtual void visitIndexExpr(IndexExpr& expr) = 0;
+    virtual void visitGetExpr(GetExpr& expr) = 0;
+    virtual void visitSetExpr(SetExpr& expr) = 0;
 };
 
 } // namespace sapphire

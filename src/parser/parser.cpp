@@ -111,6 +111,9 @@ std::unique_ptr<Stmt> Parser::declaration() {
     if (match({TokenType::FN, TokenType::ASYNC})) {
         return functionDeclaration();
     }
+    if (match({TokenType::CLASS})) {
+        return classDeclaration();
+    }
     return statement();
 }
 
@@ -177,6 +180,38 @@ std::unique_ptr<Stmt> Parser::functionDeclaration() {
     
     return std::make_unique<FunctionDecl>(name.lexeme, std::move(parameters),
                                           return_type, std::move(body), is_async);
+}
+
+std::unique_ptr<Stmt> Parser::classDeclaration() {
+    // class Name[:]
+    Token name = consumeToken(TokenType::IDENTIFIER, "Expected class name");
+    
+    std::string superclass_name;
+    if (match({TokenType::LPAREN})) {
+        Token base = consumeToken(TokenType::IDENTIFIER, "Expected base class name");
+        superclass_name = base.lexeme;
+        consume(TokenType::RPAREN, "Expected ')' after base class name");
+    }
+    
+    consume(TokenType::COLON, "Expected ':' after class header");
+    skipNewlines();
+    consume(TokenType::INDENT, "Expected indented block for class body");
+    
+    // Parse class body as a block and collect methods
+    auto body_statements = block();
+    std::vector<std::unique_ptr<FunctionDecl>> methods;
+    
+    for (auto& stmt : body_statements) {
+        if (auto* fn = dynamic_cast<FunctionDecl*>(stmt.get())) {
+            // Transfer ownership into methods vector
+            std::unique_ptr<FunctionDecl> method(fn);
+            stmt.release();
+            methods.push_back(std::move(method));
+        }
+        // Non-function statements in class body are ignored for now
+    }
+    
+    return std::make_unique<ClassDecl>(name.lexeme, superclass_name, std::move(methods));
 }
 
 std::unique_ptr<Stmt> Parser::statement() {
@@ -278,9 +313,14 @@ std::unique_ptr<Expr> Parser::assignment() {
         Token equals = previous();
         auto value = assignment();
         
-        // Check if left side is a variable
+        // Check if left side is a variable or property
         if (auto* var = dynamic_cast<VariableExpr*>(expr.get())) {
             return std::make_unique<AssignExpr>(var->name, std::move(value));
+        } else if (auto* get = dynamic_cast<GetExpr*>(expr.get())) {
+            // Transform "object.name = value" into a SetExpr
+            auto object = std::move(get->object);
+            std::string name = get->name;
+            return std::make_unique<SetExpr>(std::move(object), name, std::move(value));
         }
         
         throw error(equals, "Invalid assignment target");
@@ -402,6 +442,9 @@ std::unique_ptr<Expr> Parser::call() {
             auto index = expression();
             consume(TokenType::RBRACKET, "Expected ']' after index");
             expr = std::make_unique<IndexExpr>(std::move(expr), std::move(index));
+        } else if (match({TokenType::DOT})) {
+            Token name = consumeToken(TokenType::IDENTIFIER, "Expected property name after '.'");
+            expr = std::make_unique<GetExpr>(std::move(expr), name.lexeme);
         } else {
             break;
         }
@@ -484,7 +527,8 @@ std::unique_ptr<Stmt> Parser::tryStatement() {
             if (match({TokenType::AS})) {
                 // catch ExceptionType as e:
                 exception_type = first.lexeme;
-                variable_name = consume(TokenType::IDENTIFIER, "Expected variable name after 'as'").lexeme;
+                Token var_token = consumeToken(TokenType::IDENTIFIER, "Expected variable name after 'as'");
+                variable_name = var_token.lexeme;
             } else {
                 // catch e:
                 variable_name = first.lexeme;

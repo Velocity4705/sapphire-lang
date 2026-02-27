@@ -1,0 +1,35 @@
+print("=== Error Handling Examples ===")
+
+print("Test 1: Basic try-catch with division by zero")
+try:
+    let x = 10 / 0
+    print(x)
+catch DivisionByZeroError as e:
+    print("Error: Division by zero")
+
+print("Test 2: Multiple catch blocks")
+fn risky_operation():
+    # Simulate a file error
+    throw FileNotFoundError("config.yaml not found")
+
+try:
+    risky_operation()
+catch FileNotFoundError as e:
+    print("File not found")
+catch PermissionError as e:
+    print("Permission denied")
+
+print("Test 3: Finally block")
+fn open_file():
+    throw RuntimeError("generic error")
+
+fn cleanup():
+    print("cleanup called")
+
+try:
+    open_file()
+catch e:
+    print("Error occurred")
+finally:
+    cleanup()
+
