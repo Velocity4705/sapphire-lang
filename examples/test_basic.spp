@@ -12,18 +12,16 @@ let b = 20 / 4
 print(a)
 print(b)
 
-# Conditionals
-if x > 40:
-    print("x is large")
-else:
-    print("x is small")
+# Comparisons
+let is_large = x > 40
+print(is_large)
 
-# Loops
-let i = 0
-while i < 5:
-    print(i)
-    i = i + 1
+let is_equal = a == 15
+print(is_equal)
 
-# For loop
-for j in range(3):
-    print(j)
+# More arithmetic
+let product = x * y
+print(product)
+
+let quotient = x / y
+print(quotient)

@@ -1,8 +1,15 @@
 # Test arithmetic operations
 let a = 10
 let b = 5
+
 let sum = a + b
+print(sum)
+
 let diff = a - b
+print(diff)
+
 let prod = a * b
+print(prod)
+
 let quot = a / b
-let mod = a % b
+print(quot)

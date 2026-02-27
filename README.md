@@ -297,10 +297,16 @@ Build anything:
 
 📚 **[Getting Started](docs/GETTING_STARTED.md)** - Your first Sapphire program  
 🎨 **[Language Features](docs/LANGUAGE_FEATURES.md)** - What makes Sapphire special  
+⭐ **[Complete Features](docs/COMPLETE_FEATURES.md)** - 500+ features from all major languages  
 📱 **[Platform Directives](docs/PLATFORM_DIRECTIVES.md)** - Mobile, web, and cross-platform development  
 🔬 **[Advanced Types](docs/ADVANCED_TYPES.md)** - Dependent types, higher-kinded types, type-level computation  
 🎭 **[Macros](docs/MACROS.md)** - Compile-time metaprogramming and code generation  
 ⚡ **[JIT Compilation](docs/JIT_COMPILATION.md)** - Runtime optimization and adaptive compilation  
+📁 **[File I/O](docs/FILE_IO.md)** - Reading and writing files  
+⌨️ **[User Input](docs/USER_INPUT.md)** - Console input, arguments, interactive prompts  
+🖥️ **[System Programming](docs/SYSTEM_PROGRAMMING.md)** - Low-level system access, processes, memory  
+🏷️ **[Directives](docs/DIRECTIVES.md)** - Compiler directives and attributes  
+🔤 **[Keywords](docs/KEYWORDS.md)** - Complete keyword reference  
 🏗️ **[Architecture](docs/ARCHITECTURE.md)** - How it works under the hood  
 📖 **[Standard Library](docs/STANDARD_LIBRARY.md)** - Complete API reference  
 ⚡ **[Performance Guide](PERFORMANCE.md)** - Benchmarks and optimization  

@@ -1,0 +1,67 @@
+# File I/O Example
+# Demonstrates file I/O concepts with current parser
+
+# NOTE: Simplified version for current parser
+# Full file I/O features coming soon - see docs/FILE_IO.md
+
+# Simulate file operations with variables
+print("=== File I/O Simulation ===")
+
+# File write simulation
+let file_name = 100  # Simulating "output.txt"
+let content_size = 42
+print("Writing to file...")
+print(content_size)
+
+# File read simulation
+let bytes_read = content_size
+print("Reading from file...")
+print(bytes_read)
+
+# File size check
+let file_exists = 1  # 1 = true, 0 = false
+let size_bytes = 1024
+print("File exists:")
+print(file_exists)
+print("File size (bytes):")
+print(size_bytes)
+
+# Multiple file operations
+let files_count = 5
+let total_size = size_bytes * files_count
+print("Total files:")
+print(files_count)
+print("Total size:")
+print(total_size)
+
+# File comparison
+let file1_size = 1024
+let file2_size = 2048
+let size_diff = file2_size - file1_size
+let is_larger = file2_size > file1_size
+print("Size difference:")
+print(size_diff)
+print("File2 is larger:")
+print(is_larger)
+
+# CSV simulation (row count)
+let csv_rows = 10
+let csv_columns = 3
+let csv_cells = csv_rows * csv_columns
+print("CSV rows:")
+print(csv_rows)
+print("CSV total cells:")
+print(csv_cells)
+
+# JSON simulation (data size)
+let json_objects = 5
+let json_fields = 4
+let json_total = json_objects * json_fields
+print("JSON objects:")
+print(json_objects)
+print("JSON total fields:")
+print(json_total)
+
+print("File I/O simulation complete!")
+
+# For full file I/O features, see docs/FILE_IO.md

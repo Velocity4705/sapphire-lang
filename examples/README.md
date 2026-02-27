@@ -4,22 +4,135 @@ This directory contains example programs demonstrating Sapphire's features.
 
 ## ✅ Working Examples (Current v1.0.0)
 
-These examples work with the current parser:
+These examples work with the current parser and have been verified:
 
-- **`hello.spp`** - Hello World
-- **`simple.spp`** - Basic variables and arithmetic
-- **`showcase.spp`** - Working language features
-- **`data_science_simple.spp`** - Basic data processing
-- **`test_basic.spp`** - Basic operations
-- **`test_arithmetic.spp`** - Arithmetic operations
-- **`test_comparison.spp`** - Comparison operators
-
-### Run a working example:
+### `hello.spp` - Hello World
 ```bash
 ./sapp examples/hello.spp
+```
+Output:
+```
+Hello, Sapphire!
+Hello, World!
+```
+
+### `simple.spp` - Basic variables and arithmetic
+```bash
+./sapp examples/simple.spp
+```
+Output:
+```
+10
+30
+```
+
+### `showcase.spp` - Working language features
+```bash
 ./sapp examples/showcase.spp
+```
+Output:
+```
+30
+200
+256.000000
+true
+true
+true
+50
+78.539750
+```
+
+### `data_science_simple.spp` - Basic data processing
+```bash
 ./sapp examples/data_science_simple.spp
 ```
+Output:
+```
+=== Sapphire Data Science Demo ===
+
+Mean:
+10.000000
+Sum:
+30
+Average:
+10.000000
+Variance:
+16.666667
+Value above threshold:
+true
+
+✓ Data analysis complete!
+```
+
+### `test_basic.spp` - Basic operations
+```bash
+./sapp examples/test_basic.spp
+```
+Output:
+```
+52
+15
+5.000000
+true
+true
+420
+4.200000
+```
+
+### `test_arithmetic.spp` - Arithmetic operations
+```bash
+./sapp examples/test_arithmetic.spp
+```
+Output:
+```
+15
+5
+50
+2.000000
+```
+
+### `test_comparison.spp` - Comparison operators
+```bash
+./sapp examples/test_comparison.spp
+```
+Output:
+```
+true
+false
+false
+true
+```
+
+### `file_io_example.spp` - File I/O simulation
+```bash
+./sapp examples/file_io_example.spp
+```
+Demonstrates file operations concepts (reading, writing, CSV, JSON).
+
+### `user_input_example.spp` - User input simulation
+```bash
+./sapp examples/user_input_example.spp
+```
+Demonstrates user input validation and processing.
+
+### `system_programming_example.spp` - System programming simulation
+```bash
+./sapp examples/system_programming_example.spp
+```
+Demonstrates system-level operations (processes, memory, CPU, disk).
+
+### `directives_example.spp` - Directives simulation
+```bash
+./sapp examples/directives_example.spp
+```
+Demonstrates compiler directives and optimization concepts.
+
+### Test All Examples
+```bash
+./test_examples.sh
+```
+
+All 11 examples pass! ✅
 
 ## 🔮 Future Vision Examples
 
@@ -55,15 +168,105 @@ The current parser (v1.0.0) supports:
 
 ## Coming Soon
 
-Features being implemented:
+Features being implemented for v1.0.0:
 
-- 🔄 Control flow (if/else, while, for)
-- 🔄 Functions
-- 🔄 Classes and objects
-- 🔄 Imports and modules
-- 🔄 String interpolation
-- 🔄 Arrays and collections
+### Control Flow
+- 🔄 if/else statements
+- 🔄 while loops
+- 🔄 for loops
+- 🔄 match/switch statements
 - 🔄 Pattern matching
+- 🔄 Guard clauses
+
+### Functions & Methods
+- 🔄 Function definitions
+- 🔄 Methods
+- 🔄 Lambda expressions
+- 🔄 Closures
+- 🔄 Higher-order functions
+- 🔄 Default parameters
+- 🔄 Named parameters
+- 🔄 Variadic functions
+
+### Object-Oriented
+- 🔄 Classes and objects
+- 🔄 Inheritance
+- 🔄 Interfaces/Traits
+- 🔄 Abstract classes
+- 🔄 Properties
+- 🔄 Constructors/Destructors
+- 🔄 Operator overloading
+- 🔄 Method overloading
+
+### Data Structures
+- 🔄 Arrays
+- 🔄 Lists/Vectors
+- 🔄 Hash maps/Dictionaries
+- 🔄 Sets
+- 🔄 Tuples
+- 🔄 Structs
+- 🔄 Enums
+
+### Advanced Features
+- 🔄 Generics
+- 🔄 Type inference
+- 🔄 Pattern matching
+- 🔄 String interpolation
+- 🔄 Imports and modules
+- 🔄 Async/await
+- 🔄 Coroutines
+- 🔄 Macros
+- 🔄 Reflection
+- 🔄 Decorators
+
+### Memory Management
+- 🔄 Ownership system
+- 🔄 Borrowing
+- 🔄 Lifetimes
+- 🔄 Smart pointers
+- 🔄 Reference counting
+- 🔄 Garbage collection
+
+### Concurrency
+- 🔄 Threads
+- 🔄 Channels
+- 🔄 Mutexes
+- 🔄 Async/await
+- 🔄 Thread pools
+- 🔄 Atomic operations
+
+### Standard Library
+- 🔄 Collections (Vec, HashMap, Set)
+- 🔄 String manipulation
+- 🔄 File I/O
+- 🔄 Networking (HTTP, TCP, UDP)
+- 🔄 JSON/XML parsing
+- 🔄 Regular expressions
+- 🔄 Date/Time
+- 🔄 Math functions
+- 🔄 Cryptography
+- 🔄 Compression
+
+### Platform Features
+- 🔄 Platform directives (#[ios], #[android], #[web])
+- 🔄 Native API access
+- 🔄 Cross-platform GUI
+- 🔄 Mobile support
+- 🔄 WASM compilation
+
+### Tooling
+- 🔄 Package manager (spm)
+- 🔄 Build system
+- 🔄 Test framework
+- 🔄 Code formatter
+- 🔄 Linter
+- 🔄 Debugger
+- 🔄 Profiler
+- 🔄 Documentation generator
+- 🔄 REPL
+- 🔄 Language server
+
+**See [COMPLETE_FEATURES.md](../docs/COMPLETE_FEATURES.md) for the full list of 500+ features from all major programming languages.**
 
 ## Creating Your Own Examples
 

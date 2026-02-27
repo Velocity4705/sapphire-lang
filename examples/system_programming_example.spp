@@ -1,0 +1,127 @@
+# System Programming Example
+# Demonstrates system programming concepts with current parser
+
+# NOTE: Simplified version for current parser
+# Full system programming features coming soon - see docs/SYSTEM_PROGRAMMING.md
+
+print("=== System Programming Simulation ===")
+
+# Process management simulation
+let process_id = 1234
+let parent_pid = 1000
+let child_pid = process_id + 1
+print("Process ID:")
+print(process_id)
+print("Parent PID:")
+print(parent_pid)
+print("Child PID:")
+print(child_pid)
+
+# Exit code simulation
+let exit_success = 0
+let exit_error = 1
+let process_succeeded = exit_success == 0
+print("Exit code:")
+print(exit_success)
+print("Process succeeded:")
+print(process_succeeded)
+
+# Memory management simulation
+let total_memory = 16384  # MB
+let used_memory = 8192
+let free_memory = total_memory - used_memory
+let memory_percent = used_memory * 100 / total_memory
+print("Total memory (MB):")
+print(total_memory)
+print("Used memory (MB):")
+print(used_memory)
+print("Free memory (MB):")
+print(free_memory)
+print("Memory usage (%):")
+print(memory_percent)
+
+# Memory allocation simulation
+let alloc_size = 1024  # bytes
+let alloc_count = 10
+let total_allocated = alloc_size * alloc_count
+print("Allocation size:")
+print(alloc_size)
+print("Total allocated:")
+print(total_allocated)
+
+# File system operations simulation
+let inode_number = 98765
+let file_permissions = 755
+let is_readable = 1  # true
+let is_writable = 1  # true
+print("Inode:")
+print(inode_number)
+print("Permissions:")
+print(file_permissions)
+print("Readable:")
+print(is_readable)
+
+# Directory operations simulation
+let dir_entries = 42
+let files_count = 30
+let dirs_count = dir_entries - files_count
+print("Directory entries:")
+print(dir_entries)
+print("Files:")
+print(files_count)
+print("Subdirectories:")
+print(dirs_count)
+
+# CPU information simulation
+let cpu_cores = 8
+let cpu_threads = 16
+let cpu_freq = 3600  # MHz
+let threads_per_core = cpu_threads / cpu_cores
+print("CPU cores:")
+print(cpu_cores)
+print("CPU threads:")
+print(cpu_threads)
+print("Threads per core:")
+print(threads_per_core)
+
+# Disk information simulation
+let disk_total = 512  # GB
+let disk_used = 256
+let disk_free = disk_total - disk_used
+let disk_percent = disk_used * 100 / disk_total
+print("Disk total (GB):")
+print(disk_total)
+print("Disk used (GB):")
+print(disk_used)
+print("Disk free (GB):")
+print(disk_free)
+print("Disk usage (%):")
+print(disk_percent)
+
+# Network simulation
+let packets_sent = 1000
+let packets_received = 950
+let packet_loss = packets_sent - packets_received
+let success_rate = packets_received * 100 / packets_sent
+print("Packets sent:")
+print(packets_sent)
+print("Packets received:")
+print(packets_received)
+print("Packet loss:")
+print(packet_loss)
+print("Success rate (%):")
+print(success_rate)
+
+# Signal handling simulation
+let signal_int = 2  # SIGINT
+let signal_term = 15  # SIGTERM
+let signal_received = signal_int
+let is_interrupt = signal_received == signal_int
+print("Signal received:")
+print(signal_received)
+print("Is interrupt:")
+print(is_interrupt)
+
+print("System programming simulation complete!")
+
+# For full system programming features, see docs/SYSTEM_PROGRAMMING.md

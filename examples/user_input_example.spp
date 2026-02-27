@@ -1,0 +1,86 @@
+# User Input Example
+# Demonstrates user input concepts with current parser
+
+# NOTE: Simplified version for current parser
+# Full user input features coming soon - see docs/USER_INPUT.md
+
+print("=== User Input Simulation ===")
+
+# Simulate user input with variables
+let user_age = 25
+let user_score = 95
+print("User age:")
+print(user_age)
+print("User score:")
+print(user_score)
+
+# Input validation simulation
+let min_age = 18
+let max_age = 100
+let is_valid_age = user_age >= min_age
+let is_in_range = user_age <= max_age
+print("Age is valid:")
+print(is_valid_age)
+print("Age in range:")
+print(is_in_range)
+
+# Menu selection simulation
+let menu_choice = 2
+let option1 = 1
+let option2 = 2
+let option3 = 3
+let selected_option2 = menu_choice == option2
+print("Menu choice:")
+print(menu_choice)
+print("Selected option 2:")
+print(selected_option2)
+
+# Password validation simulation
+let password_length = 12
+let min_password_length = 8
+let is_strong = password_length >= min_password_length
+print("Password length:")
+print(password_length)
+print("Password is strong:")
+print(is_strong)
+
+# Multiple inputs simulation
+let input1 = 10
+let input2 = 20
+let input3 = 30
+let sum_inputs = input1 + input2 + input3
+let avg_inputs = sum_inputs / 3
+print("Input sum:")
+print(sum_inputs)
+print("Input average:")
+print(avg_inputs)
+
+# Calculator simulation
+let num1 = 15
+let num2 = 5
+let add_result = num1 + num2
+let sub_result = num1 - num2
+let mul_result = num1 * num2
+let div_result = num1 / num2
+print("Addition:")
+print(add_result)
+print("Subtraction:")
+print(sub_result)
+print("Multiplication:")
+print(mul_result)
+print("Division:")
+print(div_result)
+
+# Registration simulation
+let username_length = 8
+let email_valid = 1  # 1 = true
+let terms_accepted = 1
+let can_register = username_length > 3
+print("Username length:")
+print(username_length)
+print("Can register:")
+print(can_register)
+
+print("User input simulation complete!")
+
+# For full user input features, see docs/USER_INPUT.md

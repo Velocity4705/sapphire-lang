@@ -1,0 +1,136 @@
+# Directives Example
+# Demonstrates compiler directives concepts with current parser
+
+# NOTE: Simplified version for current parser
+# Full directive features coming soon - see docs/DIRECTIVES.md
+
+print("=== Directives Simulation ===")
+
+# Platform detection simulation
+let platform_ios = 1
+let platform_android = 2
+let platform_web = 3
+let platform_desktop = 4
+let current_platform = platform_desktop
+print("Current platform:")
+print(current_platform)
+
+# Platform-specific values
+let is_mobile = current_platform < platform_web
+let is_desktop = current_platform == platform_desktop
+print("Is mobile:")
+print(is_mobile)
+print("Is desktop:")
+print(is_desktop)
+
+# Optimization levels
+let opt_none = 0
+let opt_speed = 1
+let opt_size = 2
+let opt_level = opt_speed
+print("Optimization level:")
+print(opt_level)
+
+# Inline optimization simulation
+let inline_threshold = 100
+let function_size = 50
+let should_inline = function_size < inline_threshold
+print("Function size:")
+print(function_size)
+print("Should inline:")
+print(should_inline)
+
+# Memory alignment simulation
+let align_8 = 8
+let align_16 = 16
+let data_alignment = align_16
+let is_aligned = data_alignment == align_16
+print("Data alignment:")
+print(data_alignment)
+print("Is 16-byte aligned:")
+print(is_aligned)
+
+# Feature flags simulation
+let feature_advanced = 1  # enabled
+let feature_experimental = 0  # disabled
+let can_use_advanced = feature_advanced == 1
+print("Advanced features:")
+print(can_use_advanced)
+print("Experimental features:")
+print(feature_experimental)
+
+# Conditional compilation simulation
+let debug_mode = 1
+let release_mode = 0
+let enable_logging = debug_mode == 1
+print("Debug mode:")
+print(debug_mode)
+print("Enable logging:")
+print(enable_logging)
+
+# Target architecture simulation
+let arch_x86 = 1
+let arch_arm = 2
+let arch_wasm = 3
+let target_arch = arch_x86
+let is_x86 = target_arch == arch_x86
+print("Target architecture:")
+print(target_arch)
+print("Is x86:")
+print(is_x86)
+
+# Vectorization simulation
+let vector_width = 256  # bits
+let scalar_width = 64
+let speedup_factor = vector_width / scalar_width
+print("Vector width:")
+print(vector_width)
+print("Speedup factor:")
+print(speedup_factor)
+
+# Hot/cold path simulation
+let hot_path_calls = 1000000
+let cold_path_calls = 10
+let call_ratio = hot_path_calls / cold_path_calls
+print("Hot path calls:")
+print(hot_path_calls)
+print("Cold path calls:")
+print(cold_path_calls)
+print("Call ratio:")
+print(call_ratio)
+
+# Link-time optimization simulation
+let lto_enabled = 1
+let code_size_before = 1000
+let code_size_after = 850
+let size_reduction = code_size_before - code_size_after
+let reduction_percent = size_reduction * 100 / code_size_before
+print("LTO enabled:")
+print(lto_enabled)
+print("Size reduction:")
+print(size_reduction)
+print("Reduction (%):")
+print(reduction_percent)
+
+# Thread safety simulation
+let thread_count = 4
+let shared_counter = 100
+let per_thread = shared_counter / thread_count
+print("Thread count:")
+print(thread_count)
+print("Per thread:")
+print(per_thread)
+
+# JIT compilation simulation
+let jit_enabled = 1
+let interpretation_time = 1000  # ms
+let jit_time = 100
+let speedup = interpretation_time / jit_time
+print("JIT enabled:")
+print(jit_enabled)
+print("JIT speedup:")
+print(speedup)
+
+print("Directives simulation complete!")
+
+# For full directive features, see docs/DIRECTIVES.md

@@ -272,3 +272,8 @@ run: quick
 clean:
 	rm -rf $(OBJDIR) $(TARGET) $(ALIAS)
 	rm -rf build/
+
+
+
+test-examples:
+	@bash test_examples.sh
