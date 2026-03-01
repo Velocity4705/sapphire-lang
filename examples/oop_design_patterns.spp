@@ -1,0 +1,175 @@
+# OOP Design Patterns Example
+# Demonstrates common design patterns in object-oriented programming
+
+print("=== OOP Design Patterns Demo ===")
+print()
+
+# 1. Singleton Pattern (Simplified)
+print("1. Singleton Pattern")
+class Database:
+    fn __init__(self):
+        self.connection = "Connected to DB"
+        self.queries = 0
+    
+    fn query(self, sql):
+        self.queries = self.queries + 1
+        return "Query executed: " + sql
+    
+    fn get_stats(self):
+        return self.queries
+
+db = Database()
+print(db.query("SELECT * FROM users"))
+print(db.query("INSERT INTO logs"))
+print("Total queries:", db.get_stats())
+print()
+
+# 2. Factory Pattern
+print("2. Factory Pattern")
+class Animal:
+    fn __init__(self, name):
+        self.name = name
+    
+    fn speak(self):
+        return "..."
+
+class Dog(Animal):
+    fn speak(self):
+        return "Woof! I'm " + self.name
+
+class Cat(Animal):
+    fn speak(self):
+        return "Meow! I'm " + self.name
+
+class AnimalFactory:
+    fn create_animal(self, animal_type, name):
+        if animal_type == "dog":
+            return Dog(name)
+        if animal_type == "cat":
+            return Cat(name)
+        return Animal(name)
+
+factory = AnimalFactory()
+dog = factory.create_animal("dog", "Buddy")
+cat = factory.create_animal("cat", "Whiskers")
+print(dog.speak())
+print(cat.speak())
+print()
+
+# 3. Strategy Pattern
+print("3. Strategy Pattern")
+class PaymentStrategy:
+    fn pay(self, amount):
+        return "Paid: " + str(amount)
+
+class CreditCardPayment(PaymentStrategy):
+    fn __init__(self, card_number):
+        self.card_number = card_number
+    
+    fn pay(self, amount):
+        return "Paid " + str(amount) + " with credit card"
+
+class PayPalPayment(PaymentStrategy):
+    fn __init__(self, email):
+        self.email = email
+    
+    fn pay(self, amount):
+        return "Paid " + str(amount) + " with PayPal"
+
+class ShoppingCart:
+    fn __init__(self):
+        self.total = 0
+    
+    fn add_item(self, price):
+        self.total = self.total + price
+    
+    fn checkout(self, payment_strategy):
+        return payment_strategy.pay(self.total)
+
+cart = ShoppingCart()
+cart.add_item(100)
+cart.add_item(50)
+
+credit_card = CreditCardPayment("1234-5678")
+print(cart.checkout(credit_card))
+
+paypal = PayPalPayment("user@example.com")
+print(cart.checkout(paypal))
+print()
+
+# 4. Observer Pattern (Simplified)
+print("4. Observer Pattern")
+class Subject:
+    fn __init__(self):
+        self.observers = []
+        self.state = 0
+    
+    fn attach(self, observer):
+        self.observers = self.observers + [observer]
+    
+    fn set_state(self, state):
+        self.state = state
+        return state
+    
+    fn get_state(self):
+        return self.state
+
+class Observer:
+    fn __init__(self, name):
+        self.name = name
+    
+    fn update(self, state):
+        return self.name + " received update: " + str(state)
+
+subject = Subject()
+observer1 = Observer("Observer1")
+observer2 = Observer("Observer2")
+
+subject.attach(observer1)
+subject.attach(observer2)
+subject.set_state(42)
+
+print(observer1.update(subject.get_state()))
+print(observer2.update(subject.get_state()))
+print()
+
+# 5. Decorator Pattern
+print("5. Decorator Pattern")
+class Coffee:
+    fn cost(self):
+        return 5
+    
+    fn description(self):
+        return "Coffee"
+
+class MilkDecorator(Coffee):
+    fn __init__(self, coffee):
+        self.coffee = coffee
+    
+    fn cost(self):
+        return self.coffee.cost() + 2
+    
+    fn description(self):
+        return self.coffee.description() + " + Milk"
+
+class SugarDecorator(Coffee):
+    fn __init__(self, coffee):
+        self.coffee = coffee
+    
+    fn cost(self):
+        return self.coffee.cost() + 1
+    
+    fn description(self):
+        return self.coffee.description() + " + Sugar"
+
+coffee = Coffee()
+print(coffee.description(), "- Cost:", coffee.cost())
+
+coffee_with_milk = MilkDecorator(coffee)
+print(coffee_with_milk.description(), "- Cost:", coffee_with_milk.cost())
+
+coffee_with_milk_and_sugar = SugarDecorator(coffee_with_milk)
+print(coffee_with_milk_and_sugar.description(), "- Cost:", coffee_with_milk_and_sugar.cost())
+print()
+
+print("=== All design patterns demonstrated ===")

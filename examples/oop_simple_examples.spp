@@ -1,0 +1,289 @@
+# Simple OOP Examples
+# Demonstrates practical OOP patterns that work with current features
+
+print("=== Simple OOP Examples ===")
+print()
+
+# 1. Calculator with History
+print("1. Calculator with History")
+class Calculator:
+    fn __init__(self):
+        self.result = 0
+        self.operations = 0
+    
+    fn add(self, a, b):
+        self.result = a + b
+        self.operations = self.operations + 1
+        return self.result
+    
+    fn subtract(self, a, b):
+        self.result = a - b
+        self.operations = self.operations + 1
+        return self.result
+    
+    fn multiply(self, a, b):
+        self.result = a * b
+        self.operations = self.operations + 1
+        return self.result
+    
+    fn divide(self, a, b):
+        if b == 0:
+            throw ValueError("Division by zero")
+        self.result = a / b
+        self.operations = self.operations + 1
+        return self.result
+    
+    fn get_operations_count(self):
+        return self.operations
+
+calc = Calculator()
+print("10 + 5 =", calc.add(10, 5))
+print("20 - 8 =", calc.subtract(20, 8))
+print("6 * 7 =", calc.multiply(6, 7))
+print("100 / 4 =", calc.divide(100, 4))
+print("Total operations:", calc.get_operations_count())
+print()
+
+# 2. Temperature Converter
+print("2. Temperature Converter")
+class TemperatureConverter:
+    fn __init__(self):
+        self.conversions = 0
+    
+    fn celsius_to_fahrenheit(self, celsius):
+        self.conversions = self.conversions + 1
+        return celsius * 9 / 5 + 32
+    
+    fn fahrenheit_to_celsius(self, fahrenheit):
+        self.conversions = self.conversions + 1
+        return (fahrenheit - 32) * 5 / 9
+    
+    fn celsius_to_kelvin(self, celsius):
+        self.conversions = self.conversions + 1
+        return celsius + 273
+    
+    fn get_conversion_count(self):
+        return self.conversions
+
+temp = TemperatureConverter()
+print("25°C to Fahrenheit:", temp.celsius_to_fahrenheit(25))
+print("77°F to Celsius:", temp.fahrenheit_to_celsius(77))
+print("0°C to Kelvin:", temp.celsius_to_kelvin(0))
+print("Conversions performed:", temp.get_conversion_count())
+print()
+
+# 3. Bank Account with Transactions
+print("3. Bank Account")
+class BankAccount:
+    fn __init__(self, account_number, owner):
+        self.account_number = account_number
+        self.owner = owner
+        self.balance = 0
+        self.transaction_count = 0
+    
+    fn deposit(self, amount):
+        if amount > 0:
+            self.balance = self.balance + amount
+            self.transaction_count = self.transaction_count + 1
+            return "Deposited: " + str(amount)
+        return "Invalid amount"
+    
+    fn withdraw(self, amount):
+        if amount > 0 and amount <= self.balance:
+            self.balance = self.balance - amount
+            self.transaction_count = self.transaction_count + 1
+            return "Withdrew: " + str(amount)
+        return "Insufficient funds"
+    
+    fn get_balance(self):
+        return self.balance
+    
+    fn get_info(self):
+        return self.owner + " - Account: " + self.account_number + " - Balance: $" + str(self.balance)
+
+account = BankAccount("ACC-001", "Alice")
+print(account.get_info())
+print(account.deposit(1000))
+print(account.deposit(500))
+print(account.withdraw(300))
+print(account.get_info())
+print("Transactions:", account.transaction_count)
+print()
+
+# 4. Student Grade Manager
+print("4. Student Grade Manager")
+class Student:
+    fn __init__(self, name, student_id):
+        self.name = name
+        self.student_id = student_id
+        self.total_score = 0
+        self.test_count = 0
+    
+    fn add_grade(self, score):
+        self.total_score = self.total_score + score
+        self.test_count = self.test_count + 1
+        return "Added grade: " + str(score)
+    
+    fn get_average(self):
+        if self.test_count == 0:
+            return 0
+        return self.total_score / self.test_count
+    
+    fn get_letter_grade(self):
+        avg = self.get_average()
+        if avg >= 90:
+            return "A"
+        if avg >= 80:
+            return "B"
+        if avg >= 70:
+            return "C"
+        if avg >= 60:
+            return "D"
+        return "F"
+
+student = Student("Bob", "S12345")
+print(student.add_grade(85))
+print(student.add_grade(92))
+print(student.add_grade(78))
+print(student.add_grade(88))
+print(student.name + "'s average:", student.get_average())
+print("Letter grade:", student.get_letter_grade())
+print()
+
+# 5. Timer/Stopwatch
+print("5. Timer/Stopwatch")
+class Timer:
+    fn __init__(self):
+        self.seconds = 0
+        self.running = False
+    
+    fn start(self):
+        self.running = True
+        return "Timer started"
+    
+    fn stop(self):
+        self.running = False
+        return "Timer stopped at " + str(self.seconds) + " seconds"
+    
+    fn tick(self):
+        if self.running:
+            self.seconds = self.seconds + 1
+        return self.seconds
+    
+    fn reset(self):
+        self.seconds = 0
+        self.running = False
+        return "Timer reset"
+
+timer = Timer()
+print(timer.start())
+print("Tick:", timer.tick())
+print("Tick:", timer.tick())
+print("Tick:", timer.tick())
+print(timer.stop())
+print(timer.reset())
+print()
+
+# 6. Shopping Cart
+print("6. Shopping Cart")
+class ShoppingCart:
+    fn __init__(self):
+        self.total = 0
+        self.item_count = 0
+        self.discount = 0
+    
+    fn add_item(self, price):
+        self.total = self.total + price
+        self.item_count = self.item_count + 1
+        return "Item added: $" + str(price)
+    
+    fn apply_discount(self, percent):
+        self.discount = percent
+        return "Discount applied: " + str(percent) + "%"
+    
+    fn get_total(self):
+        discount_amount = self.total * self.discount / 100
+        return self.total - discount_amount
+    
+    fn get_item_count(self):
+        return self.item_count
+
+cart = ShoppingCart()
+print(cart.add_item(29))
+print(cart.add_item(49))
+print(cart.add_item(15))
+print("Items in cart:", cart.get_item_count())
+print("Subtotal: $" + str(cart.total))
+print(cart.apply_discount(10))
+print("Total after discount: $" + str(cart.get_total()))
+print()
+
+# 7. Inventory Item
+print("7. Inventory Item")
+class InventoryItem:
+    fn __init__(self, name, sku, quantity):
+        self.name = name
+        self.sku = sku
+        self.quantity = quantity
+        self.reorder_level = 10
+    
+    fn add_stock(self, amount):
+        self.quantity = self.quantity + amount
+        return "Added " + str(amount) + " units. New quantity: " + str(self.quantity)
+    
+    fn remove_stock(self, amount):
+        if amount <= self.quantity:
+            self.quantity = self.quantity - amount
+            return "Removed " + str(amount) + " units. Remaining: " + str(self.quantity)
+        return "Insufficient stock"
+    
+    fn needs_reorder(self):
+        return self.quantity < self.reorder_level
+    
+    fn get_status(self):
+        status = "LOW STOCK" if self.needs_reorder() else "OK"
+        return self.name + " (" + self.sku + ") - Qty: " + str(self.quantity) + " - " + status
+
+item = InventoryItem("Widget", "WDG-001", 25)
+print(item.get_status())
+print(item.remove_stock(20))
+print(item.get_status())
+print(item.add_stock(50))
+print(item.get_status())
+print()
+
+# 8. Counter
+print("8. Counter")
+class Counter:
+    fn __init__(self, start):
+        self.value = start
+        self.increments = 0
+        self.decrements = 0
+    
+    fn increment(self):
+        self.value = self.value + 1
+        self.increments = self.increments + 1
+        return self.value
+    
+    fn decrement(self):
+        self.value = self.value - 1
+        self.decrements = self.decrements + 1
+        return self.value
+    
+    fn reset(self):
+        self.value = 0
+        return "Counter reset"
+    
+    fn get_stats(self):
+        return "Value: " + str(self.value) + ", Inc: " + str(self.increments) + ", Dec: " + str(self.decrements)
+
+counter = Counter(0)
+print("Initial:", counter.value)
+print("Increment:", counter.increment())
+print("Increment:", counter.increment())
+print("Increment:", counter.increment())
+print("Decrement:", counter.decrement())
+print(counter.get_stats())
+print()
+
+print("=== All simple OOP examples demonstrated ===")

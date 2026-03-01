@@ -164,6 +164,25 @@ public:
     void accept(StmtVisitor& visitor) override;
 };
 
+// Import statement
+class ImportStmt : public Stmt {
+public:
+    std::string module_name;
+    std::string alias; // Empty if no alias
+    std::vector<std::string> imported_names; // Empty for "import module"
+    bool is_from_import; // True for "from module import name"
+    
+    // Constructor for simple import: import module
+    ImportStmt(const std::string& module, const std::string& alias = "")
+        : module_name(module), alias(alias), is_from_import(false) {}
+    
+    // Constructor for from import: from module import name1, name2
+    ImportStmt(const std::string& module, const std::vector<std::string>& names)
+        : module_name(module), imported_names(names), is_from_import(true) {}
+    
+    void accept(StmtVisitor& visitor) override;
+};
+
 // Visitor interface
 class StmtVisitor {
 public:
@@ -178,6 +197,7 @@ public:
     virtual void visitTryStmt(TryStmt& stmt) = 0;
     virtual void visitThrowStmt(ThrowStmt& stmt) = 0;
     virtual void visitClassDecl(ClassDecl& stmt) = 0;
+    virtual void visitImportStmt(ImportStmt& stmt) = 0;
 };
 
 } // namespace sapphire

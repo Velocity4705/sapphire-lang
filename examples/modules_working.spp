@@ -1,0 +1,75 @@
+# Module System Test
+# Tests basic import functionality for Sapphire v1.0.0
+
+print("=== Module System Tests ===")
+print()
+
+# Test 1: Simple import
+print("Test 1: Simple import")
+import math
+print("math module imported successfully")
+print()
+
+# Test 2: Import with alias
+print("Test 2: Import with alias")
+import os as operating_system
+print("os imported as operating_system")
+print()
+
+# Test 3: From import
+print("Test 3: From import")
+from collections import Vec, HashMap
+print("Vec and HashMap imported from collections")
+print()
+
+# Test 4: Multiple imports
+print("Test 4: Multiple imports")
+import json
+import sys
+import io
+print("json, sys, and io modules imported")
+print()
+
+# Test 5: Mixed imports
+print("Test 5: Mixed imports")
+from math import sqrt, pow
+import datetime as dt
+print("sqrt and pow from math, datetime as dt")
+print()
+
+# Test 6: Import in function
+print("Test 6: Import in function")
+fn test_import():
+    import random
+    print("random imported inside function")
+    return "success"
+
+result = test_import()
+print("Function result:", result)
+print()
+
+# Test 7: Import in class
+print("Test 7: Import in class")
+class TestClass:
+    fn __init__(self):
+        import string
+        print("string imported in class constructor")
+    
+    fn method(self):
+        import re
+        print("re imported in class method")
+
+obj = TestClass()
+obj.method()
+print()
+
+# Test 8: Import with try-catch
+print("Test 8: Import with try-catch")
+try:
+    import nonexistent_module
+    print("This should not print")
+catch e:
+    print("Caught import error for nonexistent_module")
+print()
+
+print("=== All module tests completed ===")

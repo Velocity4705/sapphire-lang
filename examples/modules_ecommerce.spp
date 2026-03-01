@@ -1,0 +1,288 @@
+# Modules E-commerce System Example
+# Demonstrates modular architecture for an online store
+
+print("=== Modular E-commerce System Demo ===")
+print()
+
+# 1. Product Catalog Module
+print("1. Product Catalog Module")
+from catalog import Product, Category
+
+class Product:
+    fn __init__(self, name, price, stock):
+        self.name = name
+        self.price = price
+        self.stock = stock
+        self.category = "General"
+    
+    fn get_info(self):
+        return self.name + " - $" + str(self.price) + " (Stock: " + str(self.stock) + ")"
+    
+    fn is_available(self):
+        return self.stock > 0
+    
+    fn reduce_stock(self, quantity):
+        if self.stock >= quantity:
+            self.stock = self.stock - quantity
+            return True
+        return False
+
+laptop = Product("Gaming Laptop", 1200, 5)
+mouse = Product("Wireless Mouse", 25, 50)
+keyboard = Product("Mechanical Keyboard", 80, 30)
+
+print(laptop.get_info())
+print(mouse.get_info())
+print(keyboard.get_info())
+print()
+
+# 2. Shopping Cart Module
+print("2. Shopping Cart Module")
+from cart import ShoppingCart, CartItem
+
+class CartItem:
+    fn __init__(self, product, quantity):
+        self.product = product
+        self.quantity = quantity
+    
+    fn get_subtotal(self):
+        return self.product.price * self.quantity
+    
+    fn get_info(self):
+        return self.product.name + " x" + str(self.quantity) + " = $" + str(self.get_subtotal())
+
+class ShoppingCart:
+    fn __init__(self):
+        self.items = []
+        self.total = 0
+    
+    fn add_item(self, product, quantity):
+        if product.is_available():
+            item = CartItem(product, quantity)
+            self.items = self.items + [item]
+            self.total = self.total + item.get_subtotal()
+            return "Added " + product.name + " to cart"
+        return product.name + " is out of stock"
+    
+    fn get_total(self):
+        return self.total
+    
+    fn get_item_count(self):
+        return len(self.items)
+
+cart = ShoppingCart()
+print(cart.add_item(laptop, 1))
+print(cart.add_item(mouse, 2))
+print(cart.add_item(keyboard, 1))
+print("Cart total: $" + str(cart.get_total()))
+print("Items in cart:", cart.get_item_count())
+print()
+
+# 3. Payment Processing Module
+print("3. Payment Processing Module")
+from payment import PaymentProcessor, CreditCard, PayPal
+
+class PaymentProcessor:
+    fn process(self, amount, method):
+        return "Processing $" + str(amount) + " payment via " + method
+
+class CreditCard:
+    fn __init__(self, number, cvv):
+        self.number = number
+        self.cvv = cvv
+        self.type = "Credit Card"
+    
+    fn validate(self):
+        return True
+    
+    fn charge(self, amount):
+        return "Charged $" + str(amount) + " to card ending in " + self.number[-4:]
+
+processor = PaymentProcessor()
+card = CreditCard("1234-5678-9012-3456", "123")
+
+print(processor.process(cart.get_total(), "Credit Card"))
+if card.validate():
+    print(card.charge(cart.get_total()))
+print()
+
+# 4. Order Management Module
+print("4. Order Management Module")
+from orders import Order, OrderStatus
+
+class Order:
+    fn __init__(self, order_id, user):
+        self.order_id = order_id
+        self.user = user
+        self.items = []
+        self.status = "Pending"
+        self.total = 0
+    
+    fn add_items(self, cart):
+        self.items = cart.items
+        self.total = cart.get_total()
+        return "Order created with " + str(len(self.items)) + " items"
+    
+    fn confirm(self):
+        self.status = "Confirmed"
+        return "Order " + self.order_id + " confirmed"
+    
+    fn ship(self):
+        self.status = "Shipped"
+        return "Order " + self.order_id + " shipped"
+    
+    fn get_status(self):
+        return "Order " + self.order_id + " - Status: " + self.status
+
+order = Order("ORD-001", "Alice")
+print(order.add_items(cart))
+print(order.confirm())
+print(order.get_status())
+print()
+
+# 5. Inventory Management Module
+print("5. Inventory Management Module")
+from inventory import InventoryManager, StockAlert
+
+class InventoryManager:
+    fn __init__(self):
+        self.products = []
+        self.low_stock_threshold = 10
+    
+    fn add_product(self, product):
+        self.products = self.products + [product]
+        return "Added " + product.name + " to inventory"
+    
+    fn check_stock(self, product):
+        if product.stock < self.low_stock_threshold:
+            return "LOW STOCK: " + product.name + " (" + str(product.stock) + " remaining)"
+        return product.name + " stock is sufficient"
+    
+    fn restock(self, product, quantity):
+        product.stock = product.stock + quantity
+        return "Restocked " + product.name + " with " + str(quantity) + " units"
+
+inventory = InventoryManager()
+inventory.add_product(laptop)
+inventory.add_product(mouse)
+inventory.add_product(keyboard)
+
+print(inventory.check_stock(laptop))
+print(inventory.restock(laptop, 10))
+print(inventory.check_stock(laptop))
+print()
+
+# 6. User Account Module
+print("6. User Account Module")
+from accounts import Customer, Address
+
+class Address:
+    fn __init__(self, street, city, zipcode):
+        self.street = street
+        self.city = city
+        self.zipcode = zipcode
+    
+    fn get_full_address(self):
+        return self.street + ", " + self.city + " " + self.zipcode
+
+class Customer:
+    fn __init__(self, name, email):
+        self.name = name
+        self.email = email
+        self.orders = []
+        self.address = None
+    
+    fn set_address(self, address):
+        self.address = address
+        return "Address updated for " + self.name
+    
+    fn add_order(self, order):
+        self.orders = self.orders + [order]
+        return "Order added to " + self.name + "'s account"
+    
+    fn get_order_count(self):
+        return len(self.orders)
+
+customer = Customer("Alice Johnson", "alice@example.com")
+address = Address("123 Main St", "New York", "10001")
+print(customer.set_address(address))
+print(customer.add_order(order))
+print(customer.name + " has " + str(customer.get_order_count()) + " orders")
+print()
+
+# 7. Discount Module
+print("7. Discount Module")
+from discounts import Coupon, DiscountCalculator
+
+class Coupon:
+    fn __init__(self, code, discount_percent):
+        self.code = code
+        self.discount_percent = discount_percent
+        self.active = True
+    
+    fn apply(self, amount):
+        if self.active:
+            discount = amount * self.discount_percent / 100
+            return amount - discount
+        return amount
+    
+    fn get_info(self):
+        return "Coupon " + self.code + ": " + str(self.discount_percent) + "% off"
+
+coupon = Coupon("SAVE20", 20)
+print(coupon.get_info())
+original = cart.get_total()
+discounted = coupon.apply(original)
+print("Original: $" + str(original))
+print("After discount: $" + str(discounted))
+print()
+
+# 8. Shipping Module
+print("8. Shipping Module")
+from shipping import ShippingCalculator, Carrier
+
+class ShippingCalculator:
+    fn calculate(self, weight, distance):
+        base_rate = 5
+        weight_rate = weight * 2
+        distance_rate = distance * 1
+        return base_rate + weight_rate + distance_rate
+
+class Carrier:
+    fn __init__(self, name):
+        self.name = name
+    
+    fn get_tracking(self, order_id):
+        return "Tracking for " + order_id + " via " + self.name
+
+shipping = ShippingCalculator()
+carrier = Carrier("FastShip Express")
+
+shipping_cost = shipping.calculate(5, 100)
+print("Shipping cost: $" + str(shipping_cost))
+print(carrier.get_tracking("ORD-001"))
+print()
+
+# 9. Review Module
+print("9. Review Module")
+from reviews import Review, Rating
+
+class Review:
+    fn __init__(self, product, user, rating, comment):
+        self.product = product
+        self.user = user
+        self.rating = rating
+        self.comment = comment
+    
+    fn get_review(self):
+        stars = "*" * self.rating
+        return self.user + " rated " + self.product.name + " " + stars + " - " + self.comment
+
+review1 = Review(laptop, "Alice", 5, "Excellent laptop!")
+review2 = Review(mouse, "Bob", 4, "Good mouse, comfortable")
+
+print(review1.get_review())
+print(review2.get_review())
+print()
+
+print("=== Modular e-commerce system demonstrated ===")

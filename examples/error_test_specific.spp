@@ -1,0 +1,22 @@
+print("Testing specific exception types")
+
+# Test DivisionByZeroError
+try:
+    x = 10 / 0
+catch DivisionByZeroError as e:
+    print("Caught DivisionByZeroError!")
+
+# Test IndexError
+try:
+    arr = [1, 2, 3]
+    print(arr[10])
+catch IndexError as e:
+    print("Caught IndexError!")
+
+# Test FileNotFoundError
+try:
+    content = read_file("/nonexistent.txt")
+catch FileNotFoundError as e:
+    print("Caught FileNotFoundError!")
+
+print("All tests passed!")

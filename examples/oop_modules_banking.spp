@@ -1,0 +1,318 @@
+# OOP + Modules Banking System Example
+# Demonstrates combined OOP and modular programming for a banking application
+
+print("=== Banking System with OOP and Modules ===")
+print()
+
+# Import banking modules
+print("Importing banking modules...")
+import accounts
+import transactions
+import security
+import notifications
+from database import BankDB
+from utils import Logger
+print("All modules imported successfully")
+print()
+
+# 1. Account Base Class
+print("1. Account Management")
+class Account:
+    fn __init__(self, account_number, owner, balance):
+        self.account_number = account_number
+        self.owner = owner
+        self.balance = balance
+        self.active = True
+        self.transactions = []
+    
+    fn deposit(self, amount):
+        if amount > 0:
+            self.balance = self.balance + amount
+            return "Deposited $" + str(amount) + ". New balance: $" + str(self.balance)
+        return "Invalid deposit amount"
+    
+    fn withdraw(self, amount):
+        if amount > 0 and amount <= self.balance:
+            self.balance = self.balance - amount
+            return "Withdrew $" + str(amount) + ". New balance: $" + str(self.balance)
+        return "Insufficient funds or invalid amount"
+    
+    fn get_balance(self):
+        return self.balance
+    
+    fn get_info(self):
+        status = "Active" if self.active else "Inactive"
+        return "Account " + self.account_number + " - " + self.owner + " - $" + str(self.balance) + " (" + status + ")"
+
+# 2. Checking Account
+print("2. Checking Account")
+class CheckingAccount(Account):
+    fn __init__(self, account_number, owner, balance):
+        self.account_number = account_number
+        self.owner = owner
+        self.balance = balance
+        self.active = True
+        self.transactions = []
+        self.overdraft_limit = 500
+        self.monthly_fee = 10
+    
+    fn withdraw(self, amount):
+        max_withdrawal = self.balance + self.overdraft_limit
+        if amount > 0 and amount <= max_withdrawal:
+            self.balance = self.balance - amount
+            return "Withdrew $" + str(amount) + ". New balance: $" + str(self.balance)
+        return "Exceeds overdraft limit"
+    
+    fn charge_monthly_fee(self):
+        self.balance = self.balance - self.monthly_fee
+        return "Monthly fee charged: $" + str(self.monthly_fee)
+
+checking = CheckingAccount("CHK-001", "Alice Smith", 1000)
+print(checking.get_info())
+print(checking.deposit(500))
+print(checking.withdraw(200))
+print()
+
+# 3. Savings Account
+print("3. Savings Account")
+class SavingsAccount(Account):
+    fn __init__(self, account_number, owner, balance):
+        self.account_number = account_number
+        self.owner = owner
+        self.balance = balance
+        self.active = True
+        self.transactions = []
+        self.interest_rate = 2
+        self.withdrawal_limit = 6
+        self.withdrawals_this_month = 0
+    
+    fn withdraw(self, amount):
+        if self.withdrawals_this_month >= self.withdrawal_limit:
+            return "Monthly withdrawal limit reached"
+        if amount > 0 and amount <= self.balance:
+            self.balance = self.balance - amount
+            self.withdrawals_this_month = self.withdrawals_this_month + 1
+            return "Withdrew $" + str(amount) + ". New balance: $" + str(self.balance)
+        return "Insufficient funds or invalid amount"
+    
+    fn apply_interest(self):
+        interest = self.balance * self.interest_rate / 100
+        self.balance = self.balance + interest
+        return "Interest applied: $" + str(interest) + ". New balance: $" + str(self.balance)
+
+savings = SavingsAccount("SAV-001", "Bob Johnson", 5000)
+print(savings.get_info())
+print(savings.deposit(1000))
+print(savings.apply_interest())
+print()
+
+# 4. Transaction Module
+print("4. Transaction Processing")
+from transactions import Transaction, TransactionType
+
+class Transaction:
+    fn __init__(self, trans_id, account, trans_type, amount):
+        self.trans_id = trans_id
+        self.account = account
+        self.trans_type = trans_type
+        self.amount = amount
+        self.status = "Pending"
+    
+    fn execute(self):
+        if self.trans_type == "deposit":
+            result = self.account.deposit(self.amount)
+            self.status = "Completed"
+            return result
+        if self.trans_type == "withdrawal":
+            result = self.account.withdraw(self.amount)
+            self.status = "Completed"
+            return result
+        return "Unknown transaction type"
+    
+    fn get_details(self):
+        return "Transaction " + self.trans_id + ": " + self.trans_type + " $" + str(self.amount) + " - " + self.status
+
+trans1 = Transaction("TXN-001", checking, "deposit", 300)
+trans2 = Transaction("TXN-002", savings, "withdrawal", 500)
+
+print(trans1.get_details())
+print(trans1.execute())
+print(trans1.get_details())
+print()
+
+# 5. Transfer Module
+print("5. Money Transfer")
+from transfers import TransferService
+
+class TransferService:
+    fn __init__(self):
+        self.transfers = []
+        self.fee = 2
+    
+    fn transfer(self, from_account, to_account, amount):
+        total = amount + self.fee
+        if from_account.balance >= total:
+            from_account.balance = from_account.balance - total
+            to_account.balance = to_account.balance + amount
+            return "Transferred $" + str(amount) + " from " + from_account.account_number + " to " + to_account.account_number
+        return "Insufficient funds for transfer"
+    
+    fn get_fee(self):
+        return self.fee
+
+transfer_service = TransferService()
+print("Transfer fee: $" + str(transfer_service.get_fee()))
+print(transfer_service.transfer(checking, savings, 100))
+print("Checking balance:", checking.get_balance())
+print("Savings balance:", savings.get_balance())
+print()
+
+# 6. Customer Module
+print("6. Customer Management")
+from customers import Customer, CustomerType
+
+class Customer:
+    fn __init__(self, customer_id, name, email):
+        self.customer_id = customer_id
+        self.name = name
+        self.email = email
+        self.accounts = []
+        self.customer_type = "Regular"
+    
+    fn add_account(self, account):
+        self.accounts = self.accounts + [account]
+        return "Account " + account.account_number + " added to " + self.name
+    
+    fn get_total_balance(self):
+        total = 0
+        for account in self.accounts:
+            total = total + account.get_balance()
+        return total
+    
+    fn get_account_count(self):
+        return len(self.accounts)
+
+customer = Customer("CUST-001", "Alice Smith", "alice@example.com")
+print(customer.add_account(checking))
+print(customer.add_account(savings))
+print(customer.name + " has " + str(customer.get_account_count()) + " accounts")
+print("Total balance: $" + str(customer.get_total_balance()))
+print()
+
+# 7. Loan Module
+print("7. Loan Management")
+from loans import Loan, LoanCalculator
+
+class Loan:
+    fn __init__(self, loan_id, customer, amount, interest_rate, term_months):
+        self.loan_id = loan_id
+        self.customer = customer
+        self.amount = amount
+        self.interest_rate = interest_rate
+        self.term_months = term_months
+        self.remaining = amount
+        self.status = "Active"
+    
+    fn calculate_monthly_payment(self):
+        monthly_rate = self.interest_rate / 12 / 100
+        payment = self.amount * monthly_rate / (1 - (1 + monthly_rate) ** (-self.term_months))
+        return payment
+    
+    fn make_payment(self, amount):
+        if amount <= self.remaining:
+            self.remaining = self.remaining - amount
+            if self.remaining == 0:
+                self.status = "Paid Off"
+            return "Payment of $" + str(amount) + " applied. Remaining: $" + str(self.remaining)
+        return "Payment exceeds remaining balance"
+
+loan = Loan("LOAN-001", customer, 10000, 5, 36)
+monthly_payment = loan.calculate_monthly_payment()
+print("Loan amount: $" + str(loan.amount))
+print("Monthly payment: $" + str(monthly_payment))
+print(loan.make_payment(monthly_payment))
+print()
+
+# 8. Credit Card Module
+print("8. Credit Card Management")
+from cards import CreditCard, CardTransaction
+
+class CreditCard:
+    fn __init__(self, card_number, customer, credit_limit):
+        self.card_number = card_number
+        self.customer = customer
+        self.credit_limit = credit_limit
+        self.balance = 0
+        self.available_credit = credit_limit
+        self.active = True
+    
+    fn charge(self, amount):
+        if amount <= self.available_credit:
+            self.balance = self.balance + amount
+            self.available_credit = self.available_credit - amount
+            return "Charged $" + str(amount) + ". Available credit: $" + str(self.available_credit)
+        return "Exceeds credit limit"
+    
+    fn make_payment(self, amount):
+        if amount <= self.balance:
+            self.balance = self.balance - amount
+            self.available_credit = self.available_credit + amount
+            return "Payment of $" + str(amount) + " received. Balance: $" + str(self.balance)
+        return "Payment exceeds balance"
+
+credit_card = CreditCard("4532-1234-5678-9012", customer, 5000)
+print("Credit card issued to", customer.name)
+print("Credit limit: $" + str(credit_card.credit_limit))
+print(credit_card.charge(500))
+print(credit_card.charge(200))
+print(credit_card.make_payment(300))
+print()
+
+# 9. Security Module
+print("9. Security and Authentication")
+from security import Authenticator, SecurityLog
+
+class Authenticator:
+    fn __init__(self):
+        self.failed_attempts = 0
+        self.max_attempts = 3
+        self.locked = False
+    
+    fn authenticate(self, pin):
+        if self.locked:
+            return "Account locked due to too many failed attempts"
+        if pin == "1234":
+            self.failed_attempts = 0
+            return "Authentication successful"
+        self.failed_attempts = self.failed_attempts + 1
+        if self.failed_attempts >= self.max_attempts:
+            self.locked = True
+            return "Account locked"
+        return "Authentication failed"
+
+auth = Authenticator()
+print(auth.authenticate("0000"))
+print(auth.authenticate("1234"))
+print()
+
+# 10. Notification Module
+print("10. Notifications")
+from notifications import NotificationService
+
+class NotificationService:
+    fn send_email(self, customer, subject, message):
+        return "Email sent to " + customer.email + ": " + subject
+    
+    fn send_sms(self, customer, message):
+        return "SMS sent to " + customer.name + ": " + message
+    
+    fn send_alert(self, customer, alert_type):
+        return "Alert sent to " + customer.name + ": " + alert_type
+
+notifier = NotificationService()
+print(notifier.send_email(customer, "Account Statement", "Your monthly statement is ready"))
+print(notifier.send_sms(customer, "Transaction alert: $500 withdrawal"))
+print(notifier.send_alert(customer, "Low balance warning"))
+print()
+
+print("=== Banking system with OOP and modules demonstrated ===")

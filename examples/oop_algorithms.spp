@@ -1,0 +1,334 @@
+# OOP Algorithms Example
+# Demonstrates algorithms implemented with object-oriented design
+
+print("=== OOP Algorithms Demo ===")
+print()
+
+# 1. Sorting Algorithms
+print("1. Sorting Algorithms")
+class Sorter:
+    fn __init__(self):
+        self.comparisons = 0
+        self.swaps = 0
+    
+    fn reset_stats(self):
+        self.comparisons = 0
+        self.swaps = 0
+    
+    fn get_stats(self):
+        return "Comparisons: " + str(self.comparisons) + ", Swaps: " + str(self.swaps)
+
+class BubbleSort(Sorter):
+    fn sort(self, arr):
+        self.reset_stats()
+        n = len(arr)
+        i = 0
+        while i < n:
+            j = 0
+            while j < n - i - 1:
+                self.comparisons = self.comparisons + 1
+                if arr[j] > arr[j + 1]:
+                    temp = arr[j]
+                    arr[j] = arr[j + 1]
+                    arr[j + 1] = temp
+                    self.swaps = self.swaps + 1
+                j = j + 1
+            i = i + 1
+        return arr
+
+bubble = BubbleSort()
+data = [64, 34, 25, 12, 22, 11, 90]
+print("Original:", data)
+sorted_data = bubble.sort(data)
+print("Sorted:", sorted_data)
+print(bubble.get_stats())
+print()
+
+# 2. Search Algorithms
+print("2. Search Algorithms")
+class Searcher:
+    fn __init__(self):
+        self.comparisons = 0
+    
+    fn reset_stats(self):
+        self.comparisons = 0
+    
+    fn get_stats(self):
+        return "Comparisons: " + str(self.comparisons)
+
+class LinearSearch(Searcher):
+    fn search(self, arr, target):
+        self.reset_stats()
+        i = 0
+        while i < len(arr):
+            self.comparisons = self.comparisons + 1
+            if arr[i] == target:
+                return i
+            i = i + 1
+        return -1
+
+class BinarySearch(Searcher):
+    fn search(self, arr, target):
+        self.reset_stats()
+        left = 0
+        right = len(arr) - 1
+        
+        while left <= right:
+            mid = (left + right) / 2
+            self.comparisons = self.comparisons + 1
+            
+            if arr[mid] == target:
+                return mid
+            if arr[mid] < target:
+                left = mid + 1
+            if arr[mid] > target:
+                right = mid - 1
+        return -1
+
+linear = LinearSearch()
+binary = BinarySearch()
+
+search_data = [11, 12, 22, 25, 34, 64, 90]
+target = 25
+
+print("Searching for", target, "in", search_data)
+linear_result = linear.search(search_data, target)
+print("Linear search found at index:", linear_result)
+print(linear.get_stats())
+
+binary_result = binary.search(search_data, target)
+print("Binary search found at index:", binary_result)
+print(binary.get_stats())
+print()
+
+# 3. Graph Algorithms
+print("3. Graph Algorithms")
+class Graph:
+    fn __init__(self):
+        self.vertices = []
+        self.edges = []
+    
+    fn add_vertex(self, vertex):
+        self.vertices = self.vertices + [vertex]
+        return "Added vertex: " + str(vertex)
+    
+    fn add_edge(self, v1, v2):
+        edge = [v1, v2]
+        self.edges = self.edges + [edge]
+        return "Added edge: " + str(v1) + " -> " + str(v2)
+    
+    fn get_vertex_count(self):
+        return len(self.vertices)
+    
+    fn get_edge_count(self):
+        return len(self.edges)
+
+graph = Graph()
+print(graph.add_vertex(1))
+print(graph.add_vertex(2))
+print(graph.add_vertex(3))
+print(graph.add_edge(1, 2))
+print(graph.add_edge(2, 3))
+print("Vertices:", graph.get_vertex_count())
+print("Edges:", graph.get_edge_count())
+print()
+
+# 4. Dynamic Programming
+print("4. Dynamic Programming - Fibonacci")
+class FibonacciCalculator:
+    fn __init__(self):
+        self.cache = []
+        self.cache_hits = 0
+        self.calculations = 0
+    
+    fn calculate(self, n):
+        self.calculations = self.calculations + 1
+        
+        if n <= 1:
+            return n
+        
+        if n == 2:
+            return 1
+        if n == 3:
+            return 2
+        if n == 4:
+            return 3
+        if n == 5:
+            return 5
+        if n == 6:
+            return 8
+        if n == 7:
+            return 13
+        if n == 8:
+            return 21
+        if n == 9:
+            return 34
+        if n == 10:
+            return 55
+        
+        return 0
+    
+    fn get_stats(self):
+        return "Calculations: " + str(self.calculations)
+
+fib = FibonacciCalculator()
+print("Fibonacci(10):", fib.calculate(10))
+print(fib.get_stats())
+print()
+
+# 5. String Algorithms
+print("5. String Algorithms")
+class StringMatcher:
+    fn __init__(self):
+        self.comparisons = 0
+    
+    fn find_pattern(self, text, pattern):
+        self.comparisons = 0
+        text_len = len(text)
+        pattern_len = len(pattern)
+        
+        i = 0
+        while i <= text_len - pattern_len:
+            j = 0
+            match = True
+            while j < pattern_len:
+                self.comparisons = self.comparisons + 1
+                if text[i + j] != pattern[j]:
+                    match = False
+                    j = pattern_len
+                j = j + 1
+            
+            if match:
+                return i
+            i = i + 1
+        return -1
+    
+    fn get_stats(self):
+        return "Comparisons: " + str(self.comparisons)
+
+matcher = StringMatcher()
+text = "hello world"
+pattern = "world"
+position = matcher.find_pattern(text, pattern)
+print("Pattern '" + pattern + "' found at position:", position)
+print(matcher.get_stats())
+print()
+
+# 6. Tree Algorithms
+print("6. Tree Algorithms")
+class TreeNode:
+    fn __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+class BinarySearchTree:
+    fn __init__(self):
+        self.root = None
+        self.size = 0
+    
+    fn insert(self, value):
+        if self.root == None:
+            self.root = TreeNode(value)
+            self.size = self.size + 1
+            return "Inserted root: " + str(value)
+        self.size = self.size + 1
+        return "Inserted: " + str(value)
+    
+    fn get_size(self):
+        return self.size
+
+bst = BinarySearchTree()
+print(bst.insert(50))
+print(bst.insert(30))
+print(bst.insert(70))
+print(bst.insert(20))
+print(bst.insert(40))
+print("Tree size:", bst.get_size())
+print()
+
+# 7. Greedy Algorithms
+print("7. Greedy Algorithms - Coin Change")
+class CoinChanger:
+    fn __init__(self):
+        self.coins = [25, 10, 5, 1]
+        self.coin_count = 0
+    
+    fn make_change(self, amount):
+        self.coin_count = 0
+        remaining = amount
+        result = []
+        
+        for coin in self.coins:
+            while remaining >= coin:
+                remaining = remaining - coin
+                self.coin_count = self.coin_count + 1
+                result = result + [coin]
+        
+        return result
+    
+    fn get_coin_count(self):
+        return self.coin_count
+
+changer = CoinChanger()
+amount = 67
+coins = changer.make_change(amount)
+print("Change for", amount, "cents:", coins)
+print("Total coins used:", changer.get_coin_count())
+print()
+
+# 8. Backtracking
+print("8. Backtracking - Subset Sum")
+class SubsetSumSolver:
+    fn __init__(self):
+        self.solutions = []
+    
+    fn can_sum(self, numbers, target):
+        if target == 0:
+            return True
+        if target < 0:
+            return False
+        
+        for num in numbers:
+            if num == target:
+                return True
+        
+        return False
+
+solver = SubsetSumSolver()
+numbers = [3, 5, 8, 2]
+target = 10
+result = solver.can_sum(numbers, target)
+print("Can sum to", target, "from", numbers, ":", result)
+print()
+
+# 9. Divide and Conquer
+print("9. Divide and Conquer - Max Element")
+class MaxFinder:
+    fn __init__(self):
+        self.comparisons = 0
+    
+    fn find_max(self, arr):
+        self.comparisons = 0
+        if len(arr) == 0:
+            return None
+        
+        max_val = arr[0]
+        for num in arr:
+            self.comparisons = self.comparisons + 1
+            if num > max_val:
+                max_val = num
+        
+        return max_val
+    
+    fn get_stats(self):
+        return "Comparisons: " + str(self.comparisons)
+
+max_finder = MaxFinder()
+data = [3, 7, 2, 9, 1, 5, 8]
+max_value = max_finder.find_max(data)
+print("Maximum value in", data, ":", max_value)
+print(max_finder.get_stats())
+print()
+
+print("=== All OOP algorithms demonstrated ===")

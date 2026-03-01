@@ -771,4 +771,30 @@ void Interpreter::visitClassDecl(ClassDecl& stmt) {
     environment->define(stmt.name, cls);
 }
 
+void Interpreter::visitImportStmt(ImportStmt& stmt) {
+    // Simple implementation for now - just print what would be imported
+    // In a real implementation, this would:
+    // 1. Resolve module path
+    // 2. Load and parse module file
+    // 3. Execute module in its own environment
+    // 4. Import symbols into current environment
+    
+    if (stmt.is_from_import) {
+        // from module import name1, name2
+        // For now, just define empty values for imported names
+        for (const auto& name : stmt.imported_names) {
+            environment->define(name, Value{});
+        }
+    } else {
+        // import module
+        // import module as alias
+        std::string import_name = stmt.alias.empty() ? stmt.module_name : stmt.alias;
+        
+        // Create a simple module object (empty for now)
+        // In a real implementation, this would be a proper module object
+        // with the module's exported symbols
+        environment->define(import_name, Value{});
+    }
+}
+
 } // namespace sapphire

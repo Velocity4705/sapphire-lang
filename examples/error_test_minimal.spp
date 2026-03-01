@@ -1,0 +1,6 @@
+print("Before try")
+try:
+    print("In try")
+catch e:
+    print("In catch")
+print("After try")

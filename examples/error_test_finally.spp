@@ -1,0 +1,28 @@
+print("Testing finally blocks")
+
+# Test 1: Finally without error
+print("Test 1: Finally without error")
+try:
+    print("In try block")
+finally:
+    print("Finally executed")
+
+# Test 2: Finally with error
+print("Test 2: Finally with error")
+try:
+    x = 10 / 0
+catch e:
+    print("Caught error")
+finally:
+    print("Finally executed after catch")
+
+# Test 3: Try-finally without catch
+print("Test 3: Try-finally without catch")
+cleanup = 0
+try:
+    cleanup = 1
+finally:
+    cleanup = 2
+    print("Cleanup done")
+
+print("Finally tests complete!")

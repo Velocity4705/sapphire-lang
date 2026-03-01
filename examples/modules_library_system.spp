@@ -1,0 +1,213 @@
+# Modules Library System Example
+# Demonstrates modular programming with a library management system
+
+print("=== Modular Library System Demo ===")
+print()
+
+# Simulate importing different modules
+print("1. Importing Core Modules")
+import database
+import auth
+import logging
+print("Core modules imported: database, auth, logging")
+print()
+
+# 2. Book Management Module
+print("2. Book Management Module")
+from library import Book, BookManager
+
+class Book:
+    fn __init__(self, title, author, isbn):
+        self.title = title
+        self.author = author
+        self.isbn = isbn
+        self.available = True
+        self.borrowed_by = None
+    
+    fn get_info(self):
+        status = "Available" if self.available else "Borrowed"
+        return self.title + " by " + self.author + " - " + status
+    
+    fn borrow(self, user):
+        if self.available:
+            self.available = False
+            self.borrowed_by = user
+            return user + " borrowed " + self.title
+        return self.title + " is not available"
+    
+    fn return_book(self):
+        if self.available == False:
+            user = self.borrowed_by
+            self.available = True
+            self.borrowed_by = None
+            return user + " returned " + self.title
+        return self.title + " was not borrowed"
+
+book1 = Book("The Great Gatsby", "F. Scott Fitzgerald", "978-0743273565")
+book2 = Book("1984", "George Orwell", "978-0451524935")
+book3 = Book("To Kill a Mockingbird", "Harper Lee", "978-0061120084")
+
+print(book1.get_info())
+print(book2.get_info())
+print(book3.get_info())
+print()
+
+# 3. User Management Module
+print("3. User Management Module")
+from users import User, UserManager
+
+class User:
+    fn __init__(self, name, user_id):
+        self.name = name
+        self.user_id = user_id
+        self.borrowed_books = []
+        self.max_books = 3
+    
+    fn can_borrow(self):
+        return len(self.borrowed_books) < self.max_books
+    
+    fn borrow_book(self, book):
+        if self.can_borrow():
+            result = book.borrow(self.name)
+            if book.available == False:
+                self.borrowed_books = self.borrowed_books + [book]
+            return result
+        return self.name + " has reached maximum borrowed books"
+    
+    fn return_book(self, book):
+        result = book.return_book()
+        return result
+    
+    fn get_borrowed_count(self):
+        return len(self.borrowed_books)
+
+user1 = User("Alice", "U001")
+user2 = User("Bob", "U002")
+
+print("Users created:", user1.name, "and", user2.name)
+print()
+
+# 4. Library Operations
+print("4. Library Operations")
+print(user1.borrow_book(book1))
+print(user1.borrow_book(book2))
+print("Alice borrowed books:", user1.get_borrowed_count())
+print()
+
+print(user2.borrow_book(book3))
+print("Bob borrowed books:", user2.get_borrowed_count())
+print()
+
+print("Current book status:")
+print(book1.get_info())
+print(book2.get_info())
+print(book3.get_info())
+print()
+
+# 5. Return Books
+print("5. Returning Books")
+print(user1.return_book(book1))
+print(book1.get_info())
+print()
+
+# 6. Search Module
+print("6. Search Module")
+from search import SearchEngine
+
+class SearchEngine:
+    fn __init__(self):
+        self.books = []
+    
+    fn add_book(self, book):
+        self.books = self.books + [book]
+    
+    fn search_by_title(self, title):
+        return "Searching for: " + title
+    
+    fn search_by_author(self, author):
+        return "Searching by author: " + author
+
+search = SearchEngine()
+search.add_book(book1)
+search.add_book(book2)
+search.add_book(book3)
+
+print(search.search_by_title("1984"))
+print(search.search_by_author("George Orwell"))
+print()
+
+# 7. Analytics Module
+print("7. Analytics Module")
+from analytics import Statistics
+
+class Statistics:
+    fn __init__(self):
+        self.total_books = 0
+        self.total_users = 0
+        self.total_borrows = 0
+    
+    fn record_borrow(self):
+        self.total_borrows = self.total_borrows + 1
+    
+    fn add_book(self):
+        self.total_books = self.total_books + 1
+    
+    fn add_user(self):
+        self.total_users = self.total_users + 1
+    
+    fn get_report(self):
+        return "Books: " + str(self.total_books) + ", Users: " + str(self.total_users) + ", Borrows: " + str(self.total_borrows)
+
+stats = Statistics()
+stats.add_book()
+stats.add_book()
+stats.add_book()
+stats.add_user()
+stats.add_user()
+stats.record_borrow()
+stats.record_borrow()
+stats.record_borrow()
+
+print("Library Statistics:")
+print(stats.get_report())
+print()
+
+# 8. Notification Module
+print("8. Notification Module")
+from notifications import EmailNotifier, SMSNotifier
+
+class EmailNotifier:
+    fn send(self, user, message):
+        return "Email sent to " + user + ": " + message
+
+class SMSNotifier:
+    fn send(self, user, message):
+        return "SMS sent to " + user + ": " + message
+
+email = EmailNotifier()
+sms = SMSNotifier()
+
+print(email.send("Alice", "Your book is due tomorrow"))
+print(sms.send("Bob", "New book available: Python Programming"))
+print()
+
+# 9. Configuration Module
+print("9. Configuration Module")
+import config as cfg
+
+class Config:
+    fn __init__(self):
+        self.library_name = "City Library"
+        self.max_borrow_days = 14
+        self.late_fee = 1
+    
+    fn get_setting(self, key):
+        return "Config: " + key
+
+config = Config()
+print("Library Name:", config.library_name)
+print("Max Borrow Days:", config.max_borrow_days)
+print("Late Fee per Day:", config.late_fee)
+print()
+
+print("=== Modular library system demonstrated ===")

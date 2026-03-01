@@ -1,0 +1,214 @@
+# Object-Oriented Programming Test
+# Tests all OOP features for Sapphire v1.0.0
+
+print("=== Object-Oriented Programming Tests ===")
+print()
+
+# Test 1: Basic class with constructor
+print("Test 1: Basic class with constructor")
+class Point:
+    fn __init__(self, x, y):
+        self.x = x
+        self.y = y
+    
+    fn distance(self):
+        return (self.x ** 2 + self.y ** 2) ** 0.5
+
+p = Point(3, 4)
+print("Point created: x =", p.x, ", y =", p.y)
+print("Distance from origin:", p.distance())
+print()
+
+# Test 2: Property access and modification
+print("Test 2: Property access and modification")
+class Person:
+    fn __init__(self, name, age):
+        self.name = name
+        self.age = age
+    
+    fn greet(self):
+        return "Hello, my name is " + self.name
+
+person = Person("Alice", 30)
+print("Person created:", person.name, ", age:", person.age)
+print("Greeting:", person.greet())
+
+# Modify properties
+person.age = 31
+print("After birthday:", person.name, "is now", person.age, "years old")
+print()
+
+# Test 3: Multiple methods
+print("Test 3: Multiple methods")
+class Calculator:
+    fn add(self, a, b):
+        return a + b
+    
+    fn multiply(self, a, b):
+        return a * b
+    
+    fn power(self, a, b):
+        return a ** b
+
+calc = Calculator()
+print("5 + 3 =", calc.add(5, 3))
+print("5 * 3 =", calc.multiply(5, 3))
+print("2 ** 8 =", calc.power(2, 8))
+print()
+
+# Test 4: Inheritance
+print("Test 4: Inheritance")
+class Animal:
+    fn __init__(self, name):
+        self.name = name
+    
+    fn speak(self):
+        return "..."
+
+class Dog(Animal):
+    fn __init__(self, name, breed):
+        # Call parent constructor - super() not implemented yet
+        # super().__init__(name)
+        self.name = name
+        self.breed = breed
+    
+    fn speak(self):
+        return "Woof!"
+
+class Cat(Animal):
+    fn speak(self):
+        return "Meow!"
+
+dog = Dog("Buddy", "Golden Retriever")
+cat = Cat("Whiskers")
+
+print("Dog:", dog.name, "the", dog.breed, "says:", dog.speak())
+print("Cat:", cat.name, "says:", cat.speak())
+print()
+
+# Test 5: Method overriding
+print("Test 5: Method overriding")
+class Shape:
+    fn area(self):
+        return 0
+
+class Rectangle(Shape):
+    fn __init__(self, width, height):
+        self.width = width
+        self.height = height
+    
+    fn area(self):
+        return self.width * self.height
+
+class Circle(Shape):
+    fn __init__(self, radius):
+        self.radius = radius
+    
+    fn area(self):
+        return 3.14159 * self.radius * self.radius
+
+rect = Rectangle(5, 10)
+circle = Circle(7)
+
+print("Rectangle area (5x10):", rect.area())
+print("Circle area (radius 7):", circle.area())
+print()
+
+# Test 6: Simple class
+print("Test 6: Simple class")
+class Counter:
+    fn __init__(self):
+        self.count = 0
+    
+    fn increment(self):
+        self.count = self.count + 1
+        return self.count
+
+counter = Counter()
+print("Counter initial:", counter.increment())
+print("Counter after increment:", counter.increment())
+print("Counter after another increment:", counter.increment())
+print()
+
+# Test 7: Complex inheritance chain
+print("Test 7: Complex inheritance chain")
+class Vehicle:
+    fn __init__(self, make, model):
+        self.make = make
+        self.model = model
+    
+    fn info(self):
+        return self.make + " " + self.model
+
+class Car(Vehicle):
+    fn __init__(self, make, model, doors):
+        # Call parent constructor - super() not implemented yet
+        # super().__init__(make, model)
+        self.make = make
+        self.model = model
+        self.doors = doors
+    
+    fn info(self):
+        # Simple info without string concatenation issues
+        return "Car: " + self.make + " " + self.model
+
+car = Car("Toyota", "Camry", 4)
+print("Car make:", car.make)
+print("Car model:", car.model)
+print("Car doors:", car.doors)
+print("Car info:", car.info())
+print()
+
+# Test 8: Error handling with classes
+print("Test 8: Error handling with classes")
+class BankAccount:
+    fn __init__(self, balance):
+        self.balance = balance
+    
+    fn withdraw(self, amount):
+        if amount > self.balance:
+            throw ValueError("Insufficient funds")
+        self.balance = self.balance - amount
+        return self.balance
+
+account = BankAccount(100)
+print("Initial balance:", account.balance)
+
+try:
+    account.withdraw(50)
+    print("After withdrawing 50:", account.balance)
+    
+    account.withdraw(100)  # Should throw error
+    print("This should not print")
+catch ValueError as e:
+    print("Caught error:", e)
+    print("Balance remains:", account.balance)
+print()
+
+# Test 9: Class as value
+print("Test 9: Class as value")
+class MyClass:
+    fn method(self):
+        return "Class method called"
+
+# Store class in variable
+cls = MyClass
+obj = cls()
+print("Method via variable:", obj.method())
+print()
+
+# Test 10: Nested method calls
+print("Test 10: Nested method calls")
+class MathOperations:
+    fn square(self, x):
+        return x * x
+    
+    fn cube(self, x):
+        return self.square(x) * x
+
+math = MathOperations()
+print("Square of 5:", math.square(5))
+print("Cube of 5:", math.cube(5))
+print()
+
+print("=== All OOP tests completed ===")

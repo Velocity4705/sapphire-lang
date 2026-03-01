@@ -75,3 +75,14 @@ CURRENT_STATUS.txt
 PROJECT_STATUS_*.txt
 PROJECT_SUMMARY.txt
 FINAL_SESSION_SUMMARY.txt
+
+# Unnecessary markdown files (keep only essential docs)
+EXAMPLES_SUMMARY.md
+MILESTONE_COMPLETION_PLAN.md
+CORE_FEATURES_VERIFICATION.md
+PERFORMANCE.md
+RELEASE_NOTES.md
+CHANGELOG.md
+
+# Test files
+test_*.spp

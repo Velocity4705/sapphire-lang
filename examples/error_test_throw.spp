@@ -1,0 +1,20 @@
+print("Testing throw statement")
+
+fn validate_positive(n):
+    if n < 0:
+        throw ValueError("Number must be positive")
+    return n
+
+try:
+    result = validate_positive(5)
+    print("Valid: 5")
+catch ValueError as e:
+    print("This should not print")
+
+try:
+    result = validate_positive(-5)
+    print("This should not print")
+catch ValueError as e:
+    print("Caught ValueError: " + e)
+
+print("Throw test complete!")

@@ -1,0 +1,154 @@
+# OOP Data Structures Example
+# Demonstrates object-oriented programming with classic data structures
+
+print("=== OOP Data Structures Demo ===")
+print()
+
+# 1. Stack Implementation
+print("1. Stack (LIFO)")
+class Stack:
+    fn __init__(self):
+        self.items = []
+        self.size = 0
+    
+    fn push(self, item):
+        self.items = self.items + [item]
+        self.size = self.size + 1
+        return item
+    
+    fn pop(self):
+        if self.size == 0:
+            throw ValueError("Stack is empty")
+        item = self.items[self.size - 1]
+        self.size = self.size - 1
+        return item
+    
+    fn peek(self):
+        if self.size == 0:
+            throw ValueError("Stack is empty")
+        return self.items[self.size - 1]
+    
+    fn is_empty(self):
+        return self.size == 0
+
+stack = Stack()
+stack.push(10)
+stack.push(20)
+stack.push(30)
+print("Stack peek:", stack.peek())
+print("Stack pop:", stack.pop())
+print("Stack peek after pop:", stack.peek())
+print()
+
+# 2. Queue Implementation
+print("2. Queue (FIFO)")
+class Queue:
+    fn __init__(self):
+        self.items = []
+        self.front = 0
+        self.rear = 0
+    
+    fn enqueue(self, item):
+        self.items = self.items + [item]
+        self.rear = self.rear + 1
+        return item
+    
+    fn dequeue(self):
+        if self.front == self.rear:
+            throw ValueError("Queue is empty")
+        item = self.items[self.front]
+        self.front = self.front + 1
+        return item
+    
+    fn size(self):
+        return self.rear - self.front
+
+queue = Queue()
+queue.enqueue(100)
+queue.enqueue(200)
+queue.enqueue(300)
+print("Queue dequeue:", queue.dequeue())
+print("Queue dequeue:", queue.dequeue())
+print("Queue size:", queue.size())
+print()
+
+# 3. Linked List Node
+print("3. Linked List")
+class Node:
+    fn __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    fn __init__(self):
+        self.head = None
+        self.length = 0
+    
+    fn append(self, data):
+        new_node = Node(data)
+        if self.head == None:
+            self.head = new_node
+        self.length = self.length + 1
+        return data
+    
+    fn get_length(self):
+        return self.length
+
+linked_list = LinkedList()
+linked_list.append(1)
+linked_list.append(2)
+linked_list.append(3)
+print("Linked list length:", linked_list.get_length())
+print()
+
+# 4. Binary Tree Node
+print("4. Binary Tree")
+class TreeNode:
+    fn __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+class BinaryTree:
+    fn __init__(self):
+        self.root = None
+    
+    fn insert_root(self, value):
+        self.root = TreeNode(value)
+        return self.root
+    
+    fn get_root_value(self):
+        if self.root == None:
+            return None
+        return self.root.value
+
+tree = BinaryTree()
+tree.insert_root(50)
+print("Tree root value:", tree.get_root_value())
+print()
+
+# 5. Priority Queue (Simple)
+print("5. Priority Queue")
+class PriorityQueue:
+    fn __init__(self):
+        self.items = []
+        self.priorities = []
+        self.size = 0
+    
+    fn enqueue(self, item, priority):
+        self.items = self.items + [item]
+        self.priorities = self.priorities + [priority]
+        self.size = self.size + 1
+        return item
+    
+    fn get_size(self):
+        return self.size
+
+pq = PriorityQueue()
+pq.enqueue("Task A", 1)
+pq.enqueue("Task B", 3)
+pq.enqueue("Task C", 2)
+print("Priority queue size:", pq.get_size())
+print()
+
+print("=== All OOP data structures demonstrated ===")

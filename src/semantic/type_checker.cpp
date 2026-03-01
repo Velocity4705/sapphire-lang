@@ -322,4 +322,74 @@ void TypeChecker::visitForStmt(ForStmt& stmt) {
     }
 }
 
+void TypeChecker::visitTryStmt(TryStmt& stmt) {
+    // Type check try block
+    for (auto& s : stmt.try_body) {
+        s->accept(*this);
+    }
+    
+    // Type check catch blocks
+    for (auto& catch_clause : stmt.catch_clauses) {
+        // Bind exception variable as string (exception message)
+        if (!catch_clause.variable_name.empty()) {
+            env->define(catch_clause.variable_name, std::make_shared<StringType>());
+        }
+        
+        for (auto& s : catch_clause.body) {
+            s->accept(*this);
+        }
+    }
+    
+    // Type check finally block
+    for (auto& s : stmt.finally_body) {
+        s->accept(*this);
+    }
+}
+
+void TypeChecker::visitThrowStmt(ThrowStmt& stmt) {
+    // Type check the message expression
+    if (stmt.message) {
+        auto message_type = checkExpr(*stmt.message);
+        // Message should be convertible to string
+        // For now, we allow any type
+    }
+}
+
+void TypeChecker::visitGetExpr(GetExpr& expr) {
+    auto object_type = checkExpr(*expr.object);
+    // Property access: object.name
+    // For now, we'll return a generic type since we don't have class types
+    current_type = std::make_shared<TypeVariable>();
+}
+
+void TypeChecker::visitSetExpr(SetExpr& expr) {
+    auto object_type = checkExpr(*expr.object);
+    auto value_type = checkExpr(*expr.value);
+    // Property assignment: object.name = value
+    // The type of the expression is the type of the value
+    current_type = value_type;
+}
+
+void TypeChecker::visitClassDecl(ClassDecl& stmt) {
+    // Create a new environment for the class
+    auto class_env = std::make_shared<TypeEnvironment>(env);
+    
+    // Type check class methods in the class environment
+    for (auto& method : stmt.methods) {
+        // Push class environment
+        auto old_env = env;
+        env = class_env;
+        
+        // Type check the method
+        method->accept(*this);
+        
+        // Restore environment
+        env = old_env;
+    }
+    
+    // Class declaration creates a class type in the current environment
+    // For now, we'll use a generic type
+    current_type = std::make_shared<TypeVariable>();
+}
+
 } // namespace sapphire

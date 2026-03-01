@@ -72,6 +72,8 @@ public:
     void visitListExpr(ListExpr& expr) override;
     void visitIndexExpr(IndexExpr& expr) override;
     void visitAssignExpr(AssignExpr& expr) override;
+    void visitGetExpr(GetExpr& expr) override;
+    void visitSetExpr(SetExpr& expr) override;
     
     // Statement visitors
     void visitExprStmt(ExprStmt& stmt) override;
@@ -81,6 +83,9 @@ public:
     void visitIfStmt(IfStmt& stmt) override;
     void visitWhileStmt(WhileStmt& stmt) override;
     void visitForStmt(ForStmt& stmt) override;
+    void visitTryStmt(TryStmt& stmt) override;
+    void visitThrowStmt(ThrowStmt& stmt) override;
+    void visitClassDecl(ClassDecl& stmt) override;
 };
 
 } // namespace sapphire

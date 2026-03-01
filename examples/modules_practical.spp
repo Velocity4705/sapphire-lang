@@ -1,0 +1,255 @@
+# Practical Modules Examples
+# Demonstrates real-world module usage patterns
+
+print("=== Practical Modules Examples ===")
+print()
+
+# 1. Math Module
+print("1. Math Module")
+import math
+from math import sqrt, pow
+
+class MathHelper:
+    fn square(self, x):
+        return x * x
+    
+    fn cube(self, x):
+        return x * x * x
+    
+    fn power(self, base, exp):
+        result = 1
+        i = 0
+        while i < exp:
+            result = result * base
+            i = i + 1
+        return result
+
+helper = MathHelper()
+print("Square of 5:", helper.square(5))
+print("Cube of 3:", helper.cube(3))
+print("2 to the power of 8:", helper.power(2, 8))
+print()
+
+# 2. String Utilities
+print("2. String Utilities")
+from utils import StringUtils
+
+class StringUtils:
+    fn length(self, text):
+        return len(text)
+    
+    fn count_chars(self, text):
+        return len(text)
+
+str_utils = StringUtils()
+text = "Hello World"
+print("Text:", text)
+print("Length:", str_utils.length(text))
+print("Character count:", str_utils.count_chars(text))
+print()
+
+# 3. Date Module
+print("3. Date Module")
+import datetime
+from datetime import Date
+
+class Date:
+    fn __init__(self, year, month, day):
+        self.year = year
+        self.month = month
+        self.day = day
+    
+    fn is_leap_year(self):
+        if self.year % 4 == 0:
+            if self.year % 100 == 0:
+                if self.year % 400 == 0:
+                    return True
+                return False
+            return True
+        return False
+    
+    fn get_year(self):
+        return self.year
+
+date = Date(2024, 3, 15)
+print("Year:", date.get_year())
+print("Is leap year:", date.is_leap_year())
+print()
+
+# 4. File Manager
+print("4. File Manager")
+import fs
+from fs import FileManager
+
+class FileManager:
+    fn __init__(self):
+        self.file_count = 0
+    
+    fn create_file(self):
+        self.file_count = self.file_count + 1
+        return self.file_count
+    
+    fn get_file_count(self):
+        return self.file_count
+
+fm = FileManager()
+print("Created file, count:", fm.create_file())
+print("Created file, count:", fm.create_file())
+print("Created file, count:", fm.create_file())
+print("Total files:", fm.get_file_count())
+print()
+
+# 5. Logger
+print("5. Logger")
+import logging
+from logging import Logger
+
+class Logger:
+    fn __init__(self):
+        self.log_count = 0
+    
+    fn log(self):
+        self.log_count = self.log_count + 1
+        return self.log_count
+    
+    fn get_log_count(self):
+        return self.log_count
+
+logger = Logger()
+print("Log entry:", logger.log())
+print("Log entry:", logger.log())
+print("Log entry:", logger.log())
+print("Total logs:", logger.get_log_count())
+print()
+
+# 6. Config
+print("6. Config")
+import config
+from config import Configuration
+
+class Configuration:
+    fn __init__(self):
+        self.debug = True
+        self.max_connections = 100
+        self.timeout = 30
+    
+    fn is_debug(self):
+        return self.debug
+    
+    fn get_max_connections(self):
+        return self.max_connections
+
+config = Configuration()
+print("Debug mode:", config.is_debug())
+print("Max connections:", config.get_max_connections())
+print("Timeout:", config.timeout)
+print()
+
+# 7. HTTP Request
+print("7. HTTP Request")
+import http
+from http import Request
+
+class Request:
+    fn __init__(self):
+        self.method = "GET"
+        self.headers = 0
+    
+    fn add_header(self):
+        self.headers = self.headers + 1
+        return self.headers
+    
+    fn get_header_count(self):
+        return self.headers
+
+request = Request()
+print("Method:", request.method)
+print("Added header, count:", request.add_header())
+print("Added header, count:", request.add_header())
+print("Total headers:", request.get_header_count())
+print()
+
+# 8. Database
+print("8. Database")
+import database
+from database import DB
+
+class DB:
+    fn __init__(self):
+        self.connected = True
+        self.queries = 0
+    
+    fn query(self):
+        self.queries = self.queries + 1
+        return self.queries
+    
+    fn is_connected(self):
+        return self.connected
+    
+    fn get_query_count(self):
+        return self.queries
+
+db = DB()
+print("Connected:", db.is_connected())
+print("Query executed, count:", db.query())
+print("Query executed, count:", db.query())
+print("Total queries:", db.get_query_count())
+print()
+
+# 9. Cache
+print("9. Cache")
+import cache
+from cache import CacheManager
+
+class CacheManager:
+    fn __init__(self):
+        self.hits = 0
+        self.misses = 0
+    
+    fn hit(self):
+        self.hits = self.hits + 1
+        return self.hits
+    
+    fn miss(self):
+        self.misses = self.misses + 1
+        return self.misses
+    
+    fn get_hit_rate(self):
+        total = self.hits + self.misses
+        if total == 0:
+            return 0
+        return self.hits * 100 / total
+
+cache = CacheManager()
+print("Cache hit:", cache.hit())
+print("Cache hit:", cache.hit())
+print("Cache miss:", cache.miss())
+print("Hit rate:", cache.get_hit_rate())
+print()
+
+# 10. Random Generator
+print("10. Random Generator")
+import random
+from random import RandomGenerator
+
+class RandomGenerator:
+    fn __init__(self):
+        self.seed = 42
+        self.generated = 0
+    
+    fn next(self):
+        self.generated = self.generated + 1
+        self.seed = self.seed + 17
+        return self.seed
+    
+    fn get_generated_count(self):
+        return self.generated
+
+rng = RandomGenerator()
+print("Random number:", rng.next())
+print("Random number:", rng.next())
+print("Random number:", rng.next())
+print("Numbers generated:", rng.get_generated_count())
+print()
+
+print("=== All practical modules examples demonstrated ===")

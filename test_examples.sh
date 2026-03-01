@@ -41,6 +41,10 @@ EXAMPLES=(
     "examples/file_io_working.spp"
     "examples/complete_io_demo.spp"
     "examples/error_handling_working.spp"
+    "examples/oop_working.spp"
+    "examples/modules_working.spp"
+    "examples/oop_practical.spp"
+    "examples/modules_practical.spp"
 )
 
 for example in "${EXAMPLES[@]}"; do

@@ -1,0 +1,9 @@
+# Simple error handling test
+
+print("Test 1: Basic try-catch")
+try:
+    x = 10 / 0
+catch e:
+    print("Caught error")
+
+print("Test complete")

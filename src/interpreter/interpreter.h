@@ -141,6 +141,7 @@ public:
     void visitTryStmt(TryStmt& stmt) override;
     void visitThrowStmt(ThrowStmt& stmt) override;
     void visitClassDecl(ClassDecl& stmt) override;
+    void visitImportStmt(ImportStmt& stmt) override;
 };
 
 } // namespace sapphire

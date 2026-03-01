@@ -1,0 +1,198 @@
+# OOP Game Development Example
+# Demonstrates object-oriented game programming concepts
+
+print("=== OOP Game Development Demo ===")
+print()
+
+# 1. Game Entity Base Class
+print("1. Game Entities")
+class Entity:
+    fn __init__(self, name, x, y):
+        self.name = name
+        self.x = x
+        self.y = y
+        self.health = 100
+        self.alive = True
+    
+    fn move(self, dx, dy):
+        self.x = self.x + dx
+        self.y = self.y + dy
+        return "Moved to (" + str(self.x) + ", " + str(self.y) + ")"
+    
+    fn take_damage(self, damage):
+        self.health = self.health - damage
+        if self.health <= 0:
+            self.alive = False
+            return self.name + " has been defeated!"
+        return self.name + " took " + str(damage) + " damage. Health: " + str(self.health)
+    
+    fn get_position(self):
+        return "(" + str(self.x) + ", " + str(self.y) + ")"
+
+# 2. Player Class
+print("2. Player Character")
+class Player(Entity):
+    fn __init__(self, name, x, y):
+        self.name = name
+        self.x = x
+        self.y = y
+        self.health = 100
+        self.alive = True
+        self.level = 1
+        self.experience = 0
+        self.inventory = []
+    
+    fn attack(self, target):
+        damage = 10 * self.level
+        return target.take_damage(damage)
+    
+    fn gain_exp(self, exp):
+        self.experience = self.experience + exp
+        if self.experience >= 100:
+            self.level = self.level + 1
+            self.experience = 0
+            return self.name + " leveled up to level " + str(self.level) + "!"
+        return self.name + " gained " + str(exp) + " experience"
+    
+    fn add_item(self, item):
+        self.inventory = self.inventory + [item]
+        return "Added " + item + " to inventory"
+
+player = Player("Hero", 0, 0)
+print("Player created:", player.name, "at", player.get_position())
+print(player.move(5, 3))
+print(player.add_item("Sword"))
+print(player.add_item("Shield"))
+print()
+
+# 3. Enemy Class
+print("3. Enemy Characters")
+class Enemy(Entity):
+    fn __init__(self, name, x, y, enemy_type):
+        self.name = name
+        self.x = x
+        self.y = y
+        self.health = 100
+        self.alive = True
+        self.enemy_type = enemy_type
+        self.reward = 50
+    
+    fn attack(self, target):
+        damage = 5
+        return target.take_damage(damage)
+    
+    fn get_reward(self):
+        return self.reward
+
+goblin = Enemy("Goblin", 10, 10, "monster")
+orc = Enemy("Orc", 15, 15, "monster")
+print("Enemies spawned:", goblin.name, "and", orc.name)
+print()
+
+# 4. Combat System
+print("4. Combat System")
+print("Player attacks Goblin:")
+print(player.attack(goblin))
+print(player.attack(goblin))
+print(player.attack(goblin))
+print(player.attack(goblin))
+print(player.attack(goblin))
+print(player.attack(goblin))
+print(player.attack(goblin))
+print(player.attack(goblin))
+print(player.attack(goblin))
+print(player.attack(goblin))
+
+if goblin.alive == False:
+    print(player.gain_exp(goblin.get_reward()))
+print()
+
+# 5. Item System
+print("5. Item System")
+class Item:
+    fn __init__(self, name, item_type, value):
+        self.name = name
+        self.item_type = item_type
+        self.value = value
+    
+    fn use(self):
+        return "Used " + self.name
+
+class Weapon(Item):
+    fn __init__(self, name, damage):
+        self.name = name
+        self.item_type = "weapon"
+        self.value = 100
+        self.damage = damage
+    
+    fn use(self):
+        return "Equipped " + self.name + " (Damage: " + str(self.damage) + ")"
+
+class Potion(Item):
+    fn __init__(self, name, heal_amount):
+        self.name = name
+        self.item_type = "consumable"
+        self.value = 50
+        self.heal_amount = heal_amount
+    
+    fn use(self):
+        return "Drank " + self.name + " (Healed: " + str(self.heal_amount) + ")"
+
+sword = Weapon("Iron Sword", 25)
+potion = Potion("Health Potion", 50)
+
+print(sword.use())
+print(potion.use())
+print()
+
+# 6. Quest System
+print("6. Quest System")
+class Quest:
+    fn __init__(self, title, description):
+        self.title = title
+        self.description = description
+        self.completed = False
+        self.reward = 100
+    
+    fn complete(self):
+        self.completed = True
+        return "Quest completed: " + self.title + " (Reward: " + str(self.reward) + " XP)"
+    
+    fn get_status(self):
+        if self.completed:
+            return self.title + " - COMPLETED"
+        return self.title + " - IN PROGRESS"
+
+quest1 = Quest("Defeat the Goblin", "Defeat the goblin in the forest")
+quest2 = Quest("Collect 10 Herbs", "Gather herbs for the healer")
+
+print(quest1.get_status())
+print(quest1.complete())
+print(quest1.get_status())
+print()
+
+# 7. Game World
+print("7. Game World")
+class GameWorld:
+    fn __init__(self, name):
+        self.name = name
+        self.entities = []
+        self.time = 0
+    
+    fn add_entity(self, entity):
+        self.entities = self.entities + [entity]
+        return "Added " + entity.name + " to world"
+    
+    fn update(self):
+        self.time = self.time + 1
+        return "World time: " + str(self.time)
+
+world = GameWorld("Fantasy Realm")
+print("Created world:", world.name)
+print(world.add_entity(player))
+print(world.add_entity(orc))
+print(world.update())
+print(world.update())
+print()
+
+print("=== Game development concepts demonstrated ===")

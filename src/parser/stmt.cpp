@@ -42,4 +42,8 @@ void ClassDecl::accept(StmtVisitor& visitor) {
     visitor.visitClassDecl(*this);
 }
 
+void ImportStmt::accept(StmtVisitor& visitor) {
+    visitor.visitImportStmt(*this);
+}
+
 } // namespace sapphire

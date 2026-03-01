@@ -114,6 +114,9 @@ std::unique_ptr<Stmt> Parser::declaration() {
     if (match({TokenType::CLASS})) {
         return classDeclaration();
     }
+    if (match({TokenType::IMPORT, TokenType::FROM})) {
+        return importDeclaration();
+    }
     return statement();
 }
 
@@ -509,7 +512,7 @@ std::unique_ptr<Stmt> Parser::tryStatement() {
     // Parse try body
     std::vector<std::unique_ptr<Stmt>> try_body;
     while (!check(TokenType::DEDENT) && !isAtEnd()) {
-        try_body.push_back(statement());
+        try_body.push_back(declaration());
         skipNewlines();
     }
     consume(TokenType::DEDENT, "Expected dedent after try block");
@@ -541,7 +544,7 @@ std::unique_ptr<Stmt> Parser::tryStatement() {
         
         std::vector<std::unique_ptr<Stmt>> catch_body;
         while (!check(TokenType::DEDENT) && !isAtEnd()) {
-            catch_body.push_back(statement());
+            catch_body.push_back(declaration());
             skipNewlines();
         }
         consume(TokenType::DEDENT, "Expected dedent after catch block");
@@ -557,7 +560,7 @@ std::unique_ptr<Stmt> Parser::tryStatement() {
         consume(TokenType::INDENT, "Expected indentation after finally:");
         
         while (!check(TokenType::DEDENT) && !isAtEnd()) {
-            finally_body.push_back(statement());
+            finally_body.push_back(declaration());
             skipNewlines();
         }
         consume(TokenType::DEDENT, "Expected dedent after finally block");
@@ -598,6 +601,58 @@ std::unique_ptr<Stmt> Parser::throwStatement() {
     
     skipNewlines();
     return std::make_unique<ThrowStmt>(exception_type, std::move(message));
+}
+
+std::unique_ptr<Stmt> Parser::importDeclaration() {
+    // import module
+    // import module as alias
+    // from module import name1, name2
+    // from module import name1 as alias1, name2
+    
+    // Check if FROM was already matched (previous token is FROM)
+    bool is_from_import = previous().type == TokenType::FROM;
+    
+    if (is_from_import) {
+        // from module import name1, name2
+        Token module_token = consumeToken(TokenType::IDENTIFIER, "Expected module name after 'from'");
+        std::string module_name = module_token.lexeme;
+        
+        consume(TokenType::IMPORT, "Expected 'import' after module name");
+        
+        std::vector<std::string> imported_names;
+        
+        // Parse imported names
+        do {
+            Token name_token = consumeToken(TokenType::IDENTIFIER, "Expected identifier in import list");
+            std::string name = name_token.lexeme;
+            
+            // Check for alias
+            if (match({TokenType::AS})) {
+                Token alias_token = consumeToken(TokenType::IDENTIFIER, "Expected alias name after 'as'");
+                name = alias_token.lexeme; // For now, just use the alias as the name
+            }
+            
+            imported_names.push_back(name);
+        } while (match({TokenType::COMMA}));
+        
+        skipNewlines();
+        return std::unique_ptr<ImportStmt>(new ImportStmt(module_name, imported_names));
+    } else {
+        // import module
+        // import module as alias
+        Token module_token = consumeToken(TokenType::IDENTIFIER, "Expected module name after 'import'");
+        std::string module_name = module_token.lexeme;
+        std::string alias;
+        
+        // Check for alias
+        if (match({TokenType::AS})) {
+            Token alias_token = consumeToken(TokenType::IDENTIFIER, "Expected alias name after 'as'");
+            alias = alias_token.lexeme;
+        }
+        
+        skipNewlines();
+        return std::unique_ptr<ImportStmt>(new ImportStmt(module_name, alias));
+    }
 }
 
 } // namespace sapphire

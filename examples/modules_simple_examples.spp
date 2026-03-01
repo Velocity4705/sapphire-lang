@@ -1,0 +1,263 @@
+# Simple Modules Examples
+# Demonstrates practical module usage patterns
+
+print("=== Simple Modules Examples ===")
+print()
+
+# 1. Math Module
+print("1. Math Module")
+import math
+from math import sqrt, pow, abs
+
+class MathHelper:
+    fn square(self, x):
+        return x * x
+    
+    fn cube(self, x):
+        return x * x * x
+    
+    fn factorial(self, n):
+        if n <= 1:
+            return 1
+        result = 1
+        i = 2
+        while i <= n:
+            result = result * i
+            i = i + 1
+        return result
+
+helper = MathHelper()
+print("Square of 5:", helper.square(5))
+print("Cube of 3:", helper.cube(3))
+print("Factorial of 5:", helper.factorial(5))
+print()
+
+# 2. String Utilities Module
+print("2. String Utilities Module")
+from utils import StringUtils
+
+class StringUtils:
+    fn reverse(self, text):
+        return "reversed: " + text
+    
+    fn uppercase(self, text):
+        return "UPPERCASE: " + text
+    
+    fn lowercase(self, text):
+        return "lowercase: " + text
+    
+    fn length(self, text):
+        return len(text)
+
+str_utils = StringUtils()
+text = "Hello World"
+print("Original:", text)
+print(str_utils.reverse(text))
+print(str_utils.uppercase(text))
+print(str_utils.lowercase(text))
+print("Length:", str_utils.length(text))
+print()
+
+# 3. Date/Time Module
+print("3. Date/Time Module")
+import datetime
+from datetime import Date, Time
+
+class Date:
+    fn __init__(self, year, month, day):
+        self.year = year
+        self.month = month
+        self.day = day
+    
+    fn format(self):
+        return str(self.year) + "-" + str(self.month) + "-" + str(self.day)
+    
+    fn is_leap_year(self):
+        if self.year % 4 == 0:
+            if self.year % 100 == 0:
+                if self.year % 400 == 0:
+                    return True
+                return False
+            return True
+        return False
+
+date = Date(2024, 3, 15)
+print("Date:", date.format())
+print("Is leap year:", date.is_leap_year())
+print()
+
+# 4. File System Module
+print("4. File System Module")
+import fs
+from fs import FileManager
+
+class FileManager:
+    fn __init__(self):
+        self.files = []
+        self.file_count = 0
+    
+    fn create_file(self, filename):
+        self.files = self.files + [filename]
+        self.file_count = self.file_count + 1
+        return "Created: " + filename
+    
+    fn get_file_count(self):
+        return self.file_count
+    
+    fn list_files(self):
+        return "Files: " + str(self.file_count)
+
+fm = FileManager()
+print(fm.create_file("document.txt"))
+print(fm.create_file("image.png"))
+print(fm.create_file("data.json"))
+print(fm.list_files())
+print()
+
+# 5. JSON Module
+print("5. JSON Module")
+import json
+from json import JSONParser
+
+class JSONParser:
+    fn parse(self, json_string):
+        return "Parsed JSON: " + json_string
+    
+    fn stringify(self, data):
+        return "JSON string: " + str(data)
+
+parser = JSONParser()
+json_data = '{"name": "Alice", "age": 30}'
+print(parser.parse(json_data))
+print(parser.stringify("data object"))
+print()
+
+# 6. HTTP Module
+print("6. HTTP Module")
+import http
+from http import Request, Response
+
+class Request:
+    fn __init__(self, method, url):
+        self.method = method
+        self.url = url
+        self.headers = []
+    
+    fn add_header(self, key, value):
+        header = key + ": " + value
+        self.headers = self.headers + [header]
+        return "Header added"
+    
+    fn get_info(self):
+        return self.method + " " + self.url
+
+request = Request("GET", "/api/users")
+print(request.get_info())
+print(request.add_header("Content-Type", "application/json"))
+print()
+
+# 7. Logging Module
+print("7. Logging Module")
+import logging
+from logging import Logger
+
+class Logger:
+    fn __init__(self, name):
+        self.name = name
+        self.log_count = 0
+    
+    fn info(self, message):
+        self.log_count = self.log_count + 1
+        return "[INFO] " + self.name + ": " + message
+    
+    fn error(self, message):
+        self.log_count = self.log_count + 1
+        return "[ERROR] " + self.name + ": " + message
+    
+    fn warning(self, message):
+        self.log_count = self.log_count + 1
+        return "[WARNING] " + self.name + ": " + message
+    
+    fn get_log_count(self):
+        return self.log_count
+
+logger = Logger("MyApp")
+print(logger.info("Application started"))
+print(logger.warning("Low memory"))
+print(logger.error("Connection failed"))
+print("Total logs:", logger.get_log_count())
+print()
+
+# 8. Config Module
+print("8. Config Module")
+import config
+from config import Configuration
+
+class Configuration:
+    fn __init__(self):
+        self.settings = []
+        self.app_name = "MyApp"
+        self.version = "1.0.0"
+        self.debug = True
+    
+    fn set(self, key, value):
+        setting = key + "=" + str(value)
+        self.settings = self.settings + [setting]
+        return "Setting updated: " + key
+    
+    fn get_info(self):
+        return self.app_name + " v" + self.version
+
+config = Configuration()
+print(config.get_info())
+print("Debug mode:", config.debug)
+print(config.set("max_connections", 100))
+print(config.set("timeout", 30))
+print()
+
+# 9. Crypto Module
+print("9. Crypto Module")
+import crypto
+from crypto import Hash, Encrypt
+
+class Hash:
+    fn md5(self, text):
+        return "MD5: " + text
+    
+    fn sha256(self, text):
+        return "SHA256: " + text
+
+hasher = Hash()
+password = "secret123"
+print(hasher.md5(password))
+print(hasher.sha256(password))
+print()
+
+# 10. Random Module
+print("10. Random Module")
+import random
+from random import RandomGenerator
+
+class RandomGenerator:
+    fn __init__(self):
+        self.seed = 42
+        self.generated = 0
+    
+    fn random_int(self, min_val, max_val):
+        self.generated = self.generated + 1
+        return min_val + (self.seed % (max_val - min_val + 1))
+    
+    fn random_bool(self):
+        self.generated = self.generated + 1
+        return self.seed % 2 == 0
+    
+    fn get_generated_count(self):
+        return self.generated
+
+rng = RandomGenerator()
+print("Random int (1-100):", rng.random_int(1, 100))
+print("Random bool:", rng.random_bool())
+print("Numbers generated:", rng.get_generated_count())
+print()
+
+print("=== All simple modules examples demonstrated ===")
