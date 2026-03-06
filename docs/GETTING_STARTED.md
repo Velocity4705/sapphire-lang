@@ -24,10 +24,10 @@ Sapphire is a modern programming language that combines:
 
 ```bash
 # First time setup (run once)
-bash <(curl -s https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/scripts/setup_git_ssh.sh)
+bash <(curl -s https://raw.githubusercontent.com/velo4705/sapphire-lang/main/scripts/setup_git_ssh.sh)
 
 # Clone and build
-git clone git@github.com:Velocity4705/sapphire-lang.git
+git clone git@github.com:velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```
@@ -36,7 +36,7 @@ make quick
 
 ```bash
 # Clone and build
-git clone https://github.com/Velocity4705/sapphire-lang.git
+git clone https://github.com/velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```

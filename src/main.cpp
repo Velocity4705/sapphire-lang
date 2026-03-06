@@ -39,9 +39,9 @@ void checkForUpdates() {
     int result = system("git rev-parse --git-dir >/dev/null 2>&1");
     if (result != 0) {
         std::cout << "ℹ Not installed via git. To update, run:\n";
-        std::cout << "  curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash\n";
+        std::cout << "  curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash\n";
         std::cout << "\nCurrent version: " << current_version << "\n";
-        std::cout << "Latest version: Check https://github.com/Velocity4705/sapphire-lang/releases\n";
+        std::cout << "Latest version: Check https://github.com/velo4705/sapphire-lang/releases\n";
         return;
     }
     
@@ -49,7 +49,7 @@ void checkForUpdates() {
     result = system("git ls-remote origin main >/dev/null 2>&1");
     if (result != 0) {
         std::cout << "✗ Could not check for updates. Check your internet connection.\n";
-        std::cout << "  Or check manually: https://github.com/Velocity4705/sapphire-lang\n";
+        std::cout << "  Or check manually: https://github.com/velo4705/sapphire-lang\n";
         return;
     }
     
@@ -73,7 +73,7 @@ void updateSapphire() {
     int result = system("git rev-parse --git-dir >/dev/null 2>&1");
     if (result != 0) {
         std::cout << "✗ Not in a git repository. Please reinstall:\n";
-        std::cout << "  curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash\n";
+        std::cout << "  curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash\n";
         return;
     }
     

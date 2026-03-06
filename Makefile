@@ -333,7 +333,25 @@ test-window: stdlib/gui/window.cpp stdlib/tests/test_window.cpp
 	@echo "Running tests..."
 	@./build/tests/test_window
 
-test-new-stdlib: test-datetime test-system test-graphics test-utils test-algorithms test-window
+test-os-dev: stdlib/system/system.cpp stdlib/tests/test_os_dev.cpp
+	@echo "Building OS development test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/system/system.cpp stdlib/tests/test_os_dev.cpp -o build/tests/test_os_dev -lpthread
+	@echo "✓ Test built: build/tests/test_os_dev"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_os_dev
+
+test-hpc: stdlib/hpc/simd.cpp stdlib/tests/test_hpc.cpp
+	@echo "Building HPC/SIMD test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O3 -march=native -I. stdlib/hpc/simd.cpp stdlib/tests/test_hpc.cpp -o build/tests/test_hpc -lpthread
+	@echo "✓ Test built: build/tests/test_hpc"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_hpc
+
+test-new-stdlib: test-datetime test-system test-graphics test-utils test-algorithms test-window test-os-dev test-hpc
 	@echo ""
 	@echo "================================================================================";
 	@echo "All new stdlib tests passed! 🚀✅"

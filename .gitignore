@@ -86,3 +86,9 @@ CHANGELOG.md
 
 # Test files
 test_*.spp
+
+# Kiro IDE/spec files (local development only)
+.kiro/
+
+
+test-project/

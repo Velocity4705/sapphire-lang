@@ -5,7 +5,7 @@
 When cloning with HTTPS, you get:
 ```
 remote: Invalid username or token. Password authentication is not supported for Git operations.
-fatal: Authentication failed for 'https://github.com/Velocity4705/sapphire-lang.git/'
+fatal: Authentication failed for 'https://github.com/velo4705/sapphire-lang.git/'
 ```
 
 ## Solution 1: Use SSH (Recommended)
@@ -48,7 +48,7 @@ Then:
 
 ```bash
 # Use SSH URL instead of HTTPS
-git clone git@github.com:Velocity4705/sapphire-lang.git
+git clone git@github.com:velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```
@@ -59,7 +59,7 @@ If you already cloned with HTTPS:
 
 ```bash
 cd sapphire-lang
-git remote set-url origin git@github.com:Velocity4705/sapphire-lang.git
+git remote set-url origin git@github.com:velo4705/sapphire-lang.git
 ```
 
 ## Solution 2: Use Personal Access Token (PAT)
@@ -80,8 +80,8 @@ git remote set-url origin git@github.com:Velocity4705/sapphire-lang.git
 
 ```bash
 # Use token as password
-git clone https://github.com/Velocity4705/sapphire-lang.git
-# Username: Velocity4705
+git clone https://github.com/velo4705/sapphire-lang.git
+# Username: velo4705
 # Password: <paste your token>
 ```
 
@@ -136,7 +136,7 @@ gh auth login
 ### Step 3: Clone
 
 ```bash
-gh repo clone Velocity4705/sapphire-lang
+gh repo clone velo4705/sapphire-lang
 cd sapphire-lang
 make quick
 ```
@@ -154,7 +154,7 @@ cat ~/.ssh/id_ed25519.pub
 # Add this to GitHub: Settings → SSH and GPG keys
 
 # 3. Clone
-git clone git@github.com:Velocity4705/sapphire-lang.git
+git clone git@github.com:velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```
@@ -165,8 +165,8 @@ make quick
 # 1. Create token at: https://github.com/settings/tokens
 
 # 2. Clone
-git clone https://github.com/Velocity4705/sapphire-lang.git
-# Username: Velocity4705
+git clone https://github.com/velo4705/sapphire-lang.git
+# Username: velo4705
 # Password: <your token>
 
 # 3. Cache credentials
@@ -211,10 +211,10 @@ git pull
 git remote -v
 
 # Update to SSH
-git remote set-url origin git@github.com:Velocity4705/sapphire-lang.git
+git remote set-url origin git@github.com:velo4705/sapphire-lang.git
 
 # Or update to HTTPS
-git remote set-url origin https://github.com/Velocity4705/sapphire-lang.git
+git remote set-url origin https://github.com/velo4705/sapphire-lang.git
 ```
 
 ## Update README.md
@@ -227,7 +227,7 @@ The README should show both options:
 ### Option 1: SSH (Recommended)
 
 ```bash
-git clone git@github.com:Velocity4705/sapphire-lang.git
+git clone git@github.com:velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```
@@ -235,7 +235,7 @@ make quick
 ### Option 2: HTTPS
 
 ```bash
-git clone https://github.com/Velocity4705/sapphire-lang.git
+git clone https://github.com/velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```

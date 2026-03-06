@@ -136,6 +136,19 @@ extern "C" {
     uint64_t sapphire_system_timestamp_us();
     uint64_t sapphire_system_timestamp_ns();
     void sapphire_system_sleep_ms(uint64_t ms);
+    
+    // Kernel Interface C API
+    int sapphire_kernel_syscall(int number, void* arg1, void* arg2);
+    void* sapphire_kernel_map_memory(void* addr, size_t length, int prot, int flags);
+    void sapphire_kernel_unmap_memory(void* addr, size_t length);
+    uint8_t sapphire_kernel_inb(uint16_t port);
+    void sapphire_kernel_outb(uint16_t port, uint8_t value);
+    uint16_t sapphire_kernel_inw(uint16_t port);
+    void sapphire_kernel_outw(uint16_t port, uint16_t value);
+    uint32_t sapphire_kernel_inl(uint16_t port);
+    void sapphire_kernel_outl(uint16_t port, uint32_t value);
+    void sapphire_kernel_enable_interrupts();
+    void sapphire_kernel_disable_interrupts();
 }
 
 #endif // SAPPHIRE_STDLIB_SYSTEM_H

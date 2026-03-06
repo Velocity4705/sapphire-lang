@@ -114,38 +114,126 @@ float dot_product_f32(const float* a, const float* b, size_t size) {
 }
 
 void matrix_multiply_f32(const float* a, const float* b, float* result, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            float sum = 0.0f;
-            for (int k = 0; k < n; k++) {
-                sum += a[i * n + k] * b[k * n + j];
+    // Cache-blocked matrix multiplication with SIMD
+    const int block_size = 32;
+    
+    // Initialize result to zero
+    for (int i = 0; i < n * n; i++) {
+        result[i] = 0.0f;
+    }
+    
+    // Blocked matrix multiplication
+    for (int ii = 0; ii < n; ii += block_size) {
+        for (int jj = 0; jj < n; jj += block_size) {
+            for (int kk = 0; kk < n; kk += block_size) {
+                // Process block
+                int i_max = std::min(ii + block_size, n);
+                int j_max = std::min(jj + block_size, n);
+                int k_max = std::min(kk + block_size, n);
+                
+                for (int i = ii; i < i_max; i++) {
+                    for (int j = jj; j < j_max; j++) {
+                        float sum = result[i * n + j];
+                        
+                        #ifdef __AVX__
+                        __m256 vsum = _mm256_setzero_ps();
+                        int k = kk;
+                        for (; k + 8 <= k_max; k += 8) {
+                            __m256 va = _mm256_loadu_ps(&a[i * n + k]);
+                            __m256 vb = _mm256_loadu_ps(&b[k * n + j]);
+                            vsum = _mm256_add_ps(vsum, _mm256_mul_ps(va, vb));
+                        }
+                        float temp[8];
+                        _mm256_storeu_ps(temp, vsum);
+                        for (int t = 0; t < 8; t++) sum += temp[t];
+                        
+                        for (; k < k_max; k++) {
+                            sum += a[i * n + k] * b[k * n + j];
+                        }
+                        #else
+                        for (int k = kk; k < k_max; k++) {
+                            sum += a[i * n + k] * b[k * n + j];
+                        }
+                        #endif
+                        
+                        result[i * n + j] = sum;
+                    }
+                }
             }
-            result[i * n + j] = sum;
         }
     }
 }
 
 float sum_f32(const float* arr, size_t size) {
     float sum = 0.0f;
+    #ifdef __AVX__
+    __m256 vsum = _mm256_setzero_ps();
+    size_t i = 0;
+    for (; i + 8 <= size; i += 8) {
+        __m256 v = _mm256_loadu_ps(&arr[i]);
+        vsum = _mm256_add_ps(vsum, v);
+    }
+    float temp[8];
+    _mm256_storeu_ps(temp, vsum);
+    for (int j = 0; j < 8; j++) sum += temp[j];
+    for (; i < size; i++) {
+        sum += arr[i];
+    }
+    #else
     for (size_t i = 0; i < size; i++) {
         sum += arr[i];
     }
+    #endif
     return sum;
 }
 
 float max_f32(const float* arr, size_t size) {
     float max_val = arr[0];
+    #ifdef __AVX__
+    __m256 vmax = _mm256_set1_ps(arr[0]);
+    size_t i = 1;
+    for (; i + 8 <= size; i += 8) {
+        __m256 v = _mm256_loadu_ps(&arr[i]);
+        vmax = _mm256_max_ps(vmax, v);
+    }
+    float temp[8];
+    _mm256_storeu_ps(temp, vmax);
+    for (int j = 0; j < 8; j++) {
+        if (temp[j] > max_val) max_val = temp[j];
+    }
+    for (; i < size; i++) {
+        if (arr[i] > max_val) max_val = arr[i];
+    }
+    #else
     for (size_t i = 1; i < size; i++) {
         if (arr[i] > max_val) max_val = arr[i];
     }
+    #endif
     return max_val;
 }
 
 float min_f32(const float* arr, size_t size) {
     float min_val = arr[0];
+    #ifdef __AVX__
+    __m256 vmin = _mm256_set1_ps(arr[0]);
+    size_t i = 1;
+    for (; i + 8 <= size; i += 8) {
+        __m256 v = _mm256_loadu_ps(&arr[i]);
+        vmin = _mm256_min_ps(vmin, v);
+    }
+    float temp[8];
+    _mm256_storeu_ps(temp, vmin);
+    for (int j = 0; j < 8; j++) {
+        if (temp[j] < min_val) min_val = temp[j];
+    }
+    for (; i < size; i++) {
+        if (arr[i] < min_val) min_val = arr[i];
+    }
+    #else
     for (size_t i = 1; i < size; i++) {
         if (arr[i] < min_val) min_val = arr[i];
     }
+    #endif
     return min_val;
 }
 
@@ -265,25 +353,7 @@ namespace Memory {
 }
 
 namespace Parallel {
-    void parallel_for(int start, int end, int num_threads, void (*func)(int)) {
-        std::vector<std::thread> threads;
-        int chunk_size = (end - start) / num_threads;
-        
-        for (int t = 0; t < num_threads; t++) {
-            int chunk_start = start + t * chunk_size;
-            int chunk_end = (t == num_threads - 1) ? end : chunk_start + chunk_size;
-            
-            threads.emplace_back([=]() {
-                for (int i = chunk_start; i < chunk_end; i++) {
-                    func(i);
-                }
-            });
-        }
-        
-        for (auto& thread : threads) {
-            thread.join();
-        }
-    }
+    // Template implementation moved to header
 }
 
 } // namespace stdlib
@@ -331,5 +401,3 @@ extern "C" {
         sapphire::stdlib::SIMD::parallel_add_f32(a, b, result, size, threads);
     }
 }
-
-#endif // SAPPHIRE_STDLIB_SIMD_H

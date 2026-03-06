@@ -3,12 +3,19 @@
 #include <sys/stat.h>
 #include <sys/sysinfo.h>
 #include <sys/wait.h>
+#include <sys/mman.h>
+#include <sys/syscall.h>
 #include <dirent.h>
 #include <cstdlib>
 #include <cstring>
 #include <csignal>
 #include <chrono>
 #include <thread>
+#include <errno.h>
+
+#ifdef __x86_64__
+#include <sys/io.h>
+#endif
 
 namespace sapphire {
 namespace stdlib {
@@ -271,52 +278,128 @@ bool is_network_available() {
 
 // Kernel Interface
 namespace Kernel {
+    // System calls - Direct syscall interface
     int syscall(int number, void* arg1, void* arg2) {
-        (void)number; (void)arg1; (void)arg2;
+        // Use Linux syscall() function for direct system calls
+        #ifdef __linux__
+        return ::syscall(number, arg1, arg2);
+        #else
+        // Not supported on non-Linux platforms
+        errno = ENOSYS;
         return -1;
+        #endif
     }
     
+    // Interrupt handling - Platform specific
     void register_interrupt_handler(int interrupt, void (*handler)()) {
+        #ifdef __linux__
+        // On Linux userspace, we can't directly register interrupt handlers
+        // This would require kernel module or privileged access
+        // For now, we'll use signal handlers as a userspace alternative
+        if (interrupt >= 0 && interrupt < 32) {
+            // Map interrupt numbers to signals (simplified)
+            int sig = SIGUSR1 + (interrupt % 2);
+            std::signal(sig, reinterpret_cast<void(*)(int)>(handler));
+        }
+        #else
         (void)interrupt; (void)handler;
+        #endif
     }
     
-    void enable_interrupts() {}
-    void disable_interrupts() {}
+    void enable_interrupts() {
+        #ifdef __x86_64__
+        // Enable interrupts using inline assembly (requires privileged mode)
+        // This will fail in userspace but is here for OS development
+        __asm__ volatile("sti");
+        #endif
+    }
     
+    void disable_interrupts() {
+        #ifdef __x86_64__
+        // Disable interrupts using inline assembly (requires privileged mode)
+        // This will fail in userspace but is here for OS development
+        __asm__ volatile("cli");
+        #endif
+    }
+    
+    // Memory mapping - Full implementation
     void* map_memory(void* addr, size_t length, int prot, int flags) {
+        #ifdef __linux__
+        void* result = mmap(addr, length, prot, flags, -1, 0);
+        if (result == MAP_FAILED) {
+            return nullptr;
+        }
+        return result;
+        #else
         (void)addr; (void)length; (void)prot; (void)flags;
         return nullptr;
+        #endif
     }
     
     void unmap_memory(void* addr, size_t length) {
+        #ifdef __linux__
+        munmap(addr, length);
+        #else
         (void)addr; (void)length;
+        #endif
     }
     
+    // Device I/O - Port operations (x86/x86_64 only)
     uint8_t inb(uint16_t port) {
+        #ifdef __x86_64__
+        uint8_t value;
+        __asm__ volatile("inb %1, %0" : "=a"(value) : "Nd"(port));
+        return value;
+        #else
         (void)port;
         return 0;
+        #endif
     }
     
     void outb(uint16_t port, uint8_t value) {
+        #ifdef __x86_64__
+        __asm__ volatile("outb %0, %1" : : "a"(value), "Nd"(port));
+        #else
         (void)port; (void)value;
+        #endif
     }
     
     uint16_t inw(uint16_t port) {
+        #ifdef __x86_64__
+        uint16_t value;
+        __asm__ volatile("inw %1, %0" : "=a"(value) : "Nd"(port));
+        return value;
+        #else
         (void)port;
         return 0;
+        #endif
     }
     
     void outw(uint16_t port, uint16_t value) {
+        #ifdef __x86_64__
+        __asm__ volatile("outw %0, %1" : : "a"(value), "Nd"(port));
+        #else
         (void)port; (void)value;
+        #endif
     }
     
     uint32_t inl(uint16_t port) {
+        #ifdef __x86_64__
+        uint32_t value;
+        __asm__ volatile("inl %1, %0" : "=a"(value) : "Nd"(port));
+        return value;
+        #else
         (void)port;
         return 0;
+        #endif
     }
     
     void outl(uint16_t port, uint32_t value) {
+        #ifdef __x86_64__
+        __asm__ volatile("outl %0, %1" : : "a"(value), "Nd"(port));
+        #else
         (void)port; (void)value;
+        #endif
     }
 }
 
@@ -403,5 +486,50 @@ extern "C" {
     
     void sapphire_system_sleep_ms(uint64_t ms) {
         sapphire::stdlib::System::sleep_ms(ms);
+    }
+    
+    // Kernel Interface C API
+    int sapphire_kernel_syscall(int number, void* arg1, void* arg2) {
+        return sapphire::stdlib::Kernel::syscall(number, arg1, arg2);
+    }
+    
+    void* sapphire_kernel_map_memory(void* addr, size_t length, int prot, int flags) {
+        return sapphire::stdlib::Kernel::map_memory(addr, length, prot, flags);
+    }
+    
+    void sapphire_kernel_unmap_memory(void* addr, size_t length) {
+        sapphire::stdlib::Kernel::unmap_memory(addr, length);
+    }
+    
+    uint8_t sapphire_kernel_inb(uint16_t port) {
+        return sapphire::stdlib::Kernel::inb(port);
+    }
+    
+    void sapphire_kernel_outb(uint16_t port, uint8_t value) {
+        sapphire::stdlib::Kernel::outb(port, value);
+    }
+    
+    uint16_t sapphire_kernel_inw(uint16_t port) {
+        return sapphire::stdlib::Kernel::inw(port);
+    }
+    
+    void sapphire_kernel_outw(uint16_t port, uint16_t value) {
+        sapphire::stdlib::Kernel::outw(port, value);
+    }
+    
+    uint32_t sapphire_kernel_inl(uint16_t port) {
+        return sapphire::stdlib::Kernel::inl(port);
+    }
+    
+    void sapphire_kernel_outl(uint16_t port, uint32_t value) {
+        sapphire::stdlib::Kernel::outl(port, value);
+    }
+    
+    void sapphire_kernel_enable_interrupts() {
+        sapphire::stdlib::Kernel::enable_interrupts();
+    }
+    
+    void sapphire_kernel_disable_interrupts() {
+        sapphire::stdlib::Kernel::disable_interrupts();
     }
 }

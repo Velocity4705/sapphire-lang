@@ -17,7 +17,7 @@ if [ -f ~/.ssh/id_ed25519 ] || [ -f ~/.ssh/id_rsa ]; then
         echo "✓ SSH authentication working!"
         echo ""
         echo "Cloning with SSH..."
-        git clone git@github.com:Velocity4705/sapphire-lang.git
+        git clone git@github.com:velo4705/sapphire-lang.git
         cd sapphire-lang
         echo ""
         echo "Building Sapphire..."
@@ -48,7 +48,7 @@ read -p "Do you have a token? (y/N): " has_token
 if [[ $has_token =~ ^[Yy]$ ]]; then
     echo ""
     echo "Cloning with HTTPS..."
-    git clone https://github.com/Velocity4705/sapphire-lang.git
+    git clone https://github.com/velo4705/sapphire-lang.git
     
     if [ $? -eq 0 ]; then
         cd sapphire-lang

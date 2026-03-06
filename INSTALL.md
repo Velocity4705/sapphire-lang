@@ -3,7 +3,7 @@
 ## Quick Install (One Line)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash
 ```
 
 This is the easiest way to install Sapphire. It will:
@@ -44,7 +44,7 @@ brew install gcc make git
 ### Step 1: Clone
 
 ```bash
-git clone https://github.com/Velocity4705/sapphire-lang.git
+git clone https://github.com/velo4705/sapphire-lang.git
 cd sapphire-lang
 ```
 
@@ -119,7 +119,7 @@ After this, git will remember your credentials after the first use.
 
 **Option 2: Use the one-line installer**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash
 ```
 
 This will update your installation without requiring credentials.
@@ -143,7 +143,7 @@ The auto-update feature requires:
 If you installed Sapphire without git, you'll see:
 ```
 ℹ Not installed via git. To update, run:
-  curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash
 ```
 
 Simply run the one-line installer again - it will update your installation.
@@ -239,7 +239,7 @@ After installation:
 1. **Read the docs**: [Getting Started](docs/GETTING_STARTED.md)
 2. **Try examples**: `ls examples/`
 3. **Create a project**: `spm init my-project`
-4. **Join the community**: [GitHub Discussions](https://github.com/Velocity4705/sapphire-lang/discussions)
+4. **Join the community**: [GitHub Discussions](https://github.com/velo4705/sapphire-lang/discussions)
 
 ## Platform Support
 
@@ -254,8 +254,8 @@ Sapphire works on:
 ## Getting Help
 
 - **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/Velocity4705/sapphire-lang/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Velocity4705/sapphire-lang/discussions)
+- **Issues**: [GitHub Issues](https://github.com/velo4705/sapphire-lang/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/velo4705/sapphire-lang/discussions)
 - **Quick Fix**: [QUICK_FIX.md](QUICK_FIX.md)
 
 ## Advanced Installation
@@ -289,7 +289,7 @@ export PATH="$PATH:$HOME/bin"
 ```dockerfile
 FROM ubuntu:22.04
 RUN apt update && apt install -y g++ make git
-RUN git clone https://github.com/Velocity4705/sapphire-lang.git
+RUN git clone https://github.com/velo4705/sapphire-lang.git
 WORKDIR /sapphire-lang
 RUN make quick
 CMD ["./sapp"]
@@ -300,7 +300,7 @@ CMD ["./sapp"]
 For contributing to Sapphire:
 
 ```bash
-git clone https://github.com/Velocity4705/sapphire-lang.git
+git clone https://github.com/velo4705/sapphire-lang.git
 cd sapphire-lang
 make debug  # Build with debug symbols
 make test   # Run tests

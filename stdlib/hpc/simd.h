@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <cstring>
 #include <immintrin.h>  // AVX/SSE intrinsics
+#include <vector>
+#include <thread>
 
 namespace sapphire {
 namespace stdlib {
@@ -94,7 +96,26 @@ namespace Memory {
 // Parallel Computing
 namespace Parallel {
     // Parallel for loop
-    void parallel_for(int start, int end, int threads, void (*func)(int));
+    template<typename Func>
+    void parallel_for(int start, int end, int threads, Func func) {
+        std::vector<std::thread> thread_pool;
+        int chunk_size = (end - start) / threads;
+        
+        for (int t = 0; t < threads; t++) {
+            int chunk_start = start + t * chunk_size;
+            int chunk_end = (t == threads - 1) ? end : chunk_start + chunk_size;
+            
+            thread_pool.emplace_back([=]() {
+                for (int i = chunk_start; i < chunk_end; i++) {
+                    func(i);
+                }
+            });
+        }
+        
+        for (auto& thread : thread_pool) {
+            thread.join();
+        }
+    }
     
     // Parallel reduce
     template<typename T>

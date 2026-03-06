@@ -1,0 +1,146 @@
+// Sapphire OS Development Example
+// Demonstrates low-level system programming capabilities
+
+import System from "stdlib/system"
+import Kernel from "stdlib/system"
+
+fn main() {
+    println("=== Sapphire OS Development Demo ===")
+    println("")
+    
+    // 1. Process Information
+    println("1. Process Information:")
+    let pid = System.get_pid()
+    let ppid = System.get_parent_pid()
+    println("  Current PID: " + str(pid))
+    println("  Parent PID: " + str(ppid))
+    println("")
+    
+    // 2. Memory Management
+    println("2. Memory Management:")
+    let page_size = System.get_page_size()
+    let total_mem = System.get_total_memory()
+    let avail_mem = System.get_available_memory()
+    println("  Page size: " + str(page_size) + " bytes")
+    println("  Total memory: " + str(total_mem / 1024 / 1024) + " MB")
+    println("  Available: " + str(avail_mem / 1024 / 1024) + " MB")
+    println("")
+    
+    // 3. Memory Mapping (mmap)
+    println("3. Memory Mapping:")
+    let addr = Kernel.map_memory(null, page_size, 
+                                  PROT_READ | PROT_WRITE,
+                                  MAP_PRIVATE | MAP_ANONYMOUS)
+    if addr != null {
+        println("  ✓ Mapped " + str(page_size) + " bytes")
+        // Write to mapped memory
+        // ... (would need pointer support in Sapphire)
+        Kernel.unmap_memory(addr, page_size)
+        println("  ✓ Memory unmapped")
+    }
+    println("")
+    
+    // 4. System Calls
+    println("4. Direct System Calls:")
+    // Example: getpid syscall (SYS_getpid = 39 on x86_64)
+    let syscall_pid = Kernel.syscall(39, null, null)
+    println("  Direct syscall PID: " + str(syscall_pid))
+    println("")
+    
+    // 5. File System Operations
+    println("5. File System:")
+    let cwd = System.get_current_directory()
+    println("  Current directory: " + cwd)
+    
+    // Create a test directory
+    System.create_directory("/tmp/sapphire_test")
+    if System.directory_exists("/tmp/sapphire_test") {
+        println("  ✓ Created test directory")
+        System.remove_directory("/tmp/sapphire_test")
+        println("  ✓ Removed test directory")
+    }
+    println("")
+    
+    // 6. Environment Variables
+    println("6. Environment:")
+    let user = System.get_username()
+    let host = System.get_hostname()
+    let os = System.get_os_name()
+    println("  User: " + user)
+    println("  Host: " + host)
+    println("  OS: " + os)
+    println("")
+    
+    // 7. System Information
+    println("7. System Info:")
+    let cpu_count = System.get_cpu_count()
+    let cpu_arch = System.get_cpu_arch()
+    let uptime = System.get_uptime()
+    println("  CPUs: " + str(cpu_count))
+    println("  Architecture: " + cpu_arch)
+    println("  Uptime: " + str(uptime) + " seconds")
+    println("")
+    
+    // 8. High-Precision Timing
+    println("8. High-Precision Timing:")
+    let ns = System.get_timestamp_ns()
+    let us = System.get_timestamp_us()
+    let ms = System.get_timestamp_ms()
+    println("  Nanoseconds: " + str(ns))
+    println("  Microseconds: " + str(us))
+    println("  Milliseconds: " + str(ms))
+    println("")
+    
+    // 9. Process Spawning
+    println("9. Process Management:")
+    let args = ["-c", "echo 'Hello from child process'"]
+    let child_pid = System.spawn_process("/bin/sh", args)
+    println("  Spawned child: " + str(child_pid))
+    let exit_code = System.wait_process(child_pid)
+    println("  Child exited with code: " + str(exit_code))
+    println("")
+    
+    // 10. Signal Handling
+    println("10. Signal Handling:")
+    println("  Signal functions available:")
+    println("    - send_signal(pid, signal)")
+    println("    - register_signal_handler(signal, handler)")
+    println("")
+    
+    // 11. Port I/O (x86/x86_64 only, requires privileges)
+    println("11. Port I/O (OS Development):")
+    println("  Available for kernel modules:")
+    println("    - Kernel.inb(port)  : Read byte from port")
+    println("    - Kernel.outb(port, val) : Write byte to port")
+    println("    - Kernel.inw(port)  : Read word from port")
+    println("    - Kernel.outw(port, val) : Write word to port")
+    println("    - Kernel.inl(port)  : Read dword from port")
+    println("    - Kernel.outl(port, val) : Write dword to port")
+    println("")
+    
+    // 12. Interrupt Control (kernel mode only)
+    println("12. Interrupt Control (Kernel Mode):")
+    println("  Available for OS development:")
+    println("    - Kernel.enable_interrupts()  : STI")
+    println("    - Kernel.disable_interrupts() : CLI")
+    println("")
+    
+    println("=== OS Development Demo Complete ===")
+    println("")
+    println("Sapphire provides full OS development capabilities:")
+    println("  ✓ Direct system calls")
+    println("  ✓ Memory mapping (mmap/munmap)")
+    println("  ✓ Process management")
+    println("  ✓ Signal handling")
+    println("  ✓ Port I/O (x86/x86_64)")
+    println("  ✓ Interrupt control")
+    println("  ✓ File system operations")
+    println("  ✓ High-precision timing")
+    println("")
+    println("Use these features to build:")
+    println("  - Operating systems")
+    println("  - Kernel modules")
+    println("  - Device drivers")
+    println("  - System utilities")
+    println("  - Low-level tools")
+}

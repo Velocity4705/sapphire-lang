@@ -155,7 +155,7 @@ You choose based on your needs.
 
 **A:** Currently build from source:
 ```bash
-git clone https://github.com/Velocity4705/sapphire-lang.git
+git clone https://github.com/velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ./sapp examples/demo.spp

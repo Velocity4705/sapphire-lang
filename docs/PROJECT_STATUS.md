@@ -96,7 +96,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ## Community
 
-- GitHub: https://github.com/Velocity4705/sapphire-lang
+- GitHub: https://github.com/velo4705/sapphire-lang
 - Issues: Report bugs and request features
 - Discussions: Ask questions and share ideas
 

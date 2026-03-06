@@ -29,7 +29,7 @@ The auto-update system:
 ### One-Line Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash
 ```
 
 This installs Sapphire with auto-update support enabled.
@@ -37,7 +37,7 @@ This installs Sapphire with auto-update support enabled.
 ### Manual Install
 
 ```bash
-git clone https://github.com/Velocity4705/sapphire-lang.git
+git clone https://github.com/velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```
@@ -101,7 +101,7 @@ We recommend checking for updates:
 If you get this error, reinstall using the one-line installer:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash
 ```
 
 ### "Update failed"
@@ -196,7 +196,7 @@ For automated deployments:
 
 ```bash
 # In your CI/CD pipeline
-git clone https://github.com/Velocity4705/sapphire-lang.git
+git clone https://github.com/velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ./sapp --version

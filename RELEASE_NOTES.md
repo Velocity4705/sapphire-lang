@@ -95,13 +95,13 @@ Cutting-edge language capabilities:
 ### One-Line Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash
 ```
 
 ### Manual Installation
 
 ```bash
-git clone https://github.com/Velocity4705/sapphire-lang.git
+git clone https://github.com/velo4705/sapphire-lang.git
 cd sapphire-lang
 make quick
 ```
@@ -251,7 +251,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Community
 
-- **GitHub**: github.com/Velocity4705/sapphire-lang
+- **GitHub**: github.com/velo4705/sapphire-lang
 - **Issues**: Report bugs and request features
 - **Discussions**: Ask questions and share ideas
 
@@ -281,6 +281,6 @@ Start building with Sapphire today!
 
 **Sapphire 1.0.0** - A modern programming language for the future.
 
-Built with 💎 by Velocity4705.
+Built with 💎 by velo4705.
 
 Released: February 26, 2026

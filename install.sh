@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sapphire One-Line Installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/Velocity4705/sapphire-lang/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash
 
 set -e
 
@@ -25,7 +25,7 @@ if [ -d "sapphire-lang" ]; then
     cd sapphire-lang
     git pull
 else
-    git clone https://github.com/Velocity4705/sapphire-lang.git
+    git clone https://github.com/velo4705/sapphire-lang.git
     cd sapphire-lang
 fi
 
@@ -81,4 +81,4 @@ echo ""
 echo "Update anytime:"
 echo "  sapp --update"
 echo ""
-echo "Documentation: https://github.com/Velocity4705/sapphire-lang"
+echo "Documentation: https://github.com/velo4705/sapphire-lang"

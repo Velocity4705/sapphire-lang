@@ -52,7 +52,7 @@ echo "3. Paste the key and give it a title (e.g., 'My Laptop')"
 echo "4. Click 'Add SSH key'"
 echo ""
 echo "Then clone Sapphire with:"
-echo "  git clone git@github.com:Velocity4705/sapphire-lang.git"
+echo "  git clone git@github.com:velo4705/sapphire-lang.git"
 echo ""
 
 # Try to copy to clipboard
@@ -78,7 +78,7 @@ if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
     echo "✓ SSH connection successful!"
     echo ""
     echo "You're all set! Clone Sapphire with:"
-    echo "  git clone git@github.com:Velocity4705/sapphire-lang.git"
+    echo "  git clone git@github.com:velo4705/sapphire-lang.git"
 else
     echo "⚠ SSH connection test failed. Please check:"
     echo "  1. Did you add the key to GitHub?"
