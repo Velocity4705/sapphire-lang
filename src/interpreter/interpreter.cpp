@@ -4,6 +4,10 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include <chrono>
+#include <thread>
+#include <algorithm>
+#include <cstdlib>
 
 namespace sapphire {
 
@@ -64,6 +68,10 @@ Interpreter::Interpreter() {
     environment->define("input", std::string("__builtin_input__"));
     environment->define("read_file", std::string("__builtin_read_file__"));
     environment->define("write_file", std::string("__builtin_write_file__"));
+    environment->define("time", std::string("__builtin_time__"));
+    environment->define("sleep", std::string("__builtin_sleep__"));
+    environment->define("sort", std::string("__builtin_sort__"));
+    environment->define("make_array", std::string("__builtin_make_array__"));
 }
 
 void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements) {
@@ -519,6 +527,89 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
             file.close();
             
             last_value = true;  // Return true on success
+        } else if (func_name == "__builtin_time__") {
+            // Return current time in seconds since epoch as double
+            auto now = std::chrono::system_clock::now();
+            auto duration = now.time_since_epoch();
+            auto seconds = std::chrono::duration_cast<std::chrono::duration<double>>(duration);
+            last_value = seconds.count();
+        } else if (func_name == "__builtin_sleep__") {
+            // Sleep for specified seconds (accepts int or double)
+            if (arguments.empty()) {
+                throw TypeError("sleep() requires 1 argument (seconds)");
+            }
+            
+            double seconds = 0.0;
+            if (std::holds_alternative<int>(arguments[0])) {
+                seconds = static_cast<double>(std::get<int>(arguments[0]));
+            } else if (std::holds_alternative<double>(arguments[0])) {
+                seconds = std::get<double>(arguments[0]);
+            } else {
+                throw TypeError("sleep() requires numeric argument");
+            }
+            
+            auto duration = std::chrono::duration<double>(seconds);
+            std::this_thread::sleep_for(duration);
+            last_value = nullptr;
+        } else if (func_name == "__builtin_sort__") {
+            // Fast native sort - O(n log n)
+            if (arguments.empty()) {
+                throw TypeError("sort() requires 1 argument (array)");
+            }
+            
+            if (!std::holds_alternative<std::shared_ptr<ArrayValue>>(arguments[0])) {
+                throw TypeError("sort() requires an array");
+            }
+            
+            auto array = std::get<std::shared_ptr<ArrayValue>>(arguments[0]);
+            
+            // Sort using C++ std::sort (highly optimized)
+            std::sort(array->elements.begin(), array->elements.end(), 
+                [](const Value& a, const Value& b) {
+                    if (std::holds_alternative<int>(a) && std::holds_alternative<int>(b)) {
+                        return std::get<int>(a) < std::get<int>(b);
+                    } else if (std::holds_alternative<double>(a) && std::holds_alternative<double>(b)) {
+                        return std::get<double>(a) < std::get<double>(b);
+                    } else if (std::holds_alternative<std::string>(a) && std::holds_alternative<std::string>(b)) {
+                        return std::get<std::string>(a) < std::get<std::string>(b);
+                    }
+                    return false;
+                });
+            
+            last_value = array;
+        } else if (func_name == "__builtin_make_array__") {
+            // Fast array generation for benchmarking
+            // make_array(size, mode) where mode: "random", "sorted", "reverse"
+            if (arguments.empty()) {
+                throw TypeError("make_array() requires at least 1 argument (size)");
+            }
+            
+            int size = std::get<int>(arguments[0]);
+            std::string mode = "random";
+            if (arguments.size() > 1) {
+                mode = std::get<std::string>(arguments[1]);
+            }
+            
+            auto array = std::make_shared<ArrayValue>();
+            array->elements.reserve(size);
+            
+            if (mode == "reverse") {
+                for (int i = size; i > 0; i--) {
+                    array->elements.push_back(i);
+                }
+            } else if (mode == "sorted") {
+                for (int i = 1; i <= size; i++) {
+                    array->elements.push_back(i);
+                }
+            } else {
+                // Random
+                srand(42);
+                for (int i = 0; i < size; i++) {
+                    array->elements.push_back(rand() % 100000);
+                }
+            }
+            
+            last_value = array;
         }
     }
 }

@@ -277,3 +277,64 @@ clean:
 
 test-examples:
 	@bash test_examples.sh
+
+
+test-datetime: stdlib/datetime/datetime.cpp stdlib/tests/test_datetime.cpp
+	@echo "Building datetime test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/datetime/datetime.cpp stdlib/tests/test_datetime.cpp -o build/tests/test_datetime
+	@echo "✓ Test built: build/tests/test_datetime"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_datetime
+
+test-system: stdlib/system/system.cpp stdlib/tests/test_system.cpp
+	@echo "Building system test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/system/system.cpp stdlib/tests/test_system.cpp -o build/tests/test_system -lpthread
+	@echo "✓ Test built: build/tests/test_system"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_system
+
+test-graphics: stdlib/graphics/graphics.cpp stdlib/tests/test_graphics.cpp
+	@echo "Building graphics test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/graphics/graphics.cpp stdlib/tests/test_graphics.cpp -o build/tests/test_graphics
+	@echo "✓ Test built: build/tests/test_graphics"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_graphics
+
+test-utils: stdlib/utils/utils.cpp stdlib/tests/test_utils.cpp
+	@echo "Building utils test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/utils/utils.cpp stdlib/tests/test_utils.cpp -o build/tests/test_utils
+	@echo "✓ Test built: build/tests/test_utils"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_utils
+
+test-algorithms: stdlib/algorithms/algorithms.cpp stdlib/tests/test_algorithms.cpp
+	@echo "Building algorithms test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/algorithms/algorithms.cpp stdlib/tests/test_algorithms.cpp -o build/tests/test_algorithms
+	@echo "✓ Test built: build/tests/test_algorithms"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_algorithms
+
+test-window: stdlib/gui/window.cpp stdlib/tests/test_window.cpp
+	@echo "Building window test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/gui/window.cpp stdlib/tests/test_window.cpp -o build/tests/test_window `pkg-config --cflags --libs sdl2 SDL2_ttf`
+	@echo "✓ Test built: build/tests/test_window"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_window
+
+test-new-stdlib: test-datetime test-system test-graphics test-utils test-algorithms test-window
+	@echo ""
+	@echo "================================================================================";
+	@echo "All new stdlib tests passed! 🚀✅"
+	@echo "================================================================================";

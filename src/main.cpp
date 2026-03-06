@@ -207,13 +207,6 @@ int main(int argc, char* argv[]) {
             std::cerr << "\n=== Compilation successful! ===\n";
         } else {
             // Interpreter mode
-            // Type checker (optional for now)
-            bool enable_type_checking = false;
-            if (enable_type_checking) {
-                sapphire::TypeChecker type_checker;
-                type_checker.check(statements);
-            }
-            
             // Interpreter - execute
             sapphire::Interpreter interpreter;
             interpreter.interpret(statements);

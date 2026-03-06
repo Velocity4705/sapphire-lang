@@ -1,0 +1,83 @@
+# Timing and Performance Measurement Example
+# Demonstrates high-precision timing with built-in time() function
+
+print("=== Sapphire Timing Example ===")
+print()
+
+# Simple timer class
+class Timer:
+    fn __init__(self):
+        self.start_time = 0.0
+        self.end_time = 0.0
+    
+    fn start(self):
+        self.start_time = time()
+    
+    fn stop(self):
+        self.end_time = time()
+    
+    fn elapsed(self):
+        return self.end_time - self.start_time
+    
+    fn elapsed_ms(self):
+        return (self.end_time - self.start_time) * 1000.0
+    
+    fn elapsed_us(self):
+        return (self.end_time - self.start_time) * 1000000.0
+
+# Test 1: Simple computation
+print("Test 1: Simple Loop")
+let timer1 = Timer()
+timer1.start()
+
+let sum = 0
+for i in range(10000):
+    sum = sum + i
+
+timer1.stop()
+print("Result:", sum)
+print("Time:", timer1.elapsed_ms(), "ms")
+print()
+
+# Test 2: Nested loops
+print("Test 2: Nested Loops")
+let timer2 = Timer()
+timer2.start()
+
+let product = 0
+for i in range(100):
+    for j in range(100):
+        product = i * j
+
+timer2.stop()
+print("Time:", timer2.elapsed_ms(), "ms")
+print()
+
+# Test 3: Function calls
+print("Test 3: Function Calls")
+
+fn fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+let timer3 = Timer()
+timer3.start()
+let fib = fibonacci(20)
+timer3.stop()
+
+print("Fibonacci(20):", fib)
+print("Time:", timer3.elapsed_ms(), "ms")
+print()
+
+# Test 4: Sleep function
+print("Test 4: Sleep Function")
+let timer4 = Timer()
+timer4.start()
+sleep(0.1)
+timer4.stop()
+print("Slept for 0.1 seconds")
+print("Actual time:", timer4.elapsed(), "seconds")
+print()
+
+print("=== All timing tests complete ===")

@@ -1,0 +1,17 @@
+# Test time function
+let start = time()
+print("Start time:")
+print(start)
+
+# Do some work
+let sum = 0
+for i in range(1000):
+    sum = sum + i
+
+let end = time()
+print("End time:")
+print(end)
+
+let elapsed = end - start
+print("Elapsed time (seconds):")
+print(elapsed)

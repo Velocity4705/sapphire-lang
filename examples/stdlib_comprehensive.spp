@@ -1,0 +1,113 @@
+# Comprehensive Standard Library Demo
+# Showcases timing, data structures, and system operations
+
+print("╔══════════════════════════════════════════════════════════════╗")
+print("║  Sapphire Standard Library - Comprehensive Demo              ║")
+print("╚══════════════════════════════════════════════════════════════╝")
+print()
+
+# Timer utility class
+class Timer:
+    fn __init__(self):
+        self.start_time = 0.0
+    
+    fn start(self):
+        self.start_time = time()
+    
+    fn elapsed_ms(self):
+        return (time() - self.start_time) * 1000.0
+
+# 1. Timing Demo
+print("1. High-Precision Timing")
+print("─────────────────────────")
+let timer = Timer()
+timer.start()
+
+let sum = 0
+for i in range(100000):
+    sum = sum + i
+
+print("Computed sum of 0-99999:", sum)
+print("Time taken:", timer.elapsed_ms(), "ms")
+print()
+
+# 2. Fibonacci with Timing
+print("2. Algorithm Performance")
+print("─────────────────────────")
+
+fn fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+let fib_timer = Timer()
+fib_timer.start()
+let fib_result = fibonacci(25)
+print("Fibonacci(25):", fib_result)
+print("Time taken:", fib_timer.elapsed_ms(), "ms")
+print()
+
+# 3. Data Structures Demo
+print("3. Data Structures")
+print("─────────────────────────")
+
+# Stack simulation
+class Stack:
+    fn __init__(self):
+        self.items = []
+        self.top_index = 0
+    
+    fn push(self, item):
+        self.top_index = self.top_index + 1
+        return item
+    
+    fn size(self):
+        return self.top_index
+
+let stack = Stack()
+stack.push(10)
+stack.push(20)
+stack.push(30)
+print("Stack size:", stack.size())
+print()
+
+# 4. String Operations
+print("4. String Operations")
+print("─────────────────────────")
+let text = "Hello, Sapphire!"
+print("Original:", text)
+print("Length:", len(text))
+print()
+
+# 5. Performance Comparison
+print("5. Performance Comparison")
+print("─────────────────────────")
+
+# Test different loop sizes
+let sizes = [1000, 10000, 100000]
+
+for size in sizes:
+    let perf_timer = Timer()
+    perf_timer.start()
+    
+    let result = 0
+    for i in range(size):
+        result = result + i
+    
+    print("Size:", size, "→ Time:", perf_timer.elapsed_ms(), "ms")
+
+print()
+
+# 6. Sleep Demo
+print("6. Sleep Function")
+print("─────────────────────────")
+let sleep_timer = Timer()
+sleep_timer.start()
+print("Sleeping for 0.05 seconds...")
+sleep(0.05)
+print("Actual sleep time:", sleep_timer.elapsed_ms(), "ms")
+print()
+
+print("╔══════════════════════════════════════════════════════════════╗")
+print("║  Demo Complete! All features working ✅                       ║")
+print("╚══════════════════════════════════════════════════════════════╝")
