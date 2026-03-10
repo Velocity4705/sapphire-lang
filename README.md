@@ -302,18 +302,120 @@ ln -s $(pwd)/editors/vscode ~/.vscode/extensions/sapphire-lang-1.0.0
 
 ---
 
+## System Programming & OS Development
+
+Sapphire includes a comprehensive system library for OS-level programming:
+
+### System Library Features
+- **Process Management**: Get PID, spawn processes, exit
+- **Memory Management**: Allocate/free memory, page size info
+- **File System**: Check existence, create directories, get CWD
+- **Environment**: Access env vars, username, hostname
+- **System Info**: CPU count, architecture detection
+- **High-Precision Timing**: Nanosecond, microsecond, millisecond timestamps
+- **Sleep Functions**: Precise timing control
+
+### Quick Example
+
+```sapphire
+import system
+
+print("System Information:")
+let pid = sapphire_system_get_pid()
+let cpu_count = sapphire_system_cpu_count()
+let cpu_arch = sapphire_system_cpu_arch()
+
+print("PID:", pid)
+print("CPUs:", cpu_count)
+print("Architecture:", cpu_arch)
+
+// High-precision timing
+let start = sapphire_system_timestamp_ns()
+// ... your code ...
+let end = sapphire_system_timestamp_ns()
+print("Elapsed:", end - start, "ns")
+```
+
+### Working Examples
+- `system_demo.spp` - System capabilities demo
+- `kernel_hello.spp` - Kernel-style initialization
+- `process_monitor.spp` - Process monitoring tool
+
+**Documentation:**
+- [System Library Complete Guide](SYSTEM_LIBRARY_COMPLETE.md)
+- [Quick Start Guide](SYSTEM_QUICK_START.md)
+- [OS Kernel Roadmap](OS_KERNEL_ROADMAP.md)
+- [OS Development Guide](docs/OS_DEVELOPMENT.md)
+
+---
+
+## Game Development
+
+Sapphire supports 2D game development with SDL2:
+
+### Working Pong Game
+
+```sapphire
+import graphics.sdl2
+
+let window = sapphire_sdl2_create_window("Pong", 800, 600)
+sapphire_sdl2_show_window(window)
+
+// Game loop
+while !sapphire_sdl2_should_close(window):
+    sapphire_sdl2_poll_events(window)
+    
+    // Clear screen
+    sapphire_sdl2_clear(window, 0, 0, 0)
+    
+    // Draw paddles and ball
+    sapphire_sdl2_fill_rect(window, p1x, p1y, 20, 100, 255, 255, 255)
+    sapphire_sdl2_fill_rect(window, p2x, p2y, 20, 100, 255, 255, 255)
+    sapphire_sdl2_fill_rect(window, bx, by, 15, 15, 255, 255, 0)
+    
+    // Present
+    sapphire_sdl2_present(window)
+    sapphire_sdl2_delay(16)  // 60 FPS
+
+sapphire_sdl2_destroy_window(window)
+```
+
+### Play the Demo
+
+```bash
+./play_pong.sh
+```
+
+**Features:**
+- SDL2 graphics library integration
+- 2D rendering (rectangles, lines, points)
+- Keyboard input handling
+- 60 FPS game loop
+- Window management
+
+**Documentation:**
+- [Pong Game README](PONG_README.md)
+- [Game Development Status](PONG_GAME_STATUS.md)
+- [Graphics Quick Start](GRAPHICS_QUICK_START.md)
+
+---
+
 ## Use Cases
 
 Build anything with Sapphire:
 
-- Web applications (frontend & backend)
-- System utilities and tools
-- High-performance computing
-- GUI applications
-- Mobile apps
-- Game development
-- Data processing
-- Network services
+- **Web applications** (frontend & backend)
+- **System utilities and tools**
+- **High-performance computing**
+- **GUI applications**
+- **Mobile apps**
+- **Game development** (2D with SDL2)
+- **Data science** (statistics, ML, time series)
+- **Network applications** (TCP, UDP, HTTP)
+- **Data processing**
+- **Network services**
+- **Operating system development** (kernel modules, drivers)
+- **Embedded systems** (IoT, sensors, controllers)
 
 ---
 

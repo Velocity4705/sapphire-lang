@@ -24,6 +24,7 @@ private:
     int width_;
     int height_;
     bool is_open_;
+    const uint8_t* keyboard_state_;
     
 public:
     Window(const std::string& title, int width, int height);
@@ -37,6 +38,9 @@ public:
     
     // Event handling
     bool poll_events();
+    
+    // Keyboard state
+    bool is_key_down(int keycode) const;
     
     // Rendering
     void clear(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0);
@@ -84,6 +88,12 @@ extern "C" {
                                    uint8_t r, uint8_t g, uint8_t b);
     void sapphire_window_fill_rect(void* window, int x, int y, int w, int h,
                                    uint8_t r, uint8_t g, uint8_t b);
+    
+    // Keyboard functions
+    bool sapphire_window_is_key_down(void* window, int keycode);
+    
+    // Window state
+    bool sapphire_window_should_close(void* window);
 }
 
 #endif // SAPPHIRE_STDLIB_WINDOW_H

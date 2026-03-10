@@ -43,9 +43,12 @@ void LLVMCodeGen::generate(const std::vector<std::unique_ptr<Stmt>>& statements)
     // Create main function
     impl->createMainFunction();
     
+    std::cerr << "DEBUG: Generating " << statements.size() << " statements" << std::endl;
+    
     // Generate code for each statement
-    for (const auto& stmt : statements) {
-        generateStmt(stmt.get());
+    for (size_t i = 0; i < statements.size(); i++) {
+        std::cerr << "DEBUG: Generating statement " << i << std::endl;
+        generateStmt(statements[i].get());
     }
     
     // Finalize main function
@@ -111,6 +114,8 @@ llvm::Value* LLVMCodeGen::generateExpr(Expr* expr) {
         return generateLiteralExpr(literal);
     } else if (auto* variable = dynamic_cast<VariableExpr*>(expr)) {
         return generateVariableExpr(variable);
+    } else if (auto* assign = dynamic_cast<AssignExpr*>(expr)) {
+        return generateAssignExpr(assign);
     } else if (auto* call = dynamic_cast<CallExpr*>(expr)) {
         return generateCallExpr(call);
     } else if (auto* match = dynamic_cast<MatchExpr*>(expr)) {
@@ -299,6 +304,25 @@ llvm::Value* LLVMCodeGen::generateVariableExpr(VariableExpr* expr) {
     return impl->builder->CreateLoad(var_type, var, expr->name);
 }
 
+llvm::Value* LLVMCodeGen::generateAssignExpr(AssignExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    
+    // Get the variable
+    llvm::Value* var = impl->named_values[expr->name];
+    if (!var) {
+        throw std::runtime_error("Unknown variable: " + expr->name);
+    }
+    
+    // Generate the value to assign
+    llvm::Value* value = generateExpr(expr->value.get());
+    
+    // Store the value
+    impl->builder->CreateStore(value, var);
+    
+    // Return the value (assignments are expressions in Sapphire)
+    return value;
+}
+
 llvm::Value* LLVMCodeGen::generateCallExpr(CallExpr* expr) {
     auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
     
@@ -313,6 +337,173 @@ llvm::Value* LLVMCodeGen::generateCallExpr(CallExpr* expr) {
     // Check if it's a built-in function
     if (func_name == "print") {
         return generatePrintCall(expr);
+    }
+    else if (func_name == "window_create") {
+        return generateWindowCreateCall(expr);
+    }
+    else if (func_name == "window_show") {
+        return generateWindowShowCall(expr);
+    }
+    else if (func_name == "window_poll_events") {
+        return generateWindowPollEventsCall(expr);
+    }
+    else if (func_name == "window_clear") {
+        return generateWindowClearCall(expr);
+    }
+    else if (func_name == "window_fill_rect") {
+        return generateWindowFillRectCall(expr);
+    }
+    else if (func_name == "window_present") {
+        return generateWindowPresentCall(expr);
+    }
+    else if (func_name == "window_is_key_down") {
+        return generateWindowIsKeyDownCall(expr);
+    }
+    else if (func_name == "window_should_close") {
+        return generateWindowShouldCloseCall(expr);
+    }
+    else if (func_name == "window_destroy") {
+        return generateWindowDestroyCall(expr);
+    }
+    else if (func_name == "delay") {
+        return generateDelayCall(expr);
+    }
+    // OpenGL functions
+    else if (func_name == "gl_clear_color") {
+        return generateGLClearColorCall(expr);
+    }
+    else if (func_name == "gl_clear") {
+        return generateGLClearCall(expr);
+    }
+    else if (func_name == "gl_begin") {
+        return generateGLBeginCall(expr);
+    }
+    else if (func_name == "gl_end") {
+        return generateGLEndCall(expr);
+    }
+    else if (func_name == "gl_vertex3f") {
+        return generateGLVertex3fCall(expr);
+    }
+    else if (func_name == "gl_color3f") {
+        return generateGLColor3fCall(expr);
+    }
+    else if (func_name == "gl_translatef") {
+        return generateGLTranslatefCall(expr);
+    }
+    else if (func_name == "gl_rotatef") {
+        return generateGLRotatefCall(expr);
+    }
+    else if (func_name == "gl_matrix_mode") {
+        return generateGLMatrixModeCall(expr);
+    }
+    else if (func_name == "gl_load_identity") {
+        return generateGLLoadIdentityCall(expr);
+    }
+    // GLUT functions
+    else if (func_name == "glut_init_display_mode") {
+        return generateGLUTInitDisplayModeCall(expr);
+    }
+    else if (func_name == "glut_init_window_size") {
+        return generateGLUTInitWindowSizeCall(expr);
+    }
+    else if (func_name == "glut_create_window") {
+        return generateGLUTCreateWindowCall(expr);
+    }
+    else if (func_name == "glut_swap_buffers") {
+        return generateGLUTSwapBuffersCall(expr);
+    }
+    else if (func_name == "glut_solid_sphere") {
+        return generateGLUTSolidSphereCall(expr);
+    }
+    else if (func_name == "glut_wire_sphere") {
+        return generateGLUTWireSphereCall(expr);
+    }
+    // SDL2 imported functions - handle type conversions
+    else if (func_name == "sapphire_sdl2_clear") {
+        // sapphire_sdl2_clear(window, r, g, b) - convert colors from i64 to i8
+        llvm::Function* func = impl->functions[func_name];
+        if (!func) throw std::runtime_error("SDL2 function not imported: " + func_name);
+        if (expr->arguments.size() != 4) throw std::runtime_error("sapphire_sdl2_clear expects 4 arguments");
+        
+        std::vector<llvm::Value*> args;
+        args.push_back(generateExpr(expr->arguments[0].get())); // window
+        for (size_t i = 1; i < 4; i++) {
+            llvm::Value* arg = generateExpr(expr->arguments[i].get());
+            if (arg->getType()->isIntegerTy(64)) {
+                arg = impl->builder->CreateTrunc(arg, llvm::Type::getInt8Ty(*impl->context));
+            }
+            args.push_back(arg);
+        }
+        return impl->builder->CreateCall(func, args);
+    }
+    else if (func_name == "sapphire_sdl2_delay") {
+        // sapphire_sdl2_delay(ms) - convert from i64 to i32
+        llvm::Function* func = impl->functions[func_name];
+        if (!func) throw std::runtime_error("SDL2 function not imported: " + func_name);
+        if (expr->arguments.size() != 1) throw std::runtime_error("sapphire_sdl2_delay expects 1 argument");
+        
+        llvm::Value* ms = generateExpr(expr->arguments[0].get());
+        if (ms->getType()->isIntegerTy(64)) {
+            ms = impl->builder->CreateTrunc(ms, llvm::Type::getInt32Ty(*impl->context));
+        }
+        return impl->builder->CreateCall(func, {ms});
+    }
+    else if (func_name == "sapphire_sdl2_fill_rect") {
+        // sapphire_sdl2_fill_rect(window, x, y, w, h, r, g, b) - convert colors from i64 to i8
+        llvm::Function* func = impl->functions[func_name];
+        if (!func) throw std::runtime_error("SDL2 function not imported: " + func_name);
+        if (expr->arguments.size() != 8) throw std::runtime_error("sapphire_sdl2_fill_rect expects 8 arguments");
+        
+        std::vector<llvm::Value*> args;
+        for (size_t i = 0; i < 5; i++) {
+            args.push_back(generateExpr(expr->arguments[i].get())); // window, x, y, w, h
+        }
+        for (size_t i = 5; i < 8; i++) {
+            llvm::Value* arg = generateExpr(expr->arguments[i].get());
+            if (arg->getType()->isIntegerTy(64)) {
+                arg = impl->builder->CreateTrunc(arg, llvm::Type::getInt8Ty(*impl->context));
+            }
+            args.push_back(arg);
+        }
+        return impl->builder->CreateCall(func, args);
+    }
+    else if (func_name == "sapphire_sdl2_draw_line") {
+        // sapphire_sdl2_draw_line(window, x1, y1, x2, y2, r, g, b) - convert colors from i64 to i8
+        llvm::Function* func = impl->functions[func_name];
+        if (!func) throw std::runtime_error("SDL2 function not imported: " + func_name);
+        if (expr->arguments.size() != 8) throw std::runtime_error("sapphire_sdl2_draw_line expects 8 arguments");
+        
+        std::vector<llvm::Value*> args;
+        for (size_t i = 0; i < 5; i++) {
+            args.push_back(generateExpr(expr->arguments[i].get())); // window, x1, y1, x2, y2
+        }
+        for (size_t i = 5; i < 8; i++) {
+            llvm::Value* arg = generateExpr(expr->arguments[i].get());
+            if (arg->getType()->isIntegerTy(64)) {
+                arg = impl->builder->CreateTrunc(arg, llvm::Type::getInt8Ty(*impl->context));
+            }
+            args.push_back(arg);
+        }
+        return impl->builder->CreateCall(func, args);
+    }
+    else if (func_name == "sapphire_sdl2_draw_point") {
+        // sapphire_sdl2_draw_point(window, x, y, r, g, b) - convert colors from i64 to i8
+        llvm::Function* func = impl->functions[func_name];
+        if (!func) throw std::runtime_error("SDL2 function not imported: " + func_name);
+        if (expr->arguments.size() != 6) throw std::runtime_error("sapphire_sdl2_draw_point expects 6 arguments");
+        
+        std::vector<llvm::Value*> args;
+        for (size_t i = 0; i < 3; i++) {
+            args.push_back(generateExpr(expr->arguments[i].get())); // window, x, y
+        }
+        for (size_t i = 3; i < 6; i++) {
+            llvm::Value* arg = generateExpr(expr->arguments[i].get());
+            if (arg->getType()->isIntegerTy(64)) {
+                arg = impl->builder->CreateTrunc(arg, llvm::Type::getInt8Ty(*impl->context));
+            }
+            args.push_back(arg);
+        }
+        return impl->builder->CreateCall(func, args);
     }
     
     // Look up function
@@ -334,8 +525,9 @@ llvm::Value* LLVMCodeGen::generateCallExpr(CallExpr* expr) {
         args.push_back(generateExpr(arg.get()));
     }
     
-    // Create call
-    return impl->builder->CreateCall(func, args, "calltmp");
+    // Create call - use empty name for void functions
+    const char* call_name = func->getReturnType()->isVoidTy() ? "" : "calltmp";
+    return impl->builder->CreateCall(func, args, call_name);
 }
 
 // Built-in functions
@@ -555,6 +747,9 @@ void LLVMCodeGen::generateStmt(Stmt* stmt) {
     else if (auto* return_stmt = dynamic_cast<ReturnStmt*>(stmt)) {
         generateReturnStmt(return_stmt);
     }
+    else if (auto* import_stmt = dynamic_cast<ImportStmt*>(stmt)) {
+        generateImportStmt(import_stmt);
+    }
 }
 
 void LLVMCodeGen::generateVarDeclStmt(VarDeclStmt* stmt) {
@@ -618,12 +813,21 @@ void LLVMCodeGen::generateIfStmt(IfStmt* stmt) {
 void LLVMCodeGen::generateWhileStmt(WhileStmt* stmt) {
     auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
     
+    std::cerr << "DEBUG: Generating while loop" << std::endl;
+    llvm::BasicBlock* entry_block = impl->builder->GetInsertBlock();
+    std::cerr << "DEBUG: Current block: " << entry_block->getName().str() << std::endl;
+    std::cerr << "DEBUG: Current block has terminator: " 
+              << (entry_block->getTerminator() != nullptr) << std::endl;
+    
     llvm::BasicBlock* cond_bb = llvm::BasicBlock::Create(*impl->context, "while_cond", impl->current_function);
     llvm::BasicBlock* body_bb = llvm::BasicBlock::Create(*impl->context, "while_body", impl->current_function);
     llvm::BasicBlock* end_bb = llvm::BasicBlock::Create(*impl->context, "while_end", impl->current_function);
     
     // Jump to condition
     impl->builder->CreateBr(cond_bb);
+    std::cerr << "DEBUG: Created branch to condition block" << std::endl;
+    std::cerr << "DEBUG: Entry block now has terminator: " 
+              << (entry_block->getTerminator() != nullptr) << std::endl;
     
     // Condition block
     impl->builder->SetInsertPoint(cond_bb);
@@ -639,6 +843,7 @@ void LLVMCodeGen::generateWhileStmt(WhileStmt* stmt) {
     
     // End block
     impl->builder->SetInsertPoint(end_bb);
+    std::cerr << "DEBUG: While loop generation complete" << std::endl;
 }
 
 void LLVMCodeGen::generateForStmt(ForStmt* stmt) {
@@ -770,6 +975,787 @@ void LLVMCodeGen::generateReturnStmt(ReturnStmt* stmt) {
     }
 }
 
+void LLVMCodeGen::generateImportStmt(ImportStmt* stmt) {
+    // Import statement implementation
+    // For now, we'll handle imports by declaring external functions based on the module name
+    
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    
+    // Map of module names to their external functions
+    // This allows us to declare functions when a module is imported
+    
+    if (stmt->module_name == "graphics" || stmt->module_name == "graphics.sdl2" || stmt->module_name == "sdl2") {
+        // Declare SDL2 graphics functions
+        // These will be linked against libsapphire_sdl2
+        declareSDL2Functions();
+    }
+    else if (stmt->module_name == "graphics.opengl" || stmt->module_name == "opengl") {
+        // Declare OpenGL functions
+        declareOpenGLFunctions();
+    }
+    else if (stmt->module_name == "graphics.glut" || stmt->module_name == "glut") {
+        // Declare GLUT functions
+        declareGLUTFunctions();
+    }
+    else if (stmt->module_name == "graphics.vulkan" || stmt->module_name == "vulkan") {
+        // Declare Vulkan functions
+        declareVulkanFunctions();
+    }
+    else if (stmt->module_name == "system") {
+        // Declare system functions
+        // These will be linked against libsapphire_system
+        declareSystemFunctions();
+    }
+    
+    // For other modules, we can add more mappings here
+    // For now, imports are recognized but don't generate errors
+    // This allows the code to compile even if the module isn't fully implemented
+}
+
+// Module import helper functions - declare external C functions from graphics libraries
+
+void LLVMCodeGen::declareSDL2Functions() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    
+    // Check if already declared
+    if (impl->module->getFunction("sapphire_sdl2_create_window")) {
+        return; // Already declared
+    }
+    
+    // void* sapphire_sdl2_create_window(const char* title, int width, int height)
+    llvm::FunctionType* create_window_type = llvm::FunctionType::get(
+        llvm::PointerType::get(*impl->context, 0),
+        {llvm::PointerType::get(*impl->context, 0), impl->getIntType(), impl->getIntType()},
+        false
+    );
+    llvm::Function* create_window_func = llvm::Function::Create(create_window_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_create_window", impl->module.get());
+    impl->functions["sapphire_sdl2_create_window"] = create_window_func;
+    
+    // void sapphire_sdl2_destroy_window(void* window)
+    llvm::FunctionType* destroy_window_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* destroy_window_func = llvm::Function::Create(destroy_window_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_destroy_window", impl->module.get());
+    impl->functions["sapphire_sdl2_destroy_window"] = destroy_window_func;
+    
+    // void sapphire_sdl2_show_window(void* window)
+    llvm::FunctionType* show_window_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* show_window_func = llvm::Function::Create(show_window_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_show_window", impl->module.get());
+    impl->functions["sapphire_sdl2_show_window"] = show_window_func;
+    
+    // void sapphire_sdl2_hide_window(void* window)
+    llvm::FunctionType* hide_window_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* hide_window_func = llvm::Function::Create(hide_window_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_hide_window", impl->module.get());
+    impl->functions["sapphire_sdl2_hide_window"] = hide_window_func;
+    
+    // bool sapphire_sdl2_should_close(void* window)
+    llvm::FunctionType* should_close_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* should_close_func = llvm::Function::Create(should_close_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_should_close", impl->module.get());
+    impl->functions["sapphire_sdl2_should_close"] = should_close_func;
+    
+    // void sapphire_sdl2_poll_events(void* window)
+    llvm::FunctionType* poll_events_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* poll_events_func = llvm::Function::Create(poll_events_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_poll_events", impl->module.get());
+    impl->functions["sapphire_sdl2_poll_events"] = poll_events_func;
+    
+    // void sapphire_sdl2_clear(void* window, uint8_t r, uint8_t g, uint8_t b)
+    llvm::FunctionType* clear_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context)},
+        false
+    );
+    llvm::Function* clear_func = llvm::Function::Create(clear_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_clear", impl->module.get());
+    impl->functions["sapphire_sdl2_clear"] = clear_func;
+    
+    // void sapphire_sdl2_present(void* window)
+    llvm::FunctionType* present_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* present_func = llvm::Function::Create(present_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_present", impl->module.get());
+    impl->functions["sapphire_sdl2_present"] = present_func;
+    
+    // void sapphire_sdl2_fill_rect(void* window, int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b)
+    llvm::FunctionType* fill_rect_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0),
+         impl->getIntType(), impl->getIntType(), impl->getIntType(), impl->getIntType(),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context)},
+        false
+    );
+    llvm::Function* fill_rect_func = llvm::Function::Create(fill_rect_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_fill_rect", impl->module.get());
+    impl->functions["sapphire_sdl2_fill_rect"] = fill_rect_func;
+    
+    // void sapphire_sdl2_draw_line(void* window, int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b)
+    llvm::FunctionType* draw_line_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0),
+         impl->getIntType(), impl->getIntType(), impl->getIntType(), impl->getIntType(),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context)},
+        false
+    );
+    llvm::Function* draw_line_func = llvm::Function::Create(draw_line_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_draw_line", impl->module.get());
+    impl->functions["sapphire_sdl2_draw_line"] = draw_line_func;
+    
+    // void sapphire_sdl2_draw_point(void* window, int x, int y, uint8_t r, uint8_t g, uint8_t b)
+    llvm::FunctionType* draw_point_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0),
+         impl->getIntType(), impl->getIntType(),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context)},
+        false
+    );
+    llvm::Function* draw_point_func = llvm::Function::Create(draw_point_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_draw_point", impl->module.get());
+    impl->functions["sapphire_sdl2_draw_point"] = draw_point_func;
+    
+    // void sapphire_sdl2_delay(uint32_t ms)
+    llvm::FunctionType* delay_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    llvm::Function* delay_func = llvm::Function::Create(delay_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_delay", impl->module.get());
+    impl->functions["sapphire_sdl2_delay"] = delay_func;
+    
+    // bool sapphire_sdl2_is_key_down(void* window, int scancode)
+    llvm::FunctionType* is_key_down_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0), impl->getIntType()},
+        false
+    );
+    llvm::Function* is_key_down_func = llvm::Function::Create(is_key_down_type, llvm::Function::ExternalLinkage,
+                          "sapphire_sdl2_is_key_down", impl->module.get());
+    impl->functions["sapphire_sdl2_is_key_down"] = is_key_down_func;
+    
+    std::cerr << "✓ SDL2 functions declared for import\n";
+}
+
+void LLVMCodeGen::declareOpenGLFunctions() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    
+    // Check if already declared
+    if (impl->module->getFunction("sapphire_gl_init")) {
+        return; // Already declared
+    }
+    
+    // bool sapphire_gl_init()
+    llvm::FunctionType* init_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {},
+        false
+    );
+    llvm::Function::Create(init_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_init", impl->module.get());
+    
+    // void sapphire_gl_viewport(int x, int y, int width, int height)
+    llvm::FunctionType* viewport_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {impl->getIntType(), impl->getIntType(), impl->getIntType(), impl->getIntType()},
+        false
+    );
+    llvm::Function::Create(viewport_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_viewport", impl->module.get());
+    
+    // void sapphire_gl_clear_color(float r, float g, float b, float a)
+    llvm::FunctionType* clear_color_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(clear_color_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_clear_color", impl->module.get());
+    
+    // void sapphire_gl_clear(unsigned int mask)
+    llvm::FunctionType* clear_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    llvm::Function::Create(clear_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_clear", impl->module.get());
+    
+    // void sapphire_gl_begin(unsigned int mode)
+    llvm::FunctionType* begin_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    llvm::Function::Create(begin_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_begin", impl->module.get());
+    
+    // void sapphire_gl_end()
+    llvm::FunctionType* end_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {},
+        false
+    );
+    llvm::Function::Create(end_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_end", impl->module.get());
+    
+    // void sapphire_gl_vertex2f(float x, float y)
+    llvm::FunctionType* vertex2f_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(vertex2f_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_vertex2f", impl->module.get());
+    
+    // void sapphire_gl_vertex3f(float x, float y, float z)
+    llvm::FunctionType* vertex3f_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(vertex3f_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_vertex3f", impl->module.get());
+    
+    // void sapphire_gl_color3f(float r, float g, float b)
+    llvm::FunctionType* color3f_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(color3f_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_color3f", impl->module.get());
+    
+    // void sapphire_gl_color4f(float r, float g, float b, float a)
+    llvm::FunctionType* color4f_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(color4f_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_color4f", impl->module.get());
+    
+    // void sapphire_gl_translate(float x, float y, float z)
+    llvm::FunctionType* translate_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(translate_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_translate", impl->module.get());
+    
+    // void sapphire_gl_rotate(float angle, float x, float y, float z)
+    llvm::FunctionType* rotate_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(rotate_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_rotate", impl->module.get());
+    
+    // void sapphire_gl_scale(float x, float y, float z)
+    llvm::FunctionType* scale_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(scale_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_scale", impl->module.get());
+    
+    // void sapphire_gl_matrix_mode(unsigned int mode)
+    llvm::FunctionType* matrix_mode_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    llvm::Function::Create(matrix_mode_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_matrix_mode", impl->module.get());
+    
+    // void sapphire_gl_load_identity()
+    llvm::FunctionType* load_identity_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {},
+        false
+    );
+    llvm::Function::Create(load_identity_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_load_identity", impl->module.get());
+    
+    // void sapphire_gl_push_matrix()
+    llvm::FunctionType* push_matrix_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {},
+        false
+    );
+    llvm::Function::Create(push_matrix_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_push_matrix", impl->module.get());
+    
+    // void sapphire_gl_pop_matrix()
+    llvm::FunctionType* pop_matrix_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {},
+        false
+    );
+    llvm::Function::Create(pop_matrix_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_pop_matrix", impl->module.get());
+    
+    // void sapphire_gl_ortho(double left, double right, double bottom, double top, double near, double far)
+    llvm::FunctionType* ortho_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context), llvm::Type::getDoubleTy(*impl->context),
+         llvm::Type::getDoubleTy(*impl->context), llvm::Type::getDoubleTy(*impl->context),
+         llvm::Type::getDoubleTy(*impl->context), llvm::Type::getDoubleTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(ortho_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_ortho", impl->module.get());
+    
+    // void sapphire_gl_perspective(double fovy, double aspect, double near, double far)
+    llvm::FunctionType* perspective_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context), llvm::Type::getDoubleTy(*impl->context),
+         llvm::Type::getDoubleTy(*impl->context), llvm::Type::getDoubleTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(perspective_type, llvm::Function::ExternalLinkage,
+                          "sapphire_gl_perspective", impl->module.get());
+    
+    std::cerr << "✓ OpenGL functions declared for import\n";
+}
+
+void LLVMCodeGen::declareGLUTFunctions() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    
+    // Check if already declared
+    if (impl->module->getFunction("sapphire_glut_init")) {
+        return; // Already declared
+    }
+    
+    // void sapphire_glut_init()
+    llvm::FunctionType* init_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {},
+        false
+    );
+    llvm::Function::Create(init_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_init", impl->module.get());
+    
+    // void sapphire_glut_init_display_mode(unsigned int mode)
+    llvm::FunctionType* init_display_mode_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    llvm::Function::Create(init_display_mode_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_init_display_mode", impl->module.get());
+    
+    // void sapphire_glut_init_window_size(int width, int height)
+    llvm::FunctionType* init_window_size_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {impl->getIntType(), impl->getIntType()},
+        false
+    );
+    llvm::Function::Create(init_window_size_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_init_window_size", impl->module.get());
+    
+    // void sapphire_glut_init_window_position(int x, int y)
+    llvm::FunctionType* init_window_position_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {impl->getIntType(), impl->getIntType()},
+        false
+    );
+    llvm::Function::Create(init_window_position_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_init_window_position", impl->module.get());
+    
+    // int sapphire_glut_create_window(const char* title)
+    llvm::FunctionType* create_window_type = llvm::FunctionType::get(
+        impl->getIntType(),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function::Create(create_window_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_create_window", impl->module.get());
+    
+    // void sapphire_glut_swap_buffers()
+    llvm::FunctionType* swap_buffers_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {},
+        false
+    );
+    llvm::Function::Create(swap_buffers_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_swap_buffers", impl->module.get());
+    
+    // void sapphire_glut_solid_sphere(double radius, int slices, int stacks)
+    llvm::FunctionType* solid_sphere_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context), impl->getIntType(), impl->getIntType()},
+        false
+    );
+    llvm::Function::Create(solid_sphere_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_solid_sphere", impl->module.get());
+    
+    // void sapphire_glut_wire_sphere(double radius, int slices, int stacks)
+    llvm::FunctionType* wire_sphere_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context), impl->getIntType(), impl->getIntType()},
+        false
+    );
+    llvm::Function::Create(wire_sphere_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_wire_sphere", impl->module.get());
+    
+    // void sapphire_glut_solid_cube(double size)
+    llvm::FunctionType* solid_cube_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(solid_cube_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_solid_cube", impl->module.get());
+    
+    // void sapphire_glut_wire_cube(double size)
+    llvm::FunctionType* wire_cube_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(wire_cube_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_wire_cube", impl->module.get());
+    
+    // void sapphire_glut_solid_teapot(double size)
+    llvm::FunctionType* solid_teapot_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(solid_teapot_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_solid_teapot", impl->module.get());
+    
+    // void sapphire_glut_wire_teapot(double size)
+    llvm::FunctionType* wire_teapot_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context)},
+        false
+    );
+    llvm::Function::Create(wire_teapot_type, llvm::Function::ExternalLinkage,
+                          "sapphire_glut_wire_teapot", impl->module.get());
+    
+    std::cerr << "✓ GLUT functions declared for import\n";
+}
+
+void LLVMCodeGen::declareVulkanFunctions() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    
+    // Check if already declared
+    if (impl->module->getFunction("sapphire_vulkan_create_context")) {
+        return; // Already declared
+    }
+    
+    // void* sapphire_vulkan_create_context(const char* title, int width, int height)
+    llvm::FunctionType* create_context_type = llvm::FunctionType::get(
+        llvm::PointerType::get(*impl->context, 0),
+        {llvm::PointerType::get(*impl->context, 0), impl->getIntType(), impl->getIntType()},
+        false
+    );
+    llvm::Function::Create(create_context_type, llvm::Function::ExternalLinkage,
+                          "sapphire_vulkan_create_context", impl->module.get());
+    
+    // void sapphire_vulkan_destroy_context(void* context)
+    llvm::FunctionType* destroy_context_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function::Create(destroy_context_type, llvm::Function::ExternalLinkage,
+                          "sapphire_vulkan_destroy_context", impl->module.get());
+    
+    // bool sapphire_vulkan_init(void* context)
+    llvm::FunctionType* init_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function::Create(init_type, llvm::Function::ExternalLinkage,
+                          "sapphire_vulkan_init", impl->module.get());
+    
+    // void sapphire_vulkan_begin_frame(void* context)
+    llvm::FunctionType* begin_frame_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function::Create(begin_frame_type, llvm::Function::ExternalLinkage,
+                          "sapphire_vulkan_begin_frame", impl->module.get());
+    
+    // void sapphire_vulkan_end_frame(void* context)
+    llvm::FunctionType* end_frame_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function::Create(end_frame_type, llvm::Function::ExternalLinkage,
+                          "sapphire_vulkan_end_frame", impl->module.get());
+    
+    // void sapphire_vulkan_draw_triangle(void* context)
+    llvm::FunctionType* draw_triangle_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function::Create(draw_triangle_type, llvm::Function::ExternalLinkage,
+                          "sapphire_vulkan_draw_triangle", impl->module.get());
+    
+    // bool sapphire_vulkan_should_close(void* context)
+    llvm::FunctionType* should_close_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function::Create(should_close_type, llvm::Function::ExternalLinkage,
+                          "sapphire_vulkan_should_close", impl->module.get());
+    
+    // void sapphire_vulkan_poll_events(void* context)
+    llvm::FunctionType* poll_events_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function::Create(poll_events_type, llvm::Function::ExternalLinkage,
+                          "sapphire_vulkan_poll_events", impl->module.get());
+    
+    std::cerr << "✓ Vulkan functions declared for import\n";
+}
+
+void LLVMCodeGen::declareSystemFunctions() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    
+    // Check if already declared
+    if (impl->module->getFunction("sapphire_system_get_pid")) {
+        return; // Already declared
+    }
+    
+    // int sapphire_system_get_pid()
+    llvm::FunctionType* get_pid_type = llvm::FunctionType::get(
+        impl->getIntType(),
+        {},
+        false
+    );
+    llvm::Function* get_pid_func = llvm::Function::Create(get_pid_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_get_pid", impl->module.get());
+    impl->functions["sapphire_system_get_pid"] = get_pid_func;
+    
+    // void sapphire_system_exit(int code)
+    llvm::FunctionType* exit_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {impl->getIntType()},
+        false
+    );
+    llvm::Function* exit_func = llvm::Function::Create(exit_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_exit", impl->module.get());
+    impl->functions["sapphire_system_exit"] = exit_func;
+    
+    // void* sapphire_system_allocate(size_t size)
+    llvm::FunctionType* allocate_type = llvm::FunctionType::get(
+        llvm::PointerType::get(*impl->context, 0),
+        {impl->getIntType()},
+        false
+    );
+    llvm::Function* allocate_func = llvm::Function::Create(allocate_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_allocate", impl->module.get());
+    impl->functions["sapphire_system_allocate"] = allocate_func;
+    
+    // void sapphire_system_free(void* ptr)
+    llvm::FunctionType* free_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* free_func = llvm::Function::Create(free_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_free", impl->module.get());
+    impl->functions["sapphire_system_free"] = free_func;
+    
+    // size_t sapphire_system_page_size()
+    llvm::FunctionType* page_size_type = llvm::FunctionType::get(
+        impl->getIntType(),
+        {},
+        false
+    );
+    llvm::Function* page_size_func = llvm::Function::Create(page_size_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_page_size", impl->module.get());
+    impl->functions["sapphire_system_page_size"] = page_size_func;
+    
+    // bool sapphire_system_file_exists(const char* path)
+    llvm::FunctionType* file_exists_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* file_exists_func = llvm::Function::Create(file_exists_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_file_exists", impl->module.get());
+    impl->functions["sapphire_system_file_exists"] = file_exists_func;
+    
+    // bool sapphire_system_directory_exists(const char* path)
+    llvm::FunctionType* directory_exists_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* directory_exists_func = llvm::Function::Create(directory_exists_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_directory_exists", impl->module.get());
+    impl->functions["sapphire_system_directory_exists"] = directory_exists_func;
+    
+    // bool sapphire_system_create_directory(const char* path)
+    llvm::FunctionType* create_directory_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* create_directory_func = llvm::Function::Create(create_directory_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_create_directory", impl->module.get());
+    impl->functions["sapphire_system_create_directory"] = create_directory_func;
+    
+    // const char* sapphire_system_get_cwd()
+    llvm::FunctionType* get_cwd_type = llvm::FunctionType::get(
+        llvm::PointerType::get(*impl->context, 0),
+        {},
+        false
+    );
+    llvm::Function* get_cwd_func = llvm::Function::Create(get_cwd_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_get_cwd", impl->module.get());
+    impl->functions["sapphire_system_get_cwd"] = get_cwd_func;
+    
+    // const char* sapphire_system_get_env(const char* name)
+    llvm::FunctionType* get_env_type = llvm::FunctionType::get(
+        llvm::PointerType::get(*impl->context, 0),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    llvm::Function* get_env_func = llvm::Function::Create(get_env_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_get_env", impl->module.get());
+    impl->functions["sapphire_system_get_env"] = get_env_func;
+    
+    // const char* sapphire_system_get_username()
+    llvm::FunctionType* get_username_type = llvm::FunctionType::get(
+        llvm::PointerType::get(*impl->context, 0),
+        {},
+        false
+    );
+    llvm::Function* get_username_func = llvm::Function::Create(get_username_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_get_username", impl->module.get());
+    impl->functions["sapphire_system_get_username"] = get_username_func;
+    
+    // const char* sapphire_system_get_hostname()
+    llvm::FunctionType* get_hostname_type = llvm::FunctionType::get(
+        llvm::PointerType::get(*impl->context, 0),
+        {},
+        false
+    );
+    llvm::Function* get_hostname_func = llvm::Function::Create(get_hostname_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_get_hostname", impl->module.get());
+    impl->functions["sapphire_system_get_hostname"] = get_hostname_func;
+    
+    // int sapphire_system_cpu_count()
+    llvm::FunctionType* cpu_count_type = llvm::FunctionType::get(
+        impl->getIntType(),
+        {},
+        false
+    );
+    llvm::Function* cpu_count_func = llvm::Function::Create(cpu_count_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_cpu_count", impl->module.get());
+    impl->functions["sapphire_system_cpu_count"] = cpu_count_func;
+    
+    // const char* sapphire_system_cpu_arch()
+    llvm::FunctionType* cpu_arch_type = llvm::FunctionType::get(
+        llvm::PointerType::get(*impl->context, 0),
+        {},
+        false
+    );
+    llvm::Function* cpu_arch_func = llvm::Function::Create(cpu_arch_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_cpu_arch", impl->module.get());
+    impl->functions["sapphire_system_cpu_arch"] = cpu_arch_func;
+    
+    // uint64_t sapphire_system_timestamp_ms()
+    llvm::FunctionType* timestamp_ms_type = llvm::FunctionType::get(
+        llvm::Type::getInt64Ty(*impl->context),
+        {},
+        false
+    );
+    llvm::Function* timestamp_ms_func = llvm::Function::Create(timestamp_ms_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_timestamp_ms", impl->module.get());
+    impl->functions["sapphire_system_timestamp_ms"] = timestamp_ms_func;
+    
+    // uint64_t sapphire_system_timestamp_us()
+    llvm::FunctionType* timestamp_us_type = llvm::FunctionType::get(
+        llvm::Type::getInt64Ty(*impl->context),
+        {},
+        false
+    );
+    llvm::Function* timestamp_us_func = llvm::Function::Create(timestamp_us_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_timestamp_us", impl->module.get());
+    impl->functions["sapphire_system_timestamp_us"] = timestamp_us_func;
+    
+    // uint64_t sapphire_system_timestamp_ns()
+    llvm::FunctionType* timestamp_ns_type = llvm::FunctionType::get(
+        llvm::Type::getInt64Ty(*impl->context),
+        {},
+        false
+    );
+    llvm::Function* timestamp_ns_func = llvm::Function::Create(timestamp_ns_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_timestamp_ns", impl->module.get());
+    impl->functions["sapphire_system_timestamp_ns"] = timestamp_ns_func;
+    
+    // void sapphire_system_sleep_ms(uint64_t ms)
+    llvm::FunctionType* sleep_ms_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt64Ty(*impl->context)},
+        false
+    );
+    llvm::Function* sleep_ms_func = llvm::Function::Create(sleep_ms_type, llvm::Function::ExternalLinkage,
+                          "sapphire_system_sleep_ms", impl->module.get());
+    impl->functions["sapphire_system_sleep_ms"] = sleep_ms_func;
+    
+    std::cerr << "✓ System functions declared for import\n";
+}
+
+
 void LLVMCodeGen::writeObject(const std::string& filename) {
     auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
     
@@ -797,8 +1783,11 @@ void LLVMCodeGen::writeExecutable(const std::string& filename) {
     std::string obj_file = filename + ".o";
     writeObject(obj_file);
     
-    // Link with system linker
-    std::string link_cmd = "clang " + obj_file + " -o " + filename;
+    // Link with system linker, including SDL2 and window support
+    std::string link_cmd = "clang " + obj_file + 
+                          " stdlib/gui/window.cpp" +
+                          " -o " + filename + 
+                          " -lSDL2 -lSDL2_ttf -lstdc++";
     int result = system(link_cmd.c_str());
     
     if (result != 0) {
@@ -809,6 +1798,853 @@ void LLVMCodeGen::writeExecutable(const std::string& filename) {
     std::remove(obj_file.c_str());
     
     std::cout << "✓ Executable created: " << filename << "\n";
+}
+
+// Window built-in functions
+llvm::Function* LLVMCodeGen::getWindowCreateFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("sapphire_window_create");
+    if (func) return func;
+    
+    // void* sapphire_window_create(const char* title, int width, int height)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::PointerType::get(*impl->context, 0),  // returns void*
+        {llvm::PointerType::get(*impl->context, 0), impl->getIntType(), impl->getIntType()},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "sapphire_window_create", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateWindowCreateCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 3) {
+        throw std::runtime_error("window_create expects 3 arguments: title, width, height");
+    }
+    
+    llvm::Function* func = getWindowCreateFunction();
+    std::vector<llvm::Value*> args;
+    for (const auto& arg : expr->arguments) {
+        args.push_back(generateExpr(arg.get()));
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getWindowShowFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("sapphire_window_show");
+    if (func) return func;
+    
+    // void sapphire_window_show(void* window)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "sapphire_window_show", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateWindowShowCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("window_show expects 1 argument: window");
+    }
+    
+    llvm::Function* func = getWindowShowFunction();
+    llvm::Value* window = generateExpr(expr->arguments[0].get());
+    return impl->builder->CreateCall(func, {window});
+}
+
+llvm::Function* LLVMCodeGen::getWindowPollEventsFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("sapphire_window_poll_events");
+    if (func) return func;
+    
+    // bool sapphire_window_poll_events(void* window)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "sapphire_window_poll_events", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateWindowPollEventsCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("window_poll_events expects 1 argument: window");
+    }
+    
+    llvm::Function* func = getWindowPollEventsFunction();
+    llvm::Value* window = generateExpr(expr->arguments[0].get());
+    return impl->builder->CreateCall(func, {window});
+}
+
+llvm::Function* LLVMCodeGen::getWindowClearFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("sapphire_window_clear");
+    if (func) return func;
+    
+    // void sapphire_window_clear(void* window, uint8_t r, uint8_t g, uint8_t b)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0), 
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "sapphire_window_clear", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateWindowClearCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 4) {
+        throw std::runtime_error("window_clear expects 4 arguments: window, r, g, b");
+    }
+    
+    llvm::Function* func = getWindowClearFunction();
+    std::vector<llvm::Value*> args;
+    for (size_t i = 0; i < expr->arguments.size(); i++) {
+        llvm::Value* arg = generateExpr(expr->arguments[i].get());
+        // Convert int64 to int8 for color values (args 1-3)
+        if (i > 0 && arg->getType()->isIntegerTy(64)) {
+            arg = impl->builder->CreateTrunc(arg, llvm::Type::getInt8Ty(*impl->context));
+        }
+        args.push_back(arg);
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getWindowFillRectFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("sapphire_window_fill_rect");
+    if (func) return func;
+    
+    // void sapphire_window_fill_rect(void* window, int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0),
+         impl->getIntType(), impl->getIntType(), impl->getIntType(), impl->getIntType(),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context),
+         llvm::Type::getInt8Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "sapphire_window_fill_rect", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateWindowFillRectCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 8) {
+        throw std::runtime_error("window_fill_rect expects 8 arguments: window, x, y, w, h, r, g, b");
+    }
+    
+    llvm::Function* func = getWindowFillRectFunction();
+    std::vector<llvm::Value*> args;
+    for (size_t i = 0; i < expr->arguments.size(); i++) {
+        llvm::Value* arg = generateExpr(expr->arguments[i].get());
+        // Convert int64 to int8 for color values (args 5-7)
+        if (i >= 5 && arg->getType()->isIntegerTy(64)) {
+            arg = impl->builder->CreateTrunc(arg, llvm::Type::getInt8Ty(*impl->context));
+        }
+        args.push_back(arg);
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getWindowPresentFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("sapphire_window_present");
+    if (func) return func;
+    
+    // void sapphire_window_present(void* window)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "sapphire_window_present", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateWindowPresentCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("window_present expects 1 argument: window");
+    }
+    
+    llvm::Function* func = getWindowPresentFunction();
+    llvm::Value* window = generateExpr(expr->arguments[0].get());
+    return impl->builder->CreateCall(func, {window});
+}
+
+llvm::Function* LLVMCodeGen::getWindowIsKeyDownFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("sapphire_window_is_key_down");
+    if (func) return func;
+    
+    // bool sapphire_window_is_key_down(void* window, int keycode)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0), impl->getIntType()},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "sapphire_window_is_key_down", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateWindowIsKeyDownCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 2) {
+        throw std::runtime_error("window_is_key_down expects 2 arguments: window, keycode");
+    }
+    
+    llvm::Function* func = getWindowIsKeyDownFunction();
+    std::vector<llvm::Value*> args;
+    for (const auto& arg : expr->arguments) {
+        args.push_back(generateExpr(arg.get()));
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getWindowShouldCloseFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("sapphire_window_should_close");
+    if (func) return func;
+    
+    // bool sapphire_window_should_close(void* window)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getInt1Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "sapphire_window_should_close", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateWindowShouldCloseCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("window_should_close expects 1 argument: window");
+    }
+    
+    llvm::Function* func = getWindowShouldCloseFunction();
+    llvm::Value* window = generateExpr(expr->arguments[0].get());
+    return impl->builder->CreateCall(func, {window});
+}
+
+llvm::Function* LLVMCodeGen::getWindowDestroyFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("sapphire_window_destroy");
+    if (func) return func;
+    
+    // void sapphire_window_destroy(void* window)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "sapphire_window_destroy", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateWindowDestroyCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("window_destroy expects 1 argument: window");
+    }
+    
+    llvm::Function* func = getWindowDestroyFunction();
+    llvm::Value* window = generateExpr(expr->arguments[0].get());
+    return impl->builder->CreateCall(func, {window});
+}
+
+llvm::Function* LLVMCodeGen::getDelayFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("SDL_Delay");
+    if (func) return func;
+    
+    // void SDL_Delay(uint32_t ms)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "SDL_Delay", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateDelayCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("delay expects 1 argument: milliseconds");
+    }
+    
+    llvm::Function* func = getDelayFunction();
+    llvm::Value* ms = generateExpr(expr->arguments[0].get());
+    // Convert int64 to int32
+    if (ms->getType()->isIntegerTy(64)) {
+        ms = impl->builder->CreateTrunc(ms, llvm::Type::getInt32Ty(*impl->context));
+    }
+    return impl->builder->CreateCall(func, {ms});
+}
+
+// OpenGL built-in functions
+llvm::Function* LLVMCodeGen::getGLClearColorFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glClearColor");
+    if (func) return func;
+    
+    // void glClearColor(float r, float g, float b, float a)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glClearColor", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLClearColorCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 4) {
+        throw std::runtime_error("gl_clear_color expects 4 arguments: r, g, b, a");
+    }
+    
+    llvm::Function* func = getGLClearColorFunction();
+    std::vector<llvm::Value*> args;
+    for (const auto& arg : expr->arguments) {
+        llvm::Value* val = generateExpr(arg.get());
+        // Convert int to float if needed
+        if (val->getType()->isIntegerTy()) {
+            val = impl->builder->CreateSIToFP(val, llvm::Type::getFloatTy(*impl->context));
+        }
+        args.push_back(val);
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getGLClearFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glClear");
+    if (func) return func;
+    
+    // void glClear(unsigned int mask)
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glClear", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLClearCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("gl_clear expects 1 argument: mask");
+    }
+    
+    llvm::Function* func = getGLClearFunction();
+    llvm::Value* mask = generateExpr(expr->arguments[0].get());
+    if (mask->getType()->isIntegerTy(64)) {
+        mask = impl->builder->CreateTrunc(mask, llvm::Type::getInt32Ty(*impl->context));
+    }
+    return impl->builder->CreateCall(func, {mask});
+}
+
+llvm::Function* LLVMCodeGen::getGLBeginFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glBegin");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glBegin", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLBeginCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("gl_begin expects 1 argument: mode");
+    }
+    
+    llvm::Function* func = getGLBeginFunction();
+    llvm::Value* mode = generateExpr(expr->arguments[0].get());
+    if (mode->getType()->isIntegerTy(64)) {
+        mode = impl->builder->CreateTrunc(mode, llvm::Type::getInt32Ty(*impl->context));
+    }
+    return impl->builder->CreateCall(func, {mode});
+}
+
+llvm::Function* LLVMCodeGen::getGLEndFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glEnd");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glEnd", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLEndCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 0) {
+        throw std::runtime_error("gl_end expects 0 arguments");
+    }
+    
+    llvm::Function* func = getGLEndFunction();
+    return impl->builder->CreateCall(func, {});
+}
+
+llvm::Function* LLVMCodeGen::getGLVertex3fFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glVertex3f");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glVertex3f", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLVertex3fCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 3) {
+        throw std::runtime_error("gl_vertex3f expects 3 arguments: x, y, z");
+    }
+    
+    llvm::Function* func = getGLVertex3fFunction();
+    std::vector<llvm::Value*> args;
+    for (const auto& arg : expr->arguments) {
+        llvm::Value* val = generateExpr(arg.get());
+        if (val->getType()->isIntegerTy()) {
+            val = impl->builder->CreateSIToFP(val, llvm::Type::getFloatTy(*impl->context));
+        }
+        args.push_back(val);
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getGLColor3fFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glColor3f");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glColor3f", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLColor3fCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 3) {
+        throw std::runtime_error("gl_color3f expects 3 arguments: r, g, b");
+    }
+    
+    llvm::Function* func = getGLColor3fFunction();
+    std::vector<llvm::Value*> args;
+    for (const auto& arg : expr->arguments) {
+        llvm::Value* val = generateExpr(arg.get());
+        if (val->getType()->isIntegerTy()) {
+            val = impl->builder->CreateSIToFP(val, llvm::Type::getFloatTy(*impl->context));
+        }
+        args.push_back(val);
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getGLTranslatefFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glTranslatef");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glTranslatef", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLTranslatefCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 3) {
+        throw std::runtime_error("gl_translatef expects 3 arguments: x, y, z");
+    }
+    
+    llvm::Function* func = getGLTranslatefFunction();
+    std::vector<llvm::Value*> args;
+    for (const auto& arg : expr->arguments) {
+        llvm::Value* val = generateExpr(arg.get());
+        if (val->getType()->isIntegerTy()) {
+            val = impl->builder->CreateSIToFP(val, llvm::Type::getFloatTy(*impl->context));
+        }
+        args.push_back(val);
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getGLRotatefFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glRotatef");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context),
+         llvm::Type::getFloatTy(*impl->context), llvm::Type::getFloatTy(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glRotatef", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLRotatefCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 4) {
+        throw std::runtime_error("gl_rotatef expects 4 arguments: angle, x, y, z");
+    }
+    
+    llvm::Function* func = getGLRotatefFunction();
+    std::vector<llvm::Value*> args;
+    for (const auto& arg : expr->arguments) {
+        llvm::Value* val = generateExpr(arg.get());
+        if (val->getType()->isIntegerTy()) {
+            val = impl->builder->CreateSIToFP(val, llvm::Type::getFloatTy(*impl->context));
+        }
+        args.push_back(val);
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getGLMatrixModeFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glMatrixMode");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glMatrixMode", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLMatrixModeCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("gl_matrix_mode expects 1 argument: mode");
+    }
+    
+    llvm::Function* func = getGLMatrixModeFunction();
+    llvm::Value* mode = generateExpr(expr->arguments[0].get());
+    if (mode->getType()->isIntegerTy(64)) {
+        mode = impl->builder->CreateTrunc(mode, llvm::Type::getInt32Ty(*impl->context));
+    }
+    return impl->builder->CreateCall(func, {mode});
+}
+
+llvm::Function* LLVMCodeGen::getGLLoadIdentityFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glLoadIdentity");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glLoadIdentity", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLLoadIdentityCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 0) {
+        throw std::runtime_error("gl_load_identity expects 0 arguments");
+    }
+    
+    llvm::Function* func = getGLLoadIdentityFunction();
+    return impl->builder->CreateCall(func, {});
+}
+
+// GLUT built-in functions
+llvm::Function* LLVMCodeGen::getGLUTInitDisplayModeFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glutInitDisplayMode");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glutInitDisplayMode", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLUTInitDisplayModeCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("glut_init_display_mode expects 1 argument: mode");
+    }
+    
+    llvm::Function* func = getGLUTInitDisplayModeFunction();
+    llvm::Value* mode = generateExpr(expr->arguments[0].get());
+    if (mode->getType()->isIntegerTy(64)) {
+        mode = impl->builder->CreateTrunc(mode, llvm::Type::getInt32Ty(*impl->context));
+    }
+    return impl->builder->CreateCall(func, {mode});
+}
+
+llvm::Function* LLVMCodeGen::getGLUTInitWindowSizeFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glutInitWindowSize");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getInt32Ty(*impl->context), llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glutInitWindowSize", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLUTInitWindowSizeCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 2) {
+        throw std::runtime_error("glut_init_window_size expects 2 arguments: width, height");
+    }
+    
+    llvm::Function* func = getGLUTInitWindowSizeFunction();
+    std::vector<llvm::Value*> args;
+    for (const auto& arg : expr->arguments) {
+        llvm::Value* val = generateExpr(arg.get());
+        if (val->getType()->isIntegerTy(64)) {
+            val = impl->builder->CreateTrunc(val, llvm::Type::getInt32Ty(*impl->context));
+        }
+        args.push_back(val);
+    }
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getGLUTCreateWindowFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glutCreateWindow");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getInt32Ty(*impl->context),
+        {llvm::PointerType::get(*impl->context, 0)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glutCreateWindow", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLUTCreateWindowCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 1) {
+        throw std::runtime_error("glut_create_window expects 1 argument: title");
+    }
+    
+    llvm::Function* func = getGLUTCreateWindowFunction();
+    llvm::Value* title = generateExpr(expr->arguments[0].get());
+    return impl->builder->CreateCall(func, {title});
+}
+
+llvm::Function* LLVMCodeGen::getGLUTSwapBuffersFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glutSwapBuffers");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glutSwapBuffers", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLUTSwapBuffersCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 0) {
+        throw std::runtime_error("glut_swap_buffers expects 0 arguments");
+    }
+    
+    llvm::Function* func = getGLUTSwapBuffersFunction();
+    return impl->builder->CreateCall(func, {});
+}
+
+llvm::Function* LLVMCodeGen::getGLUTSolidSphereFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glutSolidSphere");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context), llvm::Type::getInt32Ty(*impl->context),
+         llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glutSolidSphere", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLUTSolidSphereCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 3) {
+        throw std::runtime_error("glut_solid_sphere expects 3 arguments: radius, slices, stacks");
+    }
+    
+    llvm::Function* func = getGLUTSolidSphereFunction();
+    std::vector<llvm::Value*> args;
+    
+    // First arg (radius) should be double
+    llvm::Value* radius = generateExpr(expr->arguments[0].get());
+    if (radius->getType()->isIntegerTy()) {
+        radius = impl->builder->CreateSIToFP(radius, llvm::Type::getDoubleTy(*impl->context));
+    } else if (radius->getType()->isFloatTy()) {
+        radius = impl->builder->CreateFPExt(radius, llvm::Type::getDoubleTy(*impl->context));
+    }
+    args.push_back(radius);
+    
+    // Other args should be int32
+    for (size_t i = 1; i < expr->arguments.size(); i++) {
+        llvm::Value* val = generateExpr(expr->arguments[i].get());
+        if (val->getType()->isIntegerTy(64)) {
+            val = impl->builder->CreateTrunc(val, llvm::Type::getInt32Ty(*impl->context));
+        }
+        args.push_back(val);
+    }
+    
+    return impl->builder->CreateCall(func, args);
+}
+
+llvm::Function* LLVMCodeGen::getGLUTWireSphereFunction() {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    llvm::Function* func = impl->module->getFunction("glutWireSphere");
+    if (func) return func;
+    
+    llvm::FunctionType* func_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*impl->context),
+        {llvm::Type::getDoubleTy(*impl->context), llvm::Type::getInt32Ty(*impl->context),
+         llvm::Type::getInt32Ty(*impl->context)},
+        false
+    );
+    
+    func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
+                                  "glutWireSphere", impl->module.get());
+    return func;
+}
+
+llvm::Value* LLVMCodeGen::generateGLUTWireSphereCall(CallExpr* expr) {
+    auto* impl = static_cast<LLVMCodeGenImpl*>(impl_);
+    if (expr->arguments.size() != 3) {
+        throw std::runtime_error("glut_wire_sphere expects 3 arguments: radius, slices, stacks");
+    }
+    
+    llvm::Function* func = getGLUTWireSphereFunction();
+    std::vector<llvm::Value*> args;
+    
+    // First arg (radius) should be double
+    llvm::Value* radius = generateExpr(expr->arguments[0].get());
+    if (radius->getType()->isIntegerTy()) {
+        radius = impl->builder->CreateSIToFP(radius, llvm::Type::getDoubleTy(*impl->context));
+    } else if (radius->getType()->isFloatTy()) {
+        radius = impl->builder->CreateFPExt(radius, llvm::Type::getDoubleTy(*impl->context));
+    }
+    args.push_back(radius);
+    
+    // Other args should be int32
+    for (size_t i = 1; i < expr->arguments.size(); i++) {
+        llvm::Value* val = generateExpr(expr->arguments[i].get());
+        if (val->getType()->isIntegerTy(64)) {
+            val = impl->builder->CreateTrunc(val, llvm::Type::getInt32Ty(*impl->context));
+        }
+        args.push_back(val);
+    }
+    
+    return impl->builder->CreateCall(func, args);
 }
 
 } // namespace sapphire

@@ -1,0 +1,20 @@
+// SDL2 Graphics Library for Sapphire
+// External function declarations for SDL2 C API
+
+// External C functions from libsapphire_sdl2
+extern fn sapphire_sdl2_create_window(title: string, width: int, height: int) -> ptr
+extern fn sapphire_sdl2_destroy_window(window: ptr)
+extern fn sapphire_sdl2_show_window(window: ptr)
+extern fn sapphire_sdl2_hide_window(window: ptr)
+extern fn sapphire_sdl2_should_close(window: ptr) -> bool
+extern fn sapphire_sdl2_poll_events(window: ptr)
+extern fn sapphire_sdl2_is_key_down(window: ptr, scancode: int) -> bool
+extern fn sapphire_sdl2_clear(window: ptr, r: int, g: int, b: int)
+extern fn sapphire_sdl2_present(window: ptr)
+extern fn sapphire_sdl2_fill_rect(window: ptr, x: int, y: int, w: int, h: int, r: int, g: int, b: int)
+extern fn sapphire_sdl2_draw_line(window: ptr, x1: int, y1: int, x2: int, y2: int, r: int, g: int, b: int)
+extern fn sapphire_sdl2_draw_point(window: ptr, x: int, y: int, r: int, g: int, b: int)
+extern fn sapphire_sdl2_delay(ms: int)
+extern fn sapphire_sdl2_get_ticks() -> int
+
+print("SDL2 Graphics Library declarations loaded")

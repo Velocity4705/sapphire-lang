@@ -58,13 +58,32 @@ void LLVMCodeGenImpl::createMainFunction() {
 }
 
 void LLVMCodeGenImpl::finalizeMainFunction() {
-    // Return 0 from main
-    builder->CreateRet(llvm::ConstantInt::get(*context, llvm::APInt(32, 0)));
+    // Check if current block already has a terminator
+    if (!builder->GetInsertBlock()->getTerminator()) {
+        // Return 0 from main
+        builder->CreateRet(llvm::ConstantInt::get(*context, llvm::APInt(32, 0)));
+    }
+    
+    // Debug: print all blocks and their terminators
+    std::cerr << "DEBUG: Checking function blocks:" << std::endl;
+    int entry_count = 0;
+    for (auto& bb : *current_function) {
+        std::cerr << "  Block: " << bb.getName().str() 
+                  << " has terminator: " << (bb.getTerminator() != nullptr) << std::endl;
+        if (bb.getName() == "entry") {
+            entry_count++;
+            if (bb.getTerminator()) {
+                std::cerr << "    Terminator type: " << bb.getTerminator()->getOpcodeName() << std::endl;
+            }
+        }
+    }
+    std::cerr << "DEBUG: Found " << entry_count << " entry blocks" << std::endl;
     
     // Verify the function
     std::string error;
     llvm::raw_string_ostream error_stream(error);
     if (llvm::verifyFunction(*current_function, &error_stream)) {
+        std::cerr << "Verification error details: " << error << std::endl;
         throw std::runtime_error("Function verification failed: " + error);
     }
 }

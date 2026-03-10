@@ -45,6 +45,13 @@ coverage/
 *.gcda
 *.gcno
 
+# Benchmark outputs and artifacts
+benchmarks/output/
+benchmarks/results/
+*.bench
+*.perf
+*.timing
+
 # Profiling
 *.prof
 *.perf
@@ -58,6 +65,11 @@ logs/
 .cache/
 __pycache__/
 *.pyc
+
+# Editor extension build artifacts
+editors/*/node_modules/
+editors/*/out/
+editors/*/.vscode/settings.json
 
 # Documentation build
 docs/_build/
@@ -90,18 +102,68 @@ test_*.spp
 test_results.txt
 TEST_RESULTS_SUMMARY.md
 
+# Example build artifacts
+examples/*.ll
+examples/*.o
+examples/*.cpp
+examples/test_*
+examples/*_test
+examples/run_*.sh
+
 # Kiro IDE/spec files (local development only)
 .kiro/
 
 # Development documentation (milestones, summaries, etc.)
 .dev-docs/
 
+# Milestone documentation (development tracking)
+docs/MILESTONE*.md
+docs/MILESTONES.md
+
 # Development tools and temporary test files
 .dev-tools/
 
+# Privacy - Personal development tracking
+personal-notes/
+private/
+.private/
+dev-notes/
+.dev-notes/
+.notes/
 
+# Cleanup and temporary documentation files
+*CLEANUP*.md
+*RECATEGORIZATION*.md
+*SUMMARY_CLEANUP*.md
+*GRAPHICS_CLEANUP*.md
+
+# Session tracking files (development process)
+SESSION_*.md
+MILESTONE_*.md
+ROUND*_*.md
+
+# Test project folders
 test-project/
 
-ROADMAP_V1.1.md
-
+# Challenge examples (may contain personal solutions)
 examples/challenges
+
+documentation/roadmaps
+documentation/summaries
+
+future-enhancements/
+
+examples/
+
+test_outputs/
+
+archived-projects/
+
+benchmarks/
+
+completed-challenges/
+
+editors/vscode/node_modules/
+editors/vscode/out/
+
+docs/ROADMAP.md

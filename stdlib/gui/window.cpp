@@ -40,7 +40,7 @@ void quit_gui() {
 
 Window::Window(const std::string& title, int width, int height)
     : window_(nullptr), renderer_(nullptr), title_(title),
-      width_(width), height_(height), is_open_(false) {
+      width_(width), height_(height), is_open_(false), keyboard_state_(nullptr) {
     
     // Initialize SDL if not already done
     if (!init_gui()) {
@@ -109,7 +109,16 @@ bool Window::poll_events() {
             }
         }
     }
+    
+    // Update keyboard state
+    keyboard_state_ = SDL_GetKeyboardState(nullptr);
+    
     return is_open_;
+}
+
+bool Window::is_key_down(int keycode) const {
+    if (!keyboard_state_) return false;
+    return keyboard_state_[keycode] != 0;
 }
 
 void Window::clear(uint8_t r, uint8_t g, uint8_t b) {
@@ -248,5 +257,13 @@ extern "C" {
     void sapphire_window_fill_rect(void* window, int x, int y, int w, int h,
                                    uint8_t r, uint8_t g, uint8_t b) {
         static_cast<sapphire::stdlib::Window*>(window)->fill_rect(x, y, w, h, r, g, b);
+    }
+    
+    bool sapphire_window_is_key_down(void* window, int keycode) {
+        return static_cast<sapphire::stdlib::Window*>(window)->is_key_down(keycode);
+    }
+    
+    bool sapphire_window_should_close(void* window) {
+        return !static_cast<sapphire::stdlib::Window*>(window)->is_open();
     }
 }

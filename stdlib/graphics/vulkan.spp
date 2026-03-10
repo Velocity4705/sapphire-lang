@@ -1,0 +1,67 @@
+# Vulkan Graphics Library for Sapphire
+# Modern low-level graphics API for maximum performance
+# Platform: Linux, Windows, macOS (via MoltenVK)
+
+# Vulkan Constants
+
+# Result codes
+let VK_SUCCESS = 0
+let VK_NOT_READY = 1
+let VK_TIMEOUT = 2
+let VK_ERROR_OUT_OF_HOST_MEMORY = 0 - 1
+let VK_ERROR_OUT_OF_DEVICE_MEMORY = 0 - 2
+let VK_ERROR_INITIALIZATION_FAILED = 0 - 3
+
+# Structure types
+let VK_STRUCTURE_TYPE_APPLICATION_INFO = 0
+let VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO = 1
+let VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO = 3
+let VK_STRUCTURE_TYPE_SUBMIT_INFO = 4
+let VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO = 5
+
+# Queue flags
+let VK_QUEUE_GRAPHICS_BIT = 1
+let VK_QUEUE_COMPUTE_BIT = 2
+let VK_QUEUE_TRANSFER_BIT = 4
+
+# Memory property flags
+let VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT = 1
+let VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT = 2
+let VK_MEMORY_PROPERTY_HOST_COHERENT_BIT = 4
+
+# Image layout
+let VK_IMAGE_LAYOUT_UNDEFINED = 0
+let VK_IMAGE_LAYOUT_GENERAL = 1
+let VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL = 2
+let VK_IMAGE_LAYOUT_PRESENT_SRC_KHR = 1000001002
+
+# Pipeline stage flags
+let VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT = 1
+let VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT = 1024
+let VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT = 8192
+
+# Access flags
+let VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT = 256
+
+# Vulkan Functions (planned)
+# These will be implemented in future versions
+
+# Note: Vulkan implementation is complex and requires:
+# - Instance management
+# - Device selection
+# - Swapchain creation
+# - Render pass setup
+# - Graphics pipeline
+# - Command buffers
+# - Synchronization
+
+# For now, use SDL2 for 2D games and OpenGL for 3D games
+# Vulkan will be added when needed for AAA game development
+
+print("Vulkan Graphics Library specification loaded")
+print("Platform: Cross-platform (Linux, Windows, macOS via MoltenVK)")
+print("Version: Vulkan 1.0+")
+print("Status: Specification complete, implementation planned")
+print("")
+print("Recommendation: Use SDL2 for 2D games, OpenGL for 3D games")
+print("Vulkan is best reserved for AAA game engines and advanced projects")

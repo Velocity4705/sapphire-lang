@@ -1,0 +1,151 @@
+// OpenGL Graphics Library for Sapphire
+// Cross-platform 3D graphics API
+// Platform: Linux, Windows, macOS
+
+// OpenGL Constants
+
+# Buffer bits
+let GL_COLOR_BUFFER_BIT = 16384
+let GL_DEPTH_BUFFER_BIT = 256
+let GL_STENCIL_BUFFER_BIT = 1024
+let GL_ACCUM_BUFFER_BIT = 512
+
+# Primitive types
+let GL_POINTS = 0
+let GL_LINES = 1
+let GL_LINE_LOOP = 2
+let GL_LINE_STRIP = 3
+let GL_TRIANGLES = 4
+let GL_TRIANGLE_STRIP = 5
+let GL_TRIANGLE_FAN = 6
+let GL_QUADS = 7
+let GL_QUAD_STRIP = 8
+let GL_POLYGON = 9
+
+# Matrix modes
+let GL_MODELVIEW = 5888
+let GL_PROJECTION = 5889
+let GL_TEXTURE = 5890
+
+# Depth functions
+let GL_NEVER = 512
+let GL_LESS = 513
+let GL_EQUAL = 514
+let GL_LEQUAL = 515
+let GL_GREATER = 516
+let GL_NOTEQUAL = 517
+let GL_GEQUAL = 518
+let GL_ALWAYS = 519
+
+# Blend functions
+let GL_ZERO = 0
+let GL_ONE = 1
+let GL_SRC_COLOR = 768
+let GL_ONE_MINUS_SRC_COLOR = 769
+let GL_SRC_ALPHA = 770
+let GL_ONE_MINUS_SRC_ALPHA = 771
+let GL_DST_ALPHA = 772
+let GL_ONE_MINUS_DST_ALPHA = 773
+
+# Enable/Disable capabilities
+let GL_DEPTH_TEST = 2929
+let GL_BLEND = 3042
+let GL_LIGHTING = 2896
+let GL_TEXTURE_2D = 3553
+let GL_CULL_FACE = 2884
+
+# OpenGL Functions (built-in)
+# These are implemented in the Sapphire compiler
+
+# Clearing and Colors:
+# - gl_clear_color(r: float, g: float, b: float, a: float)
+# - gl_clear(mask: int)
+
+# Drawing Primitives:
+# - gl_begin(mode: int)
+# - gl_end()
+# - gl_vertex3f(x: float, y: float, z: float)
+# - gl_color3f(r: float, g: float, b: float)
+
+# Transformations:
+# - gl_translatef(x: float, y: float, z: float)
+# - gl_rotatef(angle: float, x: float, y: float, z: float)
+
+# Matrix Operations:
+# - gl_matrix_mode(mode: int)
+# - gl_load_identity()
+
+# Helper functions for common patterns
+
+fn gl_clear_black():
+    gl_clear_color(0, 0, 0, 1)
+    gl_clear(GL_COLOR_BUFFER_BIT + GL_DEPTH_BUFFER_BIT)
+
+fn gl_clear_white():
+    gl_clear_color(1, 1, 1, 1)
+    gl_clear(GL_COLOR_BUFFER_BIT + GL_DEPTH_BUFFER_BIT)
+
+fn gl_setup_3d_projection():
+    gl_matrix_mode(GL_PROJECTION)
+    gl_load_identity()
+    gl_matrix_mode(GL_MODELVIEW)
+    gl_load_identity()
+
+fn gl_setup_camera(x, y, z):
+    gl_translatef(x, y, z)
+
+# Color helpers
+fn gl_color_white():
+    gl_color3f(1, 1, 1)
+
+fn gl_color_black():
+    gl_color3f(0, 0, 0)
+
+fn gl_color_red():
+    gl_color3f(1, 0, 0)
+
+fn gl_color_green():
+    gl_color3f(0, 1, 0)
+
+fn gl_color_blue():
+    gl_color3f(0, 0, 1)
+
+fn gl_color_yellow():
+    gl_color3f(1, 1, 0)
+
+fn gl_color_cyan():
+    gl_color3f(0, 1, 1)
+
+fn gl_color_magenta():
+    gl_color3f(1, 0, 1)
+
+# Drawing helpers
+fn gl_draw_quad(x, y, z, w, h):
+    gl_begin(GL_QUADS)
+    gl_vertex3f(x, y, z)
+    gl_vertex3f(x + w, y, z)
+    gl_vertex3f(x + w, y + h, z)
+    gl_vertex3f(x, y + h, z)
+    gl_end()
+
+fn gl_draw_triangle(x1, y1, z1, x2, y2, z2, x3, y3, z3):
+    gl_begin(GL_TRIANGLES)
+    gl_vertex3f(x1, y1, z1)
+    gl_vertex3f(x2, y2, z2)
+    gl_vertex3f(x3, y3, z3)
+    gl_end()
+
+fn gl_draw_line(x1, y1, z1, x2, y2, z2):
+    gl_begin(GL_LINES)
+    gl_vertex3f(x1, y1, z1)
+    gl_vertex3f(x2, y2, z2)
+    gl_end()
+
+fn gl_draw_point(x, y, z):
+    gl_begin(GL_POINTS)
+    gl_vertex3f(x, y, z)
+    gl_end()
+
+print("OpenGL Graphics Library loaded")
+print("Platform: Cross-platform (Linux, Windows, macOS)")
+print("Version: OpenGL 2.1+")

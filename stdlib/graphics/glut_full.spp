@@ -1,0 +1,206 @@
+# GLUT Graphics Module for Sapphire
+# Complete GLUT (OpenGL Utility Toolkit) implementation for 3D graphics
+# Import this module to get full GLUT support in your Sapphire programs
+#
+# Usage:
+#   import "stdlib/graphics/glut_full.spp"
+#   
+#   GLUT::init()
+#   GLUT::init_display_mode(GLUT::DOUBLE | GLUT::RGB | GLUT::DEPTH)
+#   GLUT::init_window_size(800, 600)
+#   GLUT::create_window("My 3D App")
+#   
+#   GLUT::solid_sphere(1.0, 20, 20)
+#   GLUT::swap_buffers()
+
+module GLUT:
+    # ===== GLUT CONSTANTS =====
+    
+    # Display modes
+    let RGB = 0x0000
+    let RGBA = 0x0000
+    let INDEX = 0x0001
+    let SINGLE = 0x0000
+    let DOUBLE = 0x0002
+    let ACCUM = 0x0004
+    let ALPHA = 0x0008
+    let DEPTH = 0x0010
+    let STENCIL = 0x0020
+    let MULTISAMPLE = 0x0080
+    let STEREO = 0x0100
+    let LUMINANCE = 0x0200
+    
+    # Mouse buttons
+    let LEFT_BUTTON = 0
+    let MIDDLE_BUTTON = 1
+    let RIGHT_BUTTON = 2
+    
+    # Mouse button states
+    let DOWN = 0
+    let UP = 1
+    
+    # Special keys
+    let KEY_F1 = 1
+    let KEY_F2 = 2
+    let KEY_F3 = 3
+    let KEY_F4 = 4
+    let KEY_F5 = 5
+    let KEY_F6 = 6
+    let KEY_F7 = 7
+    let KEY_F8 = 8
+    let KEY_F9 = 9
+    let KEY_F10 = 10
+    let KEY_F11 = 11
+    let KEY_F12 = 12
+    let KEY_LEFT = 100
+    let KEY_UP = 101
+    let KEY_RIGHT = 102
+    let KEY_DOWN = 103
+    let KEY_PAGE_UP = 104
+    let KEY_PAGE_DOWN = 105
+    let KEY_HOME = 106
+    let KEY_END = 107
+    let KEY_INSERT = 108
+    
+    # Window position
+    let WINDOW_X = 0x0064
+    let WINDOW_Y = 0x0065
+    let WINDOW_WIDTH = 0x0066
+    let WINDOW_HEIGHT = 0x0067
+    
+    # ===== CORE GLUT FUNCTIONS =====
+    # These are implemented in the Sapphire runtime via GLUT bindings
+    
+    # Initialization
+    extern fn init()
+    extern fn init_display_mode(mode: int)
+    extern fn init_window_size(width: int, height: int)
+    extern fn init_window_position(x: int, y: int)
+    extern fn create_window(title: string) -> int
+    
+    # Main loop
+    extern fn main_loop()
+    extern fn post_redisplay()
+    
+    # Callbacks (these would need special handling in the compiler)
+    # extern fn display_func(callback: fn)
+    # extern fn reshape_func(callback: fn)
+    # extern fn keyboard_func(callback: fn)
+    # extern fn mouse_func(callback: fn)
+    # extern fn idle_func(callback: fn)
+    
+    # Window management
+    extern fn set_window(win: int)
+    extern fn get_window() -> int
+    extern fn set_window_title(title: string)
+    extern fn set_icon_title(title: string)
+    extern fn position_window(x: int, y: int)
+    extern fn reshape_window(width: int, height: int)
+    extern fn full_screen()
+    extern fn pop_window()
+    extern fn push_window()
+    extern fn show_window()
+    extern fn hide_window()
+    extern fn iconify_window()
+    extern fn destroy_window(win: int)
+    
+    # Rendering
+    extern fn swap_buffers()
+    
+    # 3D Shapes - Solid
+    extern fn solid_sphere(radius: float, slices: int, stacks: int)
+    extern fn solid_cube(size: float)
+    extern fn solid_cone(base: float, height: float, slices: int, stacks: int)
+    extern fn solid_torus(inner_radius: float, outer_radius: float, sides: int, rings: int)
+    extern fn solid_teapot(size: float)
+    extern fn solid_octahedron()
+    extern fn solid_dodecahedron()
+    extern fn solid_icosahedron()
+    extern fn solid_tetrahedron()
+    
+    # 3D Shapes - Wireframe
+    extern fn wire_sphere(radius: float, slices: int, stacks: int)
+    extern fn wire_cube(size: float)
+    extern fn wire_cone(base: float, height: float, slices: int, stacks: int)
+    extern fn wire_torus(inner_radius: float, outer_radius: float, sides: int, rings: int)
+    extern fn wire_teapot(size: float)
+    extern fn wire_octahedron()
+    extern fn wire_dodecahedron()
+    extern fn wire_icosahedron()
+    extern fn wire_tetrahedron()
+    
+    # Timing
+    extern fn get_time() -> int
+    
+    # ===== HELPER FUNCTIONS =====
+    
+    # Initialize with default settings
+    fn init_default(width, height, title):
+        init()
+        init_display_mode(DOUBLE | RGB | DEPTH)
+        init_window_size(width, height)
+        init_window_position(100, 100)
+        return create_window(title)
+    
+    # Initialize simple window
+    fn init_simple(width, height, title):
+        init()
+        init_display_mode(SINGLE | RGB)
+        init_window_size(width, height)
+        return create_window(title)
+    
+    # Initialize with multisampling
+    fn init_multisample(width, height, title):
+        init()
+        init_display_mode(DOUBLE | RGB | DEPTH | MULTISAMPLE)
+        init_window_size(width, height)
+        return create_window(title)
+    
+    # Draw common shapes with default parameters
+    fn draw_sphere(radius):
+        solid_sphere(radius, 20, 20)
+    
+    fn draw_cube(size):
+        solid_cube(size)
+    
+    fn draw_cone(base, height):
+        solid_cone(base, height, 20, 20)
+    
+    fn draw_torus(inner, outer):
+        solid_torus(inner, outer, 20, 20)
+    
+    fn draw_teapot(size):
+        solid_teapot(size)
+    
+    # Wireframe versions
+    fn draw_wire_sphere(radius):
+        wire_sphere(radius, 20, 20)
+    
+    fn draw_wire_cube(size):
+        wire_cube(size)
+    
+    fn draw_wire_cone(base, height):
+        wire_cone(base, height, 20, 20)
+    
+    fn draw_wire_torus(inner, outer):
+        wire_torus(inner, outer, 20, 20)
+    
+    fn draw_wire_teapot(size):
+        wire_teapot(size)
+    
+    # Platonic solids
+    fn draw_octahedron():
+        solid_octahedron()
+    
+    fn draw_dodecahedron():
+        solid_dodecahedron()
+    
+    fn draw_icosahedron():
+        solid_icosahedron()
+    
+    fn draw_tetrahedron():
+        solid_tetrahedron()
+
+print("GLUT Graphics Module loaded")
+print("Version: 3.0+")
+print("Platform: Cross-platform (Linux, Windows, macOS)")

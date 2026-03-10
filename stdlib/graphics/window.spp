@@ -1,0 +1,237 @@
+# Cross-Platform Window System for Sapphire
+# Unified window management for all desktop platforms
+# Platform: Linux, Windows, macOS
+
+# Window System - uses SDL2 backend for cross-platform compatibility
+
+# Import SDL2 constants
+let KEY_W = 26
+let KEY_A = 4
+let KEY_S = 22
+let KEY_D = 7
+let KEY_Q = 20
+let KEY_E = 8
+let KEY_R = 21
+let KEY_F = 9
+let KEY_SPACE = 44
+let KEY_RETURN = 40
+let KEY_ESCAPE = 41
+let KEY_BACKSPACE = 42
+let KEY_TAB = 43
+
+let KEY_UP = 82
+let KEY_DOWN = 81
+let KEY_LEFT = 80
+let KEY_RIGHT = 79
+
+let KEY_0 = 39
+let KEY_1 = 30
+let KEY_2 = 31
+let KEY_3 = 32
+let KEY_4 = 33
+let KEY_5 = 34
+let KEY_6 = 35
+let KEY_7 = 36
+let KEY_8 = 37
+let KEY_9 = 38
+
+# Common window sizes
+let WINDOW_SIZE_SMALL_W = 640
+let WINDOW_SIZE_SMALL_H = 480
+
+let WINDOW_SIZE_MEDIUM_W = 800
+let WINDOW_SIZE_MEDIUM_H = 600
+
+let WINDOW_SIZE_LARGE_W = 1024
+let WINDOW_SIZE_LARGE_H = 768
+
+let WINDOW_SIZE_HD_W = 1280
+let WINDOW_SIZE_HD_H = 720
+
+let WINDOW_SIZE_FULLHD_W = 1920
+let WINDOW_SIZE_FULLHD_H = 1080
+
+# Color presets (RGB values 0-255)
+let COLOR_BLACK_R = 0
+let COLOR_BLACK_G = 0
+let COLOR_BLACK_B = 0
+
+let COLOR_WHITE_R = 255
+let COLOR_WHITE_G = 255
+let COLOR_WHITE_B = 255
+
+let COLOR_RED_R = 255
+let COLOR_RED_G = 0
+let COLOR_RED_B = 0
+
+let COLOR_GREEN_R = 0
+let COLOR_GREEN_G = 255
+let COLOR_GREEN_B = 0
+
+let COLOR_BLUE_R = 0
+let COLOR_BLUE_G = 0
+let COLOR_BLUE_B = 255
+
+let COLOR_YELLOW_R = 255
+let COLOR_YELLOW_G = 255
+let COLOR_YELLOW_B = 0
+
+let COLOR_CYAN_R = 0
+let COLOR_CYAN_G = 255
+let COLOR_CYAN_B = 255
+
+let COLOR_MAGENTA_R = 255
+let COLOR_MAGENTA_G = 0
+let COLOR_MAGENTA_B = 255
+
+let COLOR_ORANGE_R = 255
+let COLOR_ORANGE_G = 165
+let COLOR_ORANGE_B = 0
+
+let COLOR_PURPLE_R = 128
+let COLOR_PURPLE_G = 0
+let COLOR_PURPLE_B = 128
+
+let COLOR_GRAY_R = 128
+let COLOR_GRAY_G = 128
+let COLOR_GRAY_B = 128
+
+let COLOR_DARK_GRAY_R = 64
+let COLOR_DARK_GRAY_G = 64
+let COLOR_DARK_GRAY_B = 64
+
+let COLOR_LIGHT_GRAY_R = 192
+let COLOR_LIGHT_GRAY_G = 192
+let COLOR_LIGHT_GRAY_B = 192
+
+# Window System Functions (built-in via SDL2)
+# - window_create(title: string, width: int, height: int) -> window
+# - window_show(window)
+# - window_destroy(window)
+# - window_should_close(window) -> bool
+# - window_poll_events(window)
+# - window_is_key_down(window, keycode: int) -> bool
+# - window_clear(window, r: int, g: int, b: int)
+# - window_present(window)
+# - window_fill_rect(window, x: int, y: int, w: int, h: int, r: int, g: int, b: int)
+# - delay(ms: int)
+
+# Helper functions for common window operations
+
+fn window_create_small(title):
+    return window_create(title, WINDOW_SIZE_SMALL_W, WINDOW_SIZE_SMALL_H)
+
+fn window_create_medium(title):
+    return window_create(title, WINDOW_SIZE_MEDIUM_W, WINDOW_SIZE_MEDIUM_H)
+
+fn window_create_large(title):
+    return window_create(title, WINDOW_SIZE_LARGE_W, WINDOW_SIZE_LARGE_H)
+
+fn window_create_hd(title):
+    return window_create(title, WINDOW_SIZE_HD_W, WINDOW_SIZE_HD_H)
+
+fn window_create_fullhd(title):
+    return window_create(title, WINDOW_SIZE_FULLHD_W, WINDOW_SIZE_FULLHD_H)
+
+# Clear window with preset colors
+fn window_clear_black(window):
+    window_clear(window, COLOR_BLACK_R, COLOR_BLACK_G, COLOR_BLACK_B)
+
+fn window_clear_white(window):
+    window_clear(window, COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B)
+
+fn window_clear_red(window):
+    window_clear(window, COLOR_RED_R, COLOR_RED_G, COLOR_RED_B)
+
+fn window_clear_green(window):
+    window_clear(window, COLOR_GREEN_R, COLOR_GREEN_G, COLOR_GREEN_B)
+
+fn window_clear_blue(window):
+    window_clear(window, COLOR_BLUE_R, COLOR_BLUE_G, COLOR_BLUE_B)
+
+fn window_clear_gray(window):
+    window_clear(window, COLOR_GRAY_R, COLOR_GRAY_G, COLOR_GRAY_B)
+
+# Draw rectangles with preset colors
+fn window_draw_rect_white(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B)
+
+fn window_draw_rect_red(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_RED_R, COLOR_RED_G, COLOR_RED_B)
+
+fn window_draw_rect_green(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_GREEN_R, COLOR_GREEN_G, COLOR_GREEN_B)
+
+fn window_draw_rect_blue(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_BLUE_R, COLOR_BLUE_G, COLOR_BLUE_B)
+
+fn window_draw_rect_yellow(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_YELLOW_R, COLOR_YELLOW_G, COLOR_YELLOW_B)
+
+fn window_draw_rect_cyan(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_CYAN_R, COLOR_CYAN_G, COLOR_CYAN_B)
+
+fn window_draw_rect_magenta(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_MAGENTA_R, COLOR_MAGENTA_G, COLOR_MAGENTA_B)
+
+fn window_draw_rect_orange(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_ORANGE_R, COLOR_ORANGE_G, COLOR_ORANGE_B)
+
+fn window_draw_rect_purple(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_PURPLE_R, COLOR_PURPLE_G, COLOR_PURPLE_B)
+
+fn window_draw_rect_gray(window, x, y, w, h):
+    window_fill_rect(window, x, y, w, h, COLOR_GRAY_R, COLOR_GRAY_G, COLOR_GRAY_B)
+
+# Game loop helper
+fn window_is_running(window):
+    window_poll_events(window)
+    if window_should_close(window):
+        return false
+    if window_is_key_down(window, KEY_ESCAPE):
+        return false
+    return true
+
+# Frame timing helpers
+fn window_frame_delay_60fps():
+    delay(16)
+
+fn window_frame_delay_30fps():
+    delay(33)
+
+fn window_frame_delay_120fps():
+    delay(8)
+
+# Input helpers
+fn window_is_moving_up(window):
+    if window_is_key_down(window, KEY_W):
+        return true
+    if window_is_key_down(window, KEY_UP):
+        return true
+    return false
+
+fn window_is_moving_down(window):
+    if window_is_key_down(window, KEY_S):
+        return true
+    if window_is_key_down(window, KEY_DOWN):
+        return true
+    return false
+
+fn window_is_moving_left(window):
+    if window_is_key_down(window, KEY_A):
+        return true
+    if window_is_key_down(window, KEY_LEFT):
+        return true
+    return false
+
+fn window_is_moving_right(window):
+    if window_is_key_down(window, KEY_D):
+        return true
+    if window_is_key_down(window, KEY_RIGHT):
+        return true
+    return false
+
+print("Cross-Platform Window System loaded")
+print("Backend: SDL2")
+print("Platform: Linux, Windows, macOS")
+print("Features: Window management, input handling, 2D rendering")

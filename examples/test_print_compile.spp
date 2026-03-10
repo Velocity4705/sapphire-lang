@@ -1,5 +1,0 @@
-# Test print in compiled mode
-print(42)
-print(3.14)
-print(true)
-print(false)

@@ -1,0 +1,73 @@
+// GLUT Graphics Library for Sapphire
+// OpenGL Utility Toolkit for quick 3D prototyping
+// Platform: Linux, Windows, macOS
+
+// GLUT Display Mode Flags
+let GLUT_RGB = 0
+let GLUT_RGBA = 0
+let GLUT_INDEX = 1
+let GLUT_SINGLE = 0
+let GLUT_DOUBLE = 2
+let GLUT_ACCUM = 4
+let GLUT_ALPHA = 8
+let GLUT_DEPTH = 16
+let GLUT_STENCIL = 32
+let GLUT_MULTISAMPLE = 128
+let GLUT_STEREO = 256
+let GLUT_LUMINANCE = 512
+
+# GLUT Functions (built-in)
+# These are implemented in the Sapphire compiler
+
+# Initialization:
+# - glut_init_display_mode(mode: int)
+# - glut_init_window_size(width: int, height: int)
+# - glut_create_window(title: string) -> int
+
+# Rendering:
+# - glut_swap_buffers()
+
+# 3D Shapes:
+# - glut_solid_sphere(radius: float, slices: int, stacks: int)
+# - glut_wire_sphere(radius: float, slices: int, stacks: int)
+
+# Helper functions for common patterns
+
+fn glut_init_default(width, height, title):
+    glut_init_display_mode(GLUT_DOUBLE + GLUT_RGB + GLUT_DEPTH)
+    glut_init_window_size(width, height)
+    return glut_create_window(title)
+
+fn glut_init_simple(width, height, title):
+    glut_init_display_mode(GLUT_SINGLE + GLUT_RGB)
+    glut_init_window_size(width, height)
+    return glut_create_window(title)
+
+fn glut_init_multisample(width, height, title):
+    glut_init_display_mode(GLUT_DOUBLE + GLUT_RGB + GLUT_DEPTH + GLUT_MULTISAMPLE)
+    glut_init_window_size(width, height)
+    return glut_create_window(title)
+
+# Shape helpers with default parameters
+fn glut_draw_sphere(radius):
+    glut_solid_sphere(radius, 30, 30)
+
+fn glut_draw_sphere_detailed(radius):
+    glut_solid_sphere(radius, 50, 50)
+
+fn glut_draw_sphere_simple(radius):
+    glut_solid_sphere(radius, 16, 16)
+
+fn glut_draw_wire_sphere(radius):
+    glut_wire_sphere(radius, 20, 20)
+
+fn glut_draw_wire_sphere_detailed(radius):
+    glut_wire_sphere(radius, 40, 40)
+
+fn glut_draw_wire_sphere_simple(radius):
+    glut_wire_sphere(radius, 10, 10)
+
+print("GLUT Graphics Library loaded")
+print("Platform: Cross-platform (Linux, Windows, macOS)")
+print("Version: GLUT 3.0+")
+print("Note: GLUT is best used with C++ for callback support")
