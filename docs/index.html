@@ -107,61 +107,41 @@
                     <div class="code-header">
                         <span>Hello World</span>
                     </div>
-                    <pre><code><span class="k">fn</span> <span class="f">main</span>() {
-    <span class="k">let</span> numbers = [<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, <span class="n">4</span>, <span class="n">5</span>]
-    
-    <span class="k">for</span> num <span class="k">in</span> numbers {
-        <span class="f">println</span>(num * <span class="n">2</span>)
-    }
-}</code></pre>
+                    <pre><code><span class="f">print</span>(<span class="s">"Hello, World!"</span>)</code></pre>
+                </div>
+
+                <div class="code-card">
+                    <div class="code-header">
+                        <span>Functions</span>
+                    </div>
+                    <pre><code><span class="k">fn</span> <span class="f">add</span>(a, b):
+    <span class="k">return</span> a + b
+
+<span class="k">let</span> result = <span class="f">add</span>(<span class="n">10</span>, <span class="n">20</span>)
+<span class="f">print</span>(result)</code></pre>
                 </div>
 
                 <div class="code-card">
                     <div class="code-header">
                         <span>Pattern Matching</span>
                     </div>
-                    <pre><code><span class="k">fn</span> <span class="f">classify</span>(n: <span class="t">int</span>) -> <span class="t">str</span> {
-    <span class="k">return match</span> n {
+                    <pre><code><span class="k">fn</span> <span class="f">classify</span>(n):
+    <span class="k">return match</span> n:
         <span class="n">0</span> => <span class="s">"zero"</span>
         <span class="n">1</span> => <span class="s">"one"</span>
-        x <span class="k">if</span> x < <span class="n">0</span> => <span class="s">"negative"</span>
         _ => <span class="s">"other"</span>
-    }
-}</code></pre>
+
+<span class="f">print</span>(<span class="f">classify</span>(<span class="n">0</span>))</code></pre>
                 </div>
 
                 <div class="code-card">
                     <div class="code-header">
-                        <span>Async/Await</span>
+                        <span>Loops</span>
                     </div>
-                    <pre><code><span class="k">async fn</span> <span class="f">fetch</span>(url: <span class="t">str</span>) {
-    <span class="k">let</span> res = <span class="k">await</span> <span class="f">http_get</span>(url)?
-    <span class="k">return</span> <span class="t">Ok</span>(res.body)
-}
+                    <pre><code><span class="k">let</span> numbers = [<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, <span class="n">4</span>, <span class="n">5</span>]
 
-<span class="k">async fn</span> <span class="f">main</span>() {
-    <span class="k">match await</span> <span class="f">fetch</span>(<span class="s">"https://api.example.com"</span>) {
-        <span class="t">Ok</span>(data) => <span class="f">println</span>(data)
-        <span class="t">Err</span>(e) => <span class="f">println</span>(e)
-    }
-}</code></pre>
-                </div>
-
-                <div class="code-card">
-                    <div class="code-header">
-                        <span>HTTP Server</span>
-                    </div>
-                    <pre><code><span class="k">import</span> HTTP <span class="k">from</span> <span class="s">"stdlib/http"</span>
-
-<span class="k">fn</span> <span class="f">main</span>() {
-    <span class="k">let</span> server = HTTP.<span class="f">Server</span>(<span class="n">8080</span>)
-    
-    server.<span class="f">get</span>(<span class="s">"/"</span>, <span class="k">fn</span>(req, res) {
-        res.body = <span class="s">"Hello!"</span>
-    })
-    
-    server.<span class="f">start</span>()
-}</code></pre>
+<span class="k">for</span> num <span class="k">in</span> numbers:
+    <span class="f">print</span>(num * <span class="n">2</span>)</code></pre>
                 </div>
             </div>
         </div>
