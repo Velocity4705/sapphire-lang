@@ -1,0 +1,201 @@
+// Particle System Demo - Visual effects using SDL2
+// Demonstrates: animation, multiple objects, visual effects
+
+import graphics.sdl2
+
+fn main() {
+    print("=== Particle System Demo ===")
+    print("Watch the colorful particles!")
+    print("Press ESC to quit")
+    print()
+    
+    // Create window
+    let window = sapphire_sdl2_create_window("Particles", 800, 600)
+    sapphire_sdl2_show_window(window)
+    
+    // Particle 1
+    let p1_x = 100
+    let p1_y = 100
+    let p1_dx = 2
+    let p1_dy = 3
+    
+    // Particle 2
+    let p2_x = 200
+    let p2_y = 150
+    let p2_dx = 3
+    let p2_dy = 2
+    
+    // Particle 3
+    let p3_x = 300
+    let p3_y = 200
+    let p3_dx = 2
+    let p3_dy = 2
+    
+    // Particle 4
+    let p4_x = 400
+    let p4_y = 250
+    let p4_dx = 3
+    let p4_dy = 3
+    
+    // Particle 5
+    let p5_x = 500
+    let p5_y = 300
+    let p5_dx = 2
+    let p5_dy = 2
+    
+    let frame = 0
+    
+    // Animation loop
+    let running = true
+    while running {
+        sapphire_sdl2_poll_events(window)
+        
+        // Check for quit
+        if sapphire_sdl2_should_close(window) {
+            running = false
+        }
+        if sapphire_sdl2_is_key_down(window, 41) {  // ESC
+            running = false
+        }
+        
+        // Update particles
+        p1_x = p1_x + p1_dx
+        p1_y = p1_y + p1_dy
+        if p1_x < 0 {
+            p1_x = 0
+            p1_dx = 0 - p1_dx
+        }
+        if p1_x > 780 {
+            p1_x = 780
+            p1_dx = 0 - p1_dx
+        }
+        if p1_y < 0 {
+            p1_y = 0
+            p1_dy = 0 - p1_dy
+        }
+        if p1_y > 580 {
+            p1_y = 580
+            p1_dy = 0 - p1_dy
+        }
+        
+        p2_x = p2_x + p2_dx
+        p2_y = p2_y + p2_dy
+        if p2_x < 0 {
+            p2_x = 0
+            p2_dx = 0 - p2_dx
+        }
+        if p2_x > 780 {
+            p2_x = 780
+            p2_dx = 0 - p2_dx
+        }
+        if p2_y < 0 {
+            p2_y = 0
+            p2_dy = 0 - p2_dy
+        }
+        if p2_y > 580 {
+            p2_y = 580
+            p2_dy = 0 - p2_dy
+        }
+        
+        p3_x = p3_x + p3_dx
+        p3_y = p3_y + p3_dy
+        if p3_x < 0 {
+            p3_x = 0
+            p3_dx = 0 - p3_dx
+        }
+        if p3_x > 780 {
+            p3_x = 780
+            p3_dx = 0 - p3_dx
+        }
+        if p3_y < 0 {
+            p3_y = 0
+            p3_dy = 0 - p3_dy
+        }
+        if p3_y > 580 {
+            p3_y = 580
+            p3_dy = 0 - p3_dy
+        }
+        
+        p4_x = p4_x + p4_dx
+        p4_y = p4_y + p4_dy
+        if p4_x < 0 {
+            p4_x = 0
+            p4_dx = 0 - p4_dx
+        }
+        if p4_x > 780 {
+            p4_x = 780
+            p4_dx = 0 - p4_dx
+        }
+        if p4_y < 0 {
+            p4_y = 0
+            p4_dy = 0 - p4_dy
+        }
+        if p4_y > 580 {
+            p4_y = 580
+            p4_dy = 0 - p4_dy
+        }
+        
+        p5_x = p5_x + p5_dx
+        p5_y = p5_y + p5_dy
+        if p5_x < 0 {
+            p5_x = 0
+            p5_dx = 0 - p5_dx
+        }
+        if p5_x > 780 {
+            p5_x = 780
+            p5_dx = 0 - p5_dx
+        }
+        if p5_y < 0 {
+            p5_y = 0
+            p5_dy = 0 - p5_dy
+        }
+        if p5_y > 580 {
+            p5_y = 580
+            p5_dy = 0 - p5_dy
+        }
+        
+        // Render with motion blur effect
+        sapphire_sdl2_clear(window, 0, 0, 0)
+        
+        // Draw particles with trails
+        let trail_len = 5
+        let i = 0
+        while i < trail_len {
+            let alpha = 255 - (i * 50)
+            if alpha < 50 {
+                alpha = 50
+            }
+            
+            // Particle 1 - Red
+            sapphire_sdl2_fill_rect(window, p1_x - (p1_dx * i), p1_y - (p1_dy * i), 20, 20, alpha, 0, 0)
+            
+            // Particle 2 - Green
+            sapphire_sdl2_fill_rect(window, p2_x - (p2_dx * i), p2_y - (p2_dy * i), 20, 20, 0, alpha, 0)
+            
+            // Particle 3 - Blue
+            sapphire_sdl2_fill_rect(window, p3_x - (p3_dx * i), p3_y - (p3_dy * i), 20, 20, 0, 0, alpha)
+            
+            // Particle 4 - Yellow
+            sapphire_sdl2_fill_rect(window, p4_x - (p4_dx * i), p4_y - (p4_dy * i), 20, 20, alpha, alpha, 0)
+            
+            // Particle 5 - Cyan
+            sapphire_sdl2_fill_rect(window, p5_x - (p5_dx * i), p5_y - (p5_dy * i), 20, 20, 0, alpha, alpha)
+            
+            i = i + 1
+        }
+        
+        sapphire_sdl2_present(window)
+        sapphire_sdl2_delay(16)  // ~60 FPS
+        
+        frame = frame + 1
+        
+        // Auto-quit after demo
+        if frame > 600 {  // 10 seconds
+            running = false
+        }
+    }
+    
+    sapphire_sdl2_destroy_window(window)
+    print()
+    print("Demo complete! Rendered", frame, "frames")
+}

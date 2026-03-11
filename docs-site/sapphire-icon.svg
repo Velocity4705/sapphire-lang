@@ -1,0 +1,63 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Diamond: solid trapezoid + triangle with diagonal LEFT-slanting divisions -->
+  
+  <!-- Top trapezoid - cyan -->
+  <polygon points="75,50 125,50 155,80 45,80" 
+           fill="#40E0D0" 
+           stroke="#000000" 
+           stroke-width="4"
+           stroke-linejoin="bevel"/>
+  
+  <!-- Triangle below with vertical divisions -->
+  <!-- Section 1 (leftmost) - sky blue -->
+  <polygon points="45,80 72,80 100,160 45,80" 
+           fill="#87CEEB" 
+           stroke="none"/>
+  
+  <!-- Section 2 - blue -->
+  <polygon points="72,80 99,80 100,160 72,80" 
+           fill="#4169E1" 
+           stroke="none"/>
+  
+  <!-- Section 3 - deep blue -->
+  <polygon points="99,80 126,80 100,160 99,80" 
+           fill="#00008B" 
+           stroke="none"/>
+  
+  <!-- Section 4 (rightmost) - darkest blue -->
+  <polygon points="126,80 155,80 100,160 126,80" 
+           fill="#000066" 
+           stroke="none"/>
+  
+  <!-- Outer triangle border (drawn last to be on top) -->
+  <polygon points="45,80 155,80 100,160" 
+           fill="none" 
+           stroke="#000000" 
+           stroke-width="4"
+           stroke-linejoin="bevel"/>
+  
+  <!-- Sparkle/shine star on top right -->
+  <g transform="translate(160, 65)">
+    <!-- Main star -->
+    <polygon points="0,-12 3,-3 12,0 3,3 0,12 -3,3 -12,0 -3,-3" 
+             fill="#FFFFFF" 
+             stroke="#000000" 
+             stroke-width="1.5"/>
+    
+    <!-- Inner star glow -->
+    <polygon points="0,-8 2,-2 8,0 2,2 0,8 -2,2 -8,0 -2,-2" 
+             fill="#E0F7FF" 
+             stroke="none"/>
+    
+    <!-- Center dot -->
+    <circle cx="0" cy="0" r="2" fill="#FFFFFF"/>
+  </g>
+  
+  <!-- Small sparkle on left side -->
+  <g transform="translate(40, 70)">
+    <polygon points="0,-6 1.5,-1.5 6,0 1.5,1.5 0,6 -1.5,1.5 -6,0 -1.5,-1.5" 
+             fill="#FFFFFF" 
+             stroke="#000000" 
+             stroke-width="1"/>
+  </g>
+</svg>

@@ -1,0 +1,154 @@
+// Paint Application - Simple drawing app using SDL2
+// Demonstrates: mouse input simulation, drawing, color selection
+
+import graphics.sdl2
+
+fn main() {
+    print("=== Paint Application ===")
+    print("Controls:")
+    print("  Mouse: Draw (simulated with WASD)")
+    print("  1-5: Change color")
+    print("  C: Clear canvas")
+    print("  ESC: Quit")
+    print()
+    
+    // Create window
+    let window = sapphire_sdl2_create_window("Paint App", 800, 600)
+    sapphire_sdl2_show_window(window)
+    
+    // Brush state
+    let brush_x = 400
+    let brush_y = 300
+    let brush_size = 10
+    let brush_r = 255
+    let brush_g = 255
+    let brush_b = 255
+    
+    // Canvas (we'll draw on it each frame)
+    let clear_canvas = false
+    
+    print("Paint app ready! Use WASD to move brush")
+    print("Colors: 1=White, 2=Red, 3=Green, 4=Blue, 5=Yellow")
+    
+    // Game loop
+    let running = true
+    let frame = 0
+    while running {
+        sapphire_sdl2_poll_events(window)
+        
+        // Check for quit
+        if sapphire_sdl2_should_close(window) {
+            running = false
+        }
+        if sapphire_sdl2_is_key_down(window, 41) {  // ESC
+            running = false
+        }
+        
+        // Clear canvas
+        if sapphire_sdl2_is_key_down(window, 6) {  // C
+            if frame % 30 == 0 {  // Debounce
+                clear_canvas = true
+                print("Canvas cleared!")
+            }
+        }
+        
+        // Color selection
+        if sapphire_sdl2_is_key_down(window, 30) {  // 1 - White
+            brush_r = 255
+            brush_g = 255
+            brush_b = 255
+            print("Color: White")
+        }
+        if sapphire_sdl2_is_key_down(window, 31) {  // 2 - Red
+            brush_r = 255
+            brush_g = 0
+            brush_b = 0
+            print("Color: Red")
+        }
+        if sapphire_sdl2_is_key_down(window, 32) {  // 3 - Green
+            brush_r = 0
+            brush_g = 255
+            brush_b = 0
+            print("Color: Green")
+        }
+        if sapphire_sdl2_is_key_down(window, 33) {  // 4 - Blue
+            brush_r = 0
+            brush_g = 0
+            brush_b = 255
+            print("Color: Blue")
+        }
+        if sapphire_sdl2_is_key_down(window, 34) {  // 5 - Yellow
+            brush_r = 255
+            brush_g = 255
+            brush_b = 0
+            print("Color: Yellow")
+        }
+        
+        // Move brush (WASD)
+        let moved = false
+        if sapphire_sdl2_is_key_down(window, 26) {  // W
+            brush_y = brush_y - 3
+            moved = true
+        }
+        if sapphire_sdl2_is_key_down(window, 22) {  // S
+            brush_y = brush_y + 3
+            moved = true
+        }
+        if sapphire_sdl2_is_key_down(window, 4) {  // A
+            brush_x = brush_x - 3
+            moved = true
+        }
+        if sapphire_sdl2_is_key_down(window, 7) {  // D
+            brush_x = brush_x + 3
+            moved = true
+        }
+        
+        // Clamp brush position
+        if brush_x < 0 {
+            brush_x = 0
+        }
+        if brush_x > 800 {
+            brush_x = 800
+        }
+        if brush_y < 0 {
+            brush_y = 0
+        }
+        if brush_y > 600 {
+            brush_y = 600
+        }
+        
+        // Render
+        if clear_canvas {
+            sapphire_sdl2_clear(window, 30, 30, 30)  // Dark gray
+            clear_canvas = false
+        }
+        
+        // Draw with brush (leave trail)
+        if moved {
+            sapphire_sdl2_fill_rect(window, brush_x - brush_size / 2, brush_y - brush_size / 2, 
+                                    brush_size, brush_size, brush_r, brush_g, brush_b)
+        }
+        
+        // Draw UI - color palette at top
+        sapphire_sdl2_fill_rect(window, 10, 10, 40, 40, 255, 255, 255)  // White
+        sapphire_sdl2_fill_rect(window, 60, 10, 40, 40, 255, 0, 0)      // Red
+        sapphire_sdl2_fill_rect(window, 110, 10, 40, 40, 0, 255, 0)     // Green
+        sapphire_sdl2_fill_rect(window, 160, 10, 40, 40, 0, 0, 255)     // Blue
+        sapphire_sdl2_fill_rect(window, 210, 10, 40, 40, 255, 255, 0)   // Yellow
+        
+        // Draw brush cursor (with outline)
+        sapphire_sdl2_fill_rect(window, brush_x - brush_size / 2 - 2, brush_y - brush_size / 2 - 2, 
+                                brush_size + 4, brush_size + 4, 255, 255, 255)
+        sapphire_sdl2_fill_rect(window, brush_x - brush_size / 2, brush_y - brush_size / 2, 
+                                brush_size, brush_size, brush_r, brush_g, brush_b)
+        
+        sapphire_sdl2_present(window)
+        sapphire_sdl2_delay(16)  // ~60 FPS
+        
+        frame = frame + 1
+    }
+    
+    sapphire_sdl2_destroy_window(window)
+    print()
+    print("Thanks for using Paint App!")
+}

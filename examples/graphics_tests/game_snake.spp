@@ -1,0 +1,159 @@
+// Snake Game - Classic snake game using SDL2
+// Demonstrates: arrays (simulated with variables), game logic, collision
+
+import graphics.sdl2
+
+fn main() {
+    print("=== Snake Game ===")
+    print("Controls:")
+    print("  Arrow keys: Move snake")
+    print("  ESC: Quit")
+    print()
+    
+    // Create window
+    let window = sapphire_sdl2_create_window("Snake", 640, 640)
+    sapphire_sdl2_show_window(window)
+    
+    // Grid settings
+    let grid_size = 20
+    let cell_size = 32
+    
+    // Snake (simplified - just head for now)
+    let snake_x = 10
+    let snake_y = 10
+    let snake_dx = 1
+    let snake_dy = 0
+    
+    // Food
+    let food_x = 15
+    let food_y = 10
+    
+    // Game state
+    let score = 0
+    let game_over = false
+    let move_timer = 0
+    let move_delay = 10  // Frames between moves
+    
+    print("Game started! Eat the red food!")
+    
+    // Game loop
+    let running = true
+    while running {
+        sapphire_sdl2_poll_events(window)
+        
+        // Check for quit
+        if sapphire_sdl2_should_close(window) {
+            running = false
+        }
+        if sapphire_sdl2_is_key_down(window, 41) {  // ESC
+            running = false
+        }
+        
+        if !game_over {
+            // Input - change direction
+            if sapphire_sdl2_is_key_down(window, 80) {  // Left
+                if snake_dx != 1 {  // Can't go back on yourself
+                    snake_dx = 0 - 1
+                    snake_dy = 0
+                }
+            }
+            if sapphire_sdl2_is_key_down(window, 79) {  // Right
+                if snake_dx != 0 - 1 {
+                    snake_dx = 1
+                    snake_dy = 0
+                }
+            }
+            if sapphire_sdl2_is_key_down(window, 82) {  // Up
+                if snake_dy != 1 {
+                    snake_dx = 0
+                    snake_dy = 0 - 1
+                }
+            }
+            if sapphire_sdl2_is_key_down(window, 81) {  // Down
+                if snake_dy != 0 - 1 {
+                    snake_dx = 0
+                    snake_dy = 1
+                }
+            }
+            
+            // Move snake
+            move_timer = move_timer + 1
+            if move_timer >= move_delay {
+                move_timer = 0
+                
+                snake_x = snake_x + snake_dx
+                snake_y = snake_y + snake_dy
+                
+                // Check wall collision
+                if snake_x < 0 {
+                    game_over = true
+                    print("Game Over! Hit wall!")
+                }
+                if snake_x >= grid_size {
+                    game_over = true
+                    print("Game Over! Hit wall!")
+                }
+                if snake_y < 0 {
+                    game_over = true
+                    print("Game Over! Hit wall!")
+                }
+                if snake_y >= grid_size {
+                    game_over = true
+                    print("Game Over! Hit wall!")
+                }
+                
+                // Check food collision
+                if snake_x == food_x {
+                    if snake_y == food_y {
+                        score = score + 1
+                        print("Score:", score)
+                        
+                        // Spawn new food (simple random-ish position)
+                        food_x = (food_x + 7) % grid_size
+                        food_y = (food_y + 11) % grid_size
+                        
+                        // Speed up slightly
+                        if move_delay > 3 {
+                            move_delay = move_delay - 1
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Render
+        sapphire_sdl2_clear(window, 20, 20, 20)  // Dark gray background
+        
+        // Draw grid lines
+        let i = 0
+        while i <= grid_size {
+            let pos = i * cell_size
+            sapphire_sdl2_draw_line(window, pos, 0, pos, 640, 40, 40, 40)
+            sapphire_sdl2_draw_line(window, 0, pos, 640, pos, 40, 40, 40)
+            i = i + 1
+        }
+        
+        // Draw food (red)
+        let food_px = food_x * cell_size + 2
+        let food_py = food_y * cell_size + 2
+        sapphire_sdl2_fill_rect(window, food_px, food_py, cell_size - 4, cell_size - 4, 255, 0, 0)
+        
+        // Draw snake (green)
+        let snake_px = snake_x * cell_size + 2
+        let snake_py = snake_y * cell_size + 2
+        sapphire_sdl2_fill_rect(window, snake_px, snake_py, cell_size - 4, cell_size - 4, 0, 255, 0)
+        
+        // Draw game over message (as red overlay)
+        if game_over {
+            sapphire_sdl2_fill_rect(window, 200, 280, 240, 80, 200, 0, 0)
+        }
+        
+        sapphire_sdl2_present(window)
+        sapphire_sdl2_delay(16)  // ~60 FPS
+    }
+    
+    sapphire_sdl2_destroy_window(window)
+    print()
+    print("Final Score:", score)
+    print("Thanks for playing!")
+}

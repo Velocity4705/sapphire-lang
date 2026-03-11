@@ -1,0 +1,166 @@
+# Graphics Headers Demo
+# Demonstrates using the new graphics header system
+
+print("=== Sapphire Graphics Headers Demo ===")
+print()
+
+# Note: In the future, you'll be able to import these headers:
+# import "stdlib/graphics/window.spp"
+# import "stdlib/graphics/sdl2.spp"
+# import "stdlib/graphics/opengl.spp"
+
+# For now, we'll define the constants and use built-in functions
+
+# Window sizes
+let WINDOW_SIZE_MEDIUM_W = 800
+let WINDOW_SIZE_MEDIUM_H = 600
+
+# Keycodes
+let KEY_W = 26
+let KEY_S = 22
+let KEY_UP = 82
+let KEY_DOWN = 81
+let KEY_ESCAPE = 41
+
+# Colors
+let COLOR_BLACK_R = 0
+let COLOR_BLACK_G = 0
+let COLOR_BLACK_B = 0
+
+let COLOR_WHITE_R = 255
+let COLOR_WHITE_G = 255
+let COLOR_WHITE_B = 255
+
+let COLOR_RED_R = 255
+let COLOR_RED_G = 0
+let COLOR_RED_B = 0
+
+let COLOR_GREEN_R = 0
+let COLOR_GREEN_G = 255
+let COLOR_GREEN_B = 0
+
+let COLOR_BLUE_R = 0
+let COLOR_BLUE_G = 0
+let COLOR_BLUE_B = 255
+
+# Helper functions (from window.spp)
+fn window_clear_black(window) {
+    window_clear(window, 0, 0, 0)
+}
+
+fn window_draw_rect_white(window, x, y, w, h) {
+    window_fill_rect(window, x, y, w, h, 255, 255, 255)
+}
+
+fn window_draw_rect_red(window, x, y, w, h) {
+    window_fill_rect(window, x, y, w, h, 255, 0, 0)
+}
+
+fn window_draw_rect_green(window, x, y, w, h) {
+    window_fill_rect(window, x, y, w, h, 0, 255, 0)
+}
+
+fn window_draw_rect_blue(window, x, y, w, h) {
+    window_fill_rect(window, x, y, w, h, 0, 0, 255)
+}
+
+fn window_is_running(window) {
+    window_poll_events(window)
+    if window_should_close(window) {
+        return false
+    }
+    if window_is_key_down(window, 41) {
+        return false
+    }
+    return true
+}
+
+fn window_frame_delay_60fps() {
+    delay(16)
+}
+
+fn window_is_moving_up(window) {
+    if window_is_key_down(window, 26) {
+        return true
+    }
+    if window_is_key_down(window, 82) {
+        return true
+    }
+    return false
+}
+
+fn window_is_moving_down(window) {
+    if window_is_key_down(window, 22) {
+        return true
+    }
+    if window_is_key_down(window, 81) {
+        return true
+    }
+    return false
+}
+
+# Create window using header constants
+print("Creating window...")
+let window = window_create("Graphics Headers Demo", WINDOW_SIZE_MEDIUM_W, WINDOW_SIZE_MEDIUM_H)
+window_show(window)
+
+print("Window created: 800x600")
+print()
+print("Controls:")
+print("  W/Up Arrow: Move up")
+print("  S/Down Arrow: Move down")
+print("  ESC: Quit")
+print()
+
+# Game state
+let player_y = 300
+let frame = 0
+
+# Game loop using helper functions
+while window_is_running(window) {
+    # Input using helper functions
+    if window_is_moving_up(window) {
+        player_y = player_y - 5
+    }
+    if window_is_moving_down(window) {
+        player_y = player_y + 5
+    }
+    
+    # Clamp position
+    if player_y < 0 {
+        player_y = 0
+    }
+    if player_y > 550 {
+        player_y = 550
+    }
+    
+    # Render using helper functions
+    window_clear_black(window)
+    
+    # Draw colored rectangles
+    window_draw_rect_red(window, 100, 100, 50, 50)
+    window_draw_rect_green(window, 200, 100, 50, 50)
+    window_draw_rect_blue(window, 300, 100, 50, 50)
+    
+    # Draw player (white)
+    window_draw_rect_white(window, 400, player_y, 50, 50)
+    
+    window_present(window)
+    window_frame_delay_60fps()
+    
+    frame = frame + 1
+    
+    # Run for limited time in demo
+    if frame > 300 {
+        break
+    }
+}
+
+window_destroy(window)
+
+print()
+print("Demo complete!")
+print("Frames rendered:")
+print(frame)
+print()
+print("Graphics headers system working!")

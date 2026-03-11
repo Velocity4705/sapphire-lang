@@ -1,0 +1,87 @@
+# Simple Graphics Demo
+# Demonstrates the graphics header constants
+
+print("=== Sapphire Graphics Simple Demo ===")
+print()
+
+# Window sizes (from window.spp header)
+let WINDOW_W = 800
+let WINDOW_H = 600
+
+# Keycodes (from window.spp header)
+let KEY_W = 26
+let KEY_S = 22
+let KEY_UP = 82
+let KEY_DOWN = 81
+let KEY_ESCAPE = 41
+
+print("Creating window...")
+let window = window_create("Graphics Demo", WINDOW_W, WINDOW_H)
+window_show(window)
+
+print("Window created: 800x600")
+print()
+print("Controls:")
+print("  W/Up Arrow: Move up")
+print("  S/Down Arrow: Move down")
+print("  ESC: Quit")
+print()
+
+# Game state
+let player_y = 300
+let frame = 0
+
+# Game loop
+while frame < 300:
+    window_poll_events(window)
+    
+    # Check quit
+    if window_should_close(window):
+        frame = 300
+    if window_is_key_down(window, KEY_ESCAPE):
+        frame = 300
+    
+    # Input
+    if window_is_key_down(window, KEY_W):
+        player_y = player_y - 5
+    if window_is_key_down(window, KEY_S):
+        player_y = player_y + 5
+    if window_is_key_down(window, KEY_UP):
+        player_y = player_y - 5
+    if window_is_key_down(window, KEY_DOWN):
+        player_y = player_y + 5
+    
+    # Clamp position
+    if player_y < 0:
+        player_y = 0
+    if player_y > 550:
+        player_y = 550
+    
+    # Render - clear black
+    window_clear(window, 0, 0, 0)
+    
+    # Draw colored rectangles (RGB values from header)
+    window_fill_rect(window, 100, 100, 50, 50, 255, 0, 0)    # Red
+    window_fill_rect(window, 200, 100, 50, 50, 0, 255, 0)    # Green
+    window_fill_rect(window, 300, 100, 50, 50, 0, 0, 255)    # Blue
+    
+    # Draw player (white)
+    window_fill_rect(window, 400, player_y, 50, 50, 255, 255, 255)
+    
+    window_present(window)
+    delay(16)  # 60 FPS
+    
+    frame = frame + 1
+
+window_destroy(window)
+
+print()
+print("Demo complete!")
+print("Frames rendered:")
+print(frame)
+print()
+print("Graphics headers system demonstrated!")
+print("Header constants used:")
+print("  - Window size constants")
+print("  - Keycode constants")
+print("  - Color RGB values")

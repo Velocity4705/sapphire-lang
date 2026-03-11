@@ -1,0 +1,551 @@
+// Enhanced Snake Game - Full-featured snake with growing tail
+// Demonstrates: advanced game logic, tail management, better visuals
+
+import graphics.sdl2
+
+fn main() {
+    print("=== Enhanced Snake Game ===")
+    print("Controls:")
+    print("  Arrow Keys: Move snake")
+    print("  SPACE: Restart after game over")
+    print("  ESC: Quit")
+    print()
+    print("Eat red food to grow and score points!")
+    print("Don't hit walls or yourself!")
+    print()
+    
+    // Create window
+    let window = sapphire_sdl2_create_window("Snake - Enhanced", 800, 800)
+    sapphire_sdl2_show_window(window)
+    
+    // Give window time to initialize
+    sapphire_sdl2_delay(100)
+    
+    // Grid settings
+    let grid_size = 25
+    let cell_size = 32
+    
+    // Game state
+    let game_over = false
+    let score = 0
+    let high_score = 0
+    let move_timer = 0
+    let move_delay = 8
+    
+    // Snake head
+    let snake_x = 12
+    let snake_y = 12
+    let snake_dx = 1
+    let snake_dy = 0
+    
+    // Snake tail (simulated with multiple variables - up to 20 segments)
+    let tail_length = 3
+    let t1x = 11
+    let t1y = 12
+    let t2x = 10
+    let t2y = 12
+    let t3x = 9
+    let t3y = 12
+    let t4x = 0
+    let t4y = 0
+    let t5x = 0
+    let t5y = 0
+    let t6x = 0
+    let t6y = 0
+    let t7x = 0
+    let t7y = 0
+    let t8x = 0
+    let t8y = 0
+    let t9x = 0
+    let t9y = 0
+    let t10x = 0
+    let t10y = 0
+    let t11x = 0
+    let t11y = 0
+    let t12x = 0
+    let t12y = 0
+    let t13x = 0
+    let t13y = 0
+    let t14x = 0
+    let t14y = 0
+    let t15x = 0
+    let t15y = 0
+    let t16x = 0
+    let t16y = 0
+    let t17x = 0
+    let t17y = 0
+    let t18x = 0
+    let t18y = 0
+    let t19x = 0
+    let t19y = 0
+    let t20x = 0
+    let t20y = 0
+    
+    // Food
+    let food_x = 18
+    let food_y = 12
+    
+    // Direction buffer (for smoother controls)
+    let next_dx = 1
+    let next_dy = 0
+    
+    // Key state tracking (to prevent key repeat issues)
+    let space_was_pressed = false
+    
+    print("Game started! Good luck!")
+    
+    // Main game loop
+    let running = true
+    let frame = 0
+    
+    while running {
+        sapphire_sdl2_poll_events(window)
+        
+        // Ignore all input for first 10 frames to avoid startup key state issues
+        if frame < 10 {
+            frame = frame + 1
+            sapphire_sdl2_clear(window, 15, 15, 25)
+            sapphire_sdl2_present(window)
+            sapphire_sdl2_delay(16)
+            continue
+        }
+        
+        // Check for quit
+        if sapphire_sdl2_should_close(window) {
+            running = false
+        }
+        if sapphire_sdl2_is_key_down(window, 41) {  // ESC
+            running = false
+        }
+        
+        // Restart on SPACE after game over
+        if game_over {
+            let space_pressed = sapphire_sdl2_is_key_down(window, 44)  // SPACE
+            if space_pressed {
+                if !space_was_pressed {
+                    // Reset game
+                    game_over = false
+                    score = 0
+                    snake_x = 12
+                    snake_y = 12
+                    snake_dx = 1
+                    snake_dy = 0
+                    next_dx = 1
+                    next_dy = 0
+                    tail_length = 3
+                    t1x = 11
+                    t1y = 12
+                    t2x = 10
+                    t2y = 12
+                    t3x = 9
+                    t3y = 12
+                    food_x = 18
+                    food_y = 12
+                    move_delay = 8
+                    print("New game started!")
+                }
+            }
+            space_was_pressed = space_pressed
+        }
+        
+        if !game_over {
+            // Input - buffer next direction
+            if sapphire_sdl2_is_key_down(window, 80) {  // Left
+                if snake_dx != 1 {
+                    next_dx = 0 - 1
+                    next_dy = 0
+                }
+            }
+            if sapphire_sdl2_is_key_down(window, 79) {  // Right
+                if snake_dx != 0 - 1 {
+                    next_dx = 1
+                    next_dy = 0
+                }
+            }
+            if sapphire_sdl2_is_key_down(window, 82) {  // Up
+                if snake_dy != 1 {
+                    next_dx = 0
+                    next_dy = 0 - 1
+                }
+            }
+            if sapphire_sdl2_is_key_down(window, 81) {  // Down
+                if snake_dy != 0 - 1 {
+                    next_dx = 0
+                    next_dy = 1
+                }
+            }
+            
+            // Move snake
+            move_timer = move_timer + 1
+            if move_timer >= move_delay {
+                move_timer = 0
+                
+                // Apply buffered direction
+                snake_dx = next_dx
+                snake_dy = next_dy
+                
+                // Store old head position
+                let old_x = snake_x
+                let old_y = snake_y
+                
+                // Move head
+                snake_x = snake_x + snake_dx
+                snake_y = snake_y + snake_dy
+                
+                // Check wall collision
+                if snake_x < 0 {
+                    game_over = true
+                    print("Game Over! Hit wall!")
+                    if score > high_score {
+                        high_score = score
+                    }
+                }
+                if snake_x >= grid_size {
+                    game_over = true
+                    print("Game Over! Hit wall!")
+                    if score > high_score {
+                        high_score = score
+                    }
+                }
+                if snake_y < 0 {
+                    game_over = true
+                    print("Game Over! Hit wall!")
+                    if score > high_score {
+                        high_score = score
+                    }
+                }
+                if snake_y >= grid_size {
+                    game_over = true
+                    print("Game Over! Hit wall!")
+                    if score > high_score {
+                        high_score = score
+                    }
+                }
+                
+                // Check self collision (check against all tail segments)
+                if !game_over {
+                    if tail_length >= 1 {
+                        if snake_x == t1x {
+                            if snake_y == t1y {
+                                game_over = true
+                                print("Game Over! Hit yourself!")
+                                if score > high_score {
+                                    high_score = score
+                                }
+                            }
+                        }
+                    }
+                    if tail_length >= 2 {
+                        if snake_x == t2x {
+                            if snake_y == t2y {
+                                game_over = true
+                            }
+                        }
+                    }
+                    if tail_length >= 3 {
+                        if snake_x == t3x {
+                            if snake_y == t3y {
+                                game_over = true
+                            }
+                        }
+                    }
+                    // Check more segments...
+                    if tail_length >= 4 {
+                        if snake_x == t4x {
+                            if snake_y == t4y {
+                                game_over = true
+                            }
+                        }
+                    }
+                }
+                
+                // Check food collision
+                if !game_over {
+                    if snake_x == food_x {
+                        if snake_y == food_y {
+                            score = score + 1
+                            tail_length = tail_length + 1
+                            print("Score:", score, "Length:", tail_length + 1)
+                            
+                            // Spawn new food (pseudo-random)
+                            food_x = (food_x + score * 7 + 13) % grid_size
+                            food_y = (food_y + score * 11 + 17) % grid_size
+                            
+                            // Speed up
+                            if move_delay > 3 {
+                                move_delay = move_delay - 1
+                            }
+                        }
+                    }
+                }
+                
+                // Update tail (shift all segments)
+                if !game_over {
+                    if tail_length >= 20 {
+                        t20x = t19x
+                        t20y = t19y
+                    }
+                    if tail_length >= 19 {
+                        t19x = t18x
+                        t19y = t18y
+                    }
+                    if tail_length >= 18 {
+                        t18x = t17x
+                        t18y = t17y
+                    }
+                    if tail_length >= 17 {
+                        t17x = t16x
+                        t17y = t16y
+                    }
+                    if tail_length >= 16 {
+                        t16x = t15x
+                        t16y = t15y
+                    }
+                    if tail_length >= 15 {
+                        t15x = t14x
+                        t15y = t14y
+                    }
+                    if tail_length >= 14 {
+                        t14x = t13x
+                        t14y = t13y
+                    }
+                    if tail_length >= 13 {
+                        t13x = t12x
+                        t13y = t12y
+                    }
+                    if tail_length >= 12 {
+                        t12x = t11x
+                        t12y = t11y
+                    }
+                    if tail_length >= 11 {
+                        t11x = t10x
+                        t11y = t10y
+                    }
+                    if tail_length >= 10 {
+                        t10x = t9x
+                        t10y = t9y
+                    }
+                    if tail_length >= 9 {
+                        t9x = t8x
+                        t9y = t8y
+                    }
+                    if tail_length >= 8 {
+                        t8x = t7x
+                        t8y = t7y
+                    }
+                    if tail_length >= 7 {
+                        t7x = t6x
+                        t7y = t6y
+                    }
+                    if tail_length >= 6 {
+                        t6x = t5x
+                        t6y = t5y
+                    }
+                    if tail_length >= 5 {
+                        t5x = t4x
+                        t5y = t4y
+                    }
+                    if tail_length >= 4 {
+                        t4x = t3x
+                        t4y = t3y
+                    }
+                    if tail_length >= 3 {
+                        t3x = t2x
+                        t3y = t2y
+                    }
+                    if tail_length >= 2 {
+                        t2x = t1x
+                        t2y = t1y
+                    }
+                    if tail_length >= 1 {
+                        t1x = old_x
+                        t1y = old_y
+                    }
+                }
+            }
+        }
+        
+        // === RENDERING ===
+        
+        // Background
+        sapphire_sdl2_clear(window, 15, 15, 25)  // Dark blue
+        
+        // Draw grid
+        let i = 0
+        while i <= grid_size {
+            let pos = i * cell_size
+            sapphire_sdl2_draw_line(window, pos, 0, pos, 800, 30, 30, 40)
+            sapphire_sdl2_draw_line(window, 0, pos, 800, pos, 30, 30, 40)
+            i = i + 1
+        }
+        
+        // Draw food (pulsing red)
+        let pulse = (frame % 30) / 30
+        let food_brightness = 200 + pulse * 55
+        let food_px = food_x * cell_size + 3
+        let food_py = food_y * cell_size + 3
+        sapphire_sdl2_fill_rect(window, food_px, food_py, cell_size - 6, cell_size - 6, 
+                                food_brightness, 0, 0)
+        
+        // Draw snake tail (gradient from dark to bright green)
+        if tail_length >= 20 {
+            let px = t20x * cell_size + 4
+            let py = t20y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 100, 0)
+        }
+        if tail_length >= 19 {
+            let px = t19x * cell_size + 4
+            let py = t19y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 110, 0)
+        }
+        if tail_length >= 18 {
+            let px = t18x * cell_size + 4
+            let py = t18y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 120, 0)
+        }
+        if tail_length >= 17 {
+            let px = t17x * cell_size + 4
+            let py = t17y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 130, 0)
+        }
+        if tail_length >= 16 {
+            let px = t16x * cell_size + 4
+            let py = t16y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 140, 0)
+        }
+        if tail_length >= 15 {
+            let px = t15x * cell_size + 4
+            let py = t15y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 150, 0)
+        }
+        if tail_length >= 14 {
+            let px = t14x * cell_size + 4
+            let py = t14y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 160, 0)
+        }
+        if tail_length >= 13 {
+            let px = t13x * cell_size + 4
+            let py = t13y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 170, 0)
+        }
+        if tail_length >= 12 {
+            let px = t12x * cell_size + 4
+            let py = t12y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 180, 0)
+        }
+        if tail_length >= 11 {
+            let px = t11x * cell_size + 4
+            let py = t11y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 190, 0)
+        }
+        if tail_length >= 10 {
+            let px = t10x * cell_size + 4
+            let py = t10y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 200, 0)
+        }
+        if tail_length >= 9 {
+            let px = t9x * cell_size + 4
+            let py = t9y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 210, 0)
+        }
+        if tail_length >= 8 {
+            let px = t8x * cell_size + 4
+            let py = t8y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 220, 0)
+        }
+        if tail_length >= 7 {
+            let px = t7x * cell_size + 4
+            let py = t7y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 230, 0)
+        }
+        if tail_length >= 6 {
+            let px = t6x * cell_size + 4
+            let py = t6y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 240, 0)
+        }
+        if tail_length >= 5 {
+            let px = t5x * cell_size + 4
+            let py = t5y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 245, 0)
+        }
+        if tail_length >= 4 {
+            let px = t4x * cell_size + 4
+            let py = t4y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 250, 0)
+        }
+        if tail_length >= 3 {
+            let px = t3x * cell_size + 4
+            let py = t3y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 255, 0)
+        }
+        if tail_length >= 2 {
+            let px = t2x * cell_size + 4
+            let py = t2y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 255, 0)
+        }
+        if tail_length >= 1 {
+            let px = t1x * cell_size + 4
+            let py = t1y * cell_size + 4
+            sapphire_sdl2_fill_rect(window, px, py, cell_size - 8, cell_size - 8, 0, 255, 0)
+        }
+        
+        // Draw snake head (bright green with eyes)
+        let snake_px = snake_x * cell_size + 3
+        let snake_py = snake_y * cell_size + 3
+        sapphire_sdl2_fill_rect(window, snake_px, snake_py, cell_size - 6, cell_size - 6, 0, 255, 50)
+        
+        // Draw eyes based on direction
+        if snake_dx == 1 {  // Right
+            sapphire_sdl2_fill_rect(window, snake_px + 18, snake_py + 6, 4, 4, 255, 255, 255)
+            sapphire_sdl2_fill_rect(window, snake_px + 18, snake_py + 16, 4, 4, 255, 255, 255)
+        }
+        if snake_dx == 0 - 1 {  // Left
+            sapphire_sdl2_fill_rect(window, snake_px + 4, snake_py + 6, 4, 4, 255, 255, 255)
+            sapphire_sdl2_fill_rect(window, snake_px + 4, snake_py + 16, 4, 4, 255, 255, 255)
+        }
+        if snake_dy == 0 - 1 {  // Up
+            sapphire_sdl2_fill_rect(window, snake_px + 6, snake_py + 4, 4, 4, 255, 255, 255)
+            sapphire_sdl2_fill_rect(window, snake_px + 16, snake_py + 4, 4, 4, 255, 255, 255)
+        }
+        if snake_dy == 1 {  // Down
+            sapphire_sdl2_fill_rect(window, snake_px + 6, snake_py + 18, 4, 4, 255, 255, 255)
+            sapphire_sdl2_fill_rect(window, snake_px + 16, snake_py + 18, 4, 4, 255, 255, 255)
+        }
+        
+        // Draw UI - Score display
+        sapphire_sdl2_fill_rect(window, 10, 10, 200, 40, 0, 0, 0)
+        sapphire_sdl2_fill_rect(window, 12, 12, 196, 36, 50, 50, 70)
+        
+        // Draw high score
+        if high_score > 0 {
+            sapphire_sdl2_fill_rect(window, 220, 10, 200, 40, 0, 0, 0)
+            sapphire_sdl2_fill_rect(window, 222, 12, 196, 36, 70, 50, 50)
+        }
+        
+        // Game over overlay
+        if game_over {
+            sapphire_sdl2_fill_rect(window, 150, 300, 500, 200, 0, 0, 0)
+            sapphire_sdl2_fill_rect(window, 160, 310, 480, 180, 150, 0, 0)
+            sapphire_sdl2_fill_rect(window, 170, 320, 460, 160, 200, 50, 50)
+            
+            // "Press SPACE" message
+            sapphire_sdl2_fill_rect(window, 250, 400, 300, 50, 255, 255, 255)
+        }
+        
+        sapphire_sdl2_present(window)
+        sapphire_sdl2_delay(16)  // ~60 FPS
+        
+        frame = frame + 1
+    }
+    
+    sapphire_sdl2_destroy_window(window)
+    print()
+    print("=== Game Over ===")
+    print("Final Score:", score)
+    print("Snake Length:", tail_length + 1)
+    if high_score > 0 {
+        print("High Score:", high_score)
+    }
+    print()
+    print("Thanks for playing!")
+}

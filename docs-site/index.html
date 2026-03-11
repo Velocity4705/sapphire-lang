@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sapphire - A modern programming language that's as fast as C and as easy as Python">
+    <title>Sapphire 💎</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <nav class="nav">
+            <div class="nav-content">
+                <div class="nav-left">
+                    <img src="sapphire-icon.svg" alt="Sapphire" class="nav-logo">
+                    <span class="nav-name">Sapphire</span>
+                    <span class="nav-badge">beta.3</span>
+                </div>
+                <div class="nav-right">
+                    <a href="#features">Features</a>
+                    <a href="#examples">Examples</a>
+                    <a href="#download">Download</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/tree/main/docs" target="_blank">Docs</a>
+                    <a href="https://github.com/velo4705/sapphire-lang" class="nav-github">GitHub</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="hero-main">
+            <img src="sapphire-icon.svg" alt="Sapphire" class="hero-logo">
+            <h1 class="hero-title">Sapphire</h1>
+            <p class="hero-subtitle">Fast as C. Easy as Python.</p>
+            <p class="hero-description">
+                A modern programming language designed for performance, safety, and developer happiness.
+            </p>
+            <a href="#download" class="hero-btn">Download Now</a>
+            
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-num">0-5%</div>
+                    <div class="stat-text">of C speed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">18</div>
+                    <div class="stat-text">modules</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">50+</div>
+                    <div class="stat-text">functions</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="section">
+        <div class="container">
+            <h2 class="section-title">Why Sapphire?</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h3>Blazing Fast</h3>
+                    <p>LLVM-powered compilation delivers performance within 0-5% of C with zero-cost abstractions.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🛡️</div>
+                    <h3>Memory Safe</h3>
+                    <p>Ownership system catches bugs at compile time. No segfaults, no memory leaks.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎯</div>
+                    <h3>Simple Syntax</h3>
+                    <p>Clean, intuitive syntax with type inference. Less boilerplate, more productivity.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">�</div>
+                    <h3>Async Built-in</h3>
+                    <p>Async/await, channels, and threads built into the language from day one.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📦</div>
+                    <h3>Complete Tooling</h3>
+                    <p>Package manager, formatter, LSP, debugger, and test runner included.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎨</div>
+                    <h3>Rich Ecosystem</h3>
+                    <p>18 modules with 50+ functions covering I/O, networking, graphics, and more.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Examples -->
+    <section id="examples" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">Code Examples</h2>
+            <div class="grid-2">
+                <div class="code-card">
+                    <div class="code-header">
+                        <span>Hello World</span>
+                    </div>
+                    <pre><code><span class="k">fn</span> <span class="f">main</span>() {
+    <span class="k">let</span> numbers = [<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, <span class="n">4</span>, <span class="n">5</span>]
+    
+    <span class="k">for</span> num <span class="k">in</span> numbers {
+        <span class="f">println</span>(num * <span class="n">2</span>)
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-card">
+                    <div class="code-header">
+                        <span>Pattern Matching</span>
+                    </div>
+                    <pre><code><span class="k">fn</span> <span class="f">classify</span>(n: <span class="t">int</span>) -> <span class="t">str</span> {
+    <span class="k">return match</span> n {
+        <span class="n">0</span> => <span class="s">"zero"</span>
+        <span class="n">1</span> => <span class="s">"one"</span>
+        x <span class="k">if</span> x < <span class="n">0</span> => <span class="s">"negative"</span>
+        _ => <span class="s">"other"</span>
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-card">
+                    <div class="code-header">
+                        <span>Async/Await</span>
+                    </div>
+                    <pre><code><span class="k">async fn</span> <span class="f">fetch</span>(url: <span class="t">str</span>) {
+    <span class="k">let</span> res = <span class="k">await</span> <span class="f">http_get</span>(url)?
+    <span class="k">return</span> <span class="t">Ok</span>(res.body)
+}
+
+<span class="k">async fn</span> <span class="f">main</span>() {
+    <span class="k">match await</span> <span class="f">fetch</span>(<span class="s">"https://api.example.com"</span>) {
+        <span class="t">Ok</span>(data) => <span class="f">println</span>(data)
+        <span class="t">Err</span>(e) => <span class="f">println</span>(e)
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-card">
+                    <div class="code-header">
+                        <span>HTTP Server</span>
+                    </div>
+                    <pre><code><span class="k">import</span> HTTP <span class="k">from</span> <span class="s">"stdlib/http"</span>
+
+<span class="k">fn</span> <span class="f">main</span>() {
+    <span class="k">let</span> server = HTTP.<span class="f">Server</span>(<span class="n">8080</span>)
+    
+    server.<span class="f">get</span>(<span class="s">"/"</span>, <span class="k">fn</span>(req, res) {
+        res.body = <span class="s">"Hello!"</span>
+    })
+    
+    server.<span class="f">start</span>()
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download -->
+    <section id="download" class="section">
+        <div class="container">
+            <h2 class="section-title">Get Started</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Quick Install</h3>
+                    <div class="cmd">
+                        <code>curl -fsSL https://raw.githubusercontent.com/velo4705/sapphire-lang/main/install.sh | bash</code>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Build from Source</h3>
+                    <div class="cmd-list">
+                        <code>git clone https://github.com/velo4705/sapphire-lang.git</code>
+                        <code>cd sapphire-lang && make quick</code>
+                        <code>./sapp examples/hello.spp</code>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tools">
+                <h3>Included Tools</h3>
+                <div class="tools-grid">
+                    <span>🔧 sapp</span>
+                    <span>📦 spm</span>
+                    <span>✨ sapphire-fmt</span>
+                    <span>🔍 sapphire-lsp</span>
+                    <span>🐛 sapphire-debug</span>
+                    <span>💻 VSCode</span>
+                </div>
+            </div>
+
+            <div class="docs-links">
+                <a href="https://github.com/velo4705/sapphire-lang/blob/main/docs/tutorials/01_GETTING_STARTED.md">📚 Getting Started</a>
+                <a href="https://github.com/velo4705/sapphire-lang/blob/main/docs/API_REFERENCE.md">📖 API Reference</a>
+                <a href="https://github.com/velo4705/sapphire-lang/blob/main/docs/LANGUAGE_FEATURES.md">⚙️ Language Features</a>
+                <a href="https://github.com/velo4705/sapphire-lang/tree/main/examples">💡 Examples</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <img src="sapphire-icon.svg" alt="Sapphire" class="footer-logo">
+                    <div class="footer-brand">Sapphire</div>
+                    <div class="footer-tagline">Fast as C. Easy as Python.</div>
+                </div>
+                <div>
+                    <h4>Resources</h4>
+                    <a href="https://github.com/velo4705/sapphire-lang">GitHub</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/blob/main/docs/API_REFERENCE.md">Documentation</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/tree/main/examples">Examples</a>
+                </div>
+                <div>
+                    <h4>Community</h4>
+                    <a href="https://github.com/velo4705/sapphire-lang/issues">Issues</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/discussions">Discussions</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/blob/main/CONTRIBUTING.md">Contributing</a>
+                </div>
+                <div>
+                    <h4>Legal</h4>
+                    <a href="https://github.com/velo4705/sapphire-lang/blob/main/LICENSE">MIT License</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Made with 💎 by the Sapphire community</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

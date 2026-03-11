@@ -1,0 +1,112 @@
+// 3D Rotating Cube - OpenGL demo
+// Demonstrates: 3D graphics, transformations, OpenGL integration
+
+import graphics.opengl
+import graphics.glut
+
+fn main() {
+    print("=== 3D Rotating Cube Demo ===")
+    print("A colorful rotating cube using OpenGL")
+    print()
+    
+    // Initialize GLUT
+    sapphire_glut_init()
+    sapphire_glut_init_display_mode(0)  // GLUT_RGB
+    sapphire_glut_init_window_size(800, 600)
+    
+    let window = sapphire_glut_create_window("3D Cube")
+    
+    // Setup OpenGL
+    sapphire_gl_clear_color(0.0, 0.0, 0.0, 1.0)
+    
+    // Enable depth testing
+    sapphire_gl_enable(2929)  // GL_DEPTH_TEST
+    
+    let angle = 0.0
+    let frame = 0
+    
+    print("Rendering 3D cube...")
+    
+    // Render loop (simplified - normally would use GLUT callbacks)
+    while frame < 300 {  // 5 seconds at 60fps
+        // Clear
+        sapphire_gl_clear(16640)  // GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+        
+        // Setup projection
+        sapphire_gl_matrix_mode(5889)  // GL_PROJECTION
+        sapphire_gl_load_identity()
+        sapphire_gl_perspective(45.0, 1.33, 0.1, 100.0)
+        
+        // Setup modelview
+        sapphire_gl_matrix_mode(5888)  // GL_MODELVIEW
+        sapphire_gl_load_identity()
+        sapphire_gl_translate(0.0, 0.0, 0.0 - 5.0)
+        sapphire_gl_rotate(angle, 1.0, 1.0, 0.0)
+        
+        // Draw cube faces
+        // Front face (red)
+        sapphire_gl_begin(7)  // GL_QUADS
+        sapphire_gl_color3f(1.0, 0.0, 0.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 0.0 - 1.0, 1.0)
+        sapphire_gl_vertex3f(1.0, 0.0 - 1.0, 1.0)
+        sapphire_gl_vertex3f(1.0, 1.0, 1.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 1.0, 1.0)
+        sapphire_gl_end()
+        
+        // Back face (green)
+        sapphire_gl_begin(7)
+        sapphire_gl_color3f(0.0, 1.0, 0.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 0.0 - 1.0, 0.0 - 1.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 1.0, 0.0 - 1.0)
+        sapphire_gl_vertex3f(1.0, 1.0, 0.0 - 1.0)
+        sapphire_gl_vertex3f(1.0, 0.0 - 1.0, 0.0 - 1.0)
+        sapphire_gl_end()
+        
+        // Top face (blue)
+        sapphire_gl_begin(7)
+        sapphire_gl_color3f(0.0, 0.0, 1.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 1.0, 0.0 - 1.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 1.0, 1.0)
+        sapphire_gl_vertex3f(1.0, 1.0, 1.0)
+        sapphire_gl_vertex3f(1.0, 1.0, 0.0 - 1.0)
+        sapphire_gl_end()
+        
+        // Bottom face (yellow)
+        sapphire_gl_begin(7)
+        sapphire_gl_color3f(1.0, 1.0, 0.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 0.0 - 1.0, 0.0 - 1.0)
+        sapphire_gl_vertex3f(1.0, 0.0 - 1.0, 0.0 - 1.0)
+        sapphire_gl_vertex3f(1.0, 0.0 - 1.0, 1.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 0.0 - 1.0, 1.0)
+        sapphire_gl_end()
+        
+        // Right face (magenta)
+        sapphire_gl_begin(7)
+        sapphire_gl_color3f(1.0, 0.0, 1.0)
+        sapphire_gl_vertex3f(1.0, 0.0 - 1.0, 0.0 - 1.0)
+        sapphire_gl_vertex3f(1.0, 1.0, 0.0 - 1.0)
+        sapphire_gl_vertex3f(1.0, 1.0, 1.0)
+        sapphire_gl_vertex3f(1.0, 0.0 - 1.0, 1.0)
+        sapphire_gl_end()
+        
+        // Left face (cyan)
+        sapphire_gl_begin(7)
+        sapphire_gl_color3f(0.0, 1.0, 1.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 0.0 - 1.0, 0.0 - 1.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 0.0 - 1.0, 1.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 1.0, 1.0)
+        sapphire_gl_vertex3f(0.0 - 1.0, 1.0, 0.0 - 1.0)
+        sapphire_gl_end()
+        
+        sapphire_glut_swap_buffers()
+        
+        angle = angle + 2.0
+        frame = frame + 1
+        
+        sapphire_sdl2_delay(16)  // ~60 FPS
+    }
+    
+    print()
+    print("Demo complete! Rendered", frame, "frames")
+    print("Cube rotated", angle, "degrees")
+}

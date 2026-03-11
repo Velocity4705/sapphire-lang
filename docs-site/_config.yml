@@ -1,0 +1,23 @@
+# GitHub Pages Configuration for Sapphire
+
+# Site settings
+title: Sapphire Programming Language
+description: A modern programming language that's as fast as C and as easy as Python
+baseurl: "/sapphire-lang"
+url: "https://velo4705.github.io"
+
+# Build settings
+markdown: kramdown
+theme: null
+
+# Exclude from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# Include files
+include:
+  - _config.yml
