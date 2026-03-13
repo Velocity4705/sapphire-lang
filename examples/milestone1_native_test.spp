@@ -1,0 +1,123 @@
+# Milestone 1: Data Science Foundation - Native Implementation Test
+print("=== MILESTONE 1: NATIVE FEATURES TEST ===")
+print("")
+
+# 1. DYNAMIC ARRAYS - Native syntax ✅
+print("1. Dynamic Arrays (Native Syntax):")
+let data = [10, 20, 30, 40, 50]
+print("  Array literal:", data)
+print("  First element:", data[0])
+print("  Last element:", data[4])
+print("  Length:", len(data))
+
+# Test array modification (if supported)
+# data[0] = 100  # Test assignment
+# print("  After modification:", data)
+
+print("")
+
+# 2. FLOATING-POINT SUPPORT ✅
+print("2. Floating-Point Support:")
+let pi = 3.14159
+let radius = 2.5
+let area = pi * radius * radius
+print("  Pi:", pi)
+print("  Radius:", radius)
+print("  Area:", area)
+
+# Test mixed int/float operations
+let mixed_calc = 10 + 3.5
+print("  Mixed calculation (10 + 3.5):", mixed_calc)
+
+print("")
+
+# 3. MATH LIBRARY - Test native vs function calls
+print("3. Math Library:")
+print("  Square root of 16:", math_sqrt(16.0))
+print("  2 to the power of 8:", math_pow(2.0, 8.0))
+print("  Sin(π/2):", math_sin(math_pi() / 2.0))
+print("  Natural log of e:", math_log(math_e()))
+
+print("")
+
+# 4. STRING OPERATIONS - Test what's native
+print("4. String Operations:")
+let text = "Hello, Sapphire!"
+print("  Text:", text)
+print("  Length:", len(text))
+
+# Test string concatenation
+let greeting = "Hello" + ", " + "World!"
+print("  Concatenation:", greeting)
+
+print("")
+
+# 5. DATA PROCESSING - Real data science example
+print("5. Data Processing Example:")
+
+# Sales data for analysis
+let sales = [120, 150, 180, 200, 175, 160, 190, 210, 185, 195]
+print("  Sales data:", sales)
+print("  Number of months:", len(sales))
+
+# Calculate total and average
+let total = 0
+let i = 0
+while i < len(sales):
+    total = total + sales[i]
+    i = i + 1
+
+let average = total / len(sales)
+print("  Total sales:", total)
+print("  Average sales:", average)
+
+# Find min and max
+let min_sales = sales[0]
+let max_sales = sales[0]
+i = 1
+while i < len(sales):
+    if sales[i] < min_sales:
+        min_sales = sales[i]
+    if sales[i] > max_sales:
+        max_sales = sales[i]
+    i = i + 1
+
+print("  Min sales:", min_sales)
+print("  Max sales:", max_sales)
+print("  Range:", max_sales - min_sales)
+
+print("")
+
+# 6. PERFORMANCE TEST
+print("6. Performance Test:")
+let large_data = []
+let count = 1000
+
+# This would test if we can create large arrays efficiently
+# For now, test with smaller array
+let perf_data = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+print("  Test data (squares):", perf_data)
+
+let sum_squares = 0
+i = 0
+while i < len(perf_data):
+    sum_squares = sum_squares + perf_data[i]
+    i = i + 1
+
+print("  Sum of squares:", sum_squares)
+
+print("")
+print("=== MILESTONE 1 STATUS ===")
+print("✅ Native array literals [1,2,3]")
+print("✅ Array indexing arr[0]")
+print("✅ Floating-point literals and operations")
+print("✅ Math function library")
+print("✅ String literals and concatenation")
+print("✅ Basic data processing")
+print("")
+print("❌ Array methods (arr.push(), arr.pop())")
+print("❌ Native CSV parsing")
+print("❌ String methods (text.split(), text.upper())")
+print("❌ Array assignment (arr[0] = value)")
+print("")
+print("MILESTONE 1 FOUNDATION: MOSTLY COMPLETE! 🎉")

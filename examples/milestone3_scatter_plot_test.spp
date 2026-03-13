@@ -1,0 +1,32 @@
+print("=== Milestone 3: Scatter Plot Test ===")
+
+print("1. Generating random scatter data")
+random_seed(42)
+let x_scatter = []
+let y_scatter = []
+
+let i = 0
+while i < 20 {
+    x_scatter.push(random(0.0, 10.0))
+    y_scatter.push(random(0.0, 10.0))
+    i = i + 1
+}
+
+print("Generated", x_scatter.length, "data points")
+
+print("2. Creating scatter plot")
+let plot = plot_create(1, 800, 600)  // 1 = SCATTER chart type
+plot_set_title(plot, "Random Scatter Plot")
+plot_set_xlabel(plot, "X Coordinate")
+plot_set_ylabel(plot, "Y Coordinate")
+
+print("3. Adding scatter data")
+plot_add_scatter(plot, x_scatter, y_scatter, "Random Points", 1.0, 0.0, 0.0, 1)  // Red circles
+
+print("4. Displaying the plot")
+plot_show(plot)
+
+print("5. Saving as SVG")
+plot_save_svg(plot, "scatter_plot.svg")
+
+print("Scatter plot test complete!")

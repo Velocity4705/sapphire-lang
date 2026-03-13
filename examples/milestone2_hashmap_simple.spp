@@ -1,0 +1,23 @@
+print("=== Hash Map Test ===")
+
+let map1 = {"name": "Alice", "age": 30}
+print("map1:", map1)
+
+print("get name:", map1.get("name"))
+print("get age:", map1.get("age"))
+
+map1.set("city", "New York")
+print("after set:", map1)
+
+print("has name:", map1.has("name"))
+print("has missing:", map1.has("missing"))
+
+print("size:", map1.size)
+print("keys:", map1.keys())
+print("values:", map1.values())
+
+let removed = map1.remove("age")
+print("removed:", removed)
+print("final map:", map1)
+
+print("Hash map implementation complete!")

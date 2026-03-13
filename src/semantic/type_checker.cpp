@@ -370,6 +370,25 @@ void TypeChecker::visitSetExpr(SetExpr& expr) {
     current_type = value_type;
 }
 
+void TypeChecker::visitIndexAssignExpr(IndexAssignExpr& expr) {
+    auto object_type = checkExpr(*expr.object);
+    auto index_type = checkExpr(*expr.index);
+    auto value_type = checkExpr(*expr.value);
+    // Index assignment: object[index] = value
+    // The type of the expression is the type of the value
+    current_type = value_type;
+}
+
+void TypeChecker::visitHashMapExpr(HashMapExpr& expr) {
+    // Check all key-value pairs
+    for (const auto& pair : expr.pairs) {
+        checkExpr(*pair.first);   // Check key expression
+        checkExpr(*pair.second);  // Check value expression
+    }
+    // Hash map literals have a generic hash map type (for now use TypeVariable)
+    current_type = std::make_shared<TypeVariable>();
+}
+
 void TypeChecker::visitClassDecl(ClassDecl& stmt) {
     // Create a new environment for the class
     auto class_env = std::make_shared<TypeEnvironment>(env);

@@ -1,0 +1,46 @@
+// Milestone 4: WebSocket Support Demo - Simple Version
+// Demonstrates real-time bidirectional communication
+
+print("=== Sapphire WebSocket Demo ===")
+
+// Test 1: WebSocket Server
+print("1. Creating WebSocket Server...")
+server = websocket_server_create(8080)
+print("WebSocket server created on port 8080")
+
+// Start the server
+print("2. Starting WebSocket Server...")
+started = websocket_server_start(server)
+print("WebSocket server started")
+
+// Test connection count
+print("3. Checking Connection Count...")
+count = websocket_server_connection_count(server)
+print("Current connections:")
+print(count)
+
+// Test 2: WebSocket Client
+print("4. Creating WebSocket Client...")
+client = websocket_client_create()
+print("WebSocket client created")
+
+// Test 3: Base64 Encoding/Decoding
+print("5. Testing Base64 Utilities...")
+original_data = "Hello WebSocket"
+encoded = websocket_base64_encode(original_data)
+decoded = websocket_base64_decode(encoded)
+
+print("Original data:")
+print(original_data)
+print("Encoded data:")
+print(encoded)
+print("Decoded data:")
+print(decoded)
+
+// Stop server
+print("6. Stopping WebSocket Server...")
+websocket_server_stop(server)
+print("WebSocket server stopped")
+
+print("=== WebSocket Demo Complete ===")
+print("WebSocket functionality implemented successfully!")

@@ -1,0 +1,119 @@
+# Milestone 1: Data Science Foundation - Real Implementation Test
+# Testing what should be implemented directly in Sapphire language
+
+print("=== MILESTONE 1 TEST: Data Science Foundation ===")
+print("")
+
+# 1. DYNAMIC ARRAYS - Native syntax (not function calls)
+print("1. Testing Dynamic Arrays...")
+
+# What we want: Native array literals and operations
+# let numbers = [1, 2, 3, 4, 5]
+# numbers.push(6)
+# let first = numbers[0]
+# let size = numbers.length
+
+# Current fallback test with existing functions
+let numbers = array_create()
+array_push(numbers, 1)
+array_push(numbers, 2)
+array_push(numbers, 3)
+print("Array created with", array_size(numbers), "elements")
+
+print("")
+
+# 2. FLOATING-POINT SUPPORT - Native literals and operations
+print("2. Testing Floating-Point Support...")
+
+# What we want: Native float literals and mixed operations
+let price = 19.99
+let tax_rate = 0.08
+let total = price * (1.0 + tax_rate)
+print("Price:", price, "Tax rate:", tax_rate, "Total:", total)
+
+print("")
+
+# 3. MATH LIBRARY - Built-in math operations
+print("3. Testing Math Library...")
+
+# What we want: Native math operations and constants
+let radius = 5.0
+let area = math_pi() * math_pow(radius, 2.0)
+let circumference = 2.0 * math_pi() * radius
+print("Circle with radius", radius)
+print("Area:", area)
+print("Circumference:", circumference)
+
+# Test trigonometry
+let angle = math_pi() / 4.0  # 45 degrees
+print("sin(45°):", math_sin(angle))
+print("cos(45°):", math_cos(angle))
+
+print("")
+
+# 4. CSV FILE I/O - Native file operations
+print("4. Testing CSV File I/O...")
+
+# What we want: Native CSV parsing and file operations
+# let data = CSV.read("data.csv")
+# data.write("output.csv")
+
+# Current test with existing functions
+print("CSV functions available (testing creation):")
+let csv_data = csv_create()
+print("CSV object created")
+
+print("")
+
+# 5. STRING OPERATIONS - Native string methods
+print("5. Testing String Operations...")
+
+# What we want: Native string methods
+# let text = "Hello, World!"
+# let upper = text.upper()
+# let words = text.split(", ")
+# let length = text.length
+
+let text = "Hello, World!"
+print("Text:", text)
+print("Length:", len(text))  # Using existing len function
+
+print("")
+
+# PERFORMANCE TEST
+print("=== PERFORMANCE TEST ===")
+
+# Test with larger dataset
+let large_array = array_create()
+let count = 100  # Start small to test
+let i = 0
+while i < count:
+    array_push(large_array, i * i)
+    i = i + 1
+
+print("Created array with", array_size(large_array), "elements")
+
+# Calculate sum
+let sum = 0
+i = 0
+while i < array_size(large_array):
+    sum = sum + array_get(large_array, i)
+    i = i + 1
+
+print("Sum of squares 0-99:", sum)
+
+print("")
+print("=== MILESTONE 1 STATUS ===")
+print("✅ Basic arrays (via functions)")
+print("✅ Floating-point literals")
+print("✅ Math functions")
+print("✅ Basic CSV support")
+print("✅ String basics")
+print("")
+print("❌ Native array syntax [1,2,3]")
+print("❌ Array indexing arr[0]")
+print("❌ Array methods arr.push()")
+print("❌ Native CSV parsing")
+print("❌ String methods text.split()")
+print("")
+print("NEXT: Implement native language features!")

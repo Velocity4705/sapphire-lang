@@ -9,6 +9,24 @@
 #include <algorithm>
 #include <cstdlib>
 
+// Milestone 1 Libraries
+#include "../stdlib/collections/array.h"
+#include "../stdlib/math/math.h"
+#include "../stdlib/io/csv.h"
+
+// Milestone 2 Libraries
+#include "../stdlib/json/json.h"
+#include "../stdlib/random/random.h"
+
+// Milestone 3 Libraries
+#include "../stdlib/plotting/plotting.h"
+
+// Milestone 4 Libraries
+#include "../stdlib/http/http.h"
+#include "../stdlib/websocket/websocket.h"
+#include "../stdlib/template/template.h"
+#include "../stdlib/database/database.h"
+
 namespace sapphire {
 
 // Environment implementation
@@ -73,6 +91,128 @@ Interpreter::Interpreter() {
     environment->define("sort", std::string("__builtin_sort__"));
     environment->define("make_array", std::string("__builtin_make_array__"));
     environment->define("WaitGroup", std::string("__builtin_waitgroup__"));
+    
+    // Milestone 1: Dynamic Arrays
+    environment->define("array_create", std::string("__builtin_array_create__"));
+    environment->define("array_push", std::string("__builtin_array_push__"));
+    environment->define("array_get", std::string("__builtin_array_get__"));
+    environment->define("array_set", std::string("__builtin_array_set__"));
+    environment->define("array_pop", std::string("__builtin_array_pop__"));
+    environment->define("array_size", std::string("__builtin_array_size__"));
+    environment->define("array_clear", std::string("__builtin_array_clear__"));
+    
+    // Milestone 1: Math Library
+    environment->define("math_sqrt", std::string("__builtin_math_sqrt__"));
+    environment->define("math_pow", std::string("__builtin_math_pow__"));
+    environment->define("math_sin", std::string("__builtin_math_sin__"));
+    environment->define("math_cos", std::string("__builtin_math_cos__"));
+    environment->define("math_tan", std::string("__builtin_math_tan__"));
+    environment->define("math_exp", std::string("__builtin_math_exp__"));
+    environment->define("math_log", std::string("__builtin_math_log__"));
+    environment->define("math_log10", std::string("__builtin_math_log10__"));
+    environment->define("math_abs", std::string("__builtin_math_abs__"));
+    environment->define("math_floor", std::string("__builtin_math_floor__"));
+    environment->define("math_ceil", std::string("__builtin_math_ceil__"));
+    environment->define("math_round", std::string("__builtin_math_round__"));
+    environment->define("math_pi", std::string("__builtin_math_pi__"));
+    environment->define("math_e", std::string("__builtin_math_e__"));
+    
+    // Milestone 1: CSV I/O
+    environment->define("csv_create", std::string("__builtin_csv_create__"));
+    environment->define("csv_read_file", std::string("__builtin_csv_read_file__"));
+    environment->define("csv_write_file", std::string("__builtin_csv_write_file__"));
+    environment->define("csv_get", std::string("__builtin_csv_get__"));
+    environment->define("csv_set", std::string("__builtin_csv_set__"));
+    environment->define("csv_row_count", std::string("__builtin_csv_row_count__"));
+    
+    // Milestone 2: JSON Support
+    environment->define("json_parse", std::string("__builtin_json_parse__"));
+    environment->define("json_stringify", std::string("__builtin_json_stringify__"));
+    environment->define("json_create_object", std::string("__builtin_json_create_object__"));
+    environment->define("json_create_array", std::string("__builtin_json_create_array__"));
+    environment->define("json_get", std::string("__builtin_json_get__"));
+    environment->define("json_set", std::string("__builtin_json_set__"));
+    environment->define("json_push", std::string("__builtin_json_push__"));
+    environment->define("json_size", std::string("__builtin_json_size__"));
+    
+    // Milestone 2: Random Numbers
+    environment->define("random_seed", std::string("__builtin_random_seed__"));
+    environment->define("random", std::string("__builtin_random__"));
+    environment->define("random_int", std::string("__builtin_random_int__"));
+    environment->define("random_normal", std::string("__builtin_random_normal__"));
+    environment->define("random_boolean", std::string("__builtin_random_boolean__"));
+    environment->define("crypto_random", std::string("__builtin_crypto_random__"));
+    environment->define("crypto_random_int", std::string("__builtin_crypto_random_int__"));
+    
+    // Milestone 3: Data Visualization
+    environment->define("plot_create", std::string("__builtin_plot_create__"));
+    environment->define("plot_add_line", std::string("__builtin_plot_add_line__"));
+    environment->define("plot_add_scatter", std::string("__builtin_plot_add_scatter__"));
+    environment->define("plot_add_bar", std::string("__builtin_plot_add_bar__"));
+    environment->define("plot_add_histogram", std::string("__builtin_plot_add_histogram__"));
+    environment->define("plot_set_title", std::string("__builtin_plot_set_title__"));
+    environment->define("plot_set_xlabel", std::string("__builtin_plot_set_xlabel__"));
+    environment->define("plot_set_ylabel", std::string("__builtin_plot_set_ylabel__"));
+    environment->define("plot_show", std::string("__builtin_plot_show__"));
+    environment->define("plot_save_svg", std::string("__builtin_plot_save_svg__"));
+    environment->define("quick_plot", std::string("__builtin_quick_plot__"));
+    environment->define("quick_scatter", std::string("__builtin_quick_scatter__"));
+    environment->define("quick_histogram", std::string("__builtin_quick_histogram__"));
+    environment->define("csv_col_count", std::string("__builtin_csv_col_count__"));
+    environment->define("csv_add_row", std::string("__builtin_csv_add_row__"));
+    
+    // Milestone 4: HTTP Server/Client
+    environment->define("http_server_create", std::string("__builtin_http_server_create__"));
+    environment->define("http_server_start", std::string("__builtin_http_server_start__"));
+    environment->define("http_server_stop", std::string("__builtin_http_server_stop__"));
+    environment->define("http_server_get", std::string("__builtin_http_server_get__"));
+    environment->define("http_server_post", std::string("__builtin_http_server_post__"));
+    environment->define("http_server_put", std::string("__builtin_http_server_put__"));
+    environment->define("http_server_delete", std::string("__builtin_http_server_delete__"));
+    environment->define("http_client_create", std::string("__builtin_http_client_create__"));
+    environment->define("http_client_get", std::string("__builtin_http_client_get__"));
+    environment->define("http_client_post", std::string("__builtin_http_client_post__"));
+    environment->define("http_response_status", std::string("__builtin_http_response_status__"));
+    environment->define("http_response_body", std::string("__builtin_http_response_body__"));
+    environment->define("http_response_header", std::string("__builtin_http_response_header__"));
+    environment->define("http_url_encode", std::string("__builtin_http_url_encode__"));
+    environment->define("http_url_decode", std::string("__builtin_http_url_decode__"));
+    environment->define("http_html_escape", std::string("__builtin_http_html_escape__"));
+    
+    // WebSocket Support
+    environment->define("websocket_server_create", std::string("__builtin_websocket_server_create__"));
+    environment->define("websocket_server_start", std::string("__builtin_websocket_server_start__"));
+    environment->define("websocket_server_stop", std::string("__builtin_websocket_server_stop__"));
+    environment->define("websocket_server_broadcast_text", std::string("__builtin_websocket_server_broadcast_text__"));
+    environment->define("websocket_server_broadcast_binary", std::string("__builtin_websocket_server_broadcast_binary__"));
+    environment->define("websocket_server_connection_count", std::string("__builtin_websocket_server_connection_count__"));
+    environment->define("websocket_client_create", std::string("__builtin_websocket_client_create__"));
+    environment->define("websocket_client_connect", std::string("__builtin_websocket_client_connect__"));
+    environment->define("websocket_client_disconnect", std::string("__builtin_websocket_client_disconnect__"));
+    environment->define("websocket_client_send_text", std::string("__builtin_websocket_client_send_text__"));
+    environment->define("websocket_client_send_binary", std::string("__builtin_websocket_client_send_binary__"));
+    environment->define("websocket_client_is_connected", std::string("__builtin_websocket_client_is_connected__"));
+    environment->define("websocket_base64_encode", std::string("__builtin_websocket_base64_encode__"));
+    environment->define("websocket_base64_decode", std::string("__builtin_websocket_base64_decode__"));
+    
+    // Template Engine
+    environment->define("html_template_engine_create", std::string("__builtin_html_template_engine_create__"));
+    environment->define("html_template_render", std::string("__builtin_html_template_render__"));
+    environment->define("html_template_render_file", std::string("__builtin_html_template_render_file__"));
+    environment->define("html_template_set_dir", std::string("__builtin_html_template_set_dir__"));
+    environment->define("html_template_cache", std::string("__builtin_html_template_cache__"));
+    
+    // Database Drivers
+    environment->define("postgresql_create", std::string("__builtin_postgresql_create__"));
+    environment->define("postgresql_connect", std::string("__builtin_postgresql_connect__"));
+    environment->define("postgresql_disconnect", std::string("__builtin_postgresql_disconnect__"));
+    environment->define("postgresql_query", std::string("__builtin_postgresql_query__"));
+    environment->define("postgresql_execute", std::string("__builtin_postgresql_execute__"));
+    environment->define("mysql_create", std::string("__builtin_mysql_create__"));
+    environment->define("mysql_connect", std::string("__builtin_mysql_connect__"));
+    environment->define("mysql_disconnect", std::string("__builtin_mysql_disconnect__"));
+    environment->define("mysql_query", std::string("__builtin_mysql_query__"));
+    environment->define("mysql_execute", std::string("__builtin_mysql_execute__"));
     
     // Option type constructors
     environment->define("Some", std::string("__builtin_some__"));
@@ -259,6 +399,26 @@ std::string Interpreter::valueToString(const Value& value) {
     } else if (std::holds_alternative<std::shared_ptr<ResultMethod>>(value)) {
         auto rm = std::get<std::shared_ptr<ResultMethod>>(value);
         return "<Result method " + rm->method_name + ">";
+    } else if (std::holds_alternative<std::shared_ptr<ArrayMethod>>(value)) {
+        auto am = std::get<std::shared_ptr<ArrayMethod>>(value);
+        return "<Array method " + am->method_name + ">";
+    } else if (std::holds_alternative<std::shared_ptr<StringMethod>>(value)) {
+        auto sm = std::get<std::shared_ptr<StringMethod>>(value);
+        return "<String method " + sm->method_name + ">";
+    } else if (std::holds_alternative<std::shared_ptr<HashMapValue>>(value)) {
+        auto hashmap = std::get<std::shared_ptr<HashMapValue>>(value);
+        std::string result = "{";
+        bool first = true;
+        for (const auto& pair : hashmap->pairs) {
+            if (!first) result += ", ";
+            result += "\"" + pair.first + "\": " + valueToString(pair.second);
+            first = false;
+        }
+        result += "}";
+        return result;
+    } else if (std::holds_alternative<std::shared_ptr<HashMapMethod>>(value)) {
+        auto hm = std::get<std::shared_ptr<HashMapMethod>>(value);
+        return "<HashMap method " + hm->method_name + ">";
     }
     return "unknown";
 }
@@ -472,6 +632,155 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
         }
         
         throw RuntimeError("Unknown channel method: " + cm->method_name);
+    }
+    
+    // Handle array methods
+    if (std::holds_alternative<std::shared_ptr<ArrayMethod>>(callee)) {
+        auto am = std::get<std::shared_ptr<ArrayMethod>>(callee);
+        
+        if (am->method_name == "push") {
+            if (arguments.size() != 1) {
+                throw TypeError("Array.push() takes exactly 1 argument");
+            }
+            am->array->elements.push_back(arguments[0]);
+            last_value = static_cast<int>(am->array->elements.size());
+            return;
+        } else if (am->method_name == "pop") {
+            if (!arguments.empty()) {
+                throw TypeError("Array.pop() takes no arguments");
+            }
+            if (am->array->elements.empty()) {
+                throw RuntimeError("Cannot pop from empty array");
+            }
+            Value popped = am->array->elements.back();
+            am->array->elements.pop_back();
+            last_value = popped;
+            return;
+        }
+        
+        throw RuntimeError("Unknown array method: " + am->method_name);
+    }
+    
+    // Handle string methods
+    if (std::holds_alternative<std::shared_ptr<StringMethod>>(callee)) {
+        auto sm = std::get<std::shared_ptr<StringMethod>>(callee);
+        
+        if (sm->method_name == "upper") {
+            if (!arguments.empty()) {
+                throw TypeError("String.upper() takes no arguments");
+            }
+            std::string result = sm->string_value;
+            std::transform(result.begin(), result.end(), result.begin(), ::toupper);
+            last_value = result;
+            return;
+        } else if (sm->method_name == "lower") {
+            if (!arguments.empty()) {
+                throw TypeError("String.lower() takes no arguments");
+            }
+            std::string result = sm->string_value;
+            std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+            last_value = result;
+            return;
+        } else if (sm->method_name == "split") {
+            if (arguments.size() != 1) {
+                throw TypeError("String.split() takes exactly 1 argument");
+            }
+            if (!std::holds_alternative<std::string>(arguments[0])) {
+                throw TypeError("String.split() argument must be a string");
+            }
+            
+            std::string delimiter = std::get<std::string>(arguments[0]);
+            std::string text = sm->string_value;
+            auto result_array = std::make_shared<ArrayValue>();
+            
+            if (delimiter.empty()) {
+                // Split into individual characters
+                for (char c : text) {
+                    result_array->elements.push_back(std::string(1, c));
+                }
+            } else {
+                // Split by delimiter
+                size_t start = 0;
+                size_t end = text.find(delimiter);
+                
+                while (end != std::string::npos) {
+                    result_array->elements.push_back(text.substr(start, end - start));
+                    start = end + delimiter.length();
+                    end = text.find(delimiter, start);
+                }
+                result_array->elements.push_back(text.substr(start));
+            }
+            
+            last_value = result_array;
+            return;
+        }
+        
+        throw RuntimeError("Unknown string method: " + sm->method_name);
+    }
+    
+    // Handle hash map methods
+    if (std::holds_alternative<std::shared_ptr<HashMapMethod>>(callee)) {
+        auto hm = std::get<std::shared_ptr<HashMapMethod>>(callee);
+        
+        if (hm->method_name == "get") {
+            if (arguments.size() != 1) {
+                throw TypeError("HashMap.get() takes exactly 1 argument");
+            }
+            std::string key = valueToString(arguments[0]);
+            last_value = hm->hashmap->get(key);
+            return;
+        } else if (hm->method_name == "set") {
+            if (arguments.size() != 2) {
+                throw TypeError("HashMap.set() takes exactly 2 arguments");
+            }
+            std::string key = valueToString(arguments[0]);
+            hm->hashmap->pairs[key] = arguments[1];
+            last_value = arguments[1];
+            return;
+        } else if (hm->method_name == "has") {
+            if (arguments.size() != 1) {
+                throw TypeError("HashMap.has() takes exactly 1 argument");
+            }
+            std::string key = valueToString(arguments[0]);
+            last_value = hm->hashmap->has(key);
+            return;
+        } else if (hm->method_name == "remove") {
+            if (arguments.size() != 1) {
+                throw TypeError("HashMap.remove() takes exactly 1 argument");
+            }
+            std::string key = valueToString(arguments[0]);
+            auto it = hm->hashmap->pairs.find(key);
+            if (it != hm->hashmap->pairs.end()) {
+                Value removed = it->second;
+                hm->hashmap->pairs.erase(it);
+                last_value = removed;
+            } else {
+                last_value = Value(nullptr);
+            }
+            return;
+        } else if (hm->method_name == "keys") {
+            if (!arguments.empty()) {
+                throw TypeError("HashMap.keys() takes no arguments");
+            }
+            auto result_array = std::make_shared<ArrayValue>();
+            for (const auto& pair : hm->hashmap->pairs) {
+                result_array->elements.push_back(pair.first);
+            }
+            last_value = result_array;
+            return;
+        } else if (hm->method_name == "values") {
+            if (!arguments.empty()) {
+                throw TypeError("HashMap.values() takes no arguments");
+            }
+            auto result_array = std::make_shared<ArrayValue>();
+            for (const auto& pair : hm->hashmap->pairs) {
+                result_array->elements.push_back(pair.second);
+            }
+            last_value = result_array;
+            return;
+        }
+        
+        throw RuntimeError("Unknown hash map method: " + hm->method_name);
     }
     
     // Handle user-defined functions
@@ -1726,6 +2035,1039 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
             
             last_value = (inst->klass->methods.find(method_name) != inst->klass->methods.end());
             return;
+        
+        // ===== MILESTONE 1: DYNAMIC ARRAYS =====
+        } else if (func_name == "__builtin_array_create__") {
+            // Create a new dynamic array
+            void* array = sapphire_array_create();
+            // Store as a raw pointer wrapped as an int (this is a temporary solution)
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(array));
+            return;
+            
+        } else if (func_name == "__builtin_array_push__") {
+            // Push element to array
+            if (arguments.size() != 2) {
+                throw TypeError("array_push() requires 2 arguments (array, value)");
+            }
+            
+            void* array = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            
+            if (std::holds_alternative<int>(arguments[1])) {
+                sapphire_array_push_int(array, std::get<int>(arguments[1]));
+            } else if (std::holds_alternative<double>(arguments[1])) {
+                sapphire_array_push_double(array, std::get<double>(arguments[1]));
+            } else if (std::holds_alternative<std::string>(arguments[1])) {
+                sapphire_array_push_string(array, std::get<std::string>(arguments[1]).c_str());
+            }
+            
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_array_get__") {
+            // Get element from array
+            if (arguments.size() != 2) {
+                throw TypeError("array_get() requires 2 arguments (array, index)");
+            }
+            
+            void* array = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int index = std::get<int>(arguments[1]);
+            
+            // For now, assume integer arrays - we'll need type information later
+            last_value = static_cast<int>(sapphire_array_get_int(array, index));
+            return;
+            
+        } else if (func_name == "__builtin_array_size__") {
+            // Get array size
+            if (arguments.size() != 1) {
+                throw TypeError("array_size() requires 1 argument (array)");
+            }
+            
+            void* array = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = static_cast<int>(sapphire_array_size(array));
+            return;
+            
+        // ===== MILESTONE 1: MATH LIBRARY =====
+        } else if (func_name == "__builtin_math_sqrt__") {
+            if (arguments.size() != 1) {
+                throw TypeError("math_sqrt() requires 1 argument");
+            }
+            double x = std::holds_alternative<int>(arguments[0]) ? 
+                      std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            last_value = sapphire_math_sqrt(x);
+            return;
+            
+        } else if (func_name == "__builtin_math_pow__") {
+            if (arguments.size() != 2) {
+                throw TypeError("math_pow() requires 2 arguments");
+            }
+            double x = std::holds_alternative<int>(arguments[0]) ? 
+                      std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            double y = std::holds_alternative<int>(arguments[1]) ? 
+                      std::get<int>(arguments[1]) : std::get<double>(arguments[1]);
+            last_value = sapphire_math_pow(x, y);
+            return;
+            
+        } else if (func_name == "__builtin_math_sin__") {
+            if (arguments.size() != 1) {
+                throw TypeError("math_sin() requires 1 argument");
+            }
+            double x = std::holds_alternative<int>(arguments[0]) ? 
+                      std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            last_value = sapphire_math_sin(x);
+            return;
+            
+        } else if (func_name == "__builtin_math_cos__") {
+            if (arguments.size() != 1) {
+                throw TypeError("math_cos() requires 1 argument");
+            }
+            double x = std::holds_alternative<int>(arguments[0]) ? 
+                      std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            last_value = sapphire_math_cos(x);
+            return;
+            
+        } else if (func_name == "__builtin_math_abs__") {
+            if (arguments.size() != 1) {
+                throw TypeError("math_abs() requires 1 argument");
+            }
+            double x = std::holds_alternative<int>(arguments[0]) ? 
+                      std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            last_value = sapphire_math_abs(x);
+            return;
+            
+        } else if (func_name == "__builtin_math_floor__") {
+            if (arguments.size() != 1) {
+                throw TypeError("math_floor() requires 1 argument");
+            }
+            double x = std::holds_alternative<int>(arguments[0]) ? 
+                      std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            last_value = sapphire_math_floor(x);
+            return;
+            
+        } else if (func_name == "__builtin_math_ceil__") {
+            if (arguments.size() != 1) {
+                throw TypeError("math_ceil() requires 1 argument");
+            }
+            double x = std::holds_alternative<int>(arguments[0]) ? 
+                      std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            last_value = sapphire_math_ceil(x);
+            return;
+            
+        } else if (func_name == "__builtin_math_pi__") {
+            if (arguments.size() != 0) {
+                throw TypeError("math_pi() requires 0 arguments");
+            }
+            last_value = sapphire_math_pi();
+            return;
+            
+        } else if (func_name == "__builtin_math_e__") {
+            if (arguments.size() != 0) {
+                throw TypeError("math_e() requires 0 arguments");
+            }
+            last_value = sapphire_math_e();
+            return;
+            
+        // ===== MILESTONE 1: CSV I/O =====
+        } else if (func_name == "__builtin_csv_create__") {
+            // Create a new CSV data structure
+            void* csv = sapphire_csv_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(csv));
+            return;
+            
+        } else if (func_name == "__builtin_csv_read_file__") {
+            if (arguments.size() != 1) {
+                throw TypeError("csv_read_file() requires 1 argument (filename)");
+            }
+            
+            std::string filename = std::get<std::string>(arguments[0]);
+            void* csv = sapphire_csv_read_file(filename.c_str(), true);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(csv));
+            return;
+            
+        } else if (func_name == "__builtin_csv_row_count__") {
+            if (arguments.size() != 1) {
+                throw TypeError("csv_row_count() requires 1 argument (csv)");
+            }
+            
+            void* csv = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = static_cast<int>(sapphire_csv_row_count(csv));
+            return;
+            
+        } else if (func_name == "__builtin_csv_get__") {
+            if (arguments.size() != 3) {
+                throw TypeError("csv_get() requires 3 arguments (csv, row, col)");
+            }
+            
+            void* csv = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int row = std::get<int>(arguments[1]);
+            int col = std::get<int>(arguments[2]);
+            
+            const char* value = sapphire_csv_get(csv, row, col);
+            last_value = std::string(value ? value : "");
+            return;
+            
+        // ===== MILESTONE 2: JSON SUPPORT =====
+        } else if (func_name == "__builtin_json_parse__") {
+            if (arguments.size() != 1) {
+                throw TypeError("json_parse() requires 1 argument (json_string)");
+            }
+            
+            std::string json_text = std::get<std::string>(arguments[0]);
+            void* json_value = sapphire_json_parse(json_text.c_str());
+            if (json_value == nullptr) {
+                throw RuntimeError("Failed to parse JSON string");
+            }
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(json_value));
+            return;
+            
+        } else if (func_name == "__builtin_json_stringify__") {
+            if (arguments.size() < 1 || arguments.size() > 2) {
+                throw TypeError("json_stringify() requires 1-2 arguments (json_value, pretty=false)");
+            }
+            
+            void* json_value = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            bool pretty = arguments.size() > 1 ? std::get<bool>(arguments[1]) : false;
+            
+            const char* json_string = sapphire_json_stringify(json_value, pretty);
+            last_value = std::string(json_string ? json_string : "null");
+            return;
+            
+        } else if (func_name == "__builtin_json_create_object__") {
+            if (arguments.size() != 0) {
+                throw TypeError("json_create_object() requires 0 arguments");
+            }
+            
+            void* json_object = sapphire_json_create_object();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(json_object));
+            return;
+            
+        } else if (func_name == "__builtin_json_create_array__") {
+            if (arguments.size() != 0) {
+                throw TypeError("json_create_array() requires 0 arguments");
+            }
+            
+            void* json_array = sapphire_json_create_array();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(json_array));
+            return;
+            
+        } else if (func_name == "__builtin_json_get__") {
+            if (arguments.size() != 2) {
+                throw TypeError("json_get() requires 2 arguments (json_object, key)");
+            }
+            
+            void* json_object = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string key = std::get<std::string>(arguments[1]);
+            
+            void* result = sapphire_json_object_get(json_object, key.c_str());
+            if (result == nullptr) {
+                last_value = nullptr;
+            } else {
+                last_value = static_cast<int>(reinterpret_cast<intptr_t>(result));
+            }
+            return;
+            
+        } else if (func_name == "__builtin_json_set__") {
+            if (arguments.size() != 3) {
+                throw TypeError("json_set() requires 3 arguments (json_object, key, value)");
+            }
+            
+            void* json_object = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string key = std::get<std::string>(arguments[1]);
+            
+            // Convert Sapphire value to JSON value
+            void* json_value = nullptr;
+            if (std::holds_alternative<std::nullptr_t>(arguments[2])) {
+                json_value = sapphire_json_create_null();
+            } else if (std::holds_alternative<bool>(arguments[2])) {
+                json_value = sapphire_json_create_bool(std::get<bool>(arguments[2]));
+            } else if (std::holds_alternative<int>(arguments[2])) {
+                json_value = sapphire_json_create_number(static_cast<double>(std::get<int>(arguments[2])));
+            } else if (std::holds_alternative<double>(arguments[2])) {
+                json_value = sapphire_json_create_number(std::get<double>(arguments[2]));
+            } else if (std::holds_alternative<std::string>(arguments[2])) {
+                json_value = sapphire_json_create_string(std::get<std::string>(arguments[2]).c_str());
+            } else {
+                throw TypeError("Unsupported value type for JSON");
+            }
+            
+            sapphire_json_object_set(json_object, key.c_str(), json_value);
+            last_value = arguments[2];
+            return;
+            
+        // ===== MILESTONE 2: RANDOM NUMBERS =====
+        } else if (func_name == "__builtin_random_seed__") {
+            if (arguments.size() != 1) {
+                throw TypeError("random_seed() requires 1 argument (seed)");
+            }
+            
+            uint64_t seed = static_cast<uint64_t>(std::get<int>(arguments[0]));
+            sapphire_random_seed(seed);
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_random__") {
+            if (arguments.size() > 2) {
+                throw TypeError("random() requires 0-2 arguments (min=0.0, max=1.0)");
+            }
+            
+            if (arguments.size() == 0) {
+                last_value = sapphire_random_uniform();
+            } else if (arguments.size() == 2) {
+                double min = std::get<double>(arguments[0]);
+                double max = std::get<double>(arguments[1]);
+                last_value = sapphire_random_uniform_range(min, max);
+            } else {
+                throw TypeError("random() requires 0 or 2 arguments");
+            }
+            return;
+            
+        } else if (func_name == "__builtin_random_int__") {
+            if (arguments.size() != 2) {
+                throw TypeError("random_int() requires 2 arguments (min, max)");
+            }
+            
+            int64_t min = static_cast<int64_t>(std::get<int>(arguments[0]));
+            int64_t max = static_cast<int64_t>(std::get<int>(arguments[1]));
+            last_value = static_cast<int>(sapphire_random_int(min, max));
+            return;
+            
+        } else if (func_name == "__builtin_random_normal__") {
+            if (arguments.size() > 2) {
+                throw TypeError("random_normal() requires 0-2 arguments (mean=0.0, stddev=1.0)");
+            }
+            
+            if (arguments.size() == 0) {
+                last_value = sapphire_random_normal();
+            } else if (arguments.size() == 2) {
+                double mean = std::get<double>(arguments[0]);
+                double stddev = std::get<double>(arguments[1]);
+                last_value = sapphire_random_normal_params(mean, stddev);
+            } else {
+                throw TypeError("random_normal() requires 0 or 2 arguments");
+            }
+            return;
+            
+        } else if (func_name == "__builtin_random_boolean__") {
+            if (arguments.size() > 1) {
+                throw TypeError("random_boolean() requires 0-1 arguments (probability=0.5)");
+            }
+            
+            if (arguments.size() == 0) {
+                last_value = sapphire_random_boolean();
+            } else {
+                double probability = std::get<double>(arguments[0]);
+                last_value = sapphire_random_boolean_prob(probability);
+            }
+            return;
+            
+        } else if (func_name == "__builtin_crypto_random__") {
+            if (arguments.size() != 0) {
+                throw TypeError("crypto_random() requires 0 arguments");
+            }
+            
+            last_value = sapphire_crypto_random_uniform();
+            return;
+            
+        } else if (func_name == "__builtin_crypto_random_int__") {
+            if (arguments.size() != 2) {
+                throw TypeError("crypto_random_int() requires 2 arguments (min, max)");
+            }
+            
+            int64_t min = static_cast<int64_t>(std::get<int>(arguments[0]));
+            int64_t max = static_cast<int64_t>(std::get<int>(arguments[1]));
+            last_value = static_cast<int>(sapphire_crypto_random_int(min, max));
+            return;
+            
+        // ===== MILESTONE 3: DATA VISUALIZATION =====
+        } else if (func_name == "__builtin_plot_create__") {
+            if (arguments.size() < 1 || arguments.size() > 3) {
+                throw TypeError("plot_create() requires 1-3 arguments (chart_type, width=800, height=600)");
+            }
+            
+            int chart_type = std::get<int>(arguments[0]);
+            int width = arguments.size() > 1 ? std::get<int>(arguments[1]) : 800;
+            int height = arguments.size() > 2 ? std::get<int>(arguments[2]) : 600;
+            
+            void* plot = sapphire_plot_create(width, height, chart_type);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(plot));
+            return;
+            
+        } else if (func_name == "__builtin_plot_add_line__") {
+            if (arguments.size() < 3 || arguments.size() > 7) {
+                throw TypeError("plot_add_line() requires 3-7 arguments (plot, x_array, y_array, label=\"\", r=0.0, g=0.0, b=1.0)");
+            }
+            
+            void* plot = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            
+            // Get arrays
+            auto x_array = std::get<std::shared_ptr<ArrayValue>>(arguments[1]);
+            auto y_array = std::get<std::shared_ptr<ArrayValue>>(arguments[2]);
+            
+            // Convert to double arrays
+            std::vector<double> x_data, y_data;
+            for (const auto& val : x_array->elements) {
+                if (std::holds_alternative<int>(val)) {
+                    x_data.push_back(static_cast<double>(std::get<int>(val)));
+                } else if (std::holds_alternative<double>(val)) {
+                    x_data.push_back(std::get<double>(val));
+                }
+            }
+            for (const auto& val : y_array->elements) {
+                if (std::holds_alternative<int>(val)) {
+                    y_data.push_back(static_cast<double>(std::get<int>(val)));
+                } else if (std::holds_alternative<double>(val)) {
+                    y_data.push_back(std::get<double>(val));
+                }
+            }
+            
+            std::string label = arguments.size() > 3 ? std::get<std::string>(arguments[3]) : "";
+            double r = arguments.size() > 4 ? std::get<double>(arguments[4]) : 0.0;
+            double g = arguments.size() > 5 ? std::get<double>(arguments[5]) : 0.0;
+            double b = arguments.size() > 6 ? std::get<double>(arguments[6]) : 1.0;
+            
+            sapphire_plot_add_line(plot, x_data.data(), y_data.data(), 
+                                  static_cast<int>(std::min(x_data.size(), y_data.size())), 
+                                  label.c_str(), r, g, b);
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_plot_add_scatter__") {
+            if (arguments.size() < 3 || arguments.size() > 8) {
+                throw TypeError("plot_add_scatter() requires 3-8 arguments (plot, x_array, y_array, label=\"\", r=1.0, g=0.0, b=0.0, marker=1)");
+            }
+            
+            void* plot = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            
+            // Get arrays
+            auto x_array = std::get<std::shared_ptr<ArrayValue>>(arguments[1]);
+            auto y_array = std::get<std::shared_ptr<ArrayValue>>(arguments[2]);
+            
+            // Convert to double arrays
+            std::vector<double> x_data, y_data;
+            for (const auto& val : x_array->elements) {
+                if (std::holds_alternative<int>(val)) {
+                    x_data.push_back(static_cast<double>(std::get<int>(val)));
+                } else if (std::holds_alternative<double>(val)) {
+                    y_data.push_back(std::get<double>(val));
+                }
+            }
+            for (const auto& val : y_array->elements) {
+                if (std::holds_alternative<int>(val)) {
+                    y_data.push_back(static_cast<double>(std::get<int>(val)));
+                } else if (std::holds_alternative<double>(val)) {
+                    y_data.push_back(std::get<double>(val));
+                }
+            }
+            
+            std::string label = arguments.size() > 3 ? std::get<std::string>(arguments[3]) : "";
+            double r = arguments.size() > 4 ? std::get<double>(arguments[4]) : 1.0;
+            double g = arguments.size() > 5 ? std::get<double>(arguments[5]) : 0.0;
+            double b = arguments.size() > 6 ? std::get<double>(arguments[6]) : 0.0;
+            int marker = arguments.size() > 7 ? std::get<int>(arguments[7]) : 1;
+            
+            sapphire_plot_add_scatter(plot, x_data.data(), y_data.data(), 
+                                     static_cast<int>(std::min(x_data.size(), y_data.size())), 
+                                     label.c_str(), r, g, b, marker);
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_plot_add_histogram__") {
+            if (arguments.size() < 2 || arguments.size() > 6) {
+                throw TypeError("plot_add_histogram() requires 2-6 arguments (plot, data_array, bins=20, label=\"\", r=1.0, g=0.5, b=0.0)");
+            }
+            
+            void* plot = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            
+            // Get data array
+            auto data_array = std::get<std::shared_ptr<ArrayValue>>(arguments[1]);
+            
+            // Convert to double array
+            std::vector<double> data;
+            for (const auto& val : data_array->elements) {
+                if (std::holds_alternative<int>(val)) {
+                    data.push_back(static_cast<double>(std::get<int>(val)));
+                } else if (std::holds_alternative<double>(val)) {
+                    data.push_back(std::get<double>(val));
+                }
+            }
+            
+            int bins = arguments.size() > 2 ? std::get<int>(arguments[2]) : 20;
+            std::string label = arguments.size() > 3 ? std::get<std::string>(arguments[3]) : "";
+            double r = arguments.size() > 4 ? std::get<double>(arguments[4]) : 1.0;
+            double g = arguments.size() > 5 ? std::get<double>(arguments[5]) : 0.5;
+            double b = arguments.size() > 6 ? std::get<double>(arguments[6]) : 0.0;
+            
+            sapphire_plot_add_histogram(plot, data.data(), static_cast<int>(data.size()), 
+                                       bins, label.c_str(), r, g, b);
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_plot_set_title__") {
+            if (arguments.size() != 2) {
+                throw TypeError("plot_set_title() requires 2 arguments (plot, title)");
+            }
+            
+            void* plot = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string title = std::get<std::string>(arguments[1]);
+            
+            sapphire_plot_set_title(plot, title.c_str());
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_plot_set_xlabel__") {
+            if (arguments.size() != 2) {
+                throw TypeError("plot_set_xlabel() requires 2 arguments (plot, label)");
+            }
+            
+            void* plot = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string label = std::get<std::string>(arguments[1]);
+            
+            sapphire_plot_set_xlabel(plot, label.c_str());
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_plot_set_ylabel__") {
+            if (arguments.size() != 2) {
+                throw TypeError("plot_set_ylabel() requires 2 arguments (plot, label)");
+            }
+            
+            void* plot = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string label = std::get<std::string>(arguments[1]);
+            
+            sapphire_plot_set_ylabel(plot, label.c_str());
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_plot_show__") {
+            if (arguments.size() != 1) {
+                throw TypeError("plot_show() requires 1 argument (plot)");
+            }
+            
+            void* plot = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sapphire_plot_show(plot);
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_plot_save_svg__") {
+            if (arguments.size() != 2) {
+                throw TypeError("plot_save_svg() requires 2 arguments (plot, filename)");
+            }
+            
+            void* plot = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string filename = std::get<std::string>(arguments[1]);
+            
+            sapphire_plot_save_svg(plot, filename.c_str());
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_quick_plot__") {
+            if (arguments.size() < 1 || arguments.size() > 2) {
+                throw TypeError("quick_plot() requires 1-2 arguments (y_array, title=\"\")");
+            }
+            
+            // Get data array
+            auto y_array = std::get<std::shared_ptr<ArrayValue>>(arguments[0]);
+            
+            // Convert to double array
+            std::vector<double> y_data;
+            for (const auto& val : y_array->elements) {
+                if (std::holds_alternative<int>(val)) {
+                    y_data.push_back(static_cast<double>(std::get<int>(val)));
+                } else if (std::holds_alternative<double>(val)) {
+                    y_data.push_back(std::get<double>(val));
+                }
+            }
+            
+            std::string title = arguments.size() > 1 ? std::get<std::string>(arguments[1]) : "";
+            
+            void* plot = sapphire_quick_plot(y_data.data(), static_cast<int>(y_data.size()), title.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(plot));
+            return;
+            
+        } else if (func_name == "__builtin_quick_scatter__") {
+            if (arguments.size() < 2 || arguments.size() > 3) {
+                throw TypeError("quick_scatter() requires 2-3 arguments (x_array, y_array, title=\"\")");
+            }
+            
+            // Get arrays
+            auto x_array = std::get<std::shared_ptr<ArrayValue>>(arguments[0]);
+            auto y_array = std::get<std::shared_ptr<ArrayValue>>(arguments[1]);
+            
+            // Convert to double arrays
+            std::vector<double> x_data, y_data;
+            for (const auto& val : x_array->elements) {
+                if (std::holds_alternative<int>(val)) {
+                    x_data.push_back(static_cast<double>(std::get<int>(val)));
+                } else if (std::holds_alternative<double>(val)) {
+                    x_data.push_back(std::get<double>(val));
+                }
+            }
+            for (const auto& val : y_array->elements) {
+                if (std::holds_alternative<int>(val)) {
+                    y_data.push_back(static_cast<double>(std::get<int>(val)));
+                } else if (std::holds_alternative<double>(val)) {
+                    y_data.push_back(std::get<double>(val));
+                }
+            }
+            
+            std::string title = arguments.size() > 2 ? std::get<std::string>(arguments[2]) : "";
+            
+            void* plot = sapphire_quick_scatter(x_data.data(), y_data.data(), 
+                                              static_cast<int>(std::min(x_data.size(), y_data.size())), 
+                                              title.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(plot));
+            return;
+            
+        } else if (func_name == "__builtin_quick_histogram__") {
+            if (arguments.size() < 1 || arguments.size() > 3) {
+                throw TypeError("quick_histogram() requires 1-3 arguments (data_array, bins=20, title=\"\")");
+            }
+            
+            // Get data array
+            auto data_array = std::get<std::shared_ptr<ArrayValue>>(arguments[0]);
+            
+            // Convert to double array
+            std::vector<double> data;
+            for (const auto& val : data_array->elements) {
+                if (std::holds_alternative<int>(val)) {
+                    data.push_back(static_cast<double>(std::get<int>(val)));
+                } else if (std::holds_alternative<double>(val)) {
+                    data.push_back(std::get<double>(val));
+                }
+            }
+            
+            int bins = arguments.size() > 1 ? std::get<int>(arguments[1]) : 20;
+            std::string title = arguments.size() > 2 ? std::get<std::string>(arguments[2]) : "";
+            
+            void* plot = sapphire_quick_histogram(data.data(), static_cast<int>(data.size()), 
+                                                bins, title.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(plot));
+            return;
+            
+        // ===== MILESTONE 4: HTTP SERVER/CLIENT =====
+        } else if (func_name == "__builtin_http_server_create__") {
+            // Create HTTP server
+            if (arguments.size() != 1) {
+                throw TypeError("http_server_create() requires 1 argument (port)");
+            }
+            
+            int port = std::get<int>(arguments[0]);
+            void* server = http_server_create(port);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(server));
+            return;
+            
+        } else if (func_name == "__builtin_http_server_start__") {
+            // Start HTTP server
+            if (arguments.size() != 1) {
+                throw TypeError("http_server_start() requires 1 argument (server)");
+            }
+            
+            void* server = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int result = http_server_start(server);
+            last_value = (result == 1);
+            return;
+            
+        } else if (func_name == "__builtin_http_server_stop__") {
+            // Stop HTTP server
+            if (arguments.size() != 1) {
+                throw TypeError("http_server_stop() requires 1 argument (server)");
+            }
+            
+            void* server = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            http_server_stop(server);
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_http_client_create__") {
+            // Create HTTP client
+            if (arguments.size() != 0) {
+                throw TypeError("http_client_create() requires 0 arguments");
+            }
+            
+            void* client = http_client_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(client));
+            return;
+            
+        } else if (func_name == "__builtin_http_client_get__") {
+            // HTTP GET request
+            if (arguments.size() != 2) {
+                throw TypeError("http_client_get() requires 2 arguments (client, url)");
+            }
+            
+            void* client = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string url = std::get<std::string>(arguments[1]);
+            
+            void* response = http_client_get(client, url.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(response));
+            return;
+            
+        } else if (func_name == "__builtin_http_client_post__") {
+            // HTTP POST request
+            if (arguments.size() != 3) {
+                throw TypeError("http_client_post() requires 3 arguments (client, url, body)");
+            }
+            
+            void* client = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string url = std::get<std::string>(arguments[1]);
+            std::string body = std::get<std::string>(arguments[2]);
+            
+            void* response = http_client_post(client, url.c_str(), body.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(response));
+            return;
+            
+        } else if (func_name == "__builtin_http_response_status__") {
+            // Get response status code
+            if (arguments.size() != 1) {
+                throw TypeError("http_response_status() requires 1 argument (response)");
+            }
+            
+            void* response = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int status = http_response_get_status(response);
+            last_value = status;
+            return;
+            
+        } else if (func_name == "__builtin_http_response_body__") {
+            // Get response body
+            if (arguments.size() != 1) {
+                throw TypeError("http_response_body() requires 1 argument (response)");
+            }
+            
+            void* response = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            const char* body = http_response_get_body(response);
+            last_value = std::string(body ? body : "");
+            return;
+            
+        } else if (func_name == "__builtin_http_response_header__") {
+            // Get response header
+            if (arguments.size() != 2) {
+                throw TypeError("http_response_header() requires 2 arguments (response, header_name)");
+            }
+            
+            void* response = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string header_name = std::get<std::string>(arguments[1]);
+            
+            const char* header_value = http_response_get_header(response, header_name.c_str());
+            last_value = std::string(header_value ? header_value : "");
+            return;
+            
+        } else if (func_name == "__builtin_http_url_encode__") {
+            // URL encode string
+            if (arguments.size() != 1) {
+                throw TypeError("http_url_encode() requires 1 argument (string)");
+            }
+            
+            std::string input = std::get<std::string>(arguments[0]);
+            char* encoded = http_url_encode(input.c_str());
+            last_value = std::string(encoded);
+            http_free_string(encoded);
+            return;
+            
+        } else if (func_name == "__builtin_http_url_decode__") {
+            // URL decode string
+            if (arguments.size() != 1) {
+                throw TypeError("http_url_decode() requires 1 argument (string)");
+            }
+            
+            std::string input = std::get<std::string>(arguments[0]);
+            char* decoded = http_url_decode(input.c_str());
+            last_value = std::string(decoded);
+            http_free_string(decoded);
+            return;
+            
+        } else if (func_name == "__builtin_http_html_escape__") {
+            // HTML escape string
+            if (arguments.size() != 1) {
+                throw TypeError("http_html_escape() requires 1 argument (string)");
+            }
+            
+            std::string input = std::get<std::string>(arguments[0]);
+            char* escaped = http_html_escape(input.c_str());
+            last_value = std::string(escaped);
+            http_free_string(escaped);
+            return;
+            
+        // ===== WEBSOCKET SUPPORT =====
+        } else if (func_name == "__builtin_websocket_server_create__") {
+            // Create WebSocket server
+            if (arguments.size() != 1) {
+                throw TypeError("websocket_server_create() requires 1 argument (port)");
+            }
+            
+            int port = std::get<int>(arguments[0]);
+            void* server = sapphire_websocket_server_create(port);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(server));
+            return;
+            
+        } else if (func_name == "__builtin_websocket_server_start__") {
+            // Start WebSocket server
+            if (arguments.size() != 1) {
+                throw TypeError("websocket_server_start() requires 1 argument (server)");
+            }
+            
+            void* server = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int result = sapphire_websocket_server_start(server);
+            last_value = (result == 1);
+            return;
+            
+        } else if (func_name == "__builtin_websocket_server_stop__") {
+            // Stop WebSocket server
+            if (arguments.size() != 1) {
+                throw TypeError("websocket_server_stop() requires 1 argument (server)");
+            }
+            
+            void* server = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sapphire_websocket_server_stop(server);
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_websocket_server_broadcast_text__") {
+            // Broadcast text to all connections
+            if (arguments.size() != 2) {
+                throw TypeError("websocket_server_broadcast_text() requires 2 arguments (server, text)");
+            }
+            
+            void* server = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string text = std::get<std::string>(arguments[1]);
+            sapphire_websocket_server_broadcast_text(server, text.c_str());
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_websocket_server_broadcast_binary__") {
+            // Broadcast binary data to all connections
+            if (arguments.size() != 2) {
+                throw TypeError("websocket_server_broadcast_binary() requires 2 arguments (server, data)");
+            }
+            
+            void* server = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string data = std::get<std::string>(arguments[1]);
+            sapphire_websocket_server_broadcast_binary(server, 
+                reinterpret_cast<const uint8_t*>(data.c_str()), data.length());
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_websocket_server_connection_count__") {
+            // Get connection count
+            if (arguments.size() != 1) {
+                throw TypeError("websocket_server_connection_count() requires 1 argument (server)");
+            }
+            
+            void* server = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int count = sapphire_websocket_server_connection_count(server);
+            last_value = count;
+            return;
+            
+        } else if (func_name == "__builtin_websocket_client_create__") {
+            // Create WebSocket client
+            if (arguments.size() != 0) {
+                throw TypeError("websocket_client_create() requires 0 arguments");
+            }
+            
+            void* client = sapphire_websocket_client_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(client));
+            return;
+            
+        } else if (func_name == "__builtin_websocket_client_connect__") {
+            // Connect WebSocket client
+            if (arguments.size() != 2) {
+                throw TypeError("websocket_client_connect() requires 2 arguments (client, url)");
+            }
+            
+            void* client = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string url = std::get<std::string>(arguments[1]);
+            int result = sapphire_websocket_client_connect(client, url.c_str());
+            last_value = (result == 1);
+            return;
+            
+        } else if (func_name == "__builtin_websocket_client_disconnect__") {
+            // Disconnect WebSocket client
+            if (arguments.size() != 1) {
+                throw TypeError("websocket_client_disconnect() requires 1 argument (client)");
+            }
+            
+            void* client = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sapphire_websocket_client_disconnect(client);
+            last_value = nullptr;
+            return;
+            
+        } else if (func_name == "__builtin_websocket_client_send_text__") {
+            // Send text message
+            if (arguments.size() != 2) {
+                throw TypeError("websocket_client_send_text() requires 2 arguments (client, text)");
+            }
+            
+            void* client = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string text = std::get<std::string>(arguments[1]);
+            int result = sapphire_websocket_client_send_text(client, text.c_str());
+            last_value = (result == 1);
+            return;
+            
+        } else if (func_name == "__builtin_websocket_client_send_binary__") {
+            // Send binary data
+            if (arguments.size() != 2) {
+                throw TypeError("websocket_client_send_binary() requires 2 arguments (client, data)");
+            }
+            
+            void* client = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string data = std::get<std::string>(arguments[1]);
+            int result = sapphire_websocket_client_send_binary(client, 
+                reinterpret_cast<const uint8_t*>(data.c_str()), data.length());
+            last_value = (result == 1);
+            return;
+            
+        } else if (func_name == "__builtin_websocket_client_is_connected__") {
+            // Check if client is connected
+            if (arguments.size() != 1) {
+                throw TypeError("websocket_client_is_connected() requires 1 argument (client)");
+            }
+            
+            void* client = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int result = sapphire_websocket_client_is_connected(client);
+            last_value = (result == 1);
+            return;
+            
+        } else if (func_name == "__builtin_websocket_base64_encode__") {
+            // Base64 encode data
+            if (arguments.size() != 1) {
+                throw TypeError("websocket_base64_encode() requires 1 argument (data)");
+            }
+            
+            std::string data = std::get<std::string>(arguments[0]);
+            char* encoded = sapphire_websocket_base64_encode(
+                reinterpret_cast<const uint8_t*>(data.c_str()), data.length());
+            last_value = std::string(encoded);
+            sapphire_websocket_free_string(encoded);
+            return;
+            
+        } else if (func_name == "__builtin_websocket_base64_decode__") {
+            // Base64 decode data
+            if (arguments.size() != 1) {
+                throw TypeError("websocket_base64_decode() requires 1 argument (encoded)");
+            }
+            
+            std::string encoded = std::get<std::string>(arguments[0]);
+            int size;
+            uint8_t* decoded = sapphire_websocket_base64_decode(encoded.c_str(), &size);
+            last_value = std::string(reinterpret_cast<char*>(decoded), size);
+            sapphire_websocket_free_data(decoded);
+            return;
+            
+        // ===== TEMPLATE ENGINE =====
+        } else if (func_name == "__builtin_html_template_engine_create__") {
+            // Create template engine
+            if (arguments.size() != 0) {
+                throw TypeError("html_template_engine_create() requires 0 arguments");
+            }
+            
+            void* engine = sapphire_html_template_engine_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(engine));
+            return;
+            
+        } else if (func_name == "__builtin_html_template_render__") {
+            // Render template string
+            if (arguments.size() != 3) {
+                throw TypeError("html_template_render() requires 3 arguments (engine, template, context)");
+            }
+            
+            void* engine = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string template_str = std::get<std::string>(arguments[1]);
+            std::string context_str = std::get<std::string>(arguments[2]);
+            
+            // Simple context parsing (key=value pairs separated by ;)
+            std::vector<const char*> keys, values;
+            std::vector<std::string> key_storage, value_storage;
+            
+            size_t pos = 0;
+            while (pos < context_str.length()) {
+                size_t eq_pos = context_str.find('=', pos);
+                if (eq_pos == std::string::npos) break;
+                
+                size_t semi_pos = context_str.find(';', eq_pos);
+                if (semi_pos == std::string::npos) semi_pos = context_str.length();
+                
+                key_storage.push_back(context_str.substr(pos, eq_pos - pos));
+                value_storage.push_back(context_str.substr(eq_pos + 1, semi_pos - eq_pos - 1));
+                
+                keys.push_back(key_storage.back().c_str());
+                values.push_back(value_storage.back().c_str());
+                
+                pos = semi_pos + 1;
+            }
+            
+            char* result = sapphire_html_template_render(engine, template_str.c_str(), 
+                keys.data(), values.data(), keys.size());
+            last_value = std::string(result);
+            sapphire_html_template_free_string(result);
+            return;
+            
+        // ===== DATABASE DRIVERS =====
+        } else if (func_name == "__builtin_postgresql_create__") {
+            // Create PostgreSQL connection
+            if (arguments.size() != 0) {
+                throw TypeError("postgresql_create() requires 0 arguments");
+            }
+            
+            void* conn = sapphire_postgresql_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(conn));
+            return;
+            
+        } else if (func_name == "__builtin_postgresql_connect__") {
+            // Connect to PostgreSQL
+            if (arguments.size() != 2) {
+                throw TypeError("postgresql_connect() requires 2 arguments (connection, connection_string)");
+            }
+            
+            void* conn = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string conn_str = std::get<std::string>(arguments[1]);
+            int result = sapphire_postgresql_connect(conn, conn_str.c_str());
+            last_value = (result == 1);
+            return;
+            
+        } else if (func_name == "__builtin_postgresql_query__") {
+            // Execute PostgreSQL query
+            if (arguments.size() != 2) {
+                throw TypeError("postgresql_query() requires 2 arguments (connection, query)");
+            }
+            
+            void* conn = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string query = std::get<std::string>(arguments[1]);
+            char* result = sapphire_postgresql_query(conn, query.c_str());
+            last_value = std::string(result);
+            sapphire_database_free_result(result);
+            return;
+            
+        } else if (func_name == "__builtin_mysql_create__") {
+            // Create MySQL connection
+            if (arguments.size() != 0) {
+                throw TypeError("mysql_create() requires 0 arguments");
+            }
+            
+            void* conn = sapphire_mysql_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(conn));
+            return;
+            
+        } else if (func_name == "__builtin_mysql_connect__") {
+            // Connect to MySQL
+            if (arguments.size() != 2) {
+                throw TypeError("mysql_connect() requires 2 arguments (connection, connection_string)");
+            }
+            
+            void* conn = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string conn_str = std::get<std::string>(arguments[1]);
+            int result = sapphire_mysql_connect(conn, conn_str.c_str());
+            last_value = (result == 1);
+            return;
+            
+        } else if (func_name == "__builtin_mysql_query__") {
+            // Execute MySQL query
+            if (arguments.size() != 2) {
+                throw TypeError("mysql_query() requires 2 arguments (connection, query)");
+            }
+            
+            void* conn = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string query = std::get<std::string>(arguments[1]);
+            char* result = sapphire_mysql_query(conn, query.c_str());
+            last_value = std::string(result);
+            sapphire_database_free_result(result);
+            return;
         }
     }
     
@@ -2205,6 +3547,84 @@ void Interpreter::visitGetExpr(GetExpr& expr) {
         throw RuntimeError("Undefined method '" + expr.name + "' on class '" + cls->name + "'");
     }
     
+    // Handle array methods
+    if (std::holds_alternative<std::shared_ptr<ArrayValue>>(object)) {
+        auto array = std::get<std::shared_ptr<ArrayValue>>(object);
+        
+        if (expr.name == "push") {
+            last_value = std::make_shared<ArrayMethod>(array, "push");
+            return;
+        } else if (expr.name == "pop") {
+            last_value = std::make_shared<ArrayMethod>(array, "pop");
+            return;
+        } else if (expr.name == "length") {
+            last_value = static_cast<int>(array->elements.size());
+            return;
+        } else if (expr.name == "size") {
+            last_value = static_cast<int>(array->elements.size());
+            return;
+        }
+        
+        throw RuntimeError("Unknown array property '" + expr.name + "'");
+    }
+    
+    // Handle string methods
+    if (std::holds_alternative<std::string>(object)) {
+        std::string str = std::get<std::string>(object);
+        
+        if (expr.name == "length") {
+            last_value = static_cast<int>(str.length());
+            return;
+        } else if (expr.name == "size") {
+            last_value = static_cast<int>(str.length());
+            return;
+        } else if (expr.name == "upper") {
+            last_value = std::make_shared<StringMethod>(str, "upper");
+            return;
+        } else if (expr.name == "lower") {
+            last_value = std::make_shared<StringMethod>(str, "lower");
+            return;
+        } else if (expr.name == "split") {
+            last_value = std::make_shared<StringMethod>(str, "split");
+            return;
+        }
+        
+        throw RuntimeError("Unknown string property '" + expr.name + "'");
+    }
+    
+    // Handle hash map methods
+    if (std::holds_alternative<std::shared_ptr<HashMapValue>>(object)) {
+        auto hashmap = std::get<std::shared_ptr<HashMapValue>>(object);
+        
+        if (expr.name == "get") {
+            last_value = std::make_shared<HashMapMethod>(hashmap, "get");
+            return;
+        } else if (expr.name == "set") {
+            last_value = std::make_shared<HashMapMethod>(hashmap, "set");
+            return;
+        } else if (expr.name == "has") {
+            last_value = std::make_shared<HashMapMethod>(hashmap, "has");
+            return;
+        } else if (expr.name == "remove") {
+            last_value = std::make_shared<HashMapMethod>(hashmap, "remove");
+            return;
+        } else if (expr.name == "keys") {
+            last_value = std::make_shared<HashMapMethod>(hashmap, "keys");
+            return;
+        } else if (expr.name == "values") {
+            last_value = std::make_shared<HashMapMethod>(hashmap, "values");
+            return;
+        } else if (expr.name == "size") {
+            last_value = static_cast<int>(hashmap->pairs.size());
+            return;
+        } else if (expr.name == "length") {
+            last_value = static_cast<int>(hashmap->pairs.size());
+            return;
+        }
+        
+        throw RuntimeError("Unknown hash map property '" + expr.name + "'");
+    }
+    
     if (std::holds_alternative<std::shared_ptr<Instance>>(object)) {
         auto instance = std::get<std::shared_ptr<Instance>>(object);
         
@@ -2258,6 +3678,54 @@ void Interpreter::visitSetExpr(SetExpr& expr) {
     }
     
     throw TypeError("Only instances have settable properties");
+}
+
+void Interpreter::visitIndexAssignExpr(IndexAssignExpr& expr) {
+    Value object = evaluateExpr(*expr.object);
+    Value index = evaluateExpr(*expr.index);
+    Value value = evaluateExpr(*expr.value);
+    
+    // Handle array index assignment
+    if (std::holds_alternative<std::shared_ptr<ArrayValue>>(object)) {
+        auto array = std::get<std::shared_ptr<ArrayValue>>(object);
+        
+        if (std::holds_alternative<int>(index)) {
+            int idx = std::get<int>(index);
+            if (idx >= 0 && idx < static_cast<int>(array->elements.size())) {
+                array->elements[idx] = value;
+                last_value = value;
+                return;
+            } else {
+                throw RuntimeError("Array index out of bounds");
+            }
+        } else {
+            throw TypeError("Array index must be an integer");
+        }
+    }
+    
+    throw TypeError("Only arrays support index assignment");
+}
+
+void Interpreter::visitHashMapExpr(HashMapExpr& expr) {
+    auto hashmap = std::make_shared<HashMapValue>();
+    
+    // Evaluate all key-value pairs
+    for (const auto& pair : expr.pairs) {
+        Value key = evaluateExpr(*pair.first);
+        Value value = evaluateExpr(*pair.second);
+        
+        // Convert key to string
+        std::string keyStr;
+        if (std::holds_alternative<std::string>(key)) {
+            keyStr = std::get<std::string>(key);
+        } else {
+            keyStr = valueToString(key);
+        }
+        
+        hashmap->pairs[keyStr] = value;
+    }
+    
+    last_value = hashmap;
 }
 
 // Statement visitors

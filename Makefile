@@ -3,7 +3,7 @@
 
 CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -O2 -I./src
-LDFLAGS = -lpthread
+LDFLAGS = -lpthread -lssl -lcrypto
 
 # Check for LLVM (optional for now)
 LLVM_CONFIG := $(shell command -v llvm-config 2> /dev/null)
@@ -33,7 +33,21 @@ SOURCES = $(SRCDIR)/main.cpp \
           $(SRCDIR)/repl/repl.cpp \
           $(SRCDIR)/types/type.cpp \
           $(SRCDIR)/semantic/type_checker.cpp \
-          $(SRCDIR)/semantic/type_inference.cpp
+          $(SRCDIR)/semantic/type_inference.cpp \
+          stdlib/collections/array.cpp \
+          stdlib/math/math.cpp \
+          stdlib/io/csv.cpp \
+          stdlib/collections/hashmap.cpp \
+          stdlib/json/json.cpp \
+          stdlib/random/random.cpp \
+          stdlib/plotting/plotting.cpp \
+          stdlib/text/text.cpp \
+          stdlib/io/stream.cpp \
+          stdlib/error/error.cpp \
+          stdlib/http/http.cpp \
+          stdlib/websocket/websocket.cpp \
+          stdlib/template/template.cpp \
+          stdlib/database/database.cpp
 
 # Add codegen if LLVM is available
 ifdef LLVM_CONFIG
@@ -109,6 +123,42 @@ test-stdlib: stdlib/core/string.cpp stdlib/io/file.cpp stdlib/math/math.cpp stdl
 	@echo ""
 	@echo "Running tests..."
 	@./build/tests/test_stdlib
+
+test-milestone1: stdlib/collections/array.cpp stdlib/math/math.cpp stdlib/io/csv.cpp
+	@echo "Building Milestone 1 libraries test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/collections/array.cpp stdlib/math/math.cpp stdlib/io/csv.cpp tests/milestone1_test.cpp -o build/tests/test_milestone1 -lpthread
+	@echo "✓ Test built: build/tests/test_milestone1"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_milestone1
+
+test-milestone4: stdlib/http/http.cpp
+	@echo "Building Milestone 4 HTTP library test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/http/http.cpp tests/milestone4_test.cpp -o build/tests/test_milestone4 -lpthread
+	@echo "✓ Test built: build/tests/test_milestone4"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_milestone4
+
+test-milestone3: stdlib/text/text.cpp stdlib/io/stream.cpp stdlib/error/error.cpp
+	@echo "Building Milestone 3 libraries test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/text/text.cpp stdlib/io/stream.cpp stdlib/error/error.cpp tests/milestone3_test.cpp -o build/tests/test_milestone3 -lpthread
+	@echo "✓ Test built: build/tests/test_milestone3"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_milestone3
+
+test-milestone2: stdlib/collections/hashmap.cpp stdlib/json/json.cpp stdlib/random/random.cpp
+	@echo "Building Milestone 2 libraries test..."
+	@mkdir -p build/tests
+	$(CXX) -std=c++20 -Wall -Wextra -O2 -I. stdlib/collections/hashmap.cpp stdlib/json/json.cpp stdlib/random/random.cpp tests/milestone2_test.cpp -o build/tests/test_milestone2 -lpthread
+	@echo "✓ Test built: build/tests/test_milestone2"
+	@echo ""
+	@echo "Running tests..."
+	@./build/tests/test_milestone2
 
 test-json: stdlib/json/json.cpp stdlib/tests/test_json.cpp
 	@echo "Building JSON test..."

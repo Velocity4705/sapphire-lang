@@ -192,6 +192,47 @@ public:
     }
 };
 
+// Index assignment expression: object[index] = value
+class IndexAssignExpr : public Expr {
+public:
+    std::unique_ptr<Expr> object;
+    std::unique_ptr<Expr> index;
+    std::unique_ptr<Expr> value;
+    
+    IndexAssignExpr(std::unique_ptr<Expr> obj, std::unique_ptr<Expr> idx, std::unique_ptr<Expr> v)
+        : object(std::move(obj)), index(std::move(idx)), value(std::move(v)) {}
+    void accept(ExprVisitor& visitor) override;
+    
+    std::unique_ptr<Expr> clone() const override {
+        return std::make_unique<IndexAssignExpr>(
+            object ? object->clone() : nullptr,
+            index ? index->clone() : nullptr,
+            value ? value->clone() : nullptr
+        );
+    }
+};
+
+// Hash map expression: {"key": value, "key2": value2}
+class HashMapExpr : public Expr {
+public:
+    std::vector<std::pair<std::unique_ptr<Expr>, std::unique_ptr<Expr>>> pairs;
+    
+    explicit HashMapExpr(std::vector<std::pair<std::unique_ptr<Expr>, std::unique_ptr<Expr>>> p)
+        : pairs(std::move(p)) {}
+    void accept(ExprVisitor& visitor) override;
+    
+    std::unique_ptr<Expr> clone() const override {
+        std::vector<std::pair<std::unique_ptr<Expr>, std::unique_ptr<Expr>>> cloned_pairs;
+        for (const auto& pair : pairs) {
+            cloned_pairs.emplace_back(
+                pair.first ? pair.first->clone() : nullptr,
+                pair.second ? pair.second->clone() : nullptr
+            );
+        }
+        return std::make_unique<HashMapExpr>(std::move(cloned_pairs));
+    }
+};
+
 // Pattern base class for pattern matching
 class Pattern {
 public:
@@ -432,6 +473,8 @@ public:
     virtual void visitIndexExpr(IndexExpr& expr) = 0;
     virtual void visitGetExpr(GetExpr& expr) = 0;
     virtual void visitSetExpr(SetExpr& expr) = 0;
+    virtual void visitIndexAssignExpr(IndexAssignExpr& expr) = 0;
+    virtual void visitHashMapExpr(HashMapExpr& expr) = 0;
     virtual void visitMatchExpr(MatchExpr& expr) = 0;
     virtual void visitAwaitExpr(AwaitExpr& expr) = 0;
     virtual void visitChannelExpr(ChannelExpr& expr) = 0;

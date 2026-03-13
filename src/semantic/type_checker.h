@@ -8,13 +8,9 @@
 #include <memory>
 #include <vector>
 #include <stdexcept>
+#include "../error/exception.h"
 
 namespace sapphire {
-
-class TypeError : public std::runtime_error {
-public:
-    explicit TypeError(const std::string& msg) : std::runtime_error(msg) {}
-};
 
 class TypeChecker : public ExprVisitor, public StmtVisitor {
 private:
@@ -74,6 +70,8 @@ public:
     void visitAssignExpr(AssignExpr& expr) override;
     void visitGetExpr(GetExpr& expr) override;
     void visitSetExpr(SetExpr& expr) override;
+    void visitIndexAssignExpr(IndexAssignExpr& expr) override;
+    void visitHashMapExpr(HashMapExpr& expr) override;
     
     // Statement visitors
     void visitExprStmt(ExprStmt& stmt) override;

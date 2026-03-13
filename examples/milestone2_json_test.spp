@@ -1,0 +1,32 @@
+print("=== JSON Support Test ===")
+
+print("1. Creating JSON objects and arrays")
+let obj = json_create_object()
+let arr = json_create_array()
+
+print("2. Setting JSON object values")
+json_set(obj, "name", "Alice")
+json_set(obj, "age", 30)
+json_set(obj, "active", true)
+
+print("3. Converting to JSON string")
+let json_str = json_stringify(obj, false)
+print("JSON string:", json_str)
+
+print("4. Pretty printing JSON")
+let pretty_json = json_stringify(obj, true)
+print("Pretty JSON:")
+print(pretty_json)
+
+print("5. Parsing JSON string")
+let test_json = "{\"city\": \"New York\", \"population\": 8000000, \"famous\": true}"
+let parsed = json_parse(test_json)
+print("Parsed JSON:", json_stringify(parsed, true))
+
+print("6. Getting values from JSON object")
+let name_val = json_get(parsed, "city")
+if name_val != none {
+    print("City:", json_stringify(name_val, false))
+}
+
+print("JSON support test complete!")

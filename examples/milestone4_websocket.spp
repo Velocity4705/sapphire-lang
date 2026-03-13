@@ -1,0 +1,118 @@
+// Milestone 4: WebSocket Support Demo
+// Demonstrates real-time bidirectional communication
+
+print("=== Sapphire WebSocket Demo ===")
+
+// Test 1: WebSocket Server
+print("\n1. Creating WebSocket Server...")
+server = websocket_server_create(8080)
+print("✓ WebSocket server created on port 8080")
+
+// Start the server
+print("\n2. Starting WebSocket Server...")
+started = websocket_server_start(server)
+if started {
+    print("✓ WebSocket server started successfully")
+} else {
+    print("✗ Failed to start WebSocket server")
+}
+
+// Test connection count
+print("\n3. Checking Connection Count...")
+count = websocket_server_connection_count(server)
+print("Current connections: " + str(count))
+
+// Test 2: WebSocket Client
+print("\n4. Creating WebSocket Client...")
+client = websocket_client_create()
+print("✓ WebSocket client created")
+
+// Connect to server
+print("\n5. Connecting to WebSocket Server...")
+connected = websocket_client_connect(client, "ws://localhost:8080")
+if connected {
+    print("✓ Client connected to server")
+} else {
+    print("✗ Failed to connect to server")
+}
+
+// Check connection status
+is_connected = websocket_client_is_connected(client)
+print("Client connection status: " + str(is_connected))
+
+// Test 3: Send Messages
+print("\n6. Testing Message Sending...")
+
+// Send text message
+text_sent = websocket_client_send_text(client, "Hello WebSocket!")
+if text_sent {
+    print("✓ Text message sent successfully")
+} else {
+    print("✗ Failed to send text message")
+}
+
+// Send binary message
+binary_data = "Binary data: " + str([1, 2, 3, 4, 5])
+binary_sent = websocket_client_send_binary(client, binary_data)
+if binary_sent {
+    print("✓ Binary message sent successfully")
+} else {
+    print("✗ Failed to send binary message")
+}
+
+// Test 4: Server Broadcasting
+print("\n7. Testing Server Broadcasting...")
+websocket_server_broadcast_text(server, "Broadcast message to all clients!")
+websocket_server_broadcast_binary(server, "Binary broadcast data")
+print("✓ Broadcast messages sent")
+
+// Test 5: Base64 Encoding/Decoding
+print("\n8. Testing Base64 Utilities...")
+original_data = "Hello, WebSocket World!"
+encoded = websocket_base64_encode(original_data)
+decoded = websocket_base64_decode(encoded)
+
+print("Original: " + original_data)
+print("Encoded:  " + encoded)
+print("Decoded:  " + decoded)
+
+if original_data == decoded {
+    print("✓ Base64 encoding/decoding works correctly")
+} else {
+    print("✗ Base64 encoding/decoding failed")
+}
+
+// Test 6: Connection Management
+print("\n9. Connection Management...")
+count_after = websocket_server_connection_count(server)
+print("Connections after client connect: " + str(count_after))
+
+// Disconnect client
+print("\n10. Disconnecting Client...")
+websocket_client_disconnect(client)
+is_connected_after = websocket_client_is_connected(client)
+print("Client connection status after disconnect: " + str(is_connected_after))
+
+// Stop server
+print("\n11. Stopping WebSocket Server...")
+websocket_server_stop(server)
+print("✓ WebSocket server stopped")
+
+print("\n=== WebSocket Demo Complete ===")
+print("✓ WebSocket server/client functionality")
+print("✓ Real-time bidirectional communication")
+print("✓ Text and binary message support")
+print("✓ Broadcasting capabilities")
+print("✓ Base64 encoding utilities")
+print("✓ Connection management")
+
+// Real-world use cases demonstrated:
+print("\n=== Real-World Applications ===")
+print("• Chat applications with real-time messaging")
+print("• Live data feeds (stock prices, sports scores)")
+print("• Collaborative editing (Google Docs style)")
+print("• Gaming with real-time multiplayer")
+print("• IoT device communication")
+print("• Live notifications and alerts")
+print("• Video/audio streaming coordination")
+print("• Real-time dashboards and monitoring")

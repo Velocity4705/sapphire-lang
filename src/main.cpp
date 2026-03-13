@@ -10,6 +10,7 @@
 #include "codegen/llvm_codegen.h"
 #include "codegen/llvm_codegen.h"
 #include "repl/repl.h"
+#include "error/exception.h"
 
 void printUsage(const char* program) {
     (void)program;
@@ -215,6 +216,9 @@ int main(int argc, char* argv[]) {
             interpreter.interpret(statements);
         }
         
+    } catch (const sapphire::SapphireException& e) {
+        std::cerr << e.getFullErrorMessage() << std::endl;
+        return 1;
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;

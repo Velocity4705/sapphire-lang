@@ -383,7 +383,7 @@ std::unique_ptr<Expr> Parser::assignment() {
         Token equals = previous();
         auto value = assignment();
         
-        // Check if left side is a variable or property
+        // Check if left side is a variable, property, or array index
         if (auto* var = dynamic_cast<VariableExpr*>(expr.get())) {
             return std::make_unique<AssignExpr>(var->name, std::move(value));
         } else if (auto* get = dynamic_cast<GetExpr*>(expr.get())) {
@@ -391,6 +391,11 @@ std::unique_ptr<Expr> Parser::assignment() {
             auto object = std::move(get->object);
             std::string name = get->name;
             return std::make_unique<SetExpr>(std::move(object), name, std::move(value));
+        } else if (auto* index = dynamic_cast<IndexExpr*>(expr.get())) {
+            // Transform "object[index] = value" into an IndexAssignExpr
+            auto object = std::move(index->object);
+            auto idx = std::move(index->index);
+            return std::make_unique<IndexAssignExpr>(std::move(object), std::move(idx), std::move(value));
         }
         
         throw error(equals, "Invalid assignment target");
@@ -606,6 +611,22 @@ std::unique_ptr<Expr> Parser::primary() {
         
         consume(TokenType::RBRACKET, "Expected ']' after list elements");
         return std::make_unique<ListExpr>(std::move(elements));
+    }
+    
+    if (match({TokenType::LBRACE})) {
+        std::vector<std::pair<std::unique_ptr<Expr>, std::unique_ptr<Expr>>> pairs;
+        
+        if (!check(TokenType::RBRACE)) {
+            do {
+                auto key = expression();
+                consume(TokenType::COLON, "Expected ':' after hash map key");
+                auto value = expression();
+                pairs.emplace_back(std::move(key), std::move(value));
+            } while (match({TokenType::COMMA}));
+        }
+        
+        consume(TokenType::RBRACE, "Expected '}' after hash map elements");
+        return std::make_unique<HashMapExpr>(std::move(pairs));
     }
     
     if (match({TokenType::LPAREN})) {

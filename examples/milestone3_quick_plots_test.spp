@@ -1,0 +1,26 @@
+print("=== Milestone 3: Quick Plots Test ===")
+
+print("1. Quick line plot")
+let y_values = [1, 4, 2, 8, 5, 7, 3, 9, 6, 2]
+let quick_line = quick_plot(y_values, "Quick Line Plot")
+plot_show(quick_line)
+
+print("2. Quick scatter plot")
+let x_vals = [1, 2, 3, 4, 5]
+let y_vals = [2, 4, 1, 8, 3]
+let quick_scatter_plot = quick_scatter(x_vals, y_vals, "Quick Scatter")
+plot_show(quick_scatter_plot)
+
+print("3. Quick histogram")
+random_seed(456)
+let hist_data = []
+let i = 0
+while i < 50 {
+    hist_data.push(random_normal(0.0, 1.0))
+    i = i + 1
+}
+
+let quick_hist = quick_histogram(hist_data, 10, "Quick Histogram")
+plot_show(quick_hist)
+
+print("Quick plots test complete!")

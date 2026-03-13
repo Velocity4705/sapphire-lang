@@ -1,0 +1,91 @@
+# 🎯 Milestone 2: Core Language Enhancement - Initial Assessment
+print("╔══════════════════════════════════════════════════════════════╗")
+print("║           MILESTONE 2: INITIAL ASSESSMENT                   ║")
+print("╚══════════════════════════════════════════════════════════════╝")
+print("")
+
+# 1. HASH MAPS - Test current state
+print("1. Hash Maps Assessment:")
+print("   Target: Native syntax like {\"key\": \"value\"}")
+
+# Test if hash map literals work
+# let map = {"name": "Alice", "age": 30}  # This probably won't work yet
+# print("   Hash map:", map)
+
+# Test existing hash map functions (from M2 libraries)
+# These might exist as function calls
+print("   Testing existing hash map functions...")
+# let hm = hashmap_create()  # Check if this exists
+
+print("   ❌ Native hash map syntax not implemented yet")
+print("   ❌ Hash map methods not available yet")
+
+print("")
+
+# 2. JSON SUPPORT - Test current state  
+print("2. JSON Support Assessment:")
+print("   Target: Native JSON parsing and generation")
+
+# Test if JSON parsing works
+# let data = JSON.parse('{\"name\": \"Bob\", \"age\": 25}')  # Probably won't work
+# print("   Parsed JSON:", data)
+
+# Test existing JSON functions (from M2 libraries)
+print("   Testing existing JSON functions...")
+# let json_obj = json_create()  # Check if this exists
+
+print("   ❌ Native JSON syntax not implemented yet")
+print("   ❌ JSON parsing methods not available yet")
+
+print("")
+
+# 3. RANDOM NUMBERS - Test current state
+print("3. Random Numbers Assessment:")
+print("   Target: Built-in random generation")
+
+# Test if random functions work
+# let rand_num = random()  # Probably won't work
+# let rand_int = random_int(1, 10)  # Probably won't work
+
+print("   ❌ Built-in random functions not implemented yet")
+print("   ❌ Random distributions not available yet")
+
+print("")
+
+# 4. ERROR HANDLING - Test current state
+print("4. Error Handling Assessment:")
+print("   Target: Better error messages and stack traces")
+
+# Test current error handling
+print("   Testing current error behavior...")
+# This should show current error handling quality
+# let arr = [1, 2, 3]
+# let bad_access = arr[10]  # This should give an error
+
+print("   Current error handling exists but could be enhanced")
+
+print("")
+
+print("╔══════════════════════════════════════════════════════════════╗")
+print("║                MILESTONE 2 STATUS                           ║")
+print("╚══════════════════════════════════════════════════════════════╝")
+print("")
+print("📊 CURRENT STATE:")
+print("   ❌ Hash Maps: Need native {\"key\": \"value\"} syntax")
+print("   ❌ JSON: Need native JSON parsing and generation")  
+print("   ❌ Random: Need built-in random number functions")
+print("   ⚠️  Errors: Basic error handling exists, needs enhancement")
+print("")
+print("🎯 MILESTONE 2 GOALS:")
+print("   1. Implement native hash map syntax and methods")
+print("   2. Add first-class JSON support")
+print("   3. Build random number generation system")
+print("   4. Enhance error messages and debugging")
+print("")
+print("🚀 READY TO START IMPLEMENTATION!")
+print("")
+print("Priority Order:")
+print("   1. Hash Maps (most critical for data structures)")
+print("   2. JSON Support (essential for web/API work)")
+print("   3. Random Numbers (useful for algorithms/testing)")
+print("   4. Error Handling (improves developer experience)")

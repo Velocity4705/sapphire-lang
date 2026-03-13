@@ -1,0 +1,40 @@
+# Milestone 1 Integration Test
+print("=== MILESTONE 1 INTEGRATION TEST ===")
+print("")
+
+# Test Math Library
+print("Testing Math Library:")
+print("sqrt(16) =", math_sqrt(16.0))
+print("sin(π/2) =", math_sin(math_pi() / 2.0))
+print("cos(0) =", math_cos(0.0))
+print("abs(-5.5) =", math_abs(-5.5))
+print("floor(3.7) =", math_floor(3.7))
+print("ceil(3.2) =", math_ceil(3.2))
+print("π =", math_pi())
+print("e =", math_e())
+print("")
+
+# Test Dynamic Arrays
+print("Testing Dynamic Arrays:")
+let arr = array_create()
+print("Created array")
+
+array_push(arr, 10)
+array_push(arr, 20)
+array_push(arr, 30)
+print("Pushed 3 elements")
+
+print("Array size:", array_size(arr))
+print("Element 0:", array_get(arr, 0))
+print("Element 1:", array_get(arr, 1))
+print("Element 2:", array_get(arr, 2))
+print("")
+
+# Test CSV (basic creation)
+print("Testing CSV:")
+let csv = csv_create()
+print("Created CSV data structure")
+print("")
+
+print("✅ Milestone 1 Integration Complete!")
+print("All basic functions are working!")

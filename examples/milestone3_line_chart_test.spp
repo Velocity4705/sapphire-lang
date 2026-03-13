@@ -1,0 +1,22 @@
+print("=== Milestone 3: Line Chart Test ===")
+
+print("1. Creating sample data")
+let x_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let y_data = [2, 4, 1, 8, 3, 9, 2, 7, 5, 6]
+
+print("2. Creating line plot")
+let plot = plot_create(0, 800, 600)  // 0 = LINE chart type
+plot_set_title(plot, "Sample Line Chart")
+plot_set_xlabel(plot, "X Values")
+plot_set_ylabel(plot, "Y Values")
+
+print("3. Adding data series")
+plot_add_line(plot, x_data, y_data, "Data Series", 0.0, 0.0, 1.0)  // Blue line
+
+print("4. Displaying the plot")
+plot_show(plot)
+
+print("5. Saving as SVG")
+plot_save_svg(plot, "line_chart.svg")
+
+print("Line chart test complete!")

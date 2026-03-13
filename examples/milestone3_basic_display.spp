@@ -1,0 +1,14 @@
+print("=== Milestone 3: Basic Display Test ===")
+
+print("1. Creating a simple line plot")
+let y_data = [1, 4, 2, 8, 5, 7, 3]
+let plot1 = quick_plot(y_data, "Simple Line Chart")
+plot_show(plot1)
+
+print("2. Creating a scatter plot")
+let x_data = [1, 2, 3, 4, 5]
+let y_scatter = [2, 4, 1, 8, 3]
+let plot2 = quick_scatter(x_data, y_scatter, "Scatter Plot Example")
+plot_show(plot2)
+
+print("Basic display test complete!")

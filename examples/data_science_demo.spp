@@ -1,0 +1,127 @@
+# Data Science Demo - Milestone 1
+print("╔══════════════════════════════════════════════════════════════╗")
+print("║              SAPPHIRE DATA SCIENCE DEMO                     ║")
+print("╚══════════════════════════════════════════════════════════════╝")
+print("")
+
+# Create sample sales data
+print("=== SALES DATA ANALYSIS ===")
+let sales = array_create()
+array_push(sales, 100)
+array_push(sales, 150)
+array_push(sales, 120)
+array_push(sales, 180)
+array_push(sales, 200)
+array_push(sales, 175)
+array_push(sales, 160)
+array_push(sales, 190)
+array_push(sales, 210)
+array_push(sales, 185)
+
+print("Monthly sales data (10 months):")
+let i = 0
+while i < array_size(sales):
+    print("Month", i + 1, ":", array_get(sales, i))
+    i = i + 1
+
+# Calculate statistics
+print("")
+print("=== STATISTICAL ANALYSIS ===")
+
+# Calculate total and mean
+let total = 0
+i = 0
+while i < array_size(sales):
+    total = total + array_get(sales, i)
+    i = i + 1
+
+let mean = total / array_size(sales)
+print("Total sales:", total)
+print("Average sales:", mean)
+
+# Find min and max
+let min_sales = array_get(sales, 0)
+let max_sales = array_get(sales, 0)
+i = 1
+while i < array_size(sales):
+    let value = array_get(sales, i)
+    if value < min_sales:
+        min_sales = value
+    if value > max_sales:
+        max_sales = value
+    i = i + 1
+
+print("Minimum sales:", min_sales)
+print("Maximum sales:", max_sales)
+print("Range:", max_sales - min_sales)
+
+# Calculate variance and standard deviation
+let variance_sum = 0.0
+i = 0
+while i < array_size(sales):
+    let diff = array_get(sales, i) - mean
+    variance_sum = variance_sum + (diff * diff)
+    i = i + 1
+
+let variance = variance_sum / array_size(sales)
+let std_dev = math_sqrt(variance)
+print("Variance:", variance)
+print("Standard deviation:", std_dev)
+
+print("")
+print("=== MATHEMATICAL FUNCTIONS DEMO ===")
+
+# Demonstrate various math functions
+let angle = math_pi() / 4.0  # 45 degrees
+print("Trigonometry (45°):")
+print("  sin(π/4) =", math_sin(angle))
+print("  cos(π/4) =", math_cos(angle))
+
+print("Exponential and logarithmic:")
+print("  exp(1) =", math_exp(1.0))
+print("  log(e) =", math_log(math_e()))
+print("  pow(2, 8) =", math_pow(2.0, 8.0))
+
+print("Rounding functions:")
+let test_value = 3.7
+print("  floor(3.7) =", math_floor(test_value))
+print("  ceil(3.7) =", math_ceil(test_value))
+
+print("")
+print("=== PERFORMANCE TEST ===")
+
+# Create a larger dataset for performance testing
+let large_data = array_create()
+let count = 1000
+i = 0
+while i < count:
+    array_push(large_data, i * i)  # Square numbers
+    i = i + 1
+
+print("Created array with", array_size(large_data), "elements")
+
+# Calculate sum of squares
+let sum_of_squares = 0
+i = 0
+while i < array_size(large_data):
+    sum_of_squares = sum_of_squares + array_get(large_data, i)
+    i = i + 1
+
+print("Sum of first 1000 squares:", sum_of_squares)
+
+# Mathematical verification: sum of squares formula n(n+1)(2n+1)/6
+let n = count - 1  # 0 to 999
+let formula_result = (n * (n + 1) * (2 * n + 1)) / 6
+print("Formula verification:", formula_result)
+
+print("")
+print("╔══════════════════════════════════════════════════════════════╗")
+print("║                    DEMO COMPLETE! ✅                        ║")
+print("╚══════════════════════════════════════════════════════════════╝")
+print("")
+print("🎯 Milestone 1 Achievements:")
+print("✅ Dynamic Arrays - Fast data structures")
+print("✅ Mathematical Functions - Complete math library")
+print("✅ Statistical Analysis - Mean, variance, std dev")
+print("✅ Performance - 1000+ element processing")
+print("✅ Data Science Foundation - Ready for real-world use!")

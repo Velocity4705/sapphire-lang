@@ -1,0 +1,37 @@
+print("=== Random Numbers Test ===")
+
+print("1. Setting random seed for reproducible results")
+random_seed(42)
+
+print("2. Uniform random numbers [0, 1)")
+print("random():", random())
+print("random():", random())
+print("random():", random())
+
+print("3. Uniform random numbers in range")
+print("random(10.0, 20.0):", random(10.0, 20.0))
+print("random(10.0, 20.0):", random(10.0, 20.0))
+
+print("4. Random integers")
+print("random_int(1, 10):", random_int(1, 10))
+print("random_int(1, 10):", random_int(1, 10))
+print("random_int(1, 10):", random_int(1, 10))
+
+print("5. Normal distribution (mean=0, stddev=1)")
+print("random_normal():", random_normal())
+print("random_normal():", random_normal())
+
+print("6. Normal distribution with parameters")
+print("random_normal(100.0, 15.0):", random_normal(100.0, 15.0))
+print("random_normal(100.0, 15.0):", random_normal(100.0, 15.0))
+
+print("7. Random booleans")
+print("random_boolean():", random_boolean())
+print("random_boolean(0.3):", random_boolean(0.3))
+print("random_boolean(0.7):", random_boolean(0.7))
+
+print("8. Cryptographic random numbers")
+print("crypto_random():", crypto_random())
+print("crypto_random_int(1, 100):", crypto_random_int(1, 100))
+
+print("Random numbers test complete!")

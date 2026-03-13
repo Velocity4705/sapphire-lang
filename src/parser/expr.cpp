@@ -42,6 +42,14 @@ void SetExpr::accept(ExprVisitor& visitor) {
     visitor.visitSetExpr(*this);
 }
 
+void IndexAssignExpr::accept(ExprVisitor& visitor) {
+    visitor.visitIndexAssignExpr(*this);
+}
+
+void HashMapExpr::accept(ExprVisitor& visitor) {
+    visitor.visitHashMapExpr(*this);
+}
+
 void MatchExpr::accept(ExprVisitor& visitor) {
     visitor.visitMatchExpr(*this);
 }

@@ -69,17 +69,37 @@ namespace Math {
 } // namespace stdlib
 } // namespace sapphire
 
-// C API
 extern "C" {
+    // Basic operations
+    double sapphire_math_abs(double x);
+    double sapphire_math_min(double a, double b);
+    double sapphire_math_max(double a, double b);
+    
+    // Trigonometry
     double sapphire_math_sin(double x);
     double sapphire_math_cos(double x);
     double sapphire_math_tan(double x);
-    double sapphire_math_sqrt(double x);
+    double sapphire_math_asin(double x);
+    double sapphire_math_acos(double x);
+    double sapphire_math_atan(double x);
+    double sapphire_math_atan2(double y, double x);
+    
+    // Exponential and logarithmic
+    double sapphire_math_exp(double x);
+    double sapphire_math_log(double x);
+    double sapphire_math_log10(double x);
+    double sapphire_math_log2(double x);
     double sapphire_math_pow(double x, double y);
-    double sapphire_math_abs(double x);
+    double sapphire_math_sqrt(double x);
+    
+    // Rounding
     double sapphire_math_floor(double x);
     double sapphire_math_ceil(double x);
     double sapphire_math_round(double x);
+    
+    // Constants
+    double sapphire_math_pi();
+    double sapphire_math_e();
 }
 
 #endif // SAPPHIRE_STDLIB_MATH_H

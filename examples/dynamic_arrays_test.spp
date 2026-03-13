@@ -1,0 +1,51 @@
+# Dynamic Arrays Test - Milestone 1 Implementation
+
+print("=== Dynamic Arrays Test ===")
+
+# Test integer arrays
+print("Testing integer arrays...")
+
+# Create array (this will need to be implemented in the compiler)
+# For now, we'll simulate the API calls that need to be added
+
+print("1. Create integer array")
+# let int_array = array_create()
+
+print("2. Push integers")
+# array_push(int_array, 10)
+# array_push(int_array, 20)
+# array_push(int_array, 30)
+
+print("3. Get array size")
+# let size = array_size(int_array)
+# print("Array size:", size)
+
+print("4. Get elements")
+# let first = array_get(int_array, 0)
+# let second = array_get(int_array, 1)
+# let third = array_get(int_array, 2)
+# print("Elements:", first, second, third)
+
+print("5. Set element")
+# array_set(int_array, 1, 25)
+# let updated = array_get(int_array, 1)
+# print("Updated element:", updated)
+
+print("6. Pop element")
+# let popped = array_pop(int_array)
+# print("Popped:", popped)
+# print("New size:", array_size(int_array))
+
+print("=== Test Complete ===")
+print("Note: This test shows the API design.")
+print("Implementation requires compiler integration.")
+
+# Demonstrate what we want to achieve:
+print("\n=== Target Usage Example ===")
+print("let data = array_create()")
+print("array_push(data, 100)")
+print("array_push(data, 200)")
+print("let size = array_size(data)  # Should be 2")
+print("let first = array_get(data, 0)  # Should be 100")
+print("array_set(data, 0, 150)")
+print("let updated = array_get(data, 0)  # Should be 150")

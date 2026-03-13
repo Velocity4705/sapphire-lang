@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="white"/>
+  <text x="400" y="30" text-anchor="middle" font-size="16">Random Data Distribution</text>
+  <circle cx="50" cy="425" r="2" fill="rgb(255,127,0)"/>
+  <circle cx="283.333" cy="550" r="2" fill="rgb(255,127,0)"/>
+  <circle cx="516.667" cy="175" r="2" fill="rgb(255,127,0)"/>
+  <circle cx="750" cy="50" r="2" fill="rgb(255,127,0)"/>
+</svg>

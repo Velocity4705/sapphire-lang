@@ -23,6 +23,8 @@ class Class;
 class Instance;
 class BoundMethod;
 struct ArrayValue;
+struct HashMapValue;
+class HashMapMethod;
 
 // Function object to store function definitions
 class Function {
@@ -89,9 +91,12 @@ class OptionValue;
 class OptionMethod;
 class ResultValue;
 class ResultMethod;
+class ArrayMethod;
+class StringMethod;
 
 using Value = std::variant<int, double, std::string, bool, std::nullptr_t, 
                            std::shared_ptr<ArrayValue>,
+                           std::shared_ptr<HashMapValue>,
                            std::shared_ptr<Function>,
                            std::shared_ptr<Class>,
                            std::shared_ptr<Instance>,
@@ -104,11 +109,49 @@ using Value = std::variant<int, double, std::string, bool, std::nullptr_t,
                            std::shared_ptr<OptionValue>,
                            std::shared_ptr<OptionMethod>,
                            std::shared_ptr<ResultValue>,
-                           std::shared_ptr<ResultMethod>>;
+                           std::shared_ptr<ResultMethod>,
+                           std::shared_ptr<ArrayMethod>,
+                           std::shared_ptr<StringMethod>,
+                           std::shared_ptr<HashMapMethod>>;
 
 // Array type (defined after Value)
 struct ArrayValue {
     std::vector<Value> elements;
+};
+
+// Hash map type
+struct HashMapValue {
+    std::map<std::string, Value> pairs;
+    
+    // Helper methods
+    bool has(const std::string& key) const {
+        return pairs.find(key) != pairs.end();
+    }
+    
+    Value get(const std::string& key) const {
+        auto it = pairs.find(key);
+        return it != pairs.end() ? it->second : Value(nullptr);
+    }
+    
+    void set(const std::string& key, const Value& value) {
+        pairs[key] = value;
+    }
+    
+    bool remove(const std::string& key) {
+        return pairs.erase(key) > 0;
+    }
+    
+    size_t size() const {
+        return pairs.size();
+    }
+    
+    std::vector<std::string> keys() const {
+        std::vector<std::string> result;
+        for (const auto& pair : pairs) {
+            result.push_back(pair.first);
+        }
+        return result;
+    }
 };
 
 // Channel method wrapper (like BoundMethod but for channels)
@@ -282,6 +325,36 @@ public:
         : result(std::move(res)), method_name(name) {}
 };
 
+// Array method wrapper (for array methods like push, pop)
+class ArrayMethod {
+public:
+    std::shared_ptr<ArrayValue> array;
+    std::string method_name;
+    
+    ArrayMethod(std::shared_ptr<ArrayValue> arr, const std::string& name)
+        : array(std::move(arr)), method_name(name) {}
+};
+
+// String method wrapper (for string methods like split, upper)
+class StringMethod {
+public:
+    std::string string_value;
+    std::string method_name;
+    
+    StringMethod(const std::string& str, const std::string& name)
+        : string_value(str), method_name(name) {}
+};
+
+// Hash map method wrapper (for hash map methods like get, set, keys)
+class HashMapMethod {
+public:
+    std::shared_ptr<HashMapValue> hashmap;
+    std::string method_name;
+    
+    HashMapMethod(std::shared_ptr<HashMapValue> hm, const std::string& name)
+        : hashmap(std::move(hm)), method_name(name) {}
+};
+
 // Instance of a class
 class Instance {
 public:
@@ -384,6 +457,8 @@ public:
     void visitIndexExpr(IndexExpr& expr) override;
     void visitGetExpr(GetExpr& expr) override;
     void visitSetExpr(SetExpr& expr) override;
+    void visitIndexAssignExpr(IndexAssignExpr& expr) override;
+    void visitHashMapExpr(HashMapExpr& expr) override;
     void visitMatchExpr(MatchExpr& expr) override;
     void visitAwaitExpr(AwaitExpr& expr) override;
     void visitChannelExpr(ChannelExpr& expr) override;
