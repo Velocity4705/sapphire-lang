@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Sapphire Beta.3 - Complete Examples Test Suite
+# Sapphire Beta.4 - Complete Examples Test Suite
 # Tests all educational examples to verify language functionality
 
 set -e
@@ -12,7 +12,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║              SAPPHIRE BETA.3 - EXAMPLES TEST SUITE           ║"
+echo "║              SAPPHIRE BETA.4 - EXAMPLES TEST SUITE           ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -24,8 +24,8 @@ fi
 
 # Create results directory
 mkdir -p test_results
-RESULTS_FILE="test_results/beta3_examples_results.txt"
-echo "Sapphire Beta.3 Examples Test Results" > $RESULTS_FILE
+RESULTS_FILE="test_results/beta4_examples_results.txt"
+echo "Sapphire Beta.4 Examples Test Results" > $RESULTS_FILE
 echo "Started: $(date)" >> $RESULTS_FILE
 echo "========================================" >> $RESULTS_FILE
 
@@ -253,14 +253,14 @@ echo -e "${GREEN}Passed: $PASSED_TESTS${NC}"
 echo -e "${RED}Failed: $FAILED_TESTS${NC}"
 
 if [ $FAILED_TESTS -eq 0 ]; then
-    echo -e "${GREEN}🎉 ALL EXAMPLES PASSED! Sapphire Beta.3 is ready! 🎉${NC}"
+    echo -e "${GREEN}🎉 ALL EXAMPLES PASSED! Sapphire Beta.4 is ready! 🎉${NC}"
     SUCCESS_RATE=100
 else
     SUCCESS_RATE=$(( PASSED_TESTS * 100 / TOTAL_TESTS ))
     echo -e "${YELLOW}Success Rate: ${SUCCESS_RATE}%${NC}"
     
     if [ $SUCCESS_RATE -ge 90 ]; then
-        echo -e "${GREEN}✅ Excellent! Beta.3 is in great shape!${NC}"
+        echo -e "${GREEN}✅ Excellent! Beta.4 is in great shape!${NC}"
     elif [ $SUCCESS_RATE -ge 80 ]; then
         echo -e "${YELLOW}⚠️  Good, but some issues need attention.${NC}"
     else
