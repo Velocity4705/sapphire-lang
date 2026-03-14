@@ -32,6 +32,7 @@ fi
 # Build
 echo ""
 echo "Building Sapphire..."
+make clean
 make quick
 
 echo ""
