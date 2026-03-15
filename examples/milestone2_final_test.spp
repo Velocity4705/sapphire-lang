@@ -1,3 +1,5 @@
+import json
+import random
 print("=== Milestone 2 - Final Comprehensive Test ===")
 
 print("\n1. Hash Maps - Complete Implementation")
@@ -69,13 +71,14 @@ print(json_stringify(analysis, true))
 print("\n5. Performance Test - Large Hash Map")
 let large_map = {}
 let i = 0
-while i < 1000 {
+while i < 1000:
     let key = "key_" + i
     large_map.set(key, random_int(1, 1000))
     i = i + 1
-}
-print("Large map created with", large_map.size, "entries")
-print("Sample value:", large_map.get("key_500"))
+print("Large map created with")
+print(large_map.size)
+print("Sample value:")
+print(large_map.get("key_500"))
 
 print("\n=== MILESTONE 2 COMPLETE! ===")
 print("✅ Hash Maps: Literals, methods, performance")

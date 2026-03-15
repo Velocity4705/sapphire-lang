@@ -1,3 +1,5 @@
+import random
+import plotting
 print("=== Milestone 3: Histogram Test ===")
 
 print("1. Generating normal distribution data")
@@ -5,7 +7,7 @@ random_seed(123)
 let data = []
 
 let i = 0
-while i < 100 {
+while i < 100:
     data.push(random_normal(50.0, 10.0))
     i = i + 1
 }
@@ -13,13 +15,13 @@ while i < 100 {
 print("Generated", data.length, "data points")
 
 print("2. Creating histogram")
-let plot = plot_create(3, 800, 600)  // 3 = HISTOGRAM chart type
+let plot = plot_create(3, 800, 600)  
 plot_set_title(plot, "Normal Distribution Histogram")
 plot_set_xlabel(plot, "Value")
 plot_set_ylabel(plot, "Frequency")
 
 print("3. Adding histogram data")
-plot_add_histogram(plot, data, 15, "Normal Data", 1.0, 0.5, 0.0)  // Orange bars
+plot_add_histogram(plot, data, 15, "Normal Data", 1.0, 0.5, 0.0)  
 
 print("4. Displaying the plot")
 plot_show(plot)

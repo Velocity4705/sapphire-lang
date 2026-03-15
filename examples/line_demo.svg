@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#ffffff"/>
+  <rect x="70" y="50" width="700" height="490" fill="#f8f9fa" stroke="#cccccc" stroke-width="1"/>
+  <g stroke="#dddddd" stroke-width="1" stroke-dasharray="4,3">
+    <line x1="70" y1="50" x2="770" y2="50"/>
+    <line x1="70" y1="50" x2="70" y2="540"/>
+    <line x1="70" y1="148" x2="770" y2="148"/>
+    <line x1="210" y1="50" x2="210" y2="540"/>
+    <line x1="70" y1="246" x2="770" y2="246"/>
+    <line x1="350" y1="50" x2="350" y2="540"/>
+    <line x1="70" y1="344" x2="770" y2="344"/>
+    <line x1="490" y1="50" x2="490" y2="540"/>
+    <line x1="70" y1="442" x2="770" y2="442"/>
+    <line x1="630" y1="50" x2="630" y2="540"/>
+    <line x1="70" y1="540" x2="770" y2="540"/>
+    <line x1="770" y1="50" x2="770" y2="540"/>
+  </g>
+  <g stroke="#333333" stroke-width="2">
+    <line x1="70" y1="540" x2="770" y2="540"/>
+    <line x1="70" y1="50" x2="70" y2="540"/>
+  </g>
+  <g font-family="Arial,sans-serif" font-size="11" fill="#444444">
+    <line x1="70" y1="540" x2="70" y2="545" stroke="#333333" stroke-width="1"/>
+    <text x="70" y="558" text-anchor="middle">1</text>
+    <line x1="65" y1="50" x2="70" y2="50" stroke="#333333" stroke-width="1"/>
+    <text x="62" y="54" text-anchor="end">9.4</text>
+    <line x1="210" y1="540" x2="210" y2="545" stroke="#333333" stroke-width="1"/>
+    <text x="210" y="558" text-anchor="middle">2.8</text>
+    <line x1="65" y1="148" x2="70" y2="148" stroke="#333333" stroke-width="1"/>
+    <text x="62" y="152" text-anchor="end">7.72</text>
+    <line x1="350" y1="540" x2="350" y2="545" stroke="#333333" stroke-width="1"/>
+    <text x="350" y="558" text-anchor="middle">4.6</text>
+    <line x1="65" y1="246" x2="70" y2="246" stroke="#333333" stroke-width="1"/>
+    <text x="62" y="250" text-anchor="end">6.04</text>
+    <line x1="490" y1="540" x2="490" y2="545" stroke="#333333" stroke-width="1"/>
+    <text x="490" y="558" text-anchor="middle">6.4</text>
+    <line x1="65" y1="344" x2="70" y2="344" stroke="#333333" stroke-width="1"/>
+    <text x="62" y="348" text-anchor="end">4.36</text>
+    <line x1="630" y1="540" x2="630" y2="545" stroke="#333333" stroke-width="1"/>
+    <text x="630" y="558" text-anchor="middle">8.2</text>
+    <line x1="65" y1="442" x2="70" y2="442" stroke="#333333" stroke-width="1"/>
+    <text x="62" y="446" text-anchor="end">2.68</text>
+    <line x1="770" y1="540" x2="770" y2="545" stroke="#333333" stroke-width="1"/>
+    <text x="770" y="558" text-anchor="middle">10</text>
+    <line x1="65" y1="540" x2="70" y2="540" stroke="#333333" stroke-width="1"/>
+    <text x="62" y="544" text-anchor="end">1</text>
+  </g>
+  <text x="420" y="590" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#222222">X</text>
+  <text transform="rotate(-90)" x="-295" y="18" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#222222">Y</text>
+  <text x="420" y="38" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="bold" fill="#111111">Sample Line Chart</text>
+  <clipPath id="plotarea">
+    <rect x="70" y="50" width="700" height="490"/>
+  </clipPath>
+  <g clip-path="url(#plotarea)">
+    <polyline fill="none" stroke="#2196F3" stroke-width="2" stroke-linejoin="round" points="70,481.667 147.778,365 225.556,540 303.333,131.667 381.111,423.333 458.889,73.3333 536.667,481.667 614.444,190 692.222,306.667 770,248.333"/>
+    <circle cx="70" cy="481.667" r="3" fill="#2196F3"/>
+    <circle cx="147.778" cy="365" r="3" fill="#2196F3"/>
+    <circle cx="225.556" cy="540" r="3" fill="#2196F3"/>
+    <circle cx="303.333" cy="131.667" r="3" fill="#2196F3"/>
+    <circle cx="381.111" cy="423.333" r="3" fill="#2196F3"/>
+    <circle cx="458.889" cy="73.3333" r="3" fill="#2196F3"/>
+    <circle cx="536.667" cy="481.667" r="3" fill="#2196F3"/>
+    <circle cx="614.444" cy="190" r="3" fill="#2196F3"/>
+    <circle cx="692.222" cy="306.667" r="3" fill="#2196F3"/>
+    <circle cx="770" cy="248.333" r="3" fill="#2196F3"/>
+  </g>
+  <rect x="640" y="60" width="120" height="30" fill="white" stroke="#cccccc" stroke-width="1" rx="3"/>
+  <rect x="648" y="70" width="14" height="12" fill="#2196F3" rx="2"/>
+  <text x="668" y="76" font-family="Arial,sans-serif" font-size="11" fill="#333333">Series A</text>
+</svg>

@@ -1,0 +1,71 @@
+import plot3d
+import math
+
+print("=== 3D Plot Demo ===")
+
+# --- 1. Surface plot: z = sin(x) * cos(y) ---
+print("\n1. Surface: sin(x)*cos(y)")
+let rows = 30
+let cols = 30
+let z = []
+let r = 0
+while r < rows:
+    let c = 0
+    while c < cols:
+        let x = -3.14 + r * 6.28 / (rows - 1)
+        let y = -3.14 + c * 6.28 / (cols - 1)
+        z.push(math_sin(x) * math_cos(y))
+        c = c + 1
+    r = r + 1
+
+let surf = plot3d_create()
+plot3d_add_surface(surf, z, rows, cols, "sin(x)*cos(y)", "Viridis")
+plot3d_set_title(surf, "3D Surface: sin(x) * cos(y)")
+plot3d_set_xlabel(surf, "X")
+plot3d_set_ylabel(surf, "Y")
+plot3d_set_zlabel(surf, "Z")
+plot3d_save_html(surf, "surface_plot.html")
+
+# --- 2. 3D Scatter plot ---
+print("\n2. Scatter: helix")
+let hx = []
+let hy = []
+let hz = []
+let i = 0
+while i < 60:
+    let t = i * 0.2
+    hx.push(math_sin(t))
+    hy.push(math_cos(t))
+    hz.push(t * 0.15)
+    i = i + 1
+
+let sc = plot3d_create()
+plot3d_add_scatter(sc, hx, hy, hz, "Helix")
+plot3d_set_title(sc, "3D Scatter: Helix")
+plot3d_set_xlabel(sc, "X")
+plot3d_set_ylabel(sc, "Y")
+plot3d_set_zlabel(sc, "Z")
+plot3d_save_html(sc, "scatter3d_plot.html")
+
+# --- 3. 3D Line plot ---
+print("\n3. Line: spiral")
+let lx = []
+let ly = []
+let lz = []
+i = 0
+while i < 100:
+    let t = i * 0.15
+    lx.push(math_sin(t) * (1.0 + t * 0.05))
+    ly.push(math_cos(t) * (1.0 + t * 0.05))
+    lz.push(t * 0.1)
+    i = i + 1
+
+let ln = plot3d_create()
+plot3d_add_line(ln, lx, ly, lz, "Spiral")
+plot3d_set_title(ln, "3D Line: Growing Spiral")
+plot3d_set_xlabel(ln, "X")
+plot3d_set_ylabel(ln, "Y")
+plot3d_set_zlabel(ln, "Z")
+plot3d_save_html(ln, "line3d_plot.html")
+
+print("\n=== Done — open .html files in your browser ===")

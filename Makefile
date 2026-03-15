@@ -3,7 +3,8 @@
 
 CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -O2 -I./src
-LDFLAGS = -lpthread -lssl -lcrypto
+LDFLAGS = -lpthread -lssl -lcrypto $(shell pkg-config --libs sdl2 SDL2_ttf 2>/dev/null)
+CXXFLAGS += $(shell pkg-config --cflags sdl2 SDL2_ttf 2>/dev/null)
 
 # Check for LLVM (optional for now)
 LLVM_CONFIG := $(shell command -v llvm-config 2> /dev/null)
@@ -41,13 +42,37 @@ SOURCES = $(SRCDIR)/main.cpp \
           stdlib/json/json.cpp \
           stdlib/random/random.cpp \
           stdlib/plotting/plotting.cpp \
+          stdlib/plot3d/plot3d.cpp \
           stdlib/text/text.cpp \
           stdlib/io/stream.cpp \
           stdlib/error/error.cpp \
           stdlib/http/http.cpp \
           stdlib/websocket/websocket.cpp \
           stdlib/template/template.cpp \
-          stdlib/database/database.cpp
+          stdlib/database/database.cpp \
+          stdlib/orm/orm.cpp \
+          stdlib/auth/auth.cpp \
+          stdlib/rest/rest.cpp \
+          stdlib/graphql/graphql.cpp \
+          stdlib/graphql/graphql_capi.cpp \
+          stdlib/blockchain/blockchain.cpp \
+          stdlib/blockchain/blockchain_capi.cpp \
+          stdlib/crypto/crypto.cpp \
+          stdlib/crypto/crypto_capi.cpp \
+          stdlib/smartcontract/smartcontract.cpp \
+          stdlib/smartcontract/smartcontract_capi.cpp \
+          stdlib/dapp/dapp.cpp \
+          stdlib/dapp/dapp_capi.cpp \
+          stdlib/security/security.cpp \
+          stdlib/security/security_capi.cpp \
+          stdlib/mobile/mobile.cpp \
+          stdlib/mobile/mobile_capi.cpp \
+          stdlib/game/game.cpp \
+          stdlib/game/game_capi.cpp \
+          stdlib/system/sysprog.cpp \
+          stdlib/gui/gui.cpp \
+          stdlib/gui/gui_capi.cpp \
+          stdlib/network/network.cpp
 
 # Add codegen if LLVM is available
 ifdef LLVM_CONFIG

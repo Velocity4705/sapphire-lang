@@ -1,0 +1,338 @@
+import game
+
+print("=== Milestone 9: Game Development ===")
+print("")
+
+# ============================================================
+# Phase 1: Graphics Engine
+# ============================================================
+print("--- Phase 1: Graphics Engine ---")
+
+# Renderer
+renderer = game_renderer_create("My Game", 1280, 720)
+print("Renderer created:")
+print(game_renderer_title(renderer))
+print(game_renderer_width(renderer))
+print(game_renderer_height(renderer))
+
+# Clear and present
+game_renderer_clear(renderer, 0.1, 0.1, 0.2, 1.0)
+game_renderer_present(renderer)
+print("Renderer cleared and presented")
+
+# Texture
+tex = game_texture_create(renderer, 64, 64)
+print("Texture created:")
+print(game_texture_width(tex))
+print(game_texture_height(tex))
+
+tex2 = game_texture_load(renderer, "assets/player.png")
+print("Texture loaded from path:")
+print(game_texture_path(tex2))
+
+# Sprite
+sprite = game_sprite_create(tex, 100.0, 200.0)
+print("Sprite created:")
+print(game_sprite_x(sprite))
+print(game_sprite_y(sprite))
+
+game_sprite_set_position(sprite, 150.0, 250.0)
+game_sprite_set_scale(sprite, 2.0, 2.0)
+game_sprite_set_rotation(sprite, 45.0)
+game_sprite_set_color(sprite, 1.0, 0.5, 0.0, 1.0)
+game_sprite_set_visible(sprite, 1)
+print(game_sprite_to_string(sprite))
+print(game_sprite_scale_x(sprite))
+print(game_sprite_rotation(sprite))
+
+# Shader
+vert_src = "void main() { gl_Position = vec4(pos, 1.0); }"
+frag_src = "void main() { fragColor = vec4(1.0); }"
+shader = game_shader_create("basic", vert_src, frag_src)
+game_shader_set_float(shader, "time", 1.5)
+game_shader_set_int(shader, "texture_unit", 0)
+game_shader_set_vec2(shader, "resolution", 1280.0, 720.0)
+game_shader_set_vec3(shader, "light_pos", 0.0, 10.0, 5.0)
+game_shader_set_vec4(shader, "color", 1.0, 0.0, 0.0, 1.0)
+print("Shader:")
+print(game_shader_name(shader))
+print(game_shader_uniform_count(shader))
+print(game_shader_uniform_name(shader, 0))
+
+# Camera 2D
+cam2d = game_camera2d_create(0.0, 0.0, 1.0)
+game_camera2d_set_position(cam2d, 100.0, 50.0)
+game_camera2d_set_zoom(cam2d, 1.5)
+game_camera2d_move(cam2d, 10.0, 5.0)
+print("Camera2D:")
+print(game_camera2d_x(cam2d))
+print(game_camera2d_y(cam2d))
+print(game_camera2d_zoom(cam2d))
+
+# Camera 3D
+cam3d = game_camera3d_create(0.0, 5.0, 10.0, 0.0, 0.0, 0.0)
+game_camera3d_set_position(cam3d, 0.0, 8.0, 15.0)
+game_camera3d_set_target(cam3d, 0.0, 0.0, 0.0)
+game_camera3d_set_fov(cam3d, 75.0)
+print("Camera3D:")
+print(game_camera3d_pos_y(cam3d))
+print(game_camera3d_fov(cam3d))
+
+print("Phase 1 PASSED")
+print("")
+
+# ============================================================
+# Phase 2: Physics Engine
+# ============================================================
+print("--- Phase 2: Physics Engine ---")
+
+# Physics world
+world = game_physics_world_create(0.0, -9.8)
+print("Physics world created")
+
+# Rigid bodies
+ball = game_rigidbody_create(world, 0.0, 10.0, 1.0, 0)
+ground = game_rigidbody_create(world, 0.0, 0.0, 1.0, 1)
+print("Bodies created:")
+print(game_physics_world_body_count(world))
+
+game_rigidbody_set_velocity(ball, 5.0, 0.0)
+game_rigidbody_apply_force(ball, 0.0, 2.0)
+game_rigidbody_set_restitution(ball, 0.8)
+game_rigidbody_set_friction(ball, 0.3)
+
+# Step simulation
+game_physics_world_step(world, 0.016)
+game_physics_world_step(world, 0.016)
+game_physics_world_step(world, 0.016)
+
+print("Ball after 3 steps:")
+print(game_rigidbody_to_string(ball))
+print(game_rigidbody_mass(ball))
+print(game_rigidbody_is_static(ground))
+
+# Colliders
+ball_col = game_collider_circle(ball, 0.5)
+ground_col = game_collider_box(ground, 20.0, 1.0)
+print("Collider types:")
+print(game_collider_type(ball_col))
+print(game_collider_type(ground_col))
+
+# Collision check (ball is far from ground, no collision)
+hit = game_collider_check(ball_col, ground_col)
+print("Collision check result:")
+print(hit)
+
+# Particle system
+ps = game_particles_create(400.0, 300.0, 100)
+game_particles_set_velocity(ps, 0.0, -80.0, 40.0)
+game_particles_set_lifetime(ps, 0.5, 2.0)
+game_particles_set_color(ps, 1.0, 0.5, 0.0, 1.0)
+game_particles_set_size(ps, 8.0, 0.0)
+game_particles_emit(ps, 20)
+print("Particles emitted:")
+print(game_particles_active_count(ps))
+print(game_particles_max_count(ps))
+
+game_particles_update(ps, 0.1)
+game_particles_update(ps, 0.1)
+print("After update:")
+print(game_particles_active_count(ps))
+print(game_particles_to_string(ps))
+
+print("Phase 2 PASSED")
+print("")
+
+# ============================================================
+# Phase 3: Audio System
+# ============================================================
+print("--- Phase 3: Audio System ---")
+
+# Audio engine
+audio = game_audio_engine_create()
+game_audio_engine_set_master_volume(audio, 0.8)
+print("Audio engine:")
+print(game_audio_engine_master_volume(audio))
+print(game_audio_engine_channel_count(audio))
+
+# Sound effects
+sfx = game_sound_create(audio, "explosion", "sfx")
+game_sound_set_volume(sfx, 0.9)
+game_sound_set_pitch(sfx, 1.2)
+game_sound_set_loop(sfx, 0)
+game_sound_play(sfx)
+print("Sound:")
+print(game_sound_name(sfx))
+print(game_sound_type(sfx))
+print(game_sound_is_playing(sfx))
+print(game_sound_volume(sfx))
+print(game_sound_pitch(sfx))
+
+sfx2 = game_sound_load(audio, "assets/sounds/jump.wav")
+print("Loaded sound:")
+print(game_sound_name(sfx2))
+
+game_sound_pause(sfx)
+print("After pause:")
+print(game_sound_is_playing(sfx))
+game_sound_resume(sfx)
+print("After resume:")
+print(game_sound_is_playing(sfx))
+game_sound_stop(sfx)
+
+# Music
+bgm = game_music_create(audio, "main_theme")
+game_music_set_volume(bgm, 0.7)
+game_music_set_loop(bgm, 1)
+game_music_play(bgm)
+print("Music:")
+print(game_music_name(bgm))
+print(game_music_is_playing(bgm))
+
+bgm2 = game_music_load(audio, "assets/music/battle.ogg")
+print("Loaded music:")
+print(game_music_name(bgm2))
+
+# 3D Audio
+audio3d = game_audio3d_create(audio)
+game_audio3d_set_listener(audio3d, 0.0, 0.0, 0.0)
+game_audio3d_set_rolloff(audio3d, 1.0)
+game_audio3d_play_at(audio3d, sfx2, 5.0, 0.0, 0.0)
+print("3D audio configured")
+
+# Mixer
+mixer = game_mixer_create(audio, 8)
+game_mixer_set_channel_volume(mixer, 0, 1.0)
+game_mixer_set_channel_volume(mixer, 1, 0.5)
+game_mixer_play_on_channel(mixer, sfx, 0)
+print("Mixer:")
+print(game_mixer_channels(mixer))
+print(game_mixer_channel_volume(mixer, 0))
+print(game_mixer_channel_volume(mixer, 1))
+
+print("Phase 3 PASSED")
+print("")
+
+# ============================================================
+# Phase 4: Game Framework
+# ============================================================
+print("--- Phase 4: Game Framework ---")
+
+# Game loop
+loop = game_loop_create(60)
+game_loop_start(loop)
+print("Game loop started:")
+print(game_loop_is_running(loop))
+print(game_loop_target_fps(loop))
+
+# Simulate a few ticks
+game_loop_tick(loop)
+game_loop_tick(loop)
+game_loop_tick(loop)
+print("After 3 ticks:")
+print(game_loop_frame_count(loop))
+
+game_loop_stop(loop)
+print("After stop:")
+print(game_loop_is_running(loop))
+
+# Scene management
+scene1 = game_scene_create("MainMenu")
+scene2 = game_scene_create("GameLevel1")
+
+game_scene_add_sprite(scene1, sprite)
+game_scene_add_body(scene2, ball)
+game_scene_update(scene1, 0.016)
+
+print("Scenes:")
+print(game_scene_name(scene1))
+print(game_scene_sprite_count(scene1))
+print(game_scene_name(scene2))
+print(game_scene_body_count(scene2))
+
+# Scene manager
+sm = game_scene_manager_create()
+game_scene_manager_push(sm, scene1)
+game_scene_manager_push(sm, scene2)
+print("Scene manager depth:")
+print(game_scene_manager_depth(sm))
+
+current = game_scene_manager_current(sm)
+print("Current scene:")
+print(game_scene_name(current))
+
+game_scene_manager_pop(sm)
+print("After pop:")
+print(game_scene_manager_depth(sm))
+
+# Input manager
+input = game_input_create()
+game_input_key_press(input, "W")
+game_input_key_press(input, "Space")
+game_input_mouse_move(input, 320.0, 240.0)
+game_input_mouse_press(input, 0)
+
+print("Input:")
+print(game_input_is_key_down(input, "W"))
+print(game_input_is_key_pressed(input, "Space"))
+print(game_input_is_mouse_down(input, 0))
+print(game_input_mouse_x(input))
+print(game_input_mouse_y(input))
+
+game_input_key_release(input, "W")
+print("After W release:")
+print(game_input_is_key_down(input, "W"))
+
+game_input_update(input)
+print("After update (pressed cleared):")
+print(game_input_is_key_pressed(input, "Space"))
+
+# Asset manager
+assets = game_assets_create("assets/")
+game_assets_register(assets, "player_tex", "textures/player.png", "texture")
+game_assets_register(assets, "enemy_tex", "textures/enemy.png", "texture")
+game_assets_register(assets, "jump_sfx", "sounds/jump.wav", "sound")
+game_assets_register(assets, "bgm_main", "music/main.ogg", "music")
+
+print("Asset manager:")
+print(game_assets_count(assets))
+print(game_assets_get_path(assets, "player_tex"))
+print(game_assets_get_type(assets, "jump_sfx"))
+print(game_assets_name_at(assets, 0))
+print(game_assets_to_json(assets))
+
+print("Phase 4 PASSED")
+print("")
+
+# Cleanup
+game_collider_destroy(ball_col)
+game_collider_destroy(ground_col)
+game_particles_destroy(ps)
+game_sprite_destroy(sprite)
+game_texture_destroy(tex)
+game_texture_destroy(tex2)
+game_shader_destroy(shader)
+game_camera2d_destroy(cam2d)
+game_camera3d_destroy(cam3d)
+game_physics_world_destroy(world)
+game_sound_destroy(sfx)
+game_sound_destroy(sfx2)
+game_music_destroy(bgm)
+game_music_destroy(bgm2)
+game_audio3d_destroy(audio3d)
+game_mixer_destroy(mixer)
+game_audio_engine_destroy(audio)
+game_loop_destroy(loop)
+game_scene_destroy(scene1)
+game_scene_destroy(scene2)
+game_scene_manager_destroy(sm)
+game_input_destroy(input)
+game_assets_destroy(assets)
+game_renderer_destroy(renderer)
+
+print("=== Milestone 9 COMPLETE ===")
+print("All 4 phases passed:")
+print("  Phase 1: Graphics Engine (Renderer, Texture, Sprite, Shader, Camera2D/3D)")
+print("  Phase 2: Physics Engine (RigidBody, Collider, ParticleSystem)")
+print("  Phase 3: Audio System (Sound, Music, Audio3D, Mixer)")
+print("  Phase 4: Game Framework (GameLoop, Scene, SceneManager, Input, Assets)")

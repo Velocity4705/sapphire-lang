@@ -1,53 +1,53 @@
-// Milestone 2 - Hash Map Implementation Test
-// Testing hash map literals and methods
+
+
 
 print("=== Hash Map Literal Test ===")
 
-// Test 1: Basic hash map literal
+
 let map1 = {"name": "Alice", "age": 30, "city": "New York"}
 print("map1:", map1)
 
-// Test 2: Empty hash map
+
 let map2 = {}
 print("map2:", map2)
 
-// Test 3: Mixed value types
+
 let map3 = {"string": "hello", "number": 42, "boolean": true}
 print("map3:", map3)
 
 print("\n=== Hash Map Methods Test ===")
 
-// Test 4: get() method
+
 print("map1.get('name'):", map1.get("name"))
 print("map1.get('age'):", map1.get("age"))
 print("map1.get('missing'):", map1.get("missing"))
 
-// Test 5: set() method
+
 map1.set("country", "USA")
 print("After setting country:", map1)
 
-// Test 6: has() method
+
 print("map1.has('name'):", map1.has("name"))
 print("map1.has('missing'):", map1.has("missing"))
 
-// Test 7: size/length properties
+
 print("map1.size:", map1.size)
 print("map1.length:", map1.length)
 
-// Test 8: keys() method
+
 let keys = map1.keys()
 print("map1.keys():", keys)
 
-// Test 9: values() method
+
 let values = map1.values()
 print("map1.values():", values)
 
-// Test 10: remove() method
+
 let removed = map1.remove("age")
 print("Removed value:", removed)
 print("After removing age:", map1)
 
-// Test 11: Dynamic key creation
+
 let dynamic_map = {}
 dynamic_map.set("key1", "value1")
 dynamic_map.set("key2", 100)
@@ -56,15 +56,11 @@ print("Dynamic map:", dynamic_map)
 
 print("\n=== Hash Map Integration Test ===")
 
-// Test 12: Hash map with array values
-let complex_map = {
-    "users": ["Alice", "Bob", "Charlie"],
-    "scores": [95, 87, 92],
-    "active": true
-}
+
+let complex_map = {"users": ["Alice", "Bob", "Charlie"], "scores": [95, 87, 92], "active": true}
 print("Complex map:", complex_map)
 
-// Test 13: Nested operations
+
 let user_list = complex_map.get("users")
 user_list.push("David")
 print("After adding user:", complex_map)

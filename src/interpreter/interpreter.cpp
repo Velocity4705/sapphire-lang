@@ -20,12 +20,32 @@
 
 // Milestone 3 Libraries
 #include "../stdlib/plotting/plotting.h"
+#include "../stdlib/plot3d/plot3d.h"
 
 // Milestone 4 Libraries
 #include "../stdlib/http/http.h"
 #include "../stdlib/websocket/websocket.h"
 #include "../stdlib/template/template.h"
 #include "../stdlib/database/database.h"
+
+// Milestone 5 Libraries
+#include "../stdlib/orm/orm.h"
+#include "../stdlib/auth/auth.h"
+#include "../stdlib/rest/rest.h"
+#include "../stdlib/graphql/graphql.h"
+
+// Milestone 6 Libraries
+#include "../stdlib/blockchain/blockchain.h"
+// Milestone 12 Libraries
+#include "../stdlib/network/network.h"
+#include "../stdlib/crypto/crypto.h"
+#include "../stdlib/smartcontract/smartcontract.h"
+#include "../stdlib/dapp/dapp.h"
+#include "../stdlib/security/security.h"
+#include "../stdlib/mobile/mobile.h"
+#include "../stdlib/game/game.h"
+#include "../stdlib/system/sysprog.h"
+#include "../stdlib/gui/gui.h"
 
 namespace sapphire {
 
@@ -92,128 +112,8 @@ Interpreter::Interpreter() {
     environment->define("make_array", std::string("__builtin_make_array__"));
     environment->define("WaitGroup", std::string("__builtin_waitgroup__"));
     
-    // Milestone 1: Dynamic Arrays
-    environment->define("array_create", std::string("__builtin_array_create__"));
-    environment->define("array_push", std::string("__builtin_array_push__"));
-    environment->define("array_get", std::string("__builtin_array_get__"));
-    environment->define("array_set", std::string("__builtin_array_set__"));
-    environment->define("array_pop", std::string("__builtin_array_pop__"));
-    environment->define("array_size", std::string("__builtin_array_size__"));
-    environment->define("array_clear", std::string("__builtin_array_clear__"));
-    
-    // Milestone 1: Math Library
-    environment->define("math_sqrt", std::string("__builtin_math_sqrt__"));
-    environment->define("math_pow", std::string("__builtin_math_pow__"));
-    environment->define("math_sin", std::string("__builtin_math_sin__"));
-    environment->define("math_cos", std::string("__builtin_math_cos__"));
-    environment->define("math_tan", std::string("__builtin_math_tan__"));
-    environment->define("math_exp", std::string("__builtin_math_exp__"));
-    environment->define("math_log", std::string("__builtin_math_log__"));
-    environment->define("math_log10", std::string("__builtin_math_log10__"));
-    environment->define("math_abs", std::string("__builtin_math_abs__"));
-    environment->define("math_floor", std::string("__builtin_math_floor__"));
-    environment->define("math_ceil", std::string("__builtin_math_ceil__"));
-    environment->define("math_round", std::string("__builtin_math_round__"));
-    environment->define("math_pi", std::string("__builtin_math_pi__"));
-    environment->define("math_e", std::string("__builtin_math_e__"));
-    
-    // Milestone 1: CSV I/O
-    environment->define("csv_create", std::string("__builtin_csv_create__"));
-    environment->define("csv_read_file", std::string("__builtin_csv_read_file__"));
-    environment->define("csv_write_file", std::string("__builtin_csv_write_file__"));
-    environment->define("csv_get", std::string("__builtin_csv_get__"));
-    environment->define("csv_set", std::string("__builtin_csv_set__"));
-    environment->define("csv_row_count", std::string("__builtin_csv_row_count__"));
-    
-    // Milestone 2: JSON Support
-    environment->define("json_parse", std::string("__builtin_json_parse__"));
-    environment->define("json_stringify", std::string("__builtin_json_stringify__"));
-    environment->define("json_create_object", std::string("__builtin_json_create_object__"));
-    environment->define("json_create_array", std::string("__builtin_json_create_array__"));
-    environment->define("json_get", std::string("__builtin_json_get__"));
-    environment->define("json_set", std::string("__builtin_json_set__"));
-    environment->define("json_push", std::string("__builtin_json_push__"));
-    environment->define("json_size", std::string("__builtin_json_size__"));
-    
-    // Milestone 2: Random Numbers
-    environment->define("random_seed", std::string("__builtin_random_seed__"));
-    environment->define("random", std::string("__builtin_random__"));
-    environment->define("random_int", std::string("__builtin_random_int__"));
-    environment->define("random_normal", std::string("__builtin_random_normal__"));
-    environment->define("random_boolean", std::string("__builtin_random_boolean__"));
-    environment->define("crypto_random", std::string("__builtin_crypto_random__"));
-    environment->define("crypto_random_int", std::string("__builtin_crypto_random_int__"));
-    
-    // Milestone 3: Data Visualization
-    environment->define("plot_create", std::string("__builtin_plot_create__"));
-    environment->define("plot_add_line", std::string("__builtin_plot_add_line__"));
-    environment->define("plot_add_scatter", std::string("__builtin_plot_add_scatter__"));
-    environment->define("plot_add_bar", std::string("__builtin_plot_add_bar__"));
-    environment->define("plot_add_histogram", std::string("__builtin_plot_add_histogram__"));
-    environment->define("plot_set_title", std::string("__builtin_plot_set_title__"));
-    environment->define("plot_set_xlabel", std::string("__builtin_plot_set_xlabel__"));
-    environment->define("plot_set_ylabel", std::string("__builtin_plot_set_ylabel__"));
-    environment->define("plot_show", std::string("__builtin_plot_show__"));
-    environment->define("plot_save_svg", std::string("__builtin_plot_save_svg__"));
-    environment->define("quick_plot", std::string("__builtin_quick_plot__"));
-    environment->define("quick_scatter", std::string("__builtin_quick_scatter__"));
-    environment->define("quick_histogram", std::string("__builtin_quick_histogram__"));
-    environment->define("csv_col_count", std::string("__builtin_csv_col_count__"));
-    environment->define("csv_add_row", std::string("__builtin_csv_add_row__"));
-    
-    // Milestone 4: HTTP Server/Client
-    environment->define("http_server_create", std::string("__builtin_http_server_create__"));
-    environment->define("http_server_start", std::string("__builtin_http_server_start__"));
-    environment->define("http_server_stop", std::string("__builtin_http_server_stop__"));
-    environment->define("http_server_get", std::string("__builtin_http_server_get__"));
-    environment->define("http_server_post", std::string("__builtin_http_server_post__"));
-    environment->define("http_server_put", std::string("__builtin_http_server_put__"));
-    environment->define("http_server_delete", std::string("__builtin_http_server_delete__"));
-    environment->define("http_client_create", std::string("__builtin_http_client_create__"));
-    environment->define("http_client_get", std::string("__builtin_http_client_get__"));
-    environment->define("http_client_post", std::string("__builtin_http_client_post__"));
-    environment->define("http_response_status", std::string("__builtin_http_response_status__"));
-    environment->define("http_response_body", std::string("__builtin_http_response_body__"));
-    environment->define("http_response_header", std::string("__builtin_http_response_header__"));
-    environment->define("http_url_encode", std::string("__builtin_http_url_encode__"));
-    environment->define("http_url_decode", std::string("__builtin_http_url_decode__"));
-    environment->define("http_html_escape", std::string("__builtin_http_html_escape__"));
-    
-    // WebSocket Support
-    environment->define("websocket_server_create", std::string("__builtin_websocket_server_create__"));
-    environment->define("websocket_server_start", std::string("__builtin_websocket_server_start__"));
-    environment->define("websocket_server_stop", std::string("__builtin_websocket_server_stop__"));
-    environment->define("websocket_server_broadcast_text", std::string("__builtin_websocket_server_broadcast_text__"));
-    environment->define("websocket_server_broadcast_binary", std::string("__builtin_websocket_server_broadcast_binary__"));
-    environment->define("websocket_server_connection_count", std::string("__builtin_websocket_server_connection_count__"));
-    environment->define("websocket_client_create", std::string("__builtin_websocket_client_create__"));
-    environment->define("websocket_client_connect", std::string("__builtin_websocket_client_connect__"));
-    environment->define("websocket_client_disconnect", std::string("__builtin_websocket_client_disconnect__"));
-    environment->define("websocket_client_send_text", std::string("__builtin_websocket_client_send_text__"));
-    environment->define("websocket_client_send_binary", std::string("__builtin_websocket_client_send_binary__"));
-    environment->define("websocket_client_is_connected", std::string("__builtin_websocket_client_is_connected__"));
-    environment->define("websocket_base64_encode", std::string("__builtin_websocket_base64_encode__"));
-    environment->define("websocket_base64_decode", std::string("__builtin_websocket_base64_decode__"));
-    
-    // Template Engine
-    environment->define("html_template_engine_create", std::string("__builtin_html_template_engine_create__"));
-    environment->define("html_template_render", std::string("__builtin_html_template_render__"));
-    environment->define("html_template_render_file", std::string("__builtin_html_template_render_file__"));
-    environment->define("html_template_set_dir", std::string("__builtin_html_template_set_dir__"));
-    environment->define("html_template_cache", std::string("__builtin_html_template_cache__"));
-    
-    // Database Drivers
-    environment->define("postgresql_create", std::string("__builtin_postgresql_create__"));
-    environment->define("postgresql_connect", std::string("__builtin_postgresql_connect__"));
-    environment->define("postgresql_disconnect", std::string("__builtin_postgresql_disconnect__"));
-    environment->define("postgresql_query", std::string("__builtin_postgresql_query__"));
-    environment->define("postgresql_execute", std::string("__builtin_postgresql_execute__"));
-    environment->define("mysql_create", std::string("__builtin_mysql_create__"));
-    environment->define("mysql_connect", std::string("__builtin_mysql_connect__"));
-    environment->define("mysql_disconnect", std::string("__builtin_mysql_disconnect__"));
-    environment->define("mysql_query", std::string("__builtin_mysql_query__"));
-    environment->define("mysql_execute", std::string("__builtin_mysql_execute__"));
-    
+    // Milestones 1-5 are opt-in via import statements (see visitImportStmt)
+
     // Option type constructors
     environment->define("Some", std::string("__builtin_some__"));
     environment->define("None", std::string("__builtin_none__"));
@@ -490,8 +390,18 @@ void Interpreter::visitBinaryExpr(BinaryExpr& expr) {
     if (expr.op == "+") {
         if (std::holds_alternative<int>(left) && std::holds_alternative<int>(right)) {
             last_value = std::get<int>(left) + std::get<int>(right);
-        } else if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(right)) {
-            last_value = std::get<std::string>(left) + std::get<std::string>(right);
+        } else if (std::holds_alternative<std::string>(left) || std::holds_alternative<std::string>(right)) {
+            // String concatenation: coerce either side to string
+            auto to_str = [](const Value& v) -> std::string {
+                if (std::holds_alternative<std::string>(v)) return std::get<std::string>(v);
+                if (std::holds_alternative<int>(v)) return std::to_string(std::get<int>(v));
+                if (std::holds_alternative<double>(v)) {
+                    std::ostringstream oss; oss << std::get<double>(v); return oss.str();
+                }
+                if (std::holds_alternative<bool>(v)) return std::get<bool>(v) ? "true" : "false";
+                return "";
+            };
+            last_value = to_str(left) + to_str(right);
         } else {
             double l = std::holds_alternative<int>(left) ? std::get<int>(left) : std::get<double>(left);
             double r = std::holds_alternative<int>(right) ? std::get<int>(right) : std::get<double>(right);
@@ -2471,8 +2381,8 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
             return;
             
         } else if (func_name == "__builtin_plot_add_histogram__") {
-            if (arguments.size() < 2 || arguments.size() > 6) {
-                throw TypeError("plot_add_histogram() requires 2-6 arguments (plot, data_array, bins=20, label=\"\", r=1.0, g=0.5, b=0.0)");
+            if (arguments.size() < 2 || arguments.size() > 7) {
+                throw TypeError("plot_add_histogram() requires 2-7 arguments (plot, data_array, bins=20, label=\"\", r=1.0, g=0.5, b=0.0)");
             }
             
             void* plot = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
@@ -2642,7 +2552,83 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
                                                 bins, title.c_str());
             last_value = static_cast<int>(reinterpret_cast<intptr_t>(plot));
             return;
-            
+
+        // ===== PLOT3D: 3D browser plots via Plotly.js =====
+        } else if (func_name == "__builtin_plot3d_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(plot3d_create()));
+            return;
+        } else if (func_name == "__builtin_plot3d_set_title__") {
+            plot3d_set_title(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_plot3d_set_xlabel__") {
+            plot3d_set_xlabel(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_plot3d_set_ylabel__") {
+            plot3d_set_ylabel(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_plot3d_set_zlabel__") {
+            plot3d_set_zlabel(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_plot3d_save_html__") {
+            plot3d_save_html(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_plot3d_add_surface__") {
+            // args: plot, z_array, rows, cols, label, colorscale
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            auto arr = std::get<std::shared_ptr<ArrayValue>>(arguments[1]);
+            int rows = std::get<int>(arguments[2]);
+            int cols = std::get<int>(arguments[3]);
+            std::string label = arguments.size() > 4 ? std::get<std::string>(arguments[4]) : "";
+            std::string cs    = arguments.size() > 5 ? std::get<std::string>(arguments[5]) : "Viridis";
+            std::vector<double> z;
+            for (const auto& v : arr->elements) {
+                if (std::holds_alternative<int>(v))    z.push_back((double)std::get<int>(v));
+                else if (std::holds_alternative<double>(v)) z.push_back(std::get<double>(v));
+                else z.push_back(0.0);
+            }
+            plot3d_add_surface(p, z.data(), rows, cols, label.c_str(), cs.c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_plot3d_add_scatter__") {
+            // args: plot, x_array, y_array, z_array, label
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            auto to_vec = [](const std::shared_ptr<ArrayValue>& a) {
+                std::vector<double> v;
+                for (const auto& e : a->elements) {
+                    if (std::holds_alternative<int>(e))    v.push_back((double)std::get<int>(e));
+                    else if (std::holds_alternative<double>(e)) v.push_back(std::get<double>(e));
+                }
+                return v;
+            };
+            auto xv = to_vec(std::get<std::shared_ptr<ArrayValue>>(arguments[1]));
+            auto yv = to_vec(std::get<std::shared_ptr<ArrayValue>>(arguments[2]));
+            auto zv = to_vec(std::get<std::shared_ptr<ArrayValue>>(arguments[3]));
+            std::string label = arguments.size() > 4 ? std::get<std::string>(arguments[4]) : "";
+            int n = (int)std::min({xv.size(), yv.size(), zv.size()});
+            plot3d_add_scatter(p, xv.data(), yv.data(), zv.data(), n, label.c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_plot3d_add_line__") {
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            auto to_vec = [](const std::shared_ptr<ArrayValue>& a) {
+                std::vector<double> v;
+                for (const auto& e : a->elements) {
+                    if (std::holds_alternative<int>(e))    v.push_back((double)std::get<int>(e));
+                    else if (std::holds_alternative<double>(e)) v.push_back(std::get<double>(e));
+                }
+                return v;
+            };
+            auto xv = to_vec(std::get<std::shared_ptr<ArrayValue>>(arguments[1]));
+            auto yv = to_vec(std::get<std::shared_ptr<ArrayValue>>(arguments[2]));
+            auto zv = to_vec(std::get<std::shared_ptr<ArrayValue>>(arguments[3]));
+            std::string label = arguments.size() > 4 ? std::get<std::string>(arguments[4]) : "";
+            int n = (int)std::min({xv.size(), yv.size(), zv.size()});
+            plot3d_add_line(p, xv.data(), yv.data(), zv.data(), n, label.c_str());
+            last_value = nullptr; return;
+
         // ===== MILESTONE 4: HTTP SERVER/CLIENT =====
         } else if (func_name == "__builtin_http_server_create__") {
             // Create HTTP server
@@ -3068,10 +3054,3423 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
             last_value = std::string(result);
             sapphire_database_free_result(result);
             return;
+
+        // ===== ORM FRAMEWORK =====
+        } else if (func_name == "__builtin_orm_model_create__") {
+            if (arguments.size() != 1) throw TypeError("orm_model_create() requires 1 argument (table_name)");
+            std::string table = std::get<std::string>(arguments[0]);
+            void* model = orm_model_create(table.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(model));
+            return;
+
+        } else if (func_name == "__builtin_orm_model_add_field__") {
+            // orm_model_add_field(model, name, type) where type is "string","int","float","bool","text","datetime","json"
+            if (arguments.size() != 3) throw TypeError("orm_model_add_field() requires 3 arguments (model, name, type)");
+            void* model = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string name = std::get<std::string>(arguments[1]);
+            std::string type = std::get<std::string>(arguments[2]);
+            if (type == "string") orm_model_add_string_field(model, name.c_str(), 255);
+            else if (type == "int") orm_model_add_int_field(model, name.c_str());
+            else if (type == "text") {
+                auto* m = static_cast<Sapphire::ORM::Model*>(model);
+                m->add_text_field(name);
+            } else if (type == "float" || type == "double") {
+                auto* m = static_cast<Sapphire::ORM::Model*>(model);
+                m->add_double_field(name);
+            } else if (type == "bool") {
+                auto* m = static_cast<Sapphire::ORM::Model*>(model);
+                m->add_bool_field(name);
+            } else if (type == "datetime") {
+                auto* m = static_cast<Sapphire::ORM::Model*>(model);
+                m->add_datetime_field(name);
+            } else if (type == "json") {
+                auto* m = static_cast<Sapphire::ORM::Model*>(model);
+                m->add_json_field(name);
+            } else {
+                orm_model_add_string_field(model, name.c_str(), 255);
+            }
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_orm_model_add_primary_key__") {
+            if (arguments.size() != 2) throw TypeError("orm_model_add_primary_key() requires 2 arguments (model, name)");
+            void* model = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string name = std::get<std::string>(arguments[1]);
+            orm_model_add_primary_key(model, name.c_str());
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_orm_model_get_sql__") {
+            if (arguments.size() != 1) throw TypeError("orm_model_get_sql() requires 1 argument (model)");
+            void* model = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(orm_model_get_create_sql(model));
+            return;
+
+        } else if (func_name == "__builtin_orm_record_create__") {
+            void* record = orm_record_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(record));
+            return;
+
+        } else if (func_name == "__builtin_orm_record_set__") {
+            if (arguments.size() != 3) throw TypeError("orm_record_set() requires 3 arguments (record, field, value)");
+            void* record = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string field = std::get<std::string>(arguments[1]);
+            // Accept string or int value
+            if (std::holds_alternative<std::string>(arguments[2])) {
+                orm_record_set_string(record, field.c_str(), std::get<std::string>(arguments[2]).c_str());
+            } else if (std::holds_alternative<int>(arguments[2])) {
+                orm_record_set_int(record, field.c_str(), std::get<int>(arguments[2]));
+            } else if (std::holds_alternative<double>(arguments[2])) {
+                auto* r = static_cast<Sapphire::ORM::Record*>(record);
+                r->set(field, std::get<double>(arguments[2]));
+            } else if (std::holds_alternative<bool>(arguments[2])) {
+                auto* r = static_cast<Sapphire::ORM::Record*>(record);
+                r->set(field, std::get<bool>(arguments[2]));
+            }
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_orm_record_get__") {
+            if (arguments.size() != 2) throw TypeError("orm_record_get() requires 2 arguments (record, field)");
+            void* record = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string field = std::get<std::string>(arguments[1]);
+            last_value = std::string(orm_record_get_string(record, field.c_str()));
+            return;
+
+        } else if (func_name == "__builtin_orm_record_to_json__") {
+            if (arguments.size() != 1) throw TypeError("orm_record_to_json() requires 1 argument (record)");
+            void* record = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(orm_record_to_json(record));
+            return;
+
+        } else if (func_name == "__builtin_orm_query_create__") {
+            if (arguments.size() != 1) throw TypeError("orm_query_create() requires 1 argument (table_name)");
+            std::string table = std::get<std::string>(arguments[0]);
+            void* query = orm_query_create(table.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(query));
+            return;
+
+        } else if (func_name == "__builtin_orm_query_where__") {
+            if (arguments.size() != 3) throw TypeError("orm_query_where() requires 3 arguments (query, field, value)");
+            void* query = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string field = std::get<std::string>(arguments[1]);
+            std::string value = std::get<std::string>(arguments[2]);
+            orm_query_where_eq(query, field.c_str(), value.c_str());
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_orm_query_limit__") {
+            if (arguments.size() != 2) throw TypeError("orm_query_limit() requires 2 arguments (query, count)");
+            void* query = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int count = std::get<int>(arguments[1]);
+            orm_query_limit(query, count);
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_orm_query_offset__") {
+            if (arguments.size() != 2) throw TypeError("orm_query_offset() requires 2 arguments (query, offset)");
+            void* query = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int off = std::get<int>(arguments[1]);
+            static_cast<Sapphire::ORM::QueryBuilder*>(query)->offset(off);
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_orm_query_order_by__") {
+            if (arguments.size() < 2) throw TypeError("orm_query_order_by() requires 2-3 arguments (query, field, [asc])");
+            void* query = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string field = std::get<std::string>(arguments[1]);
+            bool asc = true;
+            if (arguments.size() >= 3 && std::holds_alternative<std::string>(arguments[2])) {
+                std::string dir = std::get<std::string>(arguments[2]);
+                asc = (dir != "desc" && dir != "DESC");
+            }
+            static_cast<Sapphire::ORM::QueryBuilder*>(query)->order_by(field, asc);
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_orm_query_to_sql__") {
+            if (arguments.size() != 1) throw TypeError("orm_query_to_sql() requires 1 argument (query)");
+            void* query = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(orm_query_to_sql(query));
+            return;
+
+        } else if (func_name == "__builtin_orm_db_create__") {
+            void* db = orm_db_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(db));
+            return;
+
+        } else if (func_name == "__builtin_orm_db_connect__") {
+            if (arguments.size() != 2) throw TypeError("orm_db_connect() requires 2 arguments (db, connection_string)");
+            void* db = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string conn_str = std::get<std::string>(arguments[1]);
+            int result = orm_db_connect_sqlite(db, conn_str.c_str());
+            last_value = (result == 1);
+            return;
+
+        } else if (func_name == "__builtin_orm_db_execute__") {
+            if (arguments.size() != 2) throw TypeError("orm_db_execute() requires 2 arguments (db, sql)");
+            void* db = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string sql = std::get<std::string>(arguments[1]);
+            int result = orm_db_execute_command(db, sql.c_str());
+            last_value = (result == 1);
+            return;
+
+        // ===== AUTH FRAMEWORK =====
+        } else if (func_name == "__builtin_jwt_create__") {
+            if (arguments.size() < 1) throw TypeError("jwt_create() requires 1-2 arguments (secret, [algorithm])");
+            std::string secret = std::get<std::string>(arguments[0]);
+            std::string algo = arguments.size() >= 2 ? std::get<std::string>(arguments[1]) : "HS256";
+            void* jwt = jwt_create(secret.c_str(), algo.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(jwt));
+            return;
+
+        } else if (func_name == "__builtin_jwt_generate__") {
+            if (arguments.size() < 2) throw TypeError("jwt_generate() requires 2-3 arguments (jwt, subject, [expires_in])");
+            void* jwt = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string subject = std::get<std::string>(arguments[1]);
+            int expires = arguments.size() >= 3 ? std::get<int>(arguments[2]) : 3600;
+            last_value = std::string(jwt_generate(jwt, subject.c_str(), expires));
+            return;
+
+        } else if (func_name == "__builtin_jwt_validate__") {
+            if (arguments.size() != 2) throw TypeError("jwt_validate() requires 2 arguments (jwt, token)");
+            void* jwt = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string token = std::get<std::string>(arguments[1]);
+            last_value = (jwt_validate(jwt, token.c_str()) == 1);
+            return;
+
+        } else if (func_name == "__builtin_jwt_get_subject__") {
+            if (arguments.size() != 2) throw TypeError("jwt_get_subject() requires 2 arguments (jwt, token)");
+            void* jwt = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string token = std::get<std::string>(arguments[1]);
+            last_value = std::string(jwt_get_subject(jwt, token.c_str()));
+            return;
+
+        } else if (func_name == "__builtin_jwt_get_claim__") {
+            if (arguments.size() != 3) throw TypeError("jwt_get_claim() requires 3 arguments (jwt, token, claim)");
+            void* jwt = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string token = std::get<std::string>(arguments[1]);
+            std::string claim = std::get<std::string>(arguments[2]);
+            last_value = std::string(jwt_get_claim(jwt, token.c_str(), claim.c_str()));
+            return;
+
+        } else if (func_name == "__builtin_jwt_refresh__") {
+            if (arguments.size() < 2) throw TypeError("jwt_refresh() requires 2-3 arguments (jwt, token, [extend_seconds])");
+            void* jwt = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string token = std::get<std::string>(arguments[1]);
+            int extend = arguments.size() >= 3 ? std::get<int>(arguments[2]) : 3600;
+            last_value = std::string(jwt_refresh(jwt, token.c_str(), extend));
+            return;
+
+        } else if (func_name == "__builtin_jwt_blacklist__") {
+            if (arguments.size() != 2) throw TypeError("jwt_blacklist() requires 2 arguments (jwt, token)");
+            void* jwt = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string token = std::get<std::string>(arguments[1]);
+            jwt_blacklist(jwt, token.c_str());
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_jwt_is_blacklisted__") {
+            if (arguments.size() != 2) throw TypeError("jwt_is_blacklisted() requires 2 arguments (jwt, token)");
+            void* jwt = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string token = std::get<std::string>(arguments[1]);
+            last_value = (jwt_is_blacklisted(jwt, token.c_str()) == 1);
+            return;
+
+        // Sessions
+        } else if (func_name == "__builtin_session_manager_create__") {
+            int ttl = arguments.size() >= 1 ? std::get<int>(arguments[0]) : 3600;
+            void* sm = session_manager_create(ttl);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sm));
+            return;
+
+        } else if (func_name == "__builtin_session_create__") {
+            if (arguments.size() != 2) throw TypeError("session_create() requires 2 arguments (sm, user_id)");
+            void* sm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string uid = std::get<std::string>(arguments[1]);
+            last_value = std::string(session_create(sm, uid.c_str()));
+            return;
+
+        } else if (func_name == "__builtin_session_is_valid__") {
+            if (arguments.size() != 2) throw TypeError("session_is_valid() requires 2 arguments (sm, session_id)");
+            void* sm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string sid = std::get<std::string>(arguments[1]);
+            last_value = (session_is_valid(sm, sid.c_str()) == 1);
+            return;
+
+        } else if (func_name == "__builtin_session_set_data__") {
+            if (arguments.size() != 4) throw TypeError("session_set_data() requires 4 arguments (sm, session_id, key, value)");
+            void* sm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string sid = std::get<std::string>(arguments[1]);
+            std::string key = std::get<std::string>(arguments[2]);
+            std::string val = std::get<std::string>(arguments[3]);
+            session_set_data(sm, sid.c_str(), key.c_str(), val.c_str());
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_session_get_data__") {
+            if (arguments.size() != 3) throw TypeError("session_get_data() requires 3 arguments (sm, session_id, key)");
+            void* sm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string sid = std::get<std::string>(arguments[1]);
+            std::string key = std::get<std::string>(arguments[2]);
+            last_value = std::string(session_get_data(sm, sid.c_str(), key.c_str()));
+            return;
+
+        } else if (func_name == "__builtin_session_destroy__") {
+            if (arguments.size() != 2) throw TypeError("session_destroy() requires 2 arguments (sm, session_id)");
+            void* sm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string sid = std::get<std::string>(arguments[1]);
+            last_value = (session_destroy(sm, sid.c_str()) == 1);
+            return;
+
+        } else if (func_name == "__builtin_session_regenerate__") {
+            if (arguments.size() != 2) throw TypeError("session_regenerate() requires 2 arguments (sm, session_id)");
+            void* sm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string sid = std::get<std::string>(arguments[1]);
+            last_value = std::string(session_regenerate(sm, sid.c_str()));
+            return;
+
+        } else if (func_name == "__builtin_session_cleanup__") {
+            if (arguments.size() != 1) throw TypeError("session_cleanup() requires 1 argument (sm)");
+            void* sm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = session_cleanup(sm);
+            return;
+
+        } else if (func_name == "__builtin_session_get_user_id__") {
+            if (arguments.size() != 2) throw TypeError("session_get_user_id() requires 2 arguments (sm, session_id)");
+            void* sm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string sid = std::get<std::string>(arguments[1]);
+            last_value = std::string(session_get_user_id(sm, sid.c_str()));
+            return;
+
+        // RBAC
+        } else if (func_name == "__builtin_rbac_create__") {
+            void* rbac = rbac_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(rbac));
+            return;
+
+        } else if (func_name == "__builtin_rbac_define_role__") {
+            if (arguments.size() < 2) throw TypeError("rbac_define_role() requires 2-3 arguments (rbac, name, [parent])");
+            void* rbac = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string name = std::get<std::string>(arguments[1]);
+            std::string parent = arguments.size() >= 3 ? std::get<std::string>(arguments[2]) : "";
+            rbac_define_role(rbac, name.c_str(), parent.empty() ? nullptr : parent.c_str());
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_rbac_add_permission__") {
+            if (arguments.size() != 4) throw TypeError("rbac_add_permission() requires 4 arguments (rbac, role, resource, action)");
+            void* rbac = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string role     = std::get<std::string>(arguments[1]);
+            std::string resource = std::get<std::string>(arguments[2]);
+            std::string action   = std::get<std::string>(arguments[3]);
+            rbac_add_permission(rbac, role.c_str(), resource.c_str(), action.c_str());
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_rbac_assign_role__") {
+            if (arguments.size() != 3) throw TypeError("rbac_assign_role() requires 3 arguments (rbac, user_id, role)");
+            void* rbac = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string uid  = std::get<std::string>(arguments[1]);
+            std::string role = std::get<std::string>(arguments[2]);
+            rbac_assign_role(rbac, uid.c_str(), role.c_str());
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_rbac_revoke_role__") {
+            if (arguments.size() != 3) throw TypeError("rbac_revoke_role() requires 3 arguments (rbac, user_id, role)");
+            void* rbac = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string uid  = std::get<std::string>(arguments[1]);
+            std::string role = std::get<std::string>(arguments[2]);
+            rbac_revoke_role(rbac, uid.c_str(), role.c_str());
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_rbac_has_permission__") {
+            if (arguments.size() != 4) throw TypeError("rbac_has_permission() requires 4 arguments (rbac, user_id, resource, action)");
+            void* rbac = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string uid      = std::get<std::string>(arguments[1]);
+            std::string resource = std::get<std::string>(arguments[2]);
+            std::string action   = std::get<std::string>(arguments[3]);
+            last_value = (rbac_has_permission(rbac, uid.c_str(), resource.c_str(), action.c_str()) == 1);
+            return;
+
+        } else if (func_name == "__builtin_rbac_has_role__") {
+            if (arguments.size() != 3) throw TypeError("rbac_has_role() requires 3 arguments (rbac, user_id, role)");
+            void* rbac = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string uid  = std::get<std::string>(arguments[1]);
+            std::string role = std::get<std::string>(arguments[2]);
+            last_value = (rbac_has_role(rbac, uid.c_str(), role.c_str()) == 1);
+            return;
+
+        // OAuth2
+        } else if (func_name == "__builtin_oauth2_create__") {
+            void* oauth2 = oauth2_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(oauth2));
+            return;
+
+        } else if (func_name == "__builtin_oauth2_register_provider__") {
+            if (arguments.size() != 7) throw TypeError("oauth2_register_provider() requires 7 arguments");
+            void* oauth2          = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string provider  = std::get<std::string>(arguments[1]);
+            std::string client_id = std::get<std::string>(arguments[2]);
+            std::string secret    = std::get<std::string>(arguments[3]);
+            std::string redirect  = std::get<std::string>(arguments[4]);
+            std::string scopes    = std::get<std::string>(arguments[5]);
+            std::string auth_url  = std::get<std::string>(arguments[6]);
+            oauth2_register_provider(oauth2, provider.c_str(), client_id.c_str(),
+                                     secret.c_str(), redirect.c_str(), scopes.c_str(),
+                                     auth_url.c_str(), "");
+            last_value = nullptr;
+            return;
+
+        } else if (func_name == "__builtin_oauth2_get_auth_url__") {
+            if (arguments.size() < 2) throw TypeError("oauth2_get_auth_url() requires 2-3 arguments (oauth2, provider, [state])");
+            void* oauth2         = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string provider = std::get<std::string>(arguments[1]);
+            std::string state    = arguments.size() >= 3 ? std::get<std::string>(arguments[2]) : "";
+            last_value = std::string(oauth2_get_auth_url(oauth2, provider.c_str(), state.c_str()));
+            return;
+
+        } else if (func_name == "__builtin_oauth2_generate_state__") {
+            if (arguments.size() != 1) throw TypeError("oauth2_generate_state() requires 1 argument (oauth2)");
+            void* oauth2 = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(oauth2_generate_state(oauth2));
+            return;
+
+        } else if (func_name == "__builtin_oauth2_validate_state__") {
+            if (arguments.size() != 2) throw TypeError("oauth2_validate_state() requires 2 arguments (oauth2, state)");
+            void* oauth2      = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string state = std::get<std::string>(arguments[1]);
+            last_value = (oauth2_validate_state(oauth2, state.c_str()) == 1);
+            return;
+
+        } else if (func_name == "__builtin_oauth2_has_provider__") {
+            if (arguments.size() != 2) throw TypeError("oauth2_has_provider() requires 2 arguments (oauth2, provider)");
+            void* oauth2         = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string provider = std::get<std::string>(arguments[1]);
+            last_value = (oauth2_has_provider(oauth2, provider.c_str()) == 1);
+            return;
+
+        // ===== REST API Framework =====
+        } else if (func_name == "__builtin_rest_router_create__") {
+            std::string prefix = arguments.size() >= 1 ? std::get<std::string>(arguments[0]) : "/api/v1";
+            void* router = rest_router_create(prefix.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(router));
+            return;
+
+        } else if (func_name == "__builtin_rest_router_generate_crud__") {
+            if (arguments.size() != 2) throw TypeError("rest_router_generate_crud() requires 2 arguments (router, model_name)");
+            void* router = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string model = std::get<std::string>(arguments[1]);
+            rest_router_generate_crud(router, model.c_str());
+            last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_rest_router_add_custom__") {
+            if (arguments.size() < 3) throw TypeError("rest_router_add_custom() requires 3-4 arguments (router, method, path, handler, [auth])");
+            void* router = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string method  = std::get<std::string>(arguments[1]);
+            std::string path    = std::get<std::string>(arguments[2]);
+            std::string handler = arguments.size() >= 4 ? std::get<std::string>(arguments[3]) : "";
+            int auth = arguments.size() >= 5 ? (std::get<bool>(arguments[4]) ? 1 : 0) : 0;
+            rest_router_add_custom(router, method.c_str(), path.c_str(), handler.c_str(), auth);
+            last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_rest_router_require_auth__") {
+            if (arguments.size() != 3) throw TypeError("rest_router_require_auth() requires 3 arguments (router, model, required)");
+            void* router = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string model = std::get<std::string>(arguments[1]);
+            bool req = std::holds_alternative<bool>(arguments[2]) ? std::get<bool>(arguments[2]) : std::get<int>(arguments[2]) != 0;
+            rest_router_require_auth(router, model.c_str(), req ? 1 : 0);
+            last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_rest_router_route_count__") {
+            if (arguments.size() != 1) throw TypeError("rest_router_route_count() requires 1 argument");
+            void* router = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = rest_router_route_count(router); return;
+
+        } else if (func_name == "__builtin_rest_router_route_table__") {
+            if (arguments.size() != 1) throw TypeError("rest_router_route_table() requires 1 argument");
+            void* router = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(rest_router_route_table(router)); return;
+
+        } else if (func_name == "__builtin_rest_router_get_prefix__") {
+            if (arguments.size() != 1) throw TypeError("rest_router_get_prefix() requires 1 argument");
+            void* router = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(rest_router_get_prefix(router)); return;
+
+        } else if (func_name == "__builtin_rest_validator_create__") {
+            void* v = rest_validator_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(v)); return;
+
+        } else if (func_name == "__builtin_rest_validator_add_rule__") {
+            if (arguments.size() < 3) throw TypeError("rest_validator_add_rule() requires at least 3 arguments (validator, schema, field, [type], [required], [min], [max])");
+            void* v = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string schema = std::get<std::string>(arguments[1]);
+            std::string field  = std::get<std::string>(arguments[2]);
+            std::string type   = arguments.size() >= 4 ? std::get<std::string>(arguments[3]) : "string";
+            int req     = arguments.size() >= 5 ? (std::holds_alternative<bool>(arguments[4]) ? (std::get<bool>(arguments[4]) ? 1 : 0) : std::get<int>(arguments[4])) : 0;
+            int min_len = arguments.size() >= 6 ? std::get<int>(arguments[5]) : 0;
+            int max_len = arguments.size() >= 7 ? std::get<int>(arguments[6]) : 0;
+            rest_validator_add_rule(v, schema.c_str(), field.c_str(), type.c_str(), req, min_len, max_len);
+            last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_rest_validator_validate__") {
+            if (arguments.size() != 3) throw TypeError("rest_validator_validate() requires 3 arguments (validator, schema, data)");
+            void* v = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string schema = std::get<std::string>(arguments[1]);
+            std::string data   = std::get<std::string>(arguments[2]);
+            char err_buf[2048] = {};
+            int valid = rest_validator_validate(v, schema.c_str(), data.c_str(), err_buf, sizeof(err_buf));
+            last_value = (valid == 1); return;
+
+        } else if (func_name == "__builtin_rest_validator_has_schema__") {
+            if (arguments.size() != 2) throw TypeError("rest_validator_has_schema() requires 2 arguments");
+            void* v = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string schema = std::get<std::string>(arguments[1]);
+            last_value = (rest_validator_has_schema(v, schema.c_str()) == 1); return;
+
+        } else if (func_name == "__builtin_rest_validator_schema_count__") {
+            if (arguments.size() != 1) throw TypeError("rest_validator_schema_count() requires 1 argument");
+            void* v = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = rest_validator_schema_count(v); return;
+
+        } else if (func_name == "__builtin_rest_formatter_create__") {
+            std::string ver = arguments.size() >= 1 ? std::get<std::string>(arguments[0]) : "1.0";
+            void* f = rest_formatter_create(ver.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(f)); return;
+
+        } else if (func_name == "__builtin_rest_formatter_success__") {
+            if (arguments.size() < 2) throw TypeError("rest_formatter_success() requires 2-3 arguments (formatter, data, [status])");
+            void* f = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string data = std::get<std::string>(arguments[1]);
+            int status = arguments.size() >= 3 ? std::get<int>(arguments[2]) : 200;
+            last_value = std::string(rest_formatter_success(f, data.c_str(), status)); return;
+
+        } else if (func_name == "__builtin_rest_formatter_created__") {
+            if (arguments.size() != 2) throw TypeError("rest_formatter_created() requires 2 arguments");
+            void* f = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string data = std::get<std::string>(arguments[1]);
+            last_value = std::string(rest_formatter_created(f, data.c_str())); return;
+
+        } else if (func_name == "__builtin_rest_formatter_error__") {
+            if (arguments.size() < 2) throw TypeError("rest_formatter_error() requires 2-3 arguments");
+            void* f = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string msg = std::get<std::string>(arguments[1]);
+            int status = arguments.size() >= 3 ? std::get<int>(arguments[2]) : 400;
+            last_value = std::string(rest_formatter_error(f, msg.c_str(), status)); return;
+
+        } else if (func_name == "__builtin_rest_formatter_not_found__") {
+            if (arguments.size() < 1) throw TypeError("rest_formatter_not_found() requires 1-2 arguments");
+            void* f = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string res = arguments.size() >= 2 ? std::get<std::string>(arguments[1]) : "Resource";
+            last_value = std::string(rest_formatter_not_found(f, res.c_str())); return;
+
+        } else if (func_name == "__builtin_rest_formatter_unauthorized__") {
+            if (arguments.size() < 1) throw TypeError("rest_formatter_unauthorized() requires 1-2 arguments");
+            void* f = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string msg = arguments.size() >= 2 ? std::get<std::string>(arguments[1]) : "Unauthorized";
+            last_value = std::string(rest_formatter_unauthorized(f, msg.c_str())); return;
+
+        } else if (func_name == "__builtin_rest_formatter_forbidden__") {
+            if (arguments.size() < 1) throw TypeError("rest_formatter_forbidden() requires 1-2 arguments");
+            void* f = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string msg = arguments.size() >= 2 ? std::get<std::string>(arguments[1]) : "Forbidden";
+            last_value = std::string(rest_formatter_forbidden(f, msg.c_str())); return;
+
+        } else if (func_name == "__builtin_rest_formatter_validation_error__") {
+            if (arguments.size() != 2) throw TypeError("rest_formatter_validation_error() requires 2 arguments");
+            void* f = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string errs = std::get<std::string>(arguments[1]);
+            last_value = std::string(rest_formatter_validation_error(f, errs.c_str())); return;
+
+        } else if (func_name == "__builtin_rest_formatter_paginated__") {
+            if (arguments.size() != 5) throw TypeError("rest_formatter_paginated() requires 5 arguments (formatter, data, page, per_page, total)");
+            void* f = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string data = std::get<std::string>(arguments[1]);
+            int page     = std::get<int>(arguments[2]);
+            int per_page = std::get<int>(arguments[3]);
+            int total    = std::get<int>(arguments[4]);
+            last_value = std::string(rest_formatter_paginated(f, data.c_str(), page, per_page, total)); return;
+
+        } else if (func_name == "__builtin_rest_formatter_pretty__") {
+            if (arguments.size() != 2) throw TypeError("rest_formatter_pretty() requires 2 arguments");
+            void* f = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string json = std::get<std::string>(arguments[1]);
+            last_value = std::string(rest_formatter_pretty(f, json.c_str())); return;
+
+        } else if (func_name == "__builtin_rest_docs_create__") {
+            std::string title = arguments.size() >= 1 ? std::get<std::string>(arguments[0]) : "API";
+            std::string ver   = arguments.size() >= 2 ? std::get<std::string>(arguments[1]) : "1.0.0";
+            void* d = rest_docs_create(title.c_str(), ver.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(d)); return;
+
+        } else if (func_name == "__builtin_rest_docs_add_endpoint__") {
+            if (arguments.size() < 3) throw TypeError("rest_docs_add_endpoint() requires 3-4 arguments (docs, method, path, [summary], [auth])");
+            void* d = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string method  = std::get<std::string>(arguments[1]);
+            std::string path    = std::get<std::string>(arguments[2]);
+            std::string summary = arguments.size() >= 4 ? std::get<std::string>(arguments[3]) : "";
+            int auth = arguments.size() >= 5 ? (std::holds_alternative<bool>(arguments[4]) ? (std::get<bool>(arguments[4]) ? 1 : 0) : std::get<int>(arguments[4])) : 0;
+            rest_docs_add_endpoint(d, method.c_str(), path.c_str(), summary.c_str(), auth);
+            last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_rest_docs_from_router__") {
+            if (arguments.size() != 2) throw TypeError("rest_docs_from_router() requires 2 arguments (docs, router)");
+            void* d = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            void* r = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[1])));
+            rest_docs_from_router(d, r);
+            last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_rest_docs_openapi__") {
+            if (arguments.size() != 1) throw TypeError("rest_docs_openapi() requires 1 argument");
+            void* d = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(rest_docs_openapi(d)); return;
+
+        } else if (func_name == "__builtin_rest_docs_markdown__") {
+            if (arguments.size() != 1) throw TypeError("rest_docs_markdown() requires 1 argument");
+            void* d = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(rest_docs_markdown(d)); return;
+
+        } else if (func_name == "__builtin_rest_docs_html__") {
+            if (arguments.size() != 1) throw TypeError("rest_docs_html() requires 1 argument");
+            void* d = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(rest_docs_html(d)); return;
+
+        } else if (func_name == "__builtin_rest_docs_endpoint_count__") {
+            if (arguments.size() != 1) throw TypeError("rest_docs_endpoint_count() requires 1 argument");
+            void* d = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = rest_docs_endpoint_count(d); return;
+
+        // ===== GraphQL Engine =====
+        } else if (func_name == "__builtin_gql_schema_create__") {
+            void* s = gql_schema_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(s)); return;
+
+        } else if (func_name == "__builtin_gql_schema_add_type__") {
+            if (arguments.size() < 2) throw TypeError("gql_schema_add_type() requires 2-3 arguments (schema, name, [kind], [description])");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string name = std::get<std::string>(arguments[1]);
+            std::string kind = arguments.size() >= 3 ? std::get<std::string>(arguments[2]) : "type";
+            std::string desc = arguments.size() >= 4 ? std::get<std::string>(arguments[3]) : "";
+            gql_schema_add_type(s, name.c_str(), kind.c_str(), desc.c_str()); last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_schema_add_field__") {
+            if (arguments.size() < 4) throw TypeError("gql_schema_add_field() requires 4+ arguments (schema, type, field, field_type, [non_null], [is_list], [desc])");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string type_name  = std::get<std::string>(arguments[1]);
+            std::string field_name = std::get<std::string>(arguments[2]);
+            std::string field_type = std::get<std::string>(arguments[3]);
+            int non_null = arguments.size() >= 5 ? (std::holds_alternative<bool>(arguments[4]) ? (std::get<bool>(arguments[4]) ? 1 : 0) : std::get<int>(arguments[4])) : 0;
+            int is_list  = arguments.size() >= 6 ? (std::holds_alternative<bool>(arguments[5]) ? (std::get<bool>(arguments[5]) ? 1 : 0) : std::get<int>(arguments[5])) : 0;
+            std::string desc = arguments.size() >= 7 ? std::get<std::string>(arguments[6]) : "";
+            gql_schema_add_field(s, type_name.c_str(), field_name.c_str(), field_type.c_str(), non_null, is_list, desc.c_str());
+            last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_schema_add_scalar__") {
+            if (arguments.size() < 2) throw TypeError("gql_schema_add_scalar() requires 2 arguments");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string name = std::get<std::string>(arguments[1]);
+            std::string desc = arguments.size() >= 3 ? std::get<std::string>(arguments[2]) : "";
+            gql_schema_add_scalar(s, name.c_str(), desc.c_str()); last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_schema_add_enum__") {
+            if (arguments.size() < 3) throw TypeError("gql_schema_add_enum() requires 3 arguments (schema, name, values_csv)");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string name = std::get<std::string>(arguments[1]);
+            std::string vals = std::get<std::string>(arguments[2]);
+            gql_schema_add_enum(s, name.c_str(), vals.c_str()); last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_schema_set_query__") {
+            if (arguments.size() != 2) throw TypeError("gql_schema_set_query() requires 2 arguments");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            gql_schema_set_query(s, std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_schema_set_mutation__") {
+            if (arguments.size() != 2) throw TypeError("gql_schema_set_mutation() requires 2 arguments");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            gql_schema_set_mutation(s, std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_schema_set_subscription__") {
+            if (arguments.size() != 2) throw TypeError("gql_schema_set_subscription() requires 2 arguments");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            gql_schema_set_subscription(s, std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_schema_has_type__") {
+            if (arguments.size() != 2) throw TypeError("gql_schema_has_type() requires 2 arguments");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = (gql_schema_has_type(s, std::get<std::string>(arguments[1]).c_str()) == 1); return;
+
+        } else if (func_name == "__builtin_gql_schema_type_count__") {
+            if (arguments.size() != 1) throw TypeError("gql_schema_type_count() requires 1 argument");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = gql_schema_type_count(s); return;
+
+        } else if (func_name == "__builtin_gql_schema_validate__") {
+            if (arguments.size() != 1) throw TypeError("gql_schema_validate() requires 1 argument");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            char err[512] = {};
+            last_value = (gql_schema_validate(s, err, sizeof(err)) == 1); return;
+
+        } else if (func_name == "__builtin_gql_schema_to_sdl__") {
+            if (arguments.size() != 1) throw TypeError("gql_schema_to_sdl() requires 1 argument");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(gql_schema_to_sdl(s)); return;
+
+        } else if (func_name == "__builtin_gql_schema_introspect__") {
+            if (arguments.size() != 1) throw TypeError("gql_schema_introspect() requires 1 argument");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(gql_schema_introspect(s)); return;
+
+        } else if (func_name == "__builtin_gql_query_engine_create__") {
+            if (arguments.size() != 1) throw TypeError("gql_query_engine_create() requires 1 argument (schema)");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            void* e = gql_query_engine_create(s);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(e)); return;
+
+        } else if (func_name == "__builtin_gql_query_engine_register_data__") {
+            if (arguments.size() != 4) throw TypeError("gql_query_engine_register_data() requires 4 arguments (engine, type, field, json)");
+            void* e = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string type_name  = std::get<std::string>(arguments[1]);
+            std::string field_name = std::get<std::string>(arguments[2]);
+            std::string json_data  = std::get<std::string>(arguments[3]);
+            gql_query_engine_register_data(e, type_name.c_str(), field_name.c_str(), json_data.c_str());
+            last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_query_execute__") {
+            if (arguments.size() < 2) throw TypeError("gql_query_execute() requires 2-3 arguments (engine, query, [variables])");
+            void* e = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string query = std::get<std::string>(arguments[1]);
+            std::string vars  = arguments.size() >= 3 ? std::get<std::string>(arguments[2]) : "{}";
+            last_value = std::string(gql_query_execute(e, query.c_str(), vars.c_str())); return;
+
+        } else if (func_name == "__builtin_gql_query_complexity__") {
+            if (arguments.size() != 2) throw TypeError("gql_query_complexity() requires 2 arguments");
+            void* e = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string query = std::get<std::string>(arguments[1]);
+            last_value = gql_query_complexity(e, query.c_str()); return;
+
+        } else if (func_name == "__builtin_gql_query_resolver_count__") {
+            if (arguments.size() != 1) throw TypeError("gql_query_resolver_count() requires 1 argument");
+            void* e = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = gql_query_resolver_count(e); return;
+
+        } else if (func_name == "__builtin_gql_mutation_engine_create__") {
+            if (arguments.size() != 1) throw TypeError("gql_mutation_engine_create() requires 1 argument (schema)");
+            void* s = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            void* m = gql_mutation_engine_create(s);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+
+        } else if (func_name == "__builtin_gql_mutation_register__") {
+            if (arguments.size() != 3) throw TypeError("gql_mutation_register() requires 3 arguments (engine, name, result_json)");
+            void* m = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string name   = std::get<std::string>(arguments[1]);
+            std::string result = std::get<std::string>(arguments[2]);
+            gql_mutation_register(m, name.c_str(), result.c_str()); last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_mutation_execute__") {
+            if (arguments.size() < 2) throw TypeError("gql_mutation_execute() requires 2-3 arguments");
+            void* m = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string mutation = std::get<std::string>(arguments[1]);
+            std::string vars     = arguments.size() >= 3 ? std::get<std::string>(arguments[2]) : "{}";
+            last_value = std::string(gql_mutation_execute(m, mutation.c_str(), vars.c_str())); return;
+
+        } else if (func_name == "__builtin_gql_mutation_count__") {
+            if (arguments.size() != 1) throw TypeError("gql_mutation_count() requires 1 argument");
+            void* m = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = gql_mutation_count(m); return;
+
+        } else if (func_name == "__builtin_gql_subscription_manager_create__") {
+            void* mgr = gql_subscription_manager_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mgr)); return;
+
+        } else if (func_name == "__builtin_gql_subscribe__") {
+            if (arguments.size() < 3) throw TypeError("gql_subscribe() requires 3-4 arguments (mgr, client_id, event, [query])");
+            void* mgr = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string client = std::get<std::string>(arguments[1]);
+            std::string event  = std::get<std::string>(arguments[2]);
+            std::string query  = arguments.size() >= 4 ? std::get<std::string>(arguments[3]) : "";
+            last_value = std::string(gql_subscribe(mgr, client.c_str(), event.c_str(), query.c_str())); return;
+
+        } else if (func_name == "__builtin_gql_unsubscribe__") {
+            if (arguments.size() != 2) throw TypeError("gql_unsubscribe() requires 2 arguments");
+            void* mgr = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string sub_id = std::get<std::string>(arguments[1]);
+            last_value = (gql_unsubscribe(mgr, sub_id.c_str()) == 1); return;
+
+        } else if (func_name == "__builtin_gql_unsubscribe_client__") {
+            if (arguments.size() != 2) throw TypeError("gql_unsubscribe_client() requires 2 arguments");
+            void* mgr = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            gql_unsubscribe_client(mgr, std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+
+        } else if (func_name == "__builtin_gql_publish__") {
+            if (arguments.size() != 3) throw TypeError("gql_publish() requires 3 arguments (mgr, event, data_json)");
+            void* mgr = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string event = std::get<std::string>(arguments[1]);
+            std::string data  = std::get<std::string>(arguments[2]);
+            last_value = std::string(gql_publish(mgr, event.c_str(), data.c_str())); return;
+
+        } else if (func_name == "__builtin_gql_subscription_count__") {
+            if (arguments.size() != 1) throw TypeError("gql_subscription_count() requires 1 argument");
+            void* mgr = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = gql_subscription_count(mgr); return;
+
+        } else if (func_name == "__builtin_gql_client_subscription_count__") {
+            if (arguments.size() != 2) throw TypeError("gql_client_subscription_count() requires 2 arguments");
+            void* mgr = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = gql_client_subscription_count(mgr, std::get<std::string>(arguments[1]).c_str()); return;
+
+        } else if (func_name == "__builtin_gql_is_subscribed__") {
+            if (arguments.size() != 3) throw TypeError("gql_is_subscribed() requires 3 arguments");
+            void* mgr = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string client = std::get<std::string>(arguments[1]);
+            std::string event  = std::get<std::string>(arguments[2]);
+            last_value = (gql_is_subscribed(mgr, client.c_str(), event.c_str()) == 1); return;
+
+        // ===== Milestone 6: Blockchain Builtins =====
+        } else if (func_name == "__builtin_bc_sha256__") {
+        if (arguments.size() != 1) throw TypeError("bc_sha256() requires 1 argument");
+        std::string data = std::get<std::string>(arguments[0]);
+        last_value = std::string(bc_sha256(data.c_str())); return;
+    } else if (func_name == "__builtin_bc_sha256_double__") {
+        if (arguments.size() != 1) throw TypeError("bc_sha256_double() requires 1 argument");
+        std::string data = std::get<std::string>(arguments[0]);
+        last_value = std::string(bc_sha256_double(data.c_str())); return;
+    } else if (func_name == "__builtin_bc_merkle_create__") {
+        void* t = bc_merkle_create();
+        last_value = static_cast<int>(reinterpret_cast<intptr_t>(t)); return;
+    } else if (func_name == "__builtin_bc_merkle_add_leaf__") {
+        if (arguments.size() != 2) throw TypeError("bc_merkle_add_leaf() requires 2 arguments");
+        void* t = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string data = std::get<std::string>(arguments[1]);
+        bc_merkle_add_leaf(t, data.c_str()); last_value = nullptr; return;
+    } else if (func_name == "__builtin_bc_merkle_build__") {
+        if (arguments.size() != 1) throw TypeError("bc_merkle_build() requires 1 argument");
+        void* t = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_merkle_build(t)); return;
+    } else if (func_name == "__builtin_bc_merkle_root__") {
+        if (arguments.size() != 1) throw TypeError("bc_merkle_root() requires 1 argument");
+        void* t = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_merkle_root(t)); return;
+    } else if (func_name == "__builtin_bc_merkle_leaf_count__") {
+        if (arguments.size() != 1) throw TypeError("bc_merkle_leaf_count() requires 1 argument");
+        void* t = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = bc_merkle_leaf_count(t); return;
+    } else if (func_name == "__builtin_bc_tx_create__") {
+        if (arguments.size() < 3) throw TypeError("bc_tx_create() requires 3-4 arguments");
+        std::string sender   = std::get<std::string>(arguments[0]);
+        std::string receiver = std::get<std::string>(arguments[1]);
+        double amount = std::holds_alternative<double>(arguments[2])
+            ? std::get<double>(arguments[2])
+            : static_cast<double>(std::get<int>(arguments[2]));
+        std::string data = arguments.size() > 3 ? std::get<std::string>(arguments[3]) : "";
+        void* tx = bc_tx_create(sender.c_str(), receiver.c_str(), amount, data.c_str());
+        last_value = static_cast<int>(reinterpret_cast<intptr_t>(tx)); return;
+    } else if (func_name == "__builtin_bc_tx_id__") {
+        if (arguments.size() != 1) throw TypeError("bc_tx_id() requires 1 argument");
+        void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_tx_id(tx)); return;
+    } else if (func_name == "__builtin_bc_tx_hash__") {
+        if (arguments.size() != 1) throw TypeError("bc_tx_hash() requires 1 argument");
+        void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_tx_hash(tx)); return;
+    } else if (func_name == "__builtin_bc_tx_to_string__") {
+        if (arguments.size() != 1) throw TypeError("bc_tx_to_string() requires 1 argument");
+        void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_tx_to_string(tx)); return;
+    } else if (func_name == "__builtin_bc_block_create__") {
+        if (arguments.size() < 2) throw TypeError("bc_block_create() requires 2-3 arguments");
+        int index = std::get<int>(arguments[0]);
+        std::string prev = std::get<std::string>(arguments[1]);
+        int diff = arguments.size() > 2 ? std::get<int>(arguments[2]) : 2;
+        void* b = bc_block_create(index, prev.c_str(), diff);
+        last_value = static_cast<int>(reinterpret_cast<intptr_t>(b)); return;
+    } else if (func_name == "__builtin_bc_block_add_tx__") {
+        if (arguments.size() != 2) throw TypeError("bc_block_add_tx() requires 2 arguments");
+        void* b  = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[1])));
+        bc_block_add_tx(b, tx); last_value = nullptr; return;
+    } else if (func_name == "__builtin_bc_block_mine__") {
+        if (arguments.size() != 1) throw TypeError("bc_block_mine() requires 1 argument");
+        void* b = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        bc_block_mine(b); last_value = nullptr; return;
+    } else if (func_name == "__builtin_bc_block_hash__") {
+        if (arguments.size() != 1) throw TypeError("bc_block_hash() requires 1 argument");
+        void* b = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_block_hash(b)); return;
+    } else if (func_name == "__builtin_bc_block_prev_hash__") {
+        if (arguments.size() != 1) throw TypeError("bc_block_prev_hash() requires 1 argument");
+        void* b = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_block_prev_hash(b)); return;
+    } else if (func_name == "__builtin_bc_block_index__") {
+        if (arguments.size() != 1) throw TypeError("bc_block_index() requires 1 argument");
+        void* b = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = bc_block_index(b); return;
+    } else if (func_name == "__builtin_bc_block_nonce__") {
+        if (arguments.size() != 1) throw TypeError("bc_block_nonce() requires 1 argument");
+        void* b = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = bc_block_nonce(b); return;
+    } else if (func_name == "__builtin_bc_block_tx_count__") {
+        if (arguments.size() != 1) throw TypeError("bc_block_tx_count() requires 1 argument");
+        void* b = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = bc_block_tx_count(b); return;
+    } else if (func_name == "__builtin_bc_block_is_valid__") {
+        if (arguments.size() != 1) throw TypeError("bc_block_is_valid() requires 1 argument");
+        void* b = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = (bc_block_is_valid(b) == 1); return;
+    } else if (func_name == "__builtin_bc_block_to_string__") {
+        if (arguments.size() != 1) throw TypeError("bc_block_to_string() requires 1 argument");
+        void* b = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_block_to_string(b)); return;
+    } else if (func_name == "__builtin_bc_block_merkle_root__") {
+        if (arguments.size() != 1) throw TypeError("bc_block_merkle_root() requires 1 argument");
+        void* b = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_block_merkle_root(b)); return;
+    } else if (func_name == "__builtin_bc_chain_create__") {
+        int diff      = arguments.size() > 0 ? std::get<int>(arguments[0]) : 2;
+        int consensus = arguments.size() > 1 ? std::get<int>(arguments[1]) : 0;
+        void* c = bc_chain_create(diff, consensus);
+        last_value = static_cast<int>(reinterpret_cast<intptr_t>(c)); return;
+    } else if (func_name == "__builtin_bc_chain_add_tx__") {
+        if (arguments.size() < 3) throw TypeError("bc_chain_add_tx() requires 3-4 arguments");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string sender   = std::get<std::string>(arguments[1]);
+        std::string receiver = std::get<std::string>(arguments[2]);
+        double amount = arguments.size() > 3
+            ? (std::holds_alternative<double>(arguments[3])
+                ? std::get<double>(arguments[3])
+                : static_cast<double>(std::get<int>(arguments[3])))
+            : 0.0;
+        std::string data = arguments.size() > 4 ? std::get<std::string>(arguments[4]) : "";
+        last_value = std::string(bc_chain_add_tx(c, sender.c_str(), receiver.c_str(), amount, data.c_str())); return;
+    } else if (func_name == "__builtin_bc_chain_mine_block__") {
+        if (arguments.size() < 1) throw TypeError("bc_chain_mine_block() requires 1-2 arguments");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string miner = arguments.size() > 1 ? std::get<std::string>(arguments[1]) : "";
+        last_value = (bc_chain_mine_block(c, miner.c_str()) == 1); return;
+    } else if (func_name == "__builtin_bc_chain_block_count__") {
+        if (arguments.size() != 1) throw TypeError("bc_chain_block_count() requires 1 argument");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = bc_chain_block_count(c); return;
+    } else if (func_name == "__builtin_bc_chain_pending_count__") {
+        if (arguments.size() != 1) throw TypeError("bc_chain_pending_count() requires 1 argument");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = bc_chain_pending_count(c); return;
+    } else if (func_name == "__builtin_bc_chain_is_valid__") {
+        if (arguments.size() != 1) throw TypeError("bc_chain_is_valid() requires 1 argument");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = (bc_chain_is_valid(c) == 1); return;
+    } else if (func_name == "__builtin_bc_chain_get_balance__") {
+        if (arguments.size() != 2) throw TypeError("bc_chain_get_balance() requires 2 arguments");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string addr = std::get<std::string>(arguments[1]);
+        last_value = bc_chain_get_balance(c, addr.c_str()); return;
+    } else if (func_name == "__builtin_bc_chain_last_hash__") {
+        if (arguments.size() != 1) throw TypeError("bc_chain_last_hash() requires 1 argument");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_chain_last_hash(c)); return;
+    } else if (func_name == "__builtin_bc_chain_get_block_hash__") {
+        if (arguments.size() != 2) throw TypeError("bc_chain_get_block_hash() requires 2 arguments");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        int idx = std::get<int>(arguments[1]);
+        last_value = std::string(bc_chain_get_block_hash(c, idx)); return;
+    } else if (func_name == "__builtin_bc_chain_stats__") {
+        if (arguments.size() != 1) throw TypeError("bc_chain_stats() requires 1 argument");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_chain_stats(c)); return;
+    } else if (func_name == "__builtin_bc_chain_add_validator__") {
+        if (arguments.size() != 3) throw TypeError("bc_chain_add_validator() requires 3 arguments");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string addr = std::get<std::string>(arguments[1]);
+        double stake = std::holds_alternative<double>(arguments[2])
+            ? std::get<double>(arguments[2])
+            : static_cast<double>(std::get<int>(arguments[2]));
+        bc_chain_add_validator(c, addr.c_str(), stake);
+        last_value = nullptr; return;
+    } else if (func_name == "__builtin_bc_chain_select_validator__") {
+        if (arguments.size() != 1) throw TypeError("bc_chain_select_validator() requires 1 argument");
+        void* c = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = std::string(bc_chain_select_validator(c)); return;
+    } else if (func_name == "__builtin_bc_p2p_create__") {
+        void* net = bc_p2p_create();
+        last_value = static_cast<int>(reinterpret_cast<intptr_t>(net)); return;
+    } else if (func_name == "__builtin_bc_p2p_add_node__") {
+        if (arguments.size() < 1) throw TypeError("bc_p2p_add_node() requires 1-3 arguments");
+        void* net = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string addr = arguments.size() > 1 ? std::get<std::string>(arguments[1]) : "127.0.0.1";
+        int port = arguments.size() > 2 ? std::get<int>(arguments[2]) : 0;
+        last_value = std::string(bc_p2p_add_node(net, addr.c_str(), port)); return;
+    } else if (func_name == "__builtin_bc_p2p_connect__") {
+        if (arguments.size() != 2) throw TypeError("bc_p2p_connect() requires 2 arguments");
+        void* net = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string nid = std::get<std::string>(arguments[1]);
+        last_value = (bc_p2p_connect(net, nid.c_str()) == 1); return;
+    } else if (func_name == "__builtin_bc_p2p_disconnect__") {
+        if (arguments.size() != 2) throw TypeError("bc_p2p_disconnect() requires 2 arguments");
+        void* net = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string nid = std::get<std::string>(arguments[1]);
+        last_value = (bc_p2p_disconnect(net, nid.c_str()) == 1); return;
+    } else if (func_name == "__builtin_bc_p2p_broadcast_block__") {
+        if (arguments.size() != 3) throw TypeError("bc_p2p_broadcast_block() requires 3 arguments");
+        void* net = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string nid  = std::get<std::string>(arguments[1]);
+        std::string hash = std::get<std::string>(arguments[2]);
+        last_value = (bc_p2p_broadcast_block(net, nid.c_str(), hash.c_str()) == 1); return;
+    } else if (func_name == "__builtin_bc_p2p_broadcast_tx__") {
+        if (arguments.size() != 3) throw TypeError("bc_p2p_broadcast_tx() requires 3 arguments");
+        void* net = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        std::string nid = std::get<std::string>(arguments[1]);
+        std::string tid = std::get<std::string>(arguments[2]);
+        last_value = (bc_p2p_broadcast_tx(net, nid.c_str(), tid.c_str()) == 1); return;
+    } else if (func_name == "__builtin_bc_p2p_node_count__") {
+        if (arguments.size() != 1) throw TypeError("bc_p2p_node_count() requires 1 argument");
+        void* net = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = bc_p2p_node_count(net); return;
+    } else if (func_name == "__builtin_bc_p2p_connected_count__") {
+        if (arguments.size() != 1) throw TypeError("bc_p2p_connected_count() requires 1 argument");
+        void* net = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+        last_value = bc_p2p_connected_count(net); return;
+        } else if (func_name == "__builtin_bc_p2p_status__") {
+            if (arguments.size() != 1) throw TypeError("bc_p2p_status() requires 1 argument");
+            void* net = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(bc_p2p_status(net)); return;
+
+        // ===== Milestone 6 Phase 2: Cryptography Builtins =====
+        } else if (func_name == "__builtin_crypto_sha256__") {
+            if (arguments.size() != 1) throw TypeError("crypto_sha256() requires 1 argument");
+            last_value = std::string(crypto_sha256(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_sha512__") {
+            if (arguments.size() != 1) throw TypeError("crypto_sha512() requires 1 argument");
+            last_value = std::string(crypto_sha512(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_sha1__") {
+            if (arguments.size() != 1) throw TypeError("crypto_sha1() requires 1 argument");
+            last_value = std::string(crypto_sha1(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_md5__") {
+            if (arguments.size() != 1) throw TypeError("crypto_md5() requires 1 argument");
+            last_value = std::string(crypto_md5(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_ripemd160__") {
+            if (arguments.size() != 1) throw TypeError("crypto_ripemd160() requires 1 argument");
+            last_value = std::string(crypto_ripemd160(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_hmac_sha256__") {
+            if (arguments.size() != 2) throw TypeError("crypto_hmac_sha256() requires 2 arguments");
+            last_value = std::string(crypto_hmac_sha256(
+                std::get<std::string>(arguments[0]).c_str(),
+                std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_hmac_sha512__") {
+            if (arguments.size() != 2) throw TypeError("crypto_hmac_sha512() requires 2 arguments");
+            last_value = std::string(crypto_hmac_sha512(
+                std::get<std::string>(arguments[0]).c_str(),
+                std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_to_base64__") {
+            if (arguments.size() != 1) throw TypeError("crypto_to_base64() requires 1 argument");
+            last_value = std::string(crypto_to_base64(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_from_base64__") {
+            if (arguments.size() != 1) throw TypeError("crypto_from_base64() requires 1 argument");
+            last_value = std::string(crypto_from_base64(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_keypair_generate__") {
+            std::string curve = arguments.size() > 0 ? std::get<std::string>(arguments[0]) : "secp256k1";
+            void* kp = crypto_keypair_generate(curve.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(kp)); return;
+        } else if (func_name == "__builtin_crypto_keypair_from_private__") {
+            if (arguments.size() < 1) throw TypeError("crypto_keypair_from_private() requires 1-2 arguments");
+            std::string priv = std::get<std::string>(arguments[0]);
+            std::string curve = arguments.size() > 1 ? std::get<std::string>(arguments[1]) : "secp256k1";
+            void* kp = crypto_keypair_from_private(priv.c_str(), curve.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(kp)); return;
+        } else if (func_name == "__builtin_crypto_keypair_destroy__") {
+            if (arguments.size() != 1) throw TypeError("crypto_keypair_destroy() requires 1 argument");
+            void* kp = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            crypto_keypair_destroy(kp); last_value = nullptr; return;
+        } else if (func_name == "__builtin_crypto_keypair_private_pem__") {
+            if (arguments.size() != 1) throw TypeError("crypto_keypair_private_pem() requires 1 argument");
+            void* kp = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(crypto_keypair_private_pem(kp)); return;
+        } else if (func_name == "__builtin_crypto_keypair_public_pem__") {
+            if (arguments.size() != 1) throw TypeError("crypto_keypair_public_pem() requires 1 argument");
+            void* kp = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(crypto_keypair_public_pem(kp)); return;
+        } else if (func_name == "__builtin_crypto_keypair_private_hex__") {
+            if (arguments.size() != 1) throw TypeError("crypto_keypair_private_hex() requires 1 argument");
+            void* kp = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(crypto_keypair_private_hex(kp)); return;
+        } else if (func_name == "__builtin_crypto_keypair_public_hex__") {
+            if (arguments.size() != 1) throw TypeError("crypto_keypair_public_hex() requires 1 argument");
+            void* kp = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(crypto_keypair_public_hex(kp)); return;
+        } else if (func_name == "__builtin_crypto_keypair_curve__") {
+            if (arguments.size() != 1) throw TypeError("crypto_keypair_curve() requires 1 argument");
+            void* kp = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(crypto_keypair_curve(kp)); return;
+        } else if (func_name == "__builtin_crypto_ecdsa_sign__") {
+            if (arguments.size() != 2) throw TypeError("crypto_ecdsa_sign() requires 2 arguments");
+            void* kp = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string msg = std::get<std::string>(arguments[1]);
+            last_value = std::string(crypto_ecdsa_sign(kp, msg.c_str())); return;
+        } else if (func_name == "__builtin_crypto_ecdsa_verify__") {
+            if (arguments.size() != 3) throw TypeError("crypto_ecdsa_verify() requires 3 arguments");
+            void* kp = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string msg = std::get<std::string>(arguments[1]);
+            std::string sig = std::get<std::string>(arguments[2]);
+            last_value = (crypto_ecdsa_verify(kp, msg.c_str(), sig.c_str()) == 1); return;
+        } else if (func_name == "__builtin_crypto_ecdsa_verify_pubhex__") {
+            if (arguments.size() != 4) throw TypeError("crypto_ecdsa_verify_pubhex() requires 4 arguments");
+            std::string pub   = std::get<std::string>(arguments[0]);
+            std::string curve = std::get<std::string>(arguments[1]);
+            std::string msg   = std::get<std::string>(arguments[2]);
+            std::string sig   = std::get<std::string>(arguments[3]);
+            last_value = (crypto_ecdsa_verify_pubhex(pub.c_str(), curve.c_str(), msg.c_str(), sig.c_str()) == 1); return;
+        } else if (func_name == "__builtin_crypto_pubkey_to_eth_address__") {
+            if (arguments.size() != 1) throw TypeError("crypto_pubkey_to_eth_address() requires 1 argument");
+            last_value = std::string(crypto_pubkey_to_eth_address(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_pubkey_to_btc_address__") {
+            if (arguments.size() != 1) throw TypeError("crypto_pubkey_to_btc_address() requires 1 argument");
+            last_value = std::string(crypto_pubkey_to_btc_address(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_privkey_to_wif__") {
+            if (arguments.size() < 1) throw TypeError("crypto_privkey_to_wif() requires 1-2 arguments");
+            std::string priv = std::get<std::string>(arguments[0]);
+            int compressed = arguments.size() > 1 ? (std::get<bool>(arguments[1]) ? 1 : 0) : 1;
+            last_value = std::string(crypto_privkey_to_wif(priv.c_str(), compressed)); return;
+        } else if (func_name == "__builtin_crypto_wif_to_privkey__") {
+            if (arguments.size() != 1) throw TypeError("crypto_wif_to_privkey() requires 1 argument");
+            last_value = std::string(crypto_wif_to_privkey(std::get<std::string>(arguments[0]).c_str())); return;
+        } else if (func_name == "__builtin_crypto_aes_encrypt__") {
+            if (arguments.size() != 2) throw TypeError("crypto_aes_encrypt() requires 2 arguments");
+            std::string key = std::get<std::string>(arguments[0]);
+            std::string pt  = std::get<std::string>(arguments[1]);
+            void* res = crypto_aes_encrypt(key.c_str(), pt.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(res)); return;
+        } else if (func_name == "__builtin_crypto_aes_result_destroy__") {
+            if (arguments.size() != 1) throw TypeError("crypto_aes_result_destroy() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            crypto_aes_result_destroy(res); last_value = nullptr; return;
+        } else if (func_name == "__builtin_crypto_aes_ciphertext__") {
+            if (arguments.size() != 1) throw TypeError("crypto_aes_ciphertext() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(crypto_aes_ciphertext(res)); return;
+        } else if (func_name == "__builtin_crypto_aes_iv__") {
+            if (arguments.size() != 1) throw TypeError("crypto_aes_iv() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(crypto_aes_iv(res)); return;
+        } else if (func_name == "__builtin_crypto_aes_tag__") {
+            if (arguments.size() != 1) throw TypeError("crypto_aes_tag() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(crypto_aes_tag(res)); return;
+        } else if (func_name == "__builtin_crypto_aes_decrypt__") {
+            if (arguments.size() != 4) throw TypeError("crypto_aes_decrypt() requires 4 arguments");
+            std::string key = std::get<std::string>(arguments[0]);
+            std::string ct  = std::get<std::string>(arguments[1]);
+            std::string iv  = std::get<std::string>(arguments[2]);
+            std::string tag = std::get<std::string>(arguments[3]);
+            last_value = std::string(crypto_aes_decrypt(key.c_str(), ct.c_str(), iv.c_str(), tag.c_str())); return;
+        } else if (func_name == "__builtin_crypto_pbkdf2__") {
+            if (arguments.size() < 2) throw TypeError("crypto_pbkdf2() requires 2-4 arguments");
+            std::string pass = std::get<std::string>(arguments[0]);
+            std::string salt = std::get<std::string>(arguments[1]);
+            int iters   = arguments.size() > 2 ? std::get<int>(arguments[2]) : 100000;
+            int key_len = arguments.size() > 3 ? std::get<int>(arguments[3]) : 32;
+            last_value = std::string(crypto_pbkdf2(pass.c_str(), salt.c_str(), iters, key_len)); return;
+        } else if (func_name == "__builtin_crypto_random_bytes__") {
+            int count = arguments.size() > 0 ? std::get<int>(arguments[0]) : 32;
+            last_value = std::string(crypto_random_bytes(count)); return;
+
+        // ===== Milestone 6 Phase 3: Smart Contract VM =====
+        } else if (func_name == "__builtin_sc_vm_create__") {
+            void* vm = sc_vm_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(vm)); return;
+        } else if (func_name == "__builtin_sc_vm_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sc_vm_destroy() requires 1 argument");
+            void* vm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_vm_destroy(vm); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_vm_set_storage__") {
+            if (arguments.size() != 4) throw TypeError("sc_vm_set_storage() requires 4 arguments");
+            void* vm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_vm_set_storage(vm,
+                std::get<std::string>(arguments[1]).c_str(),
+                std::get<std::string>(arguments[2]).c_str(),
+                std::get<std::string>(arguments[3]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_vm_get_storage__") {
+            if (arguments.size() != 3) throw TypeError("sc_vm_get_storage() requires 3 arguments");
+            void* vm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(sc_vm_get_storage(vm,
+                std::get<std::string>(arguments[1]).c_str(),
+                std::get<std::string>(arguments[2]).c_str())); return;
+        } else if (func_name == "__builtin_sc_vm_set_balance__") {
+            if (arguments.size() != 3) throw TypeError("sc_vm_set_balance() requires 3 arguments");
+            void* vm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            int64_t bal = static_cast<int64_t>(std::get<int>(arguments[2]));
+            sc_vm_set_balance(vm, std::get<std::string>(arguments[1]).c_str(), bal);
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_vm_get_balance__") {
+            if (arguments.size() != 2) throw TypeError("sc_vm_get_balance() requires 2 arguments");
+            void* vm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = static_cast<int>(sc_vm_get_balance(vm,
+                std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_sc_vm_state_dump__") {
+            if (arguments.size() != 1) throw TypeError("sc_vm_state_dump() requires 1 argument");
+            void* vm = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(sc_vm_state_dump(vm)); return;
+        } else if (func_name == "__builtin_sc_bytecode_create__") {
+            void* bc = sc_bytecode_create();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(bc)); return;
+        } else if (func_name == "__builtin_sc_bytecode_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sc_bytecode_destroy() requires 1 argument");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_bytecode_destroy(bc); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_bytecode_push_int__") {
+            if (arguments.size() != 2) throw TypeError("sc_bytecode_push_int() requires 2 arguments");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_bytecode_push_int(bc, static_cast<int64_t>(std::get<int>(arguments[1])));
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_bytecode_push_str__") {
+            if (arguments.size() != 2) throw TypeError("sc_bytecode_push_str() requires 2 arguments");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_bytecode_push_str(bc, std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_bytecode_push_bool__") {
+            if (arguments.size() != 2) throw TypeError("sc_bytecode_push_bool() requires 2 arguments");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_bytecode_push_bool(bc, std::get<bool>(arguments[1]) ? 1 : 0);
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_bytecode_push_double__") {
+            if (arguments.size() != 2) throw TypeError("sc_bytecode_push_double() requires 2 arguments");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            double dv = std::holds_alternative<double>(arguments[1])
+                ? std::get<double>(arguments[1])
+                : static_cast<double>(std::get<int>(arguments[1]));
+            sc_bytecode_push_double(bc, dv); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_bytecode_emit__") {
+            if (arguments.size() != 2) throw TypeError("sc_bytecode_emit() requires 2 arguments");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_bytecode_emit(bc, std::get<int>(arguments[1]));
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_bytecode_label__") {
+            if (arguments.size() != 2) throw TypeError("sc_bytecode_label() requires 2 arguments");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_bytecode_label(bc, std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_bytecode_jump__") {
+            if (arguments.size() != 2) throw TypeError("sc_bytecode_jump() requires 2 arguments");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_bytecode_jump(bc, std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_bytecode_jumpi__") {
+            if (arguments.size() != 2) throw TypeError("sc_bytecode_jumpi() requires 2 arguments");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_bytecode_jumpi(bc, std::get<std::string>(arguments[1]).c_str());
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_bytecode_size__") {
+            if (arguments.size() != 1) throw TypeError("sc_bytecode_size() requires 1 argument");
+            void* bc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = sc_bytecode_size(bc); return;
+        } else if (func_name == "__builtin_sc_ctx_create__") {
+            if (arguments.size() < 2) throw TypeError("sc_ctx_create() requires 2-4 arguments");
+            std::string caller   = std::get<std::string>(arguments[0]);
+            std::string contract = std::get<std::string>(arguments[1]);
+            int64_t value    = arguments.size() > 2 ? static_cast<int64_t>(std::get<int>(arguments[2])) : 0;
+            uint64_t gas_lim = arguments.size() > 3 ? static_cast<uint64_t>(std::get<int>(arguments[3])) : 1000000;
+            void* ctx = sc_ctx_create(caller.c_str(), contract.c_str(), value, gas_lim);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(ctx)); return;
+        } else if (func_name == "__builtin_sc_ctx_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sc_ctx_destroy() requires 1 argument");
+            void* ctx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_ctx_destroy(ctx); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_ctx_set_block__") {
+            if (arguments.size() != 3) throw TypeError("sc_ctx_set_block() requires 3 arguments");
+            void* ctx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_ctx_set_block(ctx,
+                static_cast<uint64_t>(std::get<int>(arguments[1])),
+                static_cast<uint64_t>(std::get<int>(arguments[2])));
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_execute__") {
+            if (arguments.size() != 3) throw TypeError("sc_execute() requires 3 arguments");
+            void* vm  = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            void* bc  = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[1])));
+            void* ctx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[2])));
+            void* res = sc_execute(vm, bc, ctx);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(res)); return;
+        } else if (func_name == "__builtin_sc_result_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sc_result_destroy() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            sc_result_destroy(res); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sc_result_success__") {
+            if (arguments.size() != 1) throw TypeError("sc_result_success() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = (sc_result_success(res) == 1); return;
+        } else if (func_name == "__builtin_sc_result_return_value__") {
+            if (arguments.size() != 1) throw TypeError("sc_result_return_value() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(sc_result_return_value(res)); return;
+        } else if (func_name == "__builtin_sc_result_revert_reason__") {
+            if (arguments.size() != 1) throw TypeError("sc_result_revert_reason() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(sc_result_revert_reason(res)); return;
+        } else if (func_name == "__builtin_sc_result_gas_used__") {
+            if (arguments.size() != 1) throw TypeError("sc_result_gas_used() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = static_cast<int>(sc_result_gas_used(res)); return;
+        } else if (func_name == "__builtin_sc_result_event_count__") {
+            if (arguments.size() != 1) throw TypeError("sc_result_event_count() requires 1 argument");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = sc_result_event_count(res); return;
+        } else if (func_name == "__builtin_sc_result_event_name__") {
+            if (arguments.size() != 2) throw TypeError("sc_result_event_name() requires 2 arguments");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(sc_result_event_name(res, std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sc_result_event_data__") {
+            if (arguments.size() != 2) throw TypeError("sc_result_event_data() requires 2 arguments");
+            void* res = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(sc_result_event_data(res, std::get<int>(arguments[1]))); return;
+
+        // ===== Milestone 6 Phase 4: DApp Framework =====
+        } else if (func_name == "__builtin_dapp_wallet_create__") {
+            std::string net = arguments.size() > 0 ? std::get<std::string>(arguments[0]) : "local";
+            void* w = dapp_wallet_create(net.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(w)); return;
+        } else if (func_name == "__builtin_dapp_wallet_from_privkey__") {
+            if (arguments.size() < 1) throw TypeError("dapp_wallet_from_privkey() requires 1-2 arguments");
+            std::string priv = std::get<std::string>(arguments[0]);
+            std::string net  = arguments.size() > 1 ? std::get<std::string>(arguments[1]) : "local";
+            void* w = dapp_wallet_from_privkey(priv.c_str(), net.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(w)); return;
+        } else if (func_name == "__builtin_dapp_wallet_destroy__") {
+            if (arguments.size() != 1) throw TypeError("dapp_wallet_destroy() requires 1 argument");
+            void* w = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            dapp_wallet_destroy(w); last_value = nullptr; return;
+        } else if (func_name == "__builtin_dapp_wallet_address__") {
+            if (arguments.size() != 1) throw TypeError("dapp_wallet_address() requires 1 argument");
+            void* w = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_wallet_address(w)); return;
+        } else if (func_name == "__builtin_dapp_wallet_pubkey_hex__") {
+            if (arguments.size() != 1) throw TypeError("dapp_wallet_pubkey_hex() requires 1 argument");
+            void* w = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_wallet_pubkey_hex(w)); return;
+        } else if (func_name == "__builtin_dapp_wallet_privkey_hex__") {
+            if (arguments.size() != 1) throw TypeError("dapp_wallet_privkey_hex() requires 1 argument");
+            void* w = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_wallet_privkey_hex(w)); return;
+        } else if (func_name == "__builtin_dapp_wallet_balance__") {
+            if (arguments.size() != 1) throw TypeError("dapp_wallet_balance() requires 1 argument");
+            void* w = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = dapp_wallet_balance(w); return;
+        } else if (func_name == "__builtin_dapp_wallet_network__") {
+            if (arguments.size() != 1) throw TypeError("dapp_wallet_network() requires 1 argument");
+            void* w = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_wallet_network(w)); return;
+        } else if (func_name == "__builtin_dapp_wallet_sign__") {
+            if (arguments.size() != 2) throw TypeError("dapp_wallet_sign() requires 2 arguments");
+            void* w = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_wallet_sign(w, std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_dapp_wallet_verify__") {
+            if (arguments.size() != 3) throw TypeError("dapp_wallet_verify() requires 3 arguments");
+            last_value = (dapp_wallet_verify(
+                std::get<std::string>(arguments[0]).c_str(),
+                std::get<std::string>(arguments[1]).c_str(),
+                std::get<std::string>(arguments[2]).c_str()) == 1); return;
+        } else if (func_name == "__builtin_dapp_wallet_to_string__") {
+            if (arguments.size() != 1) throw TypeError("dapp_wallet_to_string() requires 1 argument");
+            void* w = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_wallet_to_string(w)); return;
+        } else if (func_name == "__builtin_dapp_provider_create__") {
+            std::string net = arguments.size() > 0 ? std::get<std::string>(arguments[0]) : "local";
+            std::string url = arguments.size() > 1 ? std::get<std::string>(arguments[1]) : "http://127.0.0.1:8545";
+            void* p = dapp_provider_create(net.c_str(), url.c_str());
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(p)); return;
+        } else if (func_name == "__builtin_dapp_provider_destroy__") {
+            if (arguments.size() != 1) throw TypeError("dapp_provider_destroy() requires 1 argument");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            dapp_provider_destroy(p); last_value = nullptr; return;
+        } else if (func_name == "__builtin_dapp_provider_network__") {
+            if (arguments.size() != 1) throw TypeError("dapp_provider_network() requires 1 argument");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_provider_network(p)); return;
+        } else if (func_name == "__builtin_dapp_provider_chain_id__") {
+            if (arguments.size() != 1) throw TypeError("dapp_provider_chain_id() requires 1 argument");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_provider_chain_id(p)); return;
+        } else if (func_name == "__builtin_dapp_provider_block_number__") {
+            if (arguments.size() != 1) throw TypeError("dapp_provider_block_number() requires 1 argument");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = static_cast<int>(dapp_provider_block_number(p)); return;
+        } else if (func_name == "__builtin_dapp_provider_mine_block__") {
+            if (arguments.size() != 1) throw TypeError("dapp_provider_mine_block() requires 1 argument");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            dapp_provider_mine_block(p); last_value = nullptr; return;
+        } else if (func_name == "__builtin_dapp_provider_get_balance__") {
+            if (arguments.size() != 2) throw TypeError("dapp_provider_get_balance() requires 2 arguments");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = dapp_provider_get_balance(p, std::get<std::string>(arguments[1]).c_str()); return;
+        } else if (func_name == "__builtin_dapp_provider_set_balance__") {
+            if (arguments.size() != 3) throw TypeError("dapp_provider_set_balance() requires 3 arguments");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            double amt = std::holds_alternative<double>(arguments[2]) ? std::get<double>(arguments[2]) : static_cast<double>(std::get<int>(arguments[2]));
+            dapp_provider_set_balance(p, std::get<std::string>(arguments[1]).c_str(), amt);
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_dapp_provider_transfer__") {
+            if (arguments.size() != 4) throw TypeError("dapp_provider_transfer() requires 4 arguments");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            double amt = std::holds_alternative<double>(arguments[3]) ? std::get<double>(arguments[3]) : static_cast<double>(std::get<int>(arguments[3]));
+            dapp_provider_transfer(p, std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str(), amt);
+            last_value = nullptr; return;
+        } else if (func_name == "__builtin_dapp_provider_status__") {
+            if (arguments.size() != 1) throw TypeError("dapp_provider_status() requires 1 argument");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_provider_status(p)); return;
+        } else if (func_name == "__builtin_dapp_provider_tx_count__") {
+            if (arguments.size() != 1) throw TypeError("dapp_provider_tx_count() requires 1 argument");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = dapp_provider_tx_count(p); return;
+        } else if (func_name == "__builtin_dapp_provider_get_tx__") {
+            if (arguments.size() != 2) throw TypeError("dapp_provider_get_tx() requires 2 arguments");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            void* tx = dapp_provider_get_tx(p, std::get<int>(arguments[1]));
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(tx)); return;
+        } else if (func_name == "__builtin_dapp_provider_contract_count__") {
+            if (arguments.size() != 1) throw TypeError("dapp_provider_contract_count() requires 1 argument");
+            void* p = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = dapp_provider_contract_count(p); return;
+        } else if (func_name == "__builtin_dapp_deploy_contract__") {
+            if (arguments.size() < 4) throw TypeError("dapp_deploy_contract() requires 4-5 arguments");
+            void* p  = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string name = std::get<std::string>(arguments[1]);
+            std::string bc   = std::get<std::string>(arguments[2]);
+            std::string abi  = std::get<std::string>(arguments[3]);
+            void* w  = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[4])));
+            double val = arguments.size() > 5 ? (std::holds_alternative<double>(arguments[5]) ? std::get<double>(arguments[5]) : static_cast<double>(std::get<int>(arguments[5]))) : 0.0;
+            void* dc = dapp_deploy_contract(p, name.c_str(), bc.c_str(), abi.c_str(), w, val);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(dc)); return;
+        } else if (func_name == "__builtin_dapp_contract_destroy__") {
+            if (arguments.size() != 1) throw TypeError("dapp_contract_destroy() requires 1 argument");
+            void* dc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            dapp_contract_destroy(dc); last_value = nullptr; return;
+        } else if (func_name == "__builtin_dapp_contract_address__") {
+            if (arguments.size() != 1) throw TypeError("dapp_contract_address() requires 1 argument");
+            void* dc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_contract_address(dc)); return;
+        } else if (func_name == "__builtin_dapp_contract_name__") {
+            if (arguments.size() != 1) throw TypeError("dapp_contract_name() requires 1 argument");
+            void* dc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_contract_name(dc)); return;
+        } else if (func_name == "__builtin_dapp_contract_deployer__") {
+            if (arguments.size() != 1) throw TypeError("dapp_contract_deployer() requires 1 argument");
+            void* dc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_contract_deployer(dc)); return;
+        } else if (func_name == "__builtin_dapp_contract_deploy_block__") {
+            if (arguments.size() != 1) throw TypeError("dapp_contract_deploy_block() requires 1 argument");
+            void* dc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = static_cast<int>(dapp_contract_deploy_block(dc)); return;
+        } else if (func_name == "__builtin_dapp_contract_to_string__") {
+            if (arguments.size() != 1) throw TypeError("dapp_contract_to_string() requires 1 argument");
+            void* dc = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_contract_to_string(dc)); return;
+        } else if (func_name == "__builtin_dapp_call_contract__") {
+            if (arguments.size() < 4) throw TypeError("dapp_call_contract() requires 4-6 arguments");
+            void* p  = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            std::string addr = std::get<std::string>(arguments[1]);
+            std::string fn   = std::get<std::string>(arguments[2]);
+            std::string args = std::get<std::string>(arguments[3]);
+            void* w  = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[4])));
+            double val = arguments.size() > 5 ? (std::holds_alternative<double>(arguments[5]) ? std::get<double>(arguments[5]) : static_cast<double>(std::get<int>(arguments[5]))) : 0.0;
+            int64_t gas = arguments.size() > 6 ? static_cast<int64_t>(std::get<int>(arguments[6])) : 1000000;
+            void* tx = dapp_call_contract(p, addr.c_str(), fn.c_str(), args.c_str(), w, val, gas);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(tx)); return;
+        } else if (func_name == "__builtin_dapp_tx_destroy__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_destroy() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            dapp_tx_destroy(tx); last_value = nullptr; return;
+        } else if (func_name == "__builtin_dapp_tx_success__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_success() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = (dapp_tx_success(tx) == 1); return;
+        } else if (func_name == "__builtin_dapp_tx_hash__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_hash() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_tx_hash(tx)); return;
+        } else if (func_name == "__builtin_dapp_tx_from__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_from() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_tx_from(tx)); return;
+        } else if (func_name == "__builtin_dapp_tx_to__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_to() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_tx_to(tx)); return;
+        } else if (func_name == "__builtin_dapp_tx_value__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_value() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = dapp_tx_value(tx); return;
+        } else if (func_name == "__builtin_dapp_tx_gas_used__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_gas_used() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = static_cast<int>(dapp_tx_gas_used(tx)); return;
+        } else if (func_name == "__builtin_dapp_tx_block__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_block() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = static_cast<int>(dapp_tx_block(tx)); return;
+        } else if (func_name == "__builtin_dapp_tx_revert_reason__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_revert_reason() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_tx_revert_reason(tx)); return;
+        } else if (func_name == "__builtin_dapp_tx_to_string__") {
+            if (arguments.size() != 1) throw TypeError("dapp_tx_to_string() requires 1 argument");
+            void* tx = reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])));
+            last_value = std::string(dapp_tx_to_string(tx)); return;
+        } else if (func_name == "__builtin_dapp_abi_encode_call__") {
+            if (arguments.size() != 2) throw TypeError("dapp_abi_encode_call() requires 2 arguments");
+            last_value = std::string(dapp_abi_encode_call(
+                std::get<std::string>(arguments[0]).c_str(),
+                std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_dapp_abi_selector__") {
+            if (arguments.size() != 1) throw TypeError("dapp_abi_selector() requires 1 argument");
+            last_value = std::string(dapp_abi_selector(std::get<std::string>(arguments[0]).c_str())); return;
+
+        // ===== security module handlers =====
+        } else if (func_name == "__builtin_sec_scanner_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sec_scanner_create())); return;
+        } else if (func_name == "__builtin_sec_scanner_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sec_scanner_destroy() requires 1 argument");
+            sec_scanner_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sec_scanner_scan_host__") {
+            if (arguments.size() < 2) throw TypeError("sec_scanner_scan_host() requires at least 2 arguments");
+            std::string _ports = arguments.size() >= 3 ? std::get<std::string>(arguments[2]) : "";
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sec_scanner_scan_host(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), _ports.c_str()))); return;
+        } else if (func_name == "__builtin_sec_scanner_vuln_db_size__") {
+            if (arguments.size() != 1) throw TypeError("sec_scanner_vuln_db_size() requires 1 argument");
+            last_value = static_cast<int>(sec_scanner_vuln_db_size(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_scanresult_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sec_scanresult_destroy() requires 1 argument");
+            sec_scanresult_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sec_scanresult_target__") {
+            if (arguments.size() != 1) throw TypeError("sec_scanresult_target() requires 1 argument");
+            last_value = std::string(sec_scanresult_target(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_scanresult_reachable__") {
+            if (arguments.size() != 1) throw TypeError("sec_scanresult_reachable() requires 1 argument");
+            last_value = static_cast<int>(sec_scanresult_reachable(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_scanresult_open_ports__") {
+            if (arguments.size() != 1) throw TypeError("sec_scanresult_open_ports() requires 1 argument");
+            last_value = static_cast<int>(sec_scanresult_open_ports(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_scanresult_vuln_count__") {
+            if (arguments.size() != 1) throw TypeError("sec_scanresult_vuln_count() requires 1 argument");
+            last_value = static_cast<int>(sec_scanresult_vuln_count(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_scanresult_to_json__") {
+            if (arguments.size() != 1) throw TypeError("sec_scanresult_to_json() requires 1 argument");
+            last_value = std::string(sec_scanresult_to_json(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_scanresult_port_service__") {
+            if (arguments.size() != 2) throw TypeError("sec_scanresult_port_service() requires 2 arguments");
+            last_value = std::string(sec_scanresult_port_service(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_scanresult_port_number__") {
+            if (arguments.size() != 2) throw TypeError("sec_scanresult_port_number() requires 2 arguments");
+            last_value = static_cast<int>(sec_scanresult_port_number(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_scanresult_vuln_name__") {
+            if (arguments.size() != 2) throw TypeError("sec_scanresult_vuln_name() requires 2 arguments");
+            last_value = std::string(sec_scanresult_vuln_name(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_scanresult_vuln_severity__") {
+            if (arguments.size() != 2) throw TypeError("sec_scanresult_vuln_severity() requires 2 arguments");
+            last_value = std::string(sec_scanresult_vuln_severity(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_scanresult_vuln_remediation__") {
+            if (arguments.size() != 2) throw TypeError("sec_scanresult_vuln_remediation() requires 2 arguments");
+            last_value = std::string(sec_scanresult_vuln_remediation(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_web_tester_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sec_web_tester_create())); return;
+        } else if (func_name == "__builtin_sec_web_tester_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sec_web_tester_destroy() requires 1 argument");
+            sec_web_tester_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sec_web_scan__") {
+            if (arguments.size() != 2) throw TypeError("sec_web_scan() requires 2 arguments");
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sec_web_scan(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_sec_web_test_sqli__") {
+            if (arguments.size() != 3) throw TypeError("sec_web_test_sqli() requires 3 arguments");
+            last_value = static_cast<int>(sec_web_test_sqli(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str())); return;
+        } else if (func_name == "__builtin_sec_web_test_xss__") {
+            if (arguments.size() != 3) throw TypeError("sec_web_test_xss() requires 3 arguments");
+            last_value = static_cast<int>(sec_web_test_xss(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str())); return;
+        } else if (func_name == "__builtin_sec_web_test_csrf__") {
+            if (arguments.size() != 2) throw TypeError("sec_web_test_csrf() requires 2 arguments");
+            last_value = static_cast<int>(sec_web_test_csrf(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_sec_web_test_auth_bypass__") {
+            if (arguments.size() != 2) throw TypeError("sec_web_test_auth_bypass() requires 2 arguments");
+            last_value = static_cast<int>(sec_web_test_auth_bypass(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_sec_web_test_path_traversal__") {
+            if (arguments.size() != 3) throw TypeError("sec_web_test_path_traversal() requires 3 arguments");
+            last_value = static_cast<int>(sec_web_test_path_traversal(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str())); return;
+        } else if (func_name == "__builtin_sec_web_encode_payload__") {
+            if (arguments.size() != 3) throw TypeError("sec_web_encode_payload() requires 3 arguments");
+            last_value = std::string(sec_web_encode_payload(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str())); return;
+        } else if (func_name == "__builtin_sec_web_get_payloads__") {
+            if (arguments.size() != 2) throw TypeError("sec_web_get_payloads() requires 2 arguments");
+            last_value = std::string(sec_web_get_payloads(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_sec_webscan_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sec_webscan_destroy() requires 1 argument");
+            sec_webscan_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sec_webscan_finding_count__") {
+            if (arguments.size() != 1) throw TypeError("sec_webscan_finding_count() requires 1 argument");
+            last_value = static_cast<int>(sec_webscan_finding_count(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_webscan_finding_name__") {
+            if (arguments.size() != 2) throw TypeError("sec_webscan_finding_name() requires 2 arguments");
+            last_value = std::string(sec_webscan_finding_name(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_webscan_finding_severity__") {
+            if (arguments.size() != 2) throw TypeError("sec_webscan_finding_severity() requires 2 arguments");
+            last_value = std::string(sec_webscan_finding_severity(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_webscan_finding_param__") {
+            if (arguments.size() != 2) throw TypeError("sec_webscan_finding_param() requires 2 arguments");
+            last_value = std::string(sec_webscan_finding_param(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_webscan_finding_payload__") {
+            if (arguments.size() != 2) throw TypeError("sec_webscan_finding_payload() requires 2 arguments");
+            last_value = std::string(sec_webscan_finding_payload(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_webscan_to_json__") {
+            if (arguments.size() != 1) throw TypeError("sec_webscan_to_json() requires 1 argument");
+            last_value = std::string(sec_webscan_to_json(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_malware_analyzer_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sec_malware_analyzer_create())); return;
+        } else if (func_name == "__builtin_sec_malware_analyzer_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sec_malware_analyzer_destroy() requires 1 argument");
+            sec_malware_analyzer_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sec_malware_static_analysis__") {
+            if (arguments.size() < 2) throw TypeError("sec_malware_static_analysis() requires at least 2 arguments");
+            std::string _hex = arguments.size() >= 3 ? std::get<std::string>(arguments[2]) : "";
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sec_malware_static_analysis(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), _hex.c_str()))); return;
+        } else if (func_name == "__builtin_sec_malware_dynamic_analysis__") {
+            if (arguments.size() < 2) throw TypeError("sec_malware_dynamic_analysis() requires at least 2 arguments");
+            int _timeout = arguments.size() >= 3 ? std::get<int>(arguments[2]) : 5000;
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sec_malware_dynamic_analysis(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), _timeout))); return;
+        } else if (func_name == "__builtin_sec_malware_add_yara_rule__") {
+            if (arguments.size() != 3) throw TypeError("sec_malware_add_yara_rule() requires 3 arguments");
+            last_value = static_cast<int>(sec_malware_add_yara_rule(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str())); return;
+        } else if (func_name == "__builtin_sec_static_result_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sec_static_result_destroy() requires 1 argument");
+            sec_static_result_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sec_static_result_threat_level__") {
+            if (arguments.size() != 1) throw TypeError("sec_static_result_threat_level() requires 1 argument");
+            last_value = std::string(sec_static_result_threat_level(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_static_result_file_type__") {
+            if (arguments.size() != 1) throw TypeError("sec_static_result_file_type() requires 1 argument");
+            last_value = std::string(sec_static_result_file_type(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_static_result_sha256__") {
+            if (arguments.size() != 1) throw TypeError("sec_static_result_sha256() requires 1 argument");
+            last_value = std::string(sec_static_result_sha256(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_static_result_md5__") {
+            if (arguments.size() != 1) throw TypeError("sec_static_result_md5() requires 1 argument");
+            last_value = std::string(sec_static_result_md5(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_static_result_entropy__") {
+            if (arguments.size() != 1) throw TypeError("sec_static_result_entropy() requires 1 argument");
+            last_value = sec_static_result_entropy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_sec_static_result_string_count__") {
+            if (arguments.size() != 1) throw TypeError("sec_static_result_string_count() requires 1 argument");
+            last_value = static_cast<int>(sec_static_result_string_count(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_static_result_string_value__") {
+            if (arguments.size() != 2) throw TypeError("sec_static_result_string_value() requires 2 arguments");
+            last_value = std::string(sec_static_result_string_value(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_static_result_string_category__") {
+            if (arguments.size() != 2) throw TypeError("sec_static_result_string_category() requires 2 arguments");
+            last_value = std::string(sec_static_result_string_category(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_static_result_suspicious_count__") {
+            if (arguments.size() != 1) throw TypeError("sec_static_result_suspicious_count() requires 1 argument");
+            last_value = static_cast<int>(sec_static_result_suspicious_count(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_static_result_suspicious__") {
+            if (arguments.size() != 2) throw TypeError("sec_static_result_suspicious() requires 2 arguments");
+            last_value = std::string(sec_static_result_suspicious(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_static_result_to_json__") {
+            if (arguments.size() != 1) throw TypeError("sec_static_result_to_json() requires 1 argument");
+            last_value = std::string(sec_static_result_to_json(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_dynamic_result_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sec_dynamic_result_destroy() requires 1 argument");
+            sec_dynamic_result_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sec_dynamic_result_threat_level__") {
+            if (arguments.size() != 1) throw TypeError("sec_dynamic_result_threat_level() requires 1 argument");
+            last_value = std::string(sec_dynamic_result_threat_level(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_dynamic_result_event_count__") {
+            if (arguments.size() != 1) throw TypeError("sec_dynamic_result_event_count() requires 1 argument");
+            last_value = static_cast<int>(sec_dynamic_result_event_count(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_dynamic_result_event_type__") {
+            if (arguments.size() != 2) throw TypeError("sec_dynamic_result_event_type() requires 2 arguments");
+            last_value = std::string(sec_dynamic_result_event_type(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_dynamic_result_event_target__") {
+            if (arguments.size() != 2) throw TypeError("sec_dynamic_result_event_target() requires 2 arguments");
+            last_value = std::string(sec_dynamic_result_event_target(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_dynamic_result_ioc_count__") {
+            if (arguments.size() != 1) throw TypeError("sec_dynamic_result_ioc_count() requires 1 argument");
+            last_value = static_cast<int>(sec_dynamic_result_ioc_count(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_dynamic_result_ioc__") {
+            if (arguments.size() != 2) throw TypeError("sec_dynamic_result_ioc() requires 2 arguments");
+            last_value = std::string(sec_dynamic_result_ioc(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_dynamic_result_to_json__") {
+            if (arguments.size() != 1) throw TypeError("sec_dynamic_result_to_json() requires 1 argument");
+            last_value = std::string(sec_dynamic_result_to_json(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_edu_platform_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sec_edu_platform_create())); return;
+        } else if (func_name == "__builtin_sec_edu_platform_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sec_edu_platform_destroy() requires 1 argument");
+            sec_edu_platform_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sec_edu_challenge_count__") {
+            if (arguments.size() != 1) throw TypeError("sec_edu_challenge_count() requires 1 argument");
+            last_value = static_cast<int>(sec_edu_challenge_count(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_edu_challenge_id__") {
+            if (arguments.size() != 2) throw TypeError("sec_edu_challenge_id() requires 2 arguments");
+            last_value = std::string(sec_edu_challenge_id(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_edu_challenge_name__") {
+            if (arguments.size() != 2) throw TypeError("sec_edu_challenge_name() requires 2 arguments");
+            last_value = std::string(sec_edu_challenge_name(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_edu_challenge_category__") {
+            if (arguments.size() != 2) throw TypeError("sec_edu_challenge_category() requires 2 arguments");
+            last_value = std::string(sec_edu_challenge_category(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_edu_challenge_points__") {
+            if (arguments.size() != 2) throw TypeError("sec_edu_challenge_points() requires 2 arguments");
+            last_value = static_cast<int>(sec_edu_challenge_points(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_edu_challenge_description__") {
+            if (arguments.size() != 2) throw TypeError("sec_edu_challenge_description() requires 2 arguments");
+            last_value = std::string(sec_edu_challenge_description(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_edu_challenge_hint__") {
+            if (arguments.size() != 2) throw TypeError("sec_edu_challenge_hint() requires 2 arguments");
+            last_value = std::string(sec_edu_challenge_hint(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_sec_edu_create_session__") {
+            if (arguments.size() != 2) throw TypeError("sec_edu_create_session() requires 2 arguments");
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(sec_edu_create_session(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_sec_edu_session_destroy__") {
+            if (arguments.size() != 1) throw TypeError("sec_edu_session_destroy() requires 1 argument");
+            sec_edu_session_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_sec_edu_session_submit__") {
+            if (arguments.size() != 4) throw TypeError("sec_edu_session_submit() requires 4 arguments");
+            last_value = static_cast<int>(sec_edu_session_submit(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[1]))), std::get<std::string>(arguments[2]).c_str(), std::get<std::string>(arguments[3]).c_str())); return;
+        } else if (func_name == "__builtin_sec_edu_session_score__") {
+            if (arguments.size() != 1) throw TypeError("sec_edu_session_score() requires 1 argument");
+            last_value = static_cast<int>(sec_edu_session_score(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_edu_session_player__") {
+            if (arguments.size() != 1) throw TypeError("sec_edu_session_player() requires 1 argument");
+            last_value = std::string(sec_edu_session_player(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_edu_leaderboard__") {
+            if (arguments.size() != 1) throw TypeError("sec_edu_leaderboard() requires 1 argument");
+            last_value = std::string(sec_edu_leaderboard(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_sec_edu_get_tutorial__") {
+            if (arguments.size() != 2) throw TypeError("sec_edu_get_tutorial() requires 2 arguments");
+            last_value = std::string(sec_edu_get_tutorial(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str())); return;
         }
     }
-    
+
+    // ===== mobile module handlers =====
+    if (std::holds_alternative<std::string>(callee)) {
+        std::string func_name = std::get<std::string>(callee);
+        if (func_name == "__builtin_mobile_app_config_create__") {
+            if (arguments.size() < 3) throw TypeError("mobile_app_config_create() requires at least 3 arguments");
+            int plat = arguments.size() >= 4 ? std::get<int>(arguments[3]) : 2;
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mobile_app_config_create(
+                std::get<std::string>(arguments[0]).c_str(),
+                std::get<std::string>(arguments[1]).c_str(),
+                std::get<std::string>(arguments[2]).c_str(), plat))); return;
+        } else if (func_name == "__builtin_mobile_app_config_destroy__") {
+            mobile_app_config_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_app_config_set_orientation__") {
+            mobile_app_config_set_orientation(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_app_config_add_permission__") {
+            mobile_app_config_add_permission(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_app_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mobile_app_create(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))))); return;
+        } else if (func_name == "__builtin_mobile_app_destroy__") {
+            mobile_app_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_app_screen_count__") {
+            last_value = static_cast<int>(mobile_app_screen_count(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_app_platform_name__") {
+            last_value = std::string(mobile_app_platform_name(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_app_build_ios__") {
+            last_value = std::string(mobile_app_build_ios(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_app_build_android__") {
+            last_value = std::string(mobile_app_build_android(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_app_export_manifest__") {
+            last_value = std::string(mobile_app_export_manifest(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_app_add_screen__") {
+            mobile_app_add_screen(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[1])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_screen_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mobile_screen_create(
+                std::get<std::string>(arguments[0]).c_str(), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_mobile_screen_destroy__") {
+            mobile_screen_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_screen_set_background__") {
+            mobile_screen_set_background(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_screen_set_nav_bar__") {
+            mobile_screen_set_nav_bar(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_screen_to_json__") {
+            last_value = std::string(mobile_screen_to_json(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_screen_set_layout__") {
+            mobile_screen_set_layout(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[1])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mobile_component_create(
+                std::get<int>(arguments[0]), std::get<std::string>(arguments[1]).c_str(),
+                std::get<std::string>(arguments[2]).c_str()))); return;
+        } else if (func_name == "__builtin_mobile_component_destroy__") {
+            mobile_component_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_set_text__") {
+            mobile_component_set_text(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_set_visible__") {
+            mobile_component_set_visible(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_set_enabled__") {
+            mobile_component_set_enabled(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_set_value__") {
+            mobile_component_set_value(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<double>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_set_prop__") {
+            mobile_component_set_prop(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_set_style_color__") {
+            mobile_component_set_style_color(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_set_style_font__") {
+            mobile_component_set_style_font(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_set_style_size__") {
+            mobile_component_set_style_size(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_set_style_padding__") {
+            mobile_component_set_style_padding(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_add_child__") {
+            mobile_component_add_child(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[1])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_component_to_json__") {
+            last_value = std::string(mobile_component_to_json(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_component_type_name__") {
+            last_value = std::string(mobile_component_type_name(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_component_get_text__") {
+            last_value = std::string(mobile_component_get_text(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_component_get_value__") {
+            last_value = mobile_component_get_value(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_layout_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mobile_layout_create(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_layout_destroy__") {
+            mobile_layout_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_layout_set_spacing__") {
+            mobile_layout_set_spacing(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_layout_set_columns__") {
+            mobile_layout_set_columns(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_layout_add_item__") {
+            mobile_layout_add_item(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[1])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_layout_to_json__") {
+            last_value = std::string(mobile_layout_to_json(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_nav_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mobile_nav_create())); return;
+        } else if (func_name == "__builtin_mobile_nav_destroy__") {
+            mobile_nav_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_nav_push__") {
+            mobile_nav_push(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_nav_pop__") {
+            mobile_nav_pop(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_nav_current__") {
+            last_value = std::string(mobile_nav_current(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_nav_depth__") {
+            last_value = static_cast<int>(mobile_nav_depth(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_device_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mobile_device_create(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_device_destroy__") {
+            mobile_device_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_device_capture_photo__") {
+            std::string q = arguments.size() >= 2 ? std::get<std::string>(arguments[1]) : "high";
+            last_value = std::string(mobile_device_capture_photo(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), q.c_str())); return;
+        } else if (func_name == "__builtin_mobile_device_record_video__") {
+            int dur = arguments.size() >= 2 ? std::get<int>(arguments[1]) : 10;
+            last_value = std::string(mobile_device_record_video(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), dur)); return;
+        } else if (func_name == "__builtin_mobile_device_get_location__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mobile_device_get_location(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))))); return;
+        } else if (func_name == "__builtin_mobile_location_destroy__") {
+            mobile_location_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_location_latitude__") {
+            last_value = mobile_location_latitude(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_location_longitude__") {
+            last_value = mobile_location_longitude(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_location_altitude__") {
+            last_value = mobile_location_altitude(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_location_accuracy__") {
+            last_value = mobile_location_accuracy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_device_get_accelerometer__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mobile_device_get_accelerometer(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))))); return;
+        } else if (func_name == "__builtin_mobile_accel_destroy__") {
+            mobile_accel_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mobile_accel_x__") {
+            last_value = mobile_accel_x(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_accel_y__") {
+            last_value = mobile_accel_y(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_accel_z__") {
+            last_value = mobile_accel_z(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_mobile_device_storage_set__") {
+            last_value = static_cast<int>(mobile_device_storage_set(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str())); return;
+        } else if (func_name == "__builtin_mobile_device_storage_get__") {
+            last_value = std::string(mobile_device_storage_get(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_mobile_device_storage_delete__") {
+            last_value = static_cast<int>(mobile_device_storage_delete(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_mobile_device_is_connected__") {
+            last_value = static_cast<int>(mobile_device_is_connected(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_device_network_type__") {
+            last_value = std::string(mobile_device_network_type(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_device_model__") {
+            last_value = std::string(mobile_device_model(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_device_os_version__") {
+            last_value = std::string(mobile_device_os_version(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_device_id__") {
+            last_value = std::string(mobile_device_id(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_device_battery_level__") {
+            last_value = static_cast<int>(mobile_device_battery_level(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_device_is_charging__") {
+            last_value = static_cast<int>(mobile_device_is_charging(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_mobile_device_check_permission__") {
+            last_value = std::string(mobile_device_check_permission(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_mobile_device_request_permission__") {
+            last_value = static_cast<int>(mobile_device_request_permission(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_mobile_device_schedule_notification__") {
+            if (arguments.size() < 3) throw TypeError("mobile_device_schedule_notification() requires at least 3 arguments");
+            int badge = arguments.size() >= 4 ? std::get<int>(arguments[3]) : 0;
+            uint64_t delay = arguments.size() >= 5 ? static_cast<uint64_t>(std::get<int>(arguments[4])) : 0;
+            last_value = std::string(mobile_device_schedule_notification(
+                reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str(),
+                std::get<std::string>(arguments[2]).c_str(), badge, delay)); return;
+        } else if (func_name == "__builtin_mobile_device_cancel_notification__") {
+            last_value = static_cast<int>(mobile_device_cancel_notification(
+                reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))),
+                std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_mobile_device_pending_notifications__") {
+            last_value = static_cast<int>(mobile_device_pending_notifications(
+                reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        }
+        // game builtins
+        else if (func_name == "__builtin_game_renderer_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_renderer_create(std::get<std::string>(arguments[0]).c_str(), std::get<int>(arguments[1]), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_game_renderer_destroy__") {
+            game_renderer_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_renderer_clear__") {
+            double r=0,g=0,b=0,a=1;
+            if (std::holds_alternative<double>(arguments[1])) r=std::get<double>(arguments[1]); else r=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) g=std::get<double>(arguments[2]); else g=std::get<int>(arguments[2]);
+            if (std::holds_alternative<double>(arguments[3])) b=std::get<double>(arguments[3]); else b=std::get<int>(arguments[3]);
+            if (std::holds_alternative<double>(arguments[4])) a=std::get<double>(arguments[4]); else a=std::get<int>(arguments[4]);
+            game_renderer_clear(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)r,(float)g,(float)b,(float)a); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_renderer_present__") {
+            game_renderer_present(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_renderer_width__") {
+            last_value = game_renderer_width(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_renderer_height__") {
+            last_value = game_renderer_height(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_renderer_title__") {
+            last_value = std::string(game_renderer_title(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_game_texture_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_texture_create(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_game_texture_load__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_texture_load(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_game_texture_destroy__") {
+            game_texture_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_texture_width__") {
+            last_value = game_texture_width(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_texture_height__") {
+            last_value = game_texture_height(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_texture_path__") {
+            last_value = std::string(game_texture_path(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_game_sprite_create__") {
+            double fx=0,fy=0;
+            if (std::holds_alternative<double>(arguments[1])) fx=std::get<double>(arguments[1]); else fx=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) fy=std::get<double>(arguments[2]); else fy=std::get<int>(arguments[2]);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_sprite_create(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)fx,(float)fy))); return;
+        } else if (func_name == "__builtin_game_sprite_destroy__") {
+            game_sprite_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sprite_set_position__") {
+            double fx=0,fy=0;
+            if (std::holds_alternative<double>(arguments[1])) fx=std::get<double>(arguments[1]); else fx=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) fy=std::get<double>(arguments[2]); else fy=std::get<int>(arguments[2]);
+            game_sprite_set_position(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)fx,(float)fy); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sprite_set_scale__") {
+            double sx=1,sy=1;
+            if (std::holds_alternative<double>(arguments[1])) sx=std::get<double>(arguments[1]); else sx=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) sy=std::get<double>(arguments[2]); else sy=std::get<int>(arguments[2]);
+            game_sprite_set_scale(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)sx,(float)sy); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sprite_set_rotation__") {
+            double a=0; if (std::holds_alternative<double>(arguments[1])) a=std::get<double>(arguments[1]); else a=std::get<int>(arguments[1]);
+            game_sprite_set_rotation(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)a); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sprite_set_color__") {
+            double r=1,g=1,b=1,a=1;
+            if (std::holds_alternative<double>(arguments[1])) r=std::get<double>(arguments[1]); else r=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) g=std::get<double>(arguments[2]); else g=std::get<int>(arguments[2]);
+            if (std::holds_alternative<double>(arguments[3])) b=std::get<double>(arguments[3]); else b=std::get<int>(arguments[3]);
+            if (std::holds_alternative<double>(arguments[4])) a=std::get<double>(arguments[4]); else a=std::get<int>(arguments[4]);
+            game_sprite_set_color(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)r,(float)g,(float)b,(float)a); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sprite_set_visible__") {
+            game_sprite_set_visible(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sprite_x__") {
+            last_value = (double)game_sprite_x(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_sprite_y__") {
+            last_value = (double)game_sprite_y(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_sprite_scale_x__") {
+            last_value = (double)game_sprite_scale_x(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_sprite_scale_y__") {
+            last_value = (double)game_sprite_scale_y(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_sprite_rotation__") {
+            last_value = (double)game_sprite_rotation(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_sprite_to_string__") {
+            last_value = std::string(game_sprite_to_string(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_game_shader_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_shader_create(std::get<std::string>(arguments[0]).c_str(), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str()))); return;
+        } else if (func_name == "__builtin_game_shader_destroy__") {
+            game_shader_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_shader_set_float__") {
+            double v=0; if (std::holds_alternative<double>(arguments[2])) v=std::get<double>(arguments[2]); else v=std::get<int>(arguments[2]);
+            game_shader_set_float(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), (float)v); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_shader_set_int__") {
+            game_shader_set_int(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_shader_set_vec2__") {
+            double x=0,y=0;
+            if (std::holds_alternative<double>(arguments[2])) x=std::get<double>(arguments[2]); else x=std::get<int>(arguments[2]);
+            if (std::holds_alternative<double>(arguments[3])) y=std::get<double>(arguments[3]); else y=std::get<int>(arguments[3]);
+            game_shader_set_vec2(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), (float)x,(float)y); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_shader_set_vec3__") {
+            double x=0,y=0,z=0;
+            if (std::holds_alternative<double>(arguments[2])) x=std::get<double>(arguments[2]); else x=std::get<int>(arguments[2]);
+            if (std::holds_alternative<double>(arguments[3])) y=std::get<double>(arguments[3]); else y=std::get<int>(arguments[3]);
+            if (std::holds_alternative<double>(arguments[4])) z=std::get<double>(arguments[4]); else z=std::get<int>(arguments[4]);
+            game_shader_set_vec3(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), (float)x,(float)y,(float)z); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_shader_set_vec4__") {
+            double x=0,y=0,z=0,w=0;
+            if (std::holds_alternative<double>(arguments[2])) x=std::get<double>(arguments[2]); else x=std::get<int>(arguments[2]);
+            if (std::holds_alternative<double>(arguments[3])) y=std::get<double>(arguments[3]); else y=std::get<int>(arguments[3]);
+            if (std::holds_alternative<double>(arguments[4])) z=std::get<double>(arguments[4]); else z=std::get<int>(arguments[4]);
+            if (std::holds_alternative<double>(arguments[5])) w=std::get<double>(arguments[5]); else w=std::get<int>(arguments[5]);
+            game_shader_set_vec4(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<std::string>(arguments[1]).c_str(), (float)x,(float)y,(float)z,(float)w); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_shader_name__") {
+            last_value = std::string(game_shader_name(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))))); return;
+        } else if (func_name == "__builtin_game_shader_uniform_count__") {
+            last_value = game_shader_uniform_count(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_shader_uniform_name__") {
+            last_value = std::string(game_shader_uniform_name(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_game_camera2d_create__") {
+            double x=0,y=0,z=1;
+            if (std::holds_alternative<double>(arguments[0])) x=std::get<double>(arguments[0]); else x=std::get<int>(arguments[0]);
+            if (std::holds_alternative<double>(arguments[1])) y=std::get<double>(arguments[1]); else y=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) z=std::get<double>(arguments[2]); else z=std::get<int>(arguments[2]);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_camera2d_create((float)x,(float)y,(float)z))); return;
+        } else if (func_name == "__builtin_game_camera2d_destroy__") {
+            game_camera2d_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_camera2d_set_position__") {
+            double x=0,y=0;
+            if (std::holds_alternative<double>(arguments[1])) x=std::get<double>(arguments[1]); else x=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) y=std::get<double>(arguments[2]); else y=std::get<int>(arguments[2]);
+            game_camera2d_set_position(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)x,(float)y); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_camera2d_set_zoom__") {
+            double z=1; if (std::holds_alternative<double>(arguments[1])) z=std::get<double>(arguments[1]); else z=std::get<int>(arguments[1]);
+            game_camera2d_set_zoom(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)z); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_camera2d_move__") {
+            double dx=0,dy=0;
+            if (std::holds_alternative<double>(arguments[1])) dx=std::get<double>(arguments[1]); else dx=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) dy=std::get<double>(arguments[2]); else dy=std::get<int>(arguments[2]);
+            game_camera2d_move(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)dx,(float)dy); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_camera2d_x__") {
+            last_value = (double)game_camera2d_x(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_camera2d_y__") {
+            last_value = (double)game_camera2d_y(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_camera2d_zoom__") {
+            last_value = (double)game_camera2d_zoom(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_camera3d_create__") {
+            double px=0,py=0,pz=5,tx=0,ty=0,tz=0;
+            if (std::holds_alternative<double>(arguments[0])) px=std::get<double>(arguments[0]); else px=std::get<int>(arguments[0]);
+            if (std::holds_alternative<double>(arguments[1])) py=std::get<double>(arguments[1]); else py=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) pz=std::get<double>(arguments[2]); else pz=std::get<int>(arguments[2]);
+            if (std::holds_alternative<double>(arguments[3])) tx=std::get<double>(arguments[3]); else tx=std::get<int>(arguments[3]);
+            if (std::holds_alternative<double>(arguments[4])) ty=std::get<double>(arguments[4]); else ty=std::get<int>(arguments[4]);
+            if (std::holds_alternative<double>(arguments[5])) tz=std::get<double>(arguments[5]); else tz=std::get<int>(arguments[5]);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_camera3d_create((float)px,(float)py,(float)pz,(float)tx,(float)ty,(float)tz))); return;
+        } else if (func_name == "__builtin_game_camera3d_destroy__") {
+            game_camera3d_destroy(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_camera3d_set_position__") {
+            double x=0,y=0,z=0;
+            if (std::holds_alternative<double>(arguments[1])) x=std::get<double>(arguments[1]); else x=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) y=std::get<double>(arguments[2]); else y=std::get<int>(arguments[2]);
+            if (std::holds_alternative<double>(arguments[3])) z=std::get<double>(arguments[3]); else z=std::get<int>(arguments[3]);
+            game_camera3d_set_position(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)x,(float)y,(float)z); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_camera3d_set_target__") {
+            double x=0,y=0,z=0;
+            if (std::holds_alternative<double>(arguments[1])) x=std::get<double>(arguments[1]); else x=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) y=std::get<double>(arguments[2]); else y=std::get<int>(arguments[2]);
+            if (std::holds_alternative<double>(arguments[3])) z=std::get<double>(arguments[3]); else z=std::get<int>(arguments[3]);
+            game_camera3d_set_target(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)x,(float)y,(float)z); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_camera3d_set_fov__") {
+            double f=60; if (std::holds_alternative<double>(arguments[1])) f=std::get<double>(arguments[1]); else f=std::get<int>(arguments[1]);
+            game_camera3d_set_fov(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0]))), (float)f); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_camera3d_pos_x__") {
+            last_value = (double)game_camera3d_pos_x(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_camera3d_pos_y__") {
+            last_value = (double)game_camera3d_pos_y(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_camera3d_pos_z__") {
+            last_value = (double)game_camera3d_pos_z(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_camera3d_fov__") {
+            last_value = (double)game_camera3d_fov(reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[0])))); return;
+        }
+    }
+
+    // game physics/audio/framework builtins
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_game_", 0) == 0) {
+        std::string func_name = std::get<std::string>(callee);
+        auto _gptr = [&](int idx) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[idx]))); };
+        auto _gf = [&](int idx) -> float {
+            if (std::holds_alternative<double>(arguments[idx])) return (float)std::get<double>(arguments[idx]);
+            return (float)std::get<int>(arguments[idx]);
+        };
+        // Physics
+        if (func_name == "__builtin_game_physics_world_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_physics_world_create(_gf(0),_gf(1)))); return;
+        } else if (func_name == "__builtin_game_physics_world_destroy__") {
+            game_physics_world_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_physics_world_step__") {
+            game_physics_world_step(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_physics_world_set_gravity__") {
+            game_physics_world_set_gravity(_gptr(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_physics_world_body_count__") {
+            last_value = game_physics_world_body_count(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_rigidbody_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_rigidbody_create(_gptr(0), _gf(1), _gf(2), _gf(3), std::get<int>(arguments[4])))); return;
+        } else if (func_name == "__builtin_game_rigidbody_destroy__") {
+            game_rigidbody_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_rigidbody_set_position__") {
+            game_rigidbody_set_position(_gptr(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_rigidbody_set_velocity__") {
+            game_rigidbody_set_velocity(_gptr(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_rigidbody_apply_force__") {
+            game_rigidbody_apply_force(_gptr(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_rigidbody_apply_impulse__") {
+            game_rigidbody_apply_impulse(_gptr(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_rigidbody_set_restitution__") {
+            game_rigidbody_set_restitution(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_rigidbody_set_friction__") {
+            game_rigidbody_set_friction(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_rigidbody_x__") {
+            last_value = (double)game_rigidbody_x(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_rigidbody_y__") {
+            last_value = (double)game_rigidbody_y(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_rigidbody_vx__") {
+            last_value = (double)game_rigidbody_vx(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_rigidbody_vy__") {
+            last_value = (double)game_rigidbody_vy(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_rigidbody_mass__") {
+            last_value = (double)game_rigidbody_mass(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_rigidbody_is_static__") {
+            last_value = game_rigidbody_is_static(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_rigidbody_to_string__") {
+            last_value = std::string(game_rigidbody_to_string(_gptr(0))); return;
+        } else if (func_name == "__builtin_game_collider_box__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_collider_box(_gptr(0), _gf(1), _gf(2)))); return;
+        } else if (func_name == "__builtin_game_collider_circle__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_collider_circle(_gptr(0), _gf(1)))); return;
+        } else if (func_name == "__builtin_game_collider_destroy__") {
+            game_collider_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_collider_check__") {
+            last_value = game_collider_check(_gptr(0), _gptr(1)); return;
+        } else if (func_name == "__builtin_game_collider_type__") {
+            last_value = std::string(game_collider_type(_gptr(0))); return;
+        } else if (func_name == "__builtin_game_particles_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_particles_create(_gf(0), _gf(1), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_game_particles_destroy__") {
+            game_particles_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_particles_emit__") {
+            game_particles_emit(_gptr(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_particles_update__") {
+            game_particles_update(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_particles_set_velocity__") {
+            game_particles_set_velocity(_gptr(0), _gf(1), _gf(2), _gf(3)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_particles_set_lifetime__") {
+            game_particles_set_lifetime(_gptr(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_particles_set_color__") {
+            game_particles_set_color(_gptr(0), _gf(1), _gf(2), _gf(3), _gf(4)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_particles_set_size__") {
+            game_particles_set_size(_gptr(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_particles_active_count__") {
+            last_value = game_particles_active_count(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_particles_max_count__") {
+            last_value = game_particles_max_count(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_particles_to_string__") {
+            last_value = std::string(game_particles_to_string(_gptr(0))); return;
+        }
+        // Audio
+        else if (func_name == "__builtin_game_audio_engine_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_audio_engine_create())); return;
+        } else if (func_name == "__builtin_game_audio_engine_destroy__") {
+            game_audio_engine_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_audio_engine_set_master_volume__") {
+            game_audio_engine_set_master_volume(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_audio_engine_master_volume__") {
+            last_value = (double)game_audio_engine_master_volume(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_audio_engine_channel_count__") {
+            last_value = game_audio_engine_channel_count(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_sound_load__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_sound_load(_gptr(0), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_game_sound_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_sound_create(_gptr(0), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str()))); return;
+        } else if (func_name == "__builtin_game_sound_destroy__") {
+            game_sound_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sound_play__") {
+            game_sound_play(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sound_stop__") {
+            game_sound_stop(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sound_pause__") {
+            game_sound_pause(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sound_resume__") {
+            game_sound_resume(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sound_set_volume__") {
+            game_sound_set_volume(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sound_set_pitch__") {
+            game_sound_set_pitch(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sound_set_loop__") {
+            game_sound_set_loop(_gptr(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_sound_is_playing__") {
+            last_value = game_sound_is_playing(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_sound_volume__") {
+            last_value = (double)game_sound_volume(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_sound_pitch__") {
+            last_value = (double)game_sound_pitch(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_sound_name__") {
+            last_value = std::string(game_sound_name(_gptr(0))); return;
+        } else if (func_name == "__builtin_game_sound_type__") {
+            last_value = std::string(game_sound_type(_gptr(0))); return;
+        } else if (func_name == "__builtin_game_music_load__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_music_load(_gptr(0), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_game_music_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_music_create(_gptr(0), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_game_music_destroy__") {
+            game_music_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_music_play__") {
+            game_music_play(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_music_stop__") {
+            game_music_stop(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_music_pause__") {
+            game_music_pause(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_music_resume__") {
+            game_music_resume(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_music_set_volume__") {
+            game_music_set_volume(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_music_set_loop__") {
+            game_music_set_loop(_gptr(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_music_is_playing__") {
+            last_value = game_music_is_playing(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_music_name__") {
+            last_value = std::string(game_music_name(_gptr(0))); return;
+        } else if (func_name == "__builtin_game_audio3d_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_audio3d_create(_gptr(0)))); return;
+        } else if (func_name == "__builtin_game_audio3d_destroy__") {
+            game_audio3d_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_audio3d_set_listener__") {
+            game_audio3d_set_listener(_gptr(0), _gf(1), _gf(2), _gf(3)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_audio3d_play_at__") {
+            game_audio3d_play_at(_gptr(0), _gptr(1), _gf(2), _gf(3), _gf(4)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_audio3d_set_rolloff__") {
+            game_audio3d_set_rolloff(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_mixer_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_mixer_create(_gptr(0), std::get<int>(arguments[1])))); return;
+        } else if (func_name == "__builtin_game_mixer_destroy__") {
+            game_mixer_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_mixer_set_channel_volume__") {
+            game_mixer_set_channel_volume(_gptr(0), std::get<int>(arguments[1]), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_mixer_channel_volume__") {
+            last_value = (double)game_mixer_channel_volume(_gptr(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_game_mixer_play_on_channel__") {
+            game_mixer_play_on_channel(_gptr(0), _gptr(1), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_mixer_channels__") {
+            last_value = game_mixer_channels(_gptr(0)); return;
+        }
+        // Game Framework
+        else if (func_name == "__builtin_game_loop_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_loop_create(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_game_loop_destroy__") {
+            game_loop_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_loop_start__") {
+            game_loop_start(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_loop_stop__") {
+            game_loop_stop(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_loop_tick__") {
+            game_loop_tick(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_loop_is_running__") {
+            last_value = game_loop_is_running(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_loop_delta_time__") {
+            last_value = (double)game_loop_delta_time(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_loop_fps__") {
+            last_value = game_loop_fps(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_loop_target_fps__") {
+            last_value = game_loop_target_fps(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_loop_frame_count__") {
+            last_value = game_loop_frame_count(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_loop_elapsed__") {
+            last_value = game_loop_elapsed(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_scene_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_scene_create(std::get<std::string>(arguments[0]).c_str()))); return;
+        } else if (func_name == "__builtin_game_scene_destroy__") {
+            game_scene_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_scene_add_sprite__") {
+            game_scene_add_sprite(_gptr(0), _gptr(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_scene_add_body__") {
+            game_scene_add_body(_gptr(0), _gptr(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_scene_update__") {
+            game_scene_update(_gptr(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_scene_sprite_count__") {
+            last_value = game_scene_sprite_count(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_scene_body_count__") {
+            last_value = game_scene_body_count(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_scene_name__") {
+            last_value = std::string(game_scene_name(_gptr(0))); return;
+        } else if (func_name == "__builtin_game_scene_manager_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_scene_manager_create())); return;
+        } else if (func_name == "__builtin_game_scene_manager_destroy__") {
+            game_scene_manager_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_scene_manager_push__") {
+            game_scene_manager_push(_gptr(0), _gptr(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_scene_manager_pop__") {
+            game_scene_manager_pop(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_scene_manager_current__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_scene_manager_current(_gptr(0)))); return;
+        } else if (func_name == "__builtin_game_scene_manager_depth__") {
+            last_value = game_scene_manager_depth(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_input_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_input_create())); return;
+        } else if (func_name == "__builtin_game_input_destroy__") {
+            game_input_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_input_key_press__") {
+            game_input_key_press(_gptr(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_input_key_release__") {
+            game_input_key_release(_gptr(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_input_mouse_move__") {
+            game_input_mouse_move(_gptr(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_input_mouse_press__") {
+            game_input_mouse_press(_gptr(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_input_mouse_release__") {
+            game_input_mouse_release(_gptr(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_input_is_key_down__") {
+            last_value = game_input_is_key_down(_gptr(0), std::get<std::string>(arguments[1]).c_str()); return;
+        } else if (func_name == "__builtin_game_input_is_key_pressed__") {
+            last_value = game_input_is_key_pressed(_gptr(0), std::get<std::string>(arguments[1]).c_str()); return;
+        } else if (func_name == "__builtin_game_input_is_mouse_down__") {
+            last_value = game_input_is_mouse_down(_gptr(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_game_input_mouse_x__") {
+            last_value = (double)game_input_mouse_x(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_input_mouse_y__") {
+            last_value = (double)game_input_mouse_y(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_input_update__") {
+            game_input_update(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_assets_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(game_assets_create(std::get<std::string>(arguments[0]).c_str()))); return;
+        } else if (func_name == "__builtin_game_assets_destroy__") {
+            game_assets_destroy(_gptr(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_assets_register__") {
+            game_assets_register(_gptr(0), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str(), std::get<std::string>(arguments[3]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_game_assets_get_path__") {
+            last_value = std::string(game_assets_get_path(_gptr(0), std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_game_assets_get_type__") {
+            last_value = std::string(game_assets_get_type(_gptr(0), std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_game_assets_count__") {
+            last_value = game_assets_count(_gptr(0)); return;
+        } else if (func_name == "__builtin_game_assets_name_at__") {
+            last_value = std::string(game_assets_name_at(_gptr(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_game_assets_to_json__") {
+            last_value = std::string(game_assets_to_json(_gptr(0))); return;
+        }
+    }
+
+    // system builtins (asm / gpio / rtos / kernel)
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_asm_", 0) == 0) {
+        std::string func_name = std::get<std::string>(callee);
+        auto _sp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        if (func_name == "__builtin_asm_context_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(asm_context_create(std::get<std::string>(arguments[0]).c_str()))); return;
+        } else if (func_name == "__builtin_asm_context_destroy__") {
+            asm_context_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_asm_context_arch__") {
+            last_value = std::string(asm_context_arch(_sp(0))); return;
+        } else if (func_name == "__builtin_asm_assemble__") {
+            last_value = std::string(asm_assemble(_sp(0), std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_asm_disassemble__") {
+            last_value = std::string(asm_disassemble(_sp(0), std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_asm_execute__") {
+            asm_execute(_sp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_asm_set_reg__") {
+            int64_t v = std::holds_alternative<int>(arguments[2]) ? std::get<int>(arguments[2]) : (int64_t)std::get<double>(arguments[2]);
+            asm_set_reg(_sp(0), std::get<std::string>(arguments[1]).c_str(), v); last_value = nullptr; return;
+        } else if (func_name == "__builtin_asm_get_reg__") {
+            last_value = (int)asm_get_reg(_sp(0), std::get<std::string>(arguments[1]).c_str()); return;
+        } else if (func_name == "__builtin_asm_dump_regs__") {
+            last_value = std::string(asm_dump_regs(_sp(0))); return;
+        } else if (func_name == "__builtin_asm_instruction_count__") {
+            last_value = asm_instruction_count(_sp(0)); return;
+        } else if (func_name == "__builtin_asm_instruction_at__") {
+            last_value = std::string(asm_instruction_at(_sp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_asm_optimize__") {
+            last_value = std::string(asm_optimize(_sp(0), std::get<std::string>(arguments[1]).c_str())); return;
+        }
+    }
+
+    if (std::holds_alternative<std::string>(callee) && (std::get<std::string>(callee).rfind("__builtin_gpio_", 0) == 0 || std::get<std::string>(callee).rfind("__builtin_pwm_", 0) == 0 || std::get<std::string>(callee).rfind("__builtin_adc_", 0) == 0 || std::get<std::string>(callee).rfind("__builtin_dac_", 0) == 0 || std::get<std::string>(callee).rfind("__builtin_spi_", 0) == 0 || std::get<std::string>(callee).rfind("__builtin_i2c_", 0) == 0 || std::get<std::string>(callee).rfind("__builtin_uart_", 0) == 0)) {
+        std::string func_name = std::get<std::string>(callee);
+        auto _sp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _gf = [&](int i) -> float { return std::holds_alternative<double>(arguments[i]) ? (float)std::get<double>(arguments[i]) : (float)std::get<int>(arguments[i]); };
+        if (func_name == "__builtin_gpio_controller_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gpio_controller_create(std::get<std::string>(arguments[0]).c_str()))); return;
+        } else if (func_name == "__builtin_gpio_controller_destroy__") {
+            gpio_controller_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gpio_controller_board__") {
+            last_value = std::string(gpio_controller_board(_sp(0))); return;
+        } else if (func_name == "__builtin_gpio_controller_pin_count__") {
+            last_value = gpio_controller_pin_count(_sp(0)); return;
+        } else if (func_name == "__builtin_gpio_pin_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gpio_pin_create(_sp(0), std::get<int>(arguments[1]), std::get<std::string>(arguments[2]).c_str()))); return;
+        } else if (func_name == "__builtin_gpio_pin_destroy__") {
+            gpio_pin_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gpio_pin_write__") {
+            gpio_pin_write(_sp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gpio_pin_read__") {
+            last_value = gpio_pin_read(_sp(0)); return;
+        } else if (func_name == "__builtin_gpio_pin_number__") {
+            last_value = gpio_pin_number(_sp(0)); return;
+        } else if (func_name == "__builtin_gpio_pin_mode__") {
+            last_value = std::string(gpio_pin_mode(_sp(0))); return;
+        } else if (func_name == "__builtin_gpio_pin_set_pull__") {
+            gpio_pin_set_pull(_sp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gpio_pin_to_string__") {
+            last_value = std::string(gpio_pin_to_string(_sp(0))); return;
+        } else if (func_name == "__builtin_pwm_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(pwm_create(_sp(0), std::get<int>(arguments[1]), _gf(2)))); return;
+        } else if (func_name == "__builtin_pwm_destroy__") {
+            pwm_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_pwm_set_frequency__") {
+            pwm_set_frequency(_sp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_pwm_set_duty_cycle__") {
+            pwm_set_duty_cycle(_sp(0), _gf(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_pwm_start__") {
+            pwm_start(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_pwm_stop__") {
+            pwm_stop(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_pwm_frequency__") {
+            last_value = pwm_frequency(_sp(0)); return;
+        } else if (func_name == "__builtin_pwm_duty_cycle__") {
+            last_value = (double)pwm_duty_cycle(_sp(0)); return;
+        } else if (func_name == "__builtin_pwm_is_running__") {
+            last_value = pwm_is_running(_sp(0)); return;
+        } else if (func_name == "__builtin_adc_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(adc_create(_sp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_adc_destroy__") {
+            adc_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_adc_read_raw__") {
+            last_value = adc_read_raw(_sp(0)); return;
+        } else if (func_name == "__builtin_adc_read_voltage__") {
+            last_value = (double)adc_read_voltage(_sp(0), _gf(1)); return;
+        } else if (func_name == "__builtin_adc_resolution__") {
+            last_value = adc_resolution(_sp(0)); return;
+        } else if (func_name == "__builtin_adc_channel__") {
+            last_value = adc_channel(_sp(0)); return;
+        } else if (func_name == "__builtin_dac_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(dac_create(_sp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_dac_destroy__") {
+            dac_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_dac_write_raw__") {
+            dac_write_raw(_sp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_dac_write_voltage__") {
+            dac_write_voltage(_sp(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_dac_resolution__") {
+            last_value = dac_resolution(_sp(0)); return;
+        } else if (func_name == "__builtin_dac_channel__") {
+            last_value = dac_channel(_sp(0)); return;
+        } else if (func_name == "__builtin_spi_bus_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(spi_bus_create(_sp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_spi_bus_destroy__") {
+            spi_bus_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_spi_transfer__") {
+            last_value = std::string(spi_transfer(_sp(0), std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_spi_set_clock__") {
+            spi_set_clock(_sp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_spi_clock__") {
+            last_value = spi_clock(_sp(0)); return;
+        } else if (func_name == "__builtin_spi_bus_num__") {
+            last_value = spi_bus_num(_sp(0)); return;
+        } else if (func_name == "__builtin_i2c_bus_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(i2c_bus_create(_sp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_i2c_bus_destroy__") {
+            i2c_bus_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_i2c_write__") {
+            last_value = i2c_write(_sp(0), std::get<int>(arguments[1]), std::get<std::string>(arguments[2]).c_str()); return;
+        } else if (func_name == "__builtin_i2c_read__") {
+            last_value = std::string(i2c_read(_sp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]))); return;
+        } else if (func_name == "__builtin_i2c_scan__") {
+            last_value = i2c_scan(_sp(0)); return;
+        } else if (func_name == "__builtin_i2c_bus_num__") {
+            last_value = i2c_bus_num(_sp(0)); return;
+        } else if (func_name == "__builtin_uart_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(uart_create(_sp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_uart_destroy__") {
+            uart_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_uart_write__") {
+            last_value = uart_write(_sp(0), std::get<std::string>(arguments[1]).c_str()); return;
+        } else if (func_name == "__builtin_uart_read__") {
+            last_value = std::string(uart_read(_sp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_uart_set_baud__") {
+            uart_set_baud(_sp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_uart_baud__") {
+            last_value = uart_baud(_sp(0)); return;
+        } else if (func_name == "__builtin_uart_port__") {
+            last_value = uart_port(_sp(0)); return;
+        } else if (func_name == "__builtin_uart_bytes_available__") {
+            last_value = uart_bytes_available(_sp(0)); return;
+        }
+    }
+
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_rtos_", 0) == 0) {
+        std::string func_name = std::get<std::string>(callee);
+        auto _sp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        if (func_name == "__builtin_rtos_kernel_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(rtos_kernel_create(std::get<std::string>(arguments[0]).c_str()))); return;
+        } else if (func_name == "__builtin_rtos_kernel_destroy__") {
+            rtos_kernel_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_kernel_start__") {
+            rtos_kernel_start(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_kernel_stop__") {
+            rtos_kernel_stop(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_kernel_is_running__") {
+            last_value = rtos_kernel_is_running(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_kernel_name__") {
+            last_value = std::string(rtos_kernel_name(_sp(0))); return;
+        } else if (func_name == "__builtin_rtos_kernel_tick__") {
+            last_value = rtos_kernel_tick(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_kernel_task_count__") {
+            last_value = rtos_kernel_task_count(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_task_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(rtos_task_create(_sp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2]), std::get<int>(arguments[3])))); return;
+        } else if (func_name == "__builtin_rtos_task_destroy__") {
+            rtos_task_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_task_start__") {
+            rtos_task_start(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_task_suspend__") {
+            rtos_task_suspend(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_task_resume__") {
+            rtos_task_resume(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_task_delete__") {
+            rtos_task_delete(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_task_name__") {
+            last_value = std::string(rtos_task_name(_sp(0))); return;
+        } else if (func_name == "__builtin_rtos_task_priority__") {
+            last_value = rtos_task_priority(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_task_state__") {
+            last_value = std::string(rtos_task_state(_sp(0))); return;
+        } else if (func_name == "__builtin_rtos_task_stack_size__") {
+            last_value = rtos_task_stack_size(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_semaphore_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(rtos_semaphore_create(std::get<int>(arguments[0]), std::get<int>(arguments[1])))); return;
+        } else if (func_name == "__builtin_rtos_semaphore_destroy__") {
+            rtos_semaphore_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_semaphore_take__") {
+            last_value = rtos_semaphore_take(_sp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_rtos_semaphore_give__") {
+            last_value = rtos_semaphore_give(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_semaphore_count__") {
+            last_value = rtos_semaphore_count(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_mutex_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(rtos_mutex_create())); return;
+        } else if (func_name == "__builtin_rtos_mutex_destroy__") {
+            rtos_mutex_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_mutex_lock__") {
+            last_value = rtos_mutex_lock(_sp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_rtos_mutex_unlock__") {
+            last_value = rtos_mutex_unlock(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_mutex_is_locked__") {
+            last_value = rtos_mutex_is_locked(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_queue_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(rtos_queue_create(std::get<int>(arguments[0]), std::get<int>(arguments[1])))); return;
+        } else if (func_name == "__builtin_rtos_queue_destroy__") {
+            rtos_queue_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_queue_send__") {
+            last_value = rtos_queue_send(_sp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2])); return;
+        } else if (func_name == "__builtin_rtos_queue_receive__") {
+            last_value = std::string(rtos_queue_receive(_sp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_rtos_queue_size__") {
+            last_value = rtos_queue_size(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_queue_capacity__") {
+            last_value = rtos_queue_capacity(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_queue_is_full__") {
+            last_value = rtos_queue_is_full(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_queue_is_empty__") {
+            last_value = rtos_queue_is_empty(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_timer_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(rtos_timer_create(std::get<std::string>(arguments[0]).c_str(), std::get<int>(arguments[1]), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_rtos_timer_destroy__") {
+            rtos_timer_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_timer_start__") {
+            rtos_timer_start(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_timer_stop__") {
+            rtos_timer_stop(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_timer_reset__") {
+            rtos_timer_reset(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_rtos_timer_is_active__") {
+            last_value = rtos_timer_is_active(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_timer_period__") {
+            last_value = rtos_timer_period(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_timer_fire_count__") {
+            last_value = rtos_timer_fire_count(_sp(0)); return;
+        } else if (func_name == "__builtin_rtos_timer_name__") {
+            last_value = std::string(rtos_timer_name(_sp(0))); return;
+        }
+    }
+
+    if (std::holds_alternative<std::string>(callee) && (std::get<std::string>(callee).rfind("__builtin_mem_map_", 0) == 0 || std::get<std::string>(callee).rfind("__builtin_interrupt_table_", 0) == 0 || std::get<std::string>(callee).rfind("__builtin_process_table_", 0) == 0 || std::get<std::string>(callee).rfind("__builtin_kernel_", 0) == 0)) {
+        std::string func_name = std::get<std::string>(callee);
+        auto _sp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _u64 = [&](int i) -> uint64_t { return std::holds_alternative<int>(arguments[i]) ? (uint64_t)std::get<int>(arguments[i]) : (uint64_t)std::get<double>(arguments[i]); };
+        if (func_name == "__builtin_mem_map_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(mem_map_create(_u64(0), _u64(1)))); return;
+        } else if (func_name == "__builtin_mem_map_destroy__") {
+            mem_map_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mem_map_add_region__") {
+            mem_map_add_region(_sp(0), std::get<std::string>(arguments[1]).c_str(), _u64(2), _u64(3), std::get<std::string>(arguments[4]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_mem_map_region_count__") {
+            last_value = mem_map_region_count(_sp(0)); return;
+        } else if (func_name == "__builtin_mem_map_region_name__") {
+            last_value = std::string(mem_map_region_name(_sp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_mem_map_region_addr__") {
+            last_value = (int)mem_map_region_addr(_sp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_mem_map_region_size__") {
+            last_value = (int)mem_map_region_size(_sp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_mem_map_region_type__") {
+            last_value = std::string(mem_map_region_type(_sp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_mem_map_to_string__") {
+            last_value = std::string(mem_map_to_string(_sp(0))); return;
+        } else if (func_name == "__builtin_interrupt_table_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(interrupt_table_create(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_interrupt_table_destroy__") {
+            interrupt_table_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_interrupt_table_register__") {
+            interrupt_table_register(_sp(0), std::get<int>(arguments[1]), std::get<std::string>(arguments[2]).c_str(), std::get<std::string>(arguments[3]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_interrupt_table_fire__") {
+            last_value = interrupt_table_fire(_sp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_interrupt_table_handler__") {
+            last_value = std::string(interrupt_table_handler(_sp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_interrupt_table_name__") {
+            last_value = std::string(interrupt_table_name(_sp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_interrupt_table_fire_count__") {
+            last_value = interrupt_table_fire_count(_sp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_interrupt_table_size__") {
+            last_value = interrupt_table_size(_sp(0)); return;
+        } else if (func_name == "__builtin_process_table_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(process_table_create(std::get<int>(arguments[0])))); return;
+        } else if (func_name == "__builtin_process_table_destroy__") {
+            process_table_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_process_table_create_process__") {
+            last_value = process_table_create_process(_sp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2])); return;
+        } else if (func_name == "__builtin_process_table_kill__") {
+            process_table_kill(_sp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_process_table_name__") {
+            last_value = std::string(process_table_name(_sp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_process_table_priority__") {
+            last_value = process_table_priority(_sp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_process_table_state__") {
+            last_value = std::string(process_table_state(_sp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_process_table_count__") {
+            last_value = process_table_count(_sp(0)); return;
+        } else if (func_name == "__builtin_process_table_schedule__") {
+            last_value = process_table_schedule(_sp(0)); return;
+        } else if (func_name == "__builtin_process_table_to_string__") {
+            last_value = std::string(process_table_to_string(_sp(0))); return;
+        } else if (func_name == "__builtin_kernel_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(kernel_create(std::get<std::string>(arguments[0]).c_str(), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_kernel_destroy__") {
+            kernel_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_kernel_boot__") {
+            kernel_boot(_sp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_kernel_panic__") {
+            kernel_panic(_sp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_kernel_name__") {
+            last_value = std::string(kernel_name(_sp(0))); return;
+        } else if (func_name == "__builtin_kernel_arch__") {
+            last_value = std::string(kernel_arch(_sp(0))); return;
+        } else if (func_name == "__builtin_kernel_state__") {
+            last_value = std::string(kernel_state(_sp(0))); return;
+        } else if (func_name == "__builtin_kernel_uptime_ms__") {
+            last_value = kernel_uptime_ms(_sp(0)); return;
+        } else if (func_name == "__builtin_kernel_syscall__") {
+            kernel_syscall(_sp(0), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_kernel_log__") {
+            last_value = std::string(kernel_log(_sp(0))); return;
+        } else if (func_name == "__builtin_kernel_log_count__") {
+            last_value = kernel_log_count(_sp(0)); return;
+        }
+    }
+
+
+
+    // gui window/draw builtins
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_gui_", 0) == 0) {
+        std::string func_name = std::get<std::string>(callee);
+        auto _gp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        // Window system
+        if (func_name == "__builtin_gui_init__") {
+            last_value = gui_init(); return;
+        } else if (func_name == "__builtin_gui_quit__") {
+            gui_quit(); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_has_display__") {
+            last_value = gui_has_display(); return;
+        } else if (func_name == "__builtin_gui_window_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_window_create(std::get<std::string>(arguments[0]).c_str(), std::get<int>(arguments[1]), std::get<int>(arguments[2])))); return;
+        } else if (func_name == "__builtin_gui_window_destroy__") {
+            gui_window_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_window_show__") {
+            gui_window_show(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_window_hide__") {
+            gui_window_hide(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_window_set_title__") {
+            gui_window_set_title(_gp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_window_title__") {
+            last_value = std::string(gui_window_title(_gp(0))); return;
+        } else if (func_name == "__builtin_gui_window_width__") {
+            last_value = gui_window_width(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_window_height__") {
+            last_value = gui_window_height(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_window_is_open__") {
+            last_value = gui_window_is_open(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_window_close__") {
+            gui_window_close(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_window_resize__") {
+            gui_window_resize(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_window_set_resizable__") {
+            gui_window_set_resizable(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_window_set_fullscreen__") {
+            gui_window_set_fullscreen(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_window_is_fullscreen__") {
+            last_value = gui_window_is_fullscreen(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_window_poll__") {
+            last_value = gui_window_poll(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_key_down__") {
+            last_value = gui_key_down(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_key_pressed__") {
+            last_value = gui_key_pressed(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_key__") {
+            last_value = gui_key(std::get<std::string>(arguments[0]).c_str()); return;
+        } else if (func_name == "__builtin_gui_mouse_x__") {
+            last_value = gui_mouse_x(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_mouse_y__") {
+            last_value = gui_mouse_y(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_mouse_button__") {
+            last_value = gui_mouse_button(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_clear__") {
+            gui_clear(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_present__") {
+            gui_present(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_set_color__") {
+            gui_set_color(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_draw_point__") {
+            gui_draw_point(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_draw_line__") {
+            gui_draw_line(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_draw_rect__") {
+            gui_draw_rect(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_fill_rect__") {
+            gui_fill_rect(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_draw_circle__") {
+            gui_draw_circle(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_fill_circle__") {
+            gui_fill_circle(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_draw_triangle__") {
+            gui_draw_triangle(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5]), std::get<int>(arguments[6])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_fill_triangle__") {
+            gui_fill_triangle(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5]), std::get<int>(arguments[6])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_draw_text__") {
+            gui_draw_text(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5]), std::get<int>(arguments[6]), std::get<int>(arguments[7])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_width__") {
+            last_value = gui_text_width(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2])); return;
+        } else if (func_name == "__builtin_gui_text_height__") {
+            last_value = gui_text_height(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_image_load__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_image_load(_gp(0), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_gui_image_destroy__") {
+            gui_image_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_image_draw__") {
+            gui_image_draw(_gp(0), _gp(1), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_image_draw_scaled__") {
+            gui_image_draw_scaled(_gp(0), _gp(1), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_image_width__") {
+            last_value = gui_image_width(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_image_height__") {
+            last_value = gui_image_height(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_delay__") {
+            gui_delay(std::get<int>(arguments[0])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_ticks__") {
+            last_value = gui_ticks(); return;
+        } else if (func_name == "__builtin_gui_delta_time__") {
+            double dt = gui_delta_time(_gp(0)); last_value = dt; return;
+        }
+    }
+
+    // gui builtins
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_gui_", 0) == 0) {
+        std::string func_name = std::get<std::string>(callee);
+        auto _gp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        // Phase 1: Text Rendering
+        if (func_name == "__builtin_gui_font_manager_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_font_manager_create())); return;
+        } else if (func_name == "__builtin_gui_font_manager_destroy__") {
+            gui_font_manager_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_font_load__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_font_load(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2]), std::get<std::string>(arguments[3]).c_str()))); return;
+        } else if (func_name == "__builtin_gui_font_manager_count__") {
+            last_value = gui_font_manager_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_font_name__") {
+            last_value = std::string(gui_font_name(_gp(0))); return;
+        } else if (func_name == "__builtin_gui_font_size__") {
+            last_value = gui_font_size(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_font_style__") {
+            last_value = std::string(gui_font_style(_gp(0))); return;
+        } else if (func_name == "__builtin_gui_text_renderer_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_text_renderer_create())); return;
+        } else if (func_name == "__builtin_gui_text_renderer_destroy__") {
+            gui_text_renderer_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_renderer_set_font__") {
+            gui_text_renderer_set_font(_gp(0), _gp(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_renderer_set_color__") {
+            double r=1,g=1,b=1,a=1;
+            if (std::holds_alternative<double>(arguments[1])) r=std::get<double>(arguments[1]); else r=std::get<int>(arguments[1]);
+            if (std::holds_alternative<double>(arguments[2])) g=std::get<double>(arguments[2]); else g=std::get<int>(arguments[2]);
+            if (std::holds_alternative<double>(arguments[3])) b=std::get<double>(arguments[3]); else b=std::get<int>(arguments[3]);
+            if (std::holds_alternative<double>(arguments[4])) a=std::get<double>(arguments[4]); else a=std::get<int>(arguments[4]);
+            gui_text_renderer_set_color(_gp(0),(float)r,(float)g,(float)b,(float)a); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_renderer_set_align__") {
+            gui_text_renderer_set_align(_gp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_renderer_set_antialias__") {
+            gui_text_renderer_set_antialias(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_renderer_render__") {
+            last_value = std::string(gui_text_renderer_render(_gp(0), std::get<std::string>(arguments[1]).c_str())); return;
+        } else if (func_name == "__builtin_gui_text_renderer_line_count__") {
+            last_value = gui_text_renderer_line_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_text_renderer_line_at__") {
+            last_value = std::string(gui_text_renderer_line_at(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_text_metrics_measure__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_text_metrics_measure(_gp(0), std::get<std::string>(arguments[1]).c_str()))); return;
+        } else if (func_name == "__builtin_gui_text_metrics_destroy__") {
+            gui_text_metrics_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_metrics_width__") {
+            last_value = gui_text_metrics_width(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_text_metrics_height__") {
+            last_value = gui_text_metrics_height(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_text_metrics_ascent__") {
+            last_value = gui_text_metrics_ascent(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_text_metrics_descent__") {
+            last_value = gui_text_metrics_descent(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_text_metrics_line_height__") {
+            last_value = gui_text_metrics_line_height(_gp(0)); return;
+
+        // Phase 2: Mouse Support
+        } else if (func_name == "__builtin_gui_mouse_handler_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_mouse_handler_create())); return;
+        } else if (func_name == "__builtin_gui_mouse_handler_destroy__") {
+            gui_mouse_handler_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_mouse_handler_click__") {
+            gui_mouse_handler_click(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_mouse_handler_move__") {
+            gui_mouse_handler_move(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_mouse_handler_press__") {
+            gui_mouse_handler_press(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_mouse_handler_release__") {
+            gui_mouse_handler_release(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_mouse_handler_scroll__") {
+            gui_mouse_handler_scroll(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_mouse_handler_event_count__") {
+            last_value = gui_mouse_handler_event_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_mouse_handler_event_type__") {
+            last_value = std::string(gui_mouse_handler_event_type(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_mouse_handler_event_x__") {
+            last_value = gui_mouse_handler_event_x(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_mouse_handler_event_y__") {
+            last_value = gui_mouse_handler_event_y(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_mouse_handler_event_button__") {
+            last_value = gui_mouse_handler_event_button(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_mouse_handler_cursor_x__") {
+            last_value = gui_mouse_handler_cursor_x(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_mouse_handler_cursor_y__") {
+            last_value = gui_mouse_handler_cursor_y(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_mouse_handler_is_button_down__") {
+            last_value = gui_mouse_handler_is_button_down(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_drag_drop_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_drag_drop_create())); return;
+        } else if (func_name == "__builtin_gui_drag_drop_destroy__") {
+            gui_drag_drop_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_drag_drop_start__") {
+            gui_drag_drop_start(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<std::string>(arguments[3]).c_str(), std::get<std::string>(arguments[4]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_drag_drop_move__") {
+            gui_drag_drop_move(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_drag_drop_drop__") {
+            last_value = gui_drag_drop_drop(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); return;
+        } else if (func_name == "__builtin_gui_drag_drop_is_dragging__") {
+            last_value = gui_drag_drop_is_dragging(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_drag_drop_data__") {
+            last_value = std::string(gui_drag_drop_data(_gp(0))); return;
+        } else if (func_name == "__builtin_gui_drag_drop_mime__") {
+            last_value = std::string(gui_drag_drop_mime(_gp(0))); return;
+        } else if (func_name == "__builtin_gui_drag_drop_start_x__") {
+            last_value = gui_drag_drop_start_x(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_drag_drop_start_y__") {
+            last_value = gui_drag_drop_start_y(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_context_menu_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_context_menu_create())); return;
+        } else if (func_name == "__builtin_gui_context_menu_destroy__") {
+            gui_context_menu_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_context_menu_add_item__") {
+            gui_context_menu_add_item(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_context_menu_add_separator__") {
+            gui_context_menu_add_separator(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_context_menu_show__") {
+            gui_context_menu_show(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_context_menu_hide__") {
+            gui_context_menu_hide(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_context_menu_item_count__") {
+            last_value = gui_context_menu_item_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_context_menu_item_label__") {
+            last_value = std::string(gui_context_menu_item_label(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_context_menu_item_action__") {
+            last_value = std::string(gui_context_menu_item_action(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_context_menu_is_visible__") {
+            last_value = gui_context_menu_is_visible(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_context_menu_x__") {
+            last_value = gui_context_menu_x(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_context_menu_y__") {
+            last_value = gui_context_menu_y(_gp(0)); return;
+
+        // Phase 3: Advanced Widgets
+        } else if (func_name == "__builtin_gui_text_input_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_text_input_create())); return;
+        } else if (func_name == "__builtin_gui_text_input_destroy__") {
+            gui_text_input_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_input_set_text__") {
+            gui_text_input_set_text(_gp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_input_set_placeholder__") {
+            gui_text_input_set_placeholder(_gp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_input_set_max_length__") {
+            gui_text_input_set_max_length(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_input_set_password__") {
+            gui_text_input_set_password(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_input_set_multiline__") {
+            gui_text_input_set_multiline(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_input_insert__") {
+            gui_text_input_insert(_gp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_input_clear__") {
+            gui_text_input_clear(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_input_text__") {
+            last_value = std::string(gui_text_input_text(_gp(0))); return;
+        } else if (func_name == "__builtin_gui_text_input_length__") {
+            last_value = gui_text_input_length(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_text_input_cursor_pos__") {
+            last_value = gui_text_input_cursor_pos(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_text_input_is_focused__") {
+            last_value = gui_text_input_is_focused(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_text_input_focus__") {
+            gui_text_input_focus(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_text_input_blur__") {
+            gui_text_input_blur(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_dropdown_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_dropdown_create())); return;
+        } else if (func_name == "__builtin_gui_dropdown_destroy__") {
+            gui_dropdown_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_dropdown_add_option__") {
+            gui_dropdown_add_option(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_dropdown_set_selected__") {
+            gui_dropdown_set_selected(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_dropdown_set_placeholder__") {
+            gui_dropdown_set_placeholder(_gp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_dropdown_open__") {
+            gui_dropdown_open(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_dropdown_close__") {
+            gui_dropdown_close(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_dropdown_option_count__") {
+            last_value = gui_dropdown_option_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_dropdown_option_label__") {
+            last_value = std::string(gui_dropdown_option_label(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_dropdown_option_value__") {
+            last_value = std::string(gui_dropdown_option_value(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_dropdown_selected_index__") {
+            last_value = gui_dropdown_selected_index(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_dropdown_selected_value__") {
+            last_value = std::string(gui_dropdown_selected_value(_gp(0))); return;
+        } else if (func_name == "__builtin_gui_dropdown_is_open__") {
+            last_value = gui_dropdown_is_open(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_table_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_table_create())); return;
+        } else if (func_name == "__builtin_gui_table_destroy__") {
+            gui_table_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_table_add_column__") {
+            gui_table_add_column(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_table_add_row__") {
+            gui_table_add_row(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_table_set_cell__") {
+            gui_table_set_cell(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<std::string>(arguments[3]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_table_get_cell__") {
+            last_value = std::string(gui_table_get_cell(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]))); return;
+        } else if (func_name == "__builtin_gui_table_row_count__") {
+            last_value = gui_table_row_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_table_col_count__") {
+            last_value = gui_table_col_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_table_column_header__") {
+            last_value = std::string(gui_table_column_header(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_table_column_width__") {
+            last_value = gui_table_column_width(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_table_set_selected_row__") {
+            gui_table_set_selected_row(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_table_selected_row__") {
+            last_value = gui_table_selected_row(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_table_sort_by_column__") {
+            gui_table_sort_by_column(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_table_to_csv__") {
+            last_value = std::string(gui_table_to_csv(_gp(0))); return;
+
+        } else if (func_name == "__builtin_gui_tree_view_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_tree_view_create())); return;
+        } else if (func_name == "__builtin_gui_tree_view_destroy__") {
+            gui_tree_view_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_tree_view_add_node__") {
+            last_value = gui_tree_view_add_node(_gp(0), std::get<int>(arguments[1]), std::get<std::string>(arguments[2]).c_str(), std::get<std::string>(arguments[3]).c_str()); return;
+        } else if (func_name == "__builtin_gui_tree_view_expand__") {
+            gui_tree_view_expand(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_tree_view_collapse__") {
+            gui_tree_view_collapse(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_tree_view_select__") {
+            gui_tree_view_select(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_tree_view_node_count__") {
+            last_value = gui_tree_view_node_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_tree_view_node_label__") {
+            last_value = std::string(gui_tree_view_node_label(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_tree_view_node_data__") {
+            last_value = std::string(gui_tree_view_node_data(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_tree_view_node_parent__") {
+            last_value = gui_tree_view_node_parent(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_tree_view_node_is_expanded__") {
+            last_value = gui_tree_view_node_is_expanded(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_tree_view_selected_node__") {
+            last_value = gui_tree_view_selected_node(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_tree_view_child_count__") {
+            last_value = gui_tree_view_child_count(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_tabs_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_tabs_create())); return;
+        } else if (func_name == "__builtin_gui_tabs_destroy__") {
+            gui_tabs_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_tabs_add_tab__") {
+            gui_tabs_add_tab(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_tabs_set_active__") {
+            gui_tabs_set_active(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_tabs_remove_tab__") {
+            gui_tabs_remove_tab(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_tabs_count__") {
+            last_value = gui_tabs_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_tabs_label__") {
+            last_value = std::string(gui_tabs_label(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_tabs_content_id__") {
+            last_value = std::string(gui_tabs_content_id(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_tabs_active_index__") {
+            last_value = gui_tabs_active_index(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_tabs_active_label__") {
+            last_value = std::string(gui_tabs_active_label(_gp(0))); return;
+        // Phase 4: Layout Management
+        } else if (func_name == "__builtin_gui_flex_layout_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_flex_layout_create(std::get<std::string>(arguments[0]).c_str()))); return;
+        } else if (func_name == "__builtin_gui_flex_layout_destroy__") {
+            gui_flex_layout_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_flex_layout_add_item__") {
+            gui_flex_layout_add_item(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_flex_layout_set_gap__") {
+            gui_flex_layout_set_gap(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_flex_layout_set_padding__") {
+            gui_flex_layout_set_padding(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_flex_layout_set_wrap__") {
+            gui_flex_layout_set_wrap(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_flex_layout_set_align__") {
+            gui_flex_layout_set_align(_gp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_flex_layout_set_justify__") {
+            gui_flex_layout_set_justify(_gp(0), std::get<std::string>(arguments[1]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_flex_layout_item_count__") {
+            last_value = gui_flex_layout_item_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_flex_layout_item_id__") {
+            last_value = std::string(gui_flex_layout_item_id(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_flex_layout_item_flex__") {
+            last_value = gui_flex_layout_item_flex(_gp(0), std::get<int>(arguments[1])); return;
+        } else if (func_name == "__builtin_gui_flex_layout_compute__") {
+            last_value = std::string(gui_flex_layout_compute(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]))); return;
+        } else if (func_name == "__builtin_gui_flex_layout_direction__") {
+            last_value = std::string(gui_flex_layout_direction(_gp(0))); return;
+        } else if (func_name == "__builtin_gui_grid_layout_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_grid_layout_create(std::get<int>(arguments[0]), std::get<int>(arguments[1])))); return;
+        } else if (func_name == "__builtin_gui_grid_layout_destroy__") {
+            gui_grid_layout_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_grid_layout_place__") {
+            gui_grid_layout_place(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_grid_layout_set_col_width__") {
+            gui_grid_layout_set_col_width(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_grid_layout_set_row_height__") {
+            gui_grid_layout_set_row_height(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_grid_layout_set_gap__") {
+            gui_grid_layout_set_gap(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_grid_layout_cols__") {
+            last_value = gui_grid_layout_cols(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_grid_layout_rows__") {
+            last_value = gui_grid_layout_rows(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_grid_layout_item_count__") {
+            last_value = gui_grid_layout_item_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_grid_layout_item_id__") {
+            last_value = std::string(gui_grid_layout_item_id(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_grid_layout_compute__") {
+            last_value = std::string(gui_grid_layout_compute(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]))); return;
+        } else if (func_name == "__builtin_gui_anchor_layout_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_anchor_layout_create())); return;
+        } else if (func_name == "__builtin_gui_anchor_layout_destroy__") {
+            gui_anchor_layout_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_anchor_layout_add_item__") {
+            gui_anchor_layout_add_item(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_anchor_layout_set_anchor__") {
+            gui_anchor_layout_set_anchor(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str(), std::get<int>(arguments[3])); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_anchor_layout_set_relative__") {
+            gui_anchor_layout_set_relative(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<std::string>(arguments[2]).c_str(), std::get<std::string>(arguments[3]).c_str()); last_value = nullptr; return;
+        } else if (func_name == "__builtin_gui_anchor_layout_item_count__") {
+            last_value = gui_anchor_layout_item_count(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_anchor_layout_item_id__") {
+            last_value = std::string(gui_anchor_layout_item_id(_gp(0), std::get<int>(arguments[1]))); return;
+        } else if (func_name == "__builtin_gui_anchor_layout_compute__") {
+            last_value = std::string(gui_anchor_layout_compute(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]))); return;
+        }
+    }
+
+    // network builtins (Milestone 12)
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_net_", 0) == 0) {
+        std::string func_name = std::get<std::string>(callee);
+        auto _np = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _ns = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        auto _ni = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        // TCP
+        if (func_name == "__builtin_net_tcp_socket_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_tcp_socket_create())); return;
+        } else if (func_name == "__builtin_net_tcp_socket_destroy__") {
+            net_tcp_socket_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_tcp_connect__") {
+            last_value = net_tcp_connect(_np(0), _ns(1), _ni(2)); return;
+        } else if (func_name == "__builtin_net_tcp_bind__") {
+            last_value = net_tcp_bind(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_tcp_listen__") {
+            last_value = net_tcp_listen(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_tcp_accept__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_tcp_accept(_np(0)))); return;
+        } else if (func_name == "__builtin_net_tcp_send__") {
+            last_value = net_tcp_send(_np(0), _ns(1), -1); return;
+        } else if (func_name == "__builtin_net_tcp_recv__") {
+            last_value = net_tcp_recv(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_tcp_recv_data__") {
+            last_value = std::string(net_tcp_recv_data(_np(0))); return;
+        } else if (func_name == "__builtin_net_tcp_close__") {
+            last_value = net_tcp_close(_np(0)); return;
+        } else if (func_name == "__builtin_net_tcp_is_connected__") {
+            last_value = net_tcp_is_connected(_np(0)); return;
+        } else if (func_name == "__builtin_net_tcp_remote_addr__") {
+            last_value = std::string(net_tcp_remote_addr(_np(0))); return;
+        } else if (func_name == "__builtin_net_tcp_remote_port__") {
+            last_value = net_tcp_remote_port(_np(0)); return;
+        } else if (func_name == "__builtin_net_tcp_set_nonblocking__") {
+            last_value = net_tcp_set_nonblocking(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_tcp_set_timeout__") {
+            last_value = net_tcp_set_timeout(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_tcp_bytes_available__") {
+            last_value = net_tcp_bytes_available(_np(0)); return;
+        // UDP
+        } else if (func_name == "__builtin_net_udp_socket_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_udp_socket_create())); return;
+        } else if (func_name == "__builtin_net_udp_socket_destroy__") {
+            net_udp_socket_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_udp_bind__") {
+            last_value = net_udp_bind(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_udp_send_to__") {
+            // args: sock, data, len, host, port
+            last_value = net_udp_send_to(_np(0), _ns(1), _ni(2), _ns(3), _ni(4)); return;
+        } else if (func_name == "__builtin_net_udp_recv_from__") {
+            last_value = net_udp_recv_from(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_udp_recv_data__") {
+            last_value = std::string(net_udp_recv_data(_np(0))); return;
+        } else if (func_name == "__builtin_net_udp_recv_addr__") {
+            last_value = std::string(net_udp_recv_addr(_np(0))); return;
+        } else if (func_name == "__builtin_net_udp_recv_port__") {
+            last_value = net_udp_recv_port(_np(0)); return;
+        } else if (func_name == "__builtin_net_udp_close__") {
+            last_value = net_udp_close(_np(0)); return;
+        } else if (func_name == "__builtin_net_udp_set_broadcast__") {
+            last_value = net_udp_set_broadcast(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_udp_set_timeout__") {
+            last_value = net_udp_set_timeout(_np(0), _ni(1)); return;
+        // Address helpers
+        } else if (func_name == "__builtin_net_resolve_host__") {
+            last_value = std::string(net_resolve_host(_ns(0))); return;
+        } else if (func_name == "__builtin_net_local_ip__") {
+            last_value = std::string(net_local_ip()); return;
+        } else if (func_name == "__builtin_net_hostname__") {
+            last_value = std::string(net_hostname()); return;
+        // DNS
+        } else if (func_name == "__builtin_net_dns_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_dns_create())); return;
+        } else if (func_name == "__builtin_net_dns_destroy__") {
+            net_dns_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_dns_lookup__") {
+            last_value = std::string(net_dns_lookup(_np(0), _ns(1))); return;
+        } else if (func_name == "__builtin_net_dns_reverse__") {
+            last_value = std::string(net_dns_reverse(_np(0), _ns(1))); return;
+        } else if (func_name == "__builtin_net_dns_lookup_count__") {
+            last_value = net_dns_lookup_count(_np(0)); return;
+        } else if (func_name == "__builtin_net_dns_lookup_result__") {
+            last_value = std::string(net_dns_lookup_result(_np(0), _ni(1))); return;
+        } else if (func_name == "__builtin_net_dns_set_server__") {
+            net_dns_set_server(_np(0), _ns(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_dns_server__") {
+            last_value = std::string(net_dns_server(_np(0))); return;
+        // SMTP
+        } else if (func_name == "__builtin_net_smtp_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_smtp_create(_ns(0), _ni(1)))); return;
+        } else if (func_name == "__builtin_net_smtp_destroy__") {
+            net_smtp_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_smtp_connect__") {
+            last_value = net_smtp_connect(_np(0)); return;
+        } else if (func_name == "__builtin_net_smtp_auth__") {
+            last_value = net_smtp_auth(_np(0), _ns(1), _ns(2)); return;
+        } else if (func_name == "__builtin_net_smtp_send_mail__") {
+            last_value = net_smtp_send_mail(_np(0), _ns(1), _ns(2), _ns(3), _ns(4)); return;
+        } else if (func_name == "__builtin_net_smtp_disconnect__") {
+            last_value = net_smtp_disconnect(_np(0)); return;
+        } else if (func_name == "__builtin_net_smtp_is_connected__") {
+            last_value = net_smtp_is_connected(_np(0)); return;
+        } else if (func_name == "__builtin_net_smtp_last_response__") {
+            last_value = std::string(net_smtp_last_response(_np(0))); return;
+        } else if (func_name == "__builtin_net_smtp_set_tls__") {
+            net_smtp_set_tls(_np(0), _ni(1)); last_value = nullptr; return;
+        // FTP
+        } else if (func_name == "__builtin_net_ftp_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_ftp_create(_ns(0), _ni(1)))); return;
+        } else if (func_name == "__builtin_net_ftp_destroy__") {
+            net_ftp_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_ftp_connect__") {
+            last_value = net_ftp_connect(_np(0)); return;
+        } else if (func_name == "__builtin_net_ftp_login__") {
+            last_value = net_ftp_login(_np(0), _ns(1), _ns(2)); return;
+        } else if (func_name == "__builtin_net_ftp_list__") {
+            last_value = net_ftp_list(_np(0), _ns(1)); return;
+        } else if (func_name == "__builtin_net_ftp_file_count__") {
+            last_value = net_ftp_file_count(_np(0)); return;
+        } else if (func_name == "__builtin_net_ftp_file_name__") {
+            last_value = std::string(net_ftp_file_name(_np(0), _ni(1))); return;
+        } else if (func_name == "__builtin_net_ftp_file_size__") {
+            last_value = net_ftp_file_size(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_ftp_download__") {
+            last_value = net_ftp_download(_np(0), _ns(1), _ns(2)); return;
+        } else if (func_name == "__builtin_net_ftp_upload__") {
+            last_value = net_ftp_upload(_np(0), _ns(1), _ns(2)); return;
+        } else if (func_name == "__builtin_net_ftp_mkdir__") {
+            last_value = net_ftp_mkdir(_np(0), _ns(1)); return;
+        } else if (func_name == "__builtin_net_ftp_delete__") {
+            last_value = net_ftp_delete(_np(0), _ns(1)); return;
+        } else if (func_name == "__builtin_net_ftp_disconnect__") {
+            last_value = net_ftp_disconnect(_np(0)); return;
+        } else if (func_name == "__builtin_net_ftp_cwd__") {
+            last_value = std::string(net_ftp_cwd(_np(0))); return;
+        // SSH
+        } else if (func_name == "__builtin_net_ssh_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_ssh_create(_ns(0), _ni(1)))); return;
+        } else if (func_name == "__builtin_net_ssh_destroy__") {
+            net_ssh_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_ssh_connect__") {
+            last_value = net_ssh_connect(_np(0)); return;
+        } else if (func_name == "__builtin_net_ssh_auth_password__") {
+            last_value = net_ssh_auth_password(_np(0), _ns(1), _ns(2)); return;
+        } else if (func_name == "__builtin_net_ssh_auth_key__") {
+            last_value = net_ssh_auth_key(_np(0), _ns(1), _ns(2)); return;
+        } else if (func_name == "__builtin_net_ssh_exec__") {
+            last_value = net_ssh_exec(_np(0), _ns(1)); return;
+        } else if (func_name == "__builtin_net_ssh_output__") {
+            last_value = std::string(net_ssh_output(_np(0))); return;
+        } else if (func_name == "__builtin_net_ssh_stderr__") {
+            last_value = std::string(net_ssh_stderr(_np(0))); return;
+        } else if (func_name == "__builtin_net_ssh_exit_code__") {
+            last_value = net_ssh_exit_code(_np(0)); return;
+        } else if (func_name == "__builtin_net_ssh_upload__") {
+            last_value = net_ssh_upload(_np(0), _ns(1), _ns(2)); return;
+        } else if (func_name == "__builtin_net_ssh_download__") {
+            last_value = net_ssh_download(_np(0), _ns(1), _ns(2)); return;
+        } else if (func_name == "__builtin_net_ssh_disconnect__") {
+            last_value = net_ssh_disconnect(_np(0)); return;
+        } else if (func_name == "__builtin_net_ssh_is_connected__") {
+            last_value = net_ssh_is_connected(_np(0)); return;
+        // Packet capture
+        } else if (func_name == "__builtin_net_capture_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_capture_create(_ns(0)))); return;
+        } else if (func_name == "__builtin_net_capture_destroy__") {
+            net_capture_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_capture_start__") {
+            last_value = net_capture_start(_np(0)); return;
+        } else if (func_name == "__builtin_net_capture_stop__") {
+            last_value = net_capture_stop(_np(0)); return;
+        } else if (func_name == "__builtin_net_capture_packet_count__") {
+            last_value = net_capture_packet_count(_np(0)); return;
+        } else if (func_name == "__builtin_net_capture_packet_src__") {
+            last_value = std::string(net_capture_packet_src(_np(0), _ni(1))); return;
+        } else if (func_name == "__builtin_net_capture_packet_dst__") {
+            last_value = std::string(net_capture_packet_dst(_np(0), _ni(1))); return;
+        } else if (func_name == "__builtin_net_capture_packet_proto__") {
+            last_value = std::string(net_capture_packet_proto(_np(0), _ni(1))); return;
+        } else if (func_name == "__builtin_net_capture_packet_size__") {
+            last_value = net_capture_packet_size(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_capture_packet_data__") {
+            last_value = std::string(net_capture_packet_data(_np(0), _ni(1))); return;
+        } else if (func_name == "__builtin_net_capture_set_filter__") {
+            net_capture_set_filter(_np(0), _ns(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_capture_to_json__") {
+            last_value = std::string(net_capture_to_json(_np(0))); return;
+        // Network monitor
+        } else if (func_name == "__builtin_net_monitor_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_monitor_create())); return;
+        } else if (func_name == "__builtin_net_monitor_destroy__") {
+            net_monitor_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_monitor_add_interface__") {
+            net_monitor_add_interface(_np(0), _ns(1)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_monitor_sample__") {
+            last_value = net_monitor_sample(_np(0)); return;
+        } else if (func_name == "__builtin_net_monitor_interface_count__") {
+            last_value = net_monitor_interface_count(_np(0)); return;
+        } else if (func_name == "__builtin_net_monitor_interface_name__") {
+            last_value = std::string(net_monitor_interface_name(_np(0), _ni(1))); return;
+        } else if (func_name == "__builtin_net_monitor_bytes_sent__") {
+            last_value = net_monitor_bytes_sent(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_monitor_bytes_recv__") {
+            last_value = net_monitor_bytes_recv(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_monitor_packets_sent__") {
+            last_value = net_monitor_packets_sent(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_monitor_packets_recv__") {
+            last_value = net_monitor_packets_recv(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_monitor_to_json__") {
+            last_value = std::string(net_monitor_to_json(_np(0))); return;
+        // Bandwidth
+        } else if (func_name == "__builtin_net_bandwidth_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_bandwidth_create())); return;
+        } else if (func_name == "__builtin_net_bandwidth_destroy__") {
+            net_bandwidth_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_bandwidth_test_upload__") {
+            last_value = net_bandwidth_test_upload(_np(0), _ns(1), _ni(2), _ni(3)); return;
+        } else if (func_name == "__builtin_net_bandwidth_test_download__") {
+            last_value = net_bandwidth_test_download(_np(0), _ns(1), _ni(2), _ni(3)); return;
+        } else if (func_name == "__builtin_net_bandwidth_last_upload_mbps__") {
+            last_value = net_bandwidth_last_upload_mbps(_np(0)); return;
+        } else if (func_name == "__builtin_net_bandwidth_last_download_mbps__") {
+            last_value = net_bandwidth_last_download_mbps(_np(0)); return;
+        } else if (func_name == "__builtin_net_bandwidth_report__") {
+            last_value = std::string(net_bandwidth_report(_np(0))); return;
+        // Ping
+        } else if (func_name == "__builtin_net_ping_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_ping_create())); return;
+        } else if (func_name == "__builtin_net_ping_destroy__") {
+            net_ping_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_ping_host__") {
+            last_value = net_ping_host(_np(0), _ns(1), _ni(2)); return;
+        } else if (func_name == "__builtin_net_ping_min__") {
+            last_value = net_ping_min(_np(0)); return;
+        } else if (func_name == "__builtin_net_ping_max__") {
+            last_value = net_ping_max(_np(0)); return;
+        } else if (func_name == "__builtin_net_ping_avg__") {
+            last_value = net_ping_avg(_np(0)); return;
+        } else if (func_name == "__builtin_net_ping_jitter__") {
+            last_value = net_ping_jitter(_np(0)); return;
+        } else if (func_name == "__builtin_net_ping_packet_loss__") {
+            last_value = net_ping_packet_loss(_np(0)); return;
+        } else if (func_name == "__builtin_net_ping_report__") {
+            last_value = std::string(net_ping_report(_np(0))); return;
+        // Event loop
+        } else if (func_name == "__builtin_net_event_loop_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_event_loop_create())); return;
+        } else if (func_name == "__builtin_net_event_loop_destroy__") {
+            net_event_loop_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_event_loop_add_socket__") {
+            last_value = net_event_loop_add_socket(_np(0), _np(1), _ns(2), _ns(3)); return;
+        } else if (func_name == "__builtin_net_event_loop_remove_socket__") {
+            last_value = net_event_loop_remove_socket(_np(0), _np(1)); return;
+        } else if (func_name == "__builtin_net_event_loop_run_once__") {
+            last_value = net_event_loop_run_once(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_event_loop_run__") {
+            last_value = net_event_loop_run(_np(0), _ni(1)); return;
+        } else if (func_name == "__builtin_net_event_loop_stop__") {
+            last_value = net_event_loop_stop(_np(0)); return;
+        } else if (func_name == "__builtin_net_event_loop_pending_count__") {
+            last_value = net_event_loop_pending_count(_np(0)); return;
+        } else if (func_name == "__builtin_net_event_loop_next_event__") {
+            last_value = std::string(net_event_loop_next_event(_np(0))); return;
+        } else if (func_name == "__builtin_net_event_loop_is_running__") {
+            last_value = net_event_loop_is_running(_np(0)); return;
+        // Connection pool
+        } else if (func_name == "__builtin_net_pool_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_pool_create(_ns(0), _ni(1), _ni(2)))); return;
+        } else if (func_name == "__builtin_net_pool_destroy__") {
+            net_pool_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_pool_acquire__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_pool_acquire(_np(0)))); return;
+        } else if (func_name == "__builtin_net_pool_release__") {
+            last_value = net_pool_release(_np(0), _np(1)); return;
+        } else if (func_name == "__builtin_net_pool_size__") {
+            last_value = net_pool_size(_np(0)); return;
+        } else if (func_name == "__builtin_net_pool_active__") {
+            last_value = net_pool_active(_np(0)); return;
+        } else if (func_name == "__builtin_net_pool_idle__") {
+            last_value = net_pool_idle(_np(0)); return;
+        } else if (func_name == "__builtin_net_pool_host__") {
+            last_value = std::string(net_pool_host(_np(0))); return;
+        } else if (func_name == "__builtin_net_pool_port__") {
+            last_value = net_pool_port(_np(0)); return;
+        } else if (func_name == "__builtin_net_pool_set_timeout__") {
+            net_pool_set_timeout(_np(0), _ni(1)); last_value = nullptr; return;
+        // Async request
+        } else if (func_name == "__builtin_net_async_request_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_async_request_create())); return;
+        } else if (func_name == "__builtin_net_async_request_destroy__") {
+            net_async_request_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_async_get__") {
+            last_value = net_async_get(_np(0), _ns(1)); return;
+        } else if (func_name == "__builtin_net_async_post__") {
+            last_value = net_async_post(_np(0), _ns(1), _ns(2)); return;
+        } else if (func_name == "__builtin_net_async_is_done__") {
+            last_value = net_async_is_done(_np(0)); return;
+        } else if (func_name == "__builtin_net_async_status_code__") {
+            last_value = net_async_status_code(_np(0)); return;
+        } else if (func_name == "__builtin_net_async_response__") {
+            last_value = std::string(net_async_response(_np(0))); return;
+        } else if (func_name == "__builtin_net_async_error__") {
+            last_value = std::string(net_async_error(_np(0))); return;
+        } else if (func_name == "__builtin_net_async_elapsed_ms__") {
+            last_value = net_async_elapsed_ms(_np(0)); return;
+        // Load balancer
+        } else if (func_name == "__builtin_net_lb_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(net_lb_create(_ns(0)))); return;
+        } else if (func_name == "__builtin_net_lb_destroy__") {
+            net_lb_destroy(_np(0)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_lb_add_backend__") {
+            net_lb_add_backend(_np(0), _ns(1), _ni(2), _ni(3)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_lb_next_host__") {
+            last_value = std::string(net_lb_next_host(_np(0))); return;
+        } else if (func_name == "__builtin_net_lb_next_port__") {
+            last_value = net_lb_next_port(_np(0)); return;
+        } else if (func_name == "__builtin_net_lb_backend_count__") {
+            last_value = net_lb_backend_count(_np(0)); return;
+        } else if (func_name == "__builtin_net_lb_mark_down__") {
+            net_lb_mark_down(_np(0), _ns(1), _ni(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_lb_mark_up__") {
+            net_lb_mark_up(_np(0), _ns(1), _ni(2)); last_value = nullptr; return;
+        } else if (func_name == "__builtin_net_lb_strategy__") {
+            last_value = std::string(net_lb_strategy(_np(0))); return;
+        } else if (func_name == "__builtin_net_lb_stats__") {
+            last_value = std::string(net_lb_stats(_np(0))); return;
+        }
+    }
+
     // Handle WaitGroup methods
+
     if (std::holds_alternative<std::shared_ptr<WaitGroupMethod>>(callee)) {
         auto wgm = std::get<std::shared_ptr<WaitGroupMethod>>(callee);
         
@@ -4080,27 +7479,1359 @@ void Interpreter::visitClassDecl(ClassDecl& stmt) {
 }
 
 void Interpreter::visitImportStmt(ImportStmt& stmt) {
-    // Simple implementation for now - just print what would be imported
-    // In a real implementation, this would:
-    // 1. Resolve module path
-    // 2. Load and parse module file
-    // 3. Execute module in its own environment
-    // 4. Import symbols into current environment
-    
+    std::string mod = stmt.module_name;
+
+    // ===== stdlib module registration =====
+
+    // Milestone 1: Collections (arrays)
+    if (mod == "collections") {
+        environment->define("array_create", std::string("__builtin_array_create__"));
+        environment->define("array_push", std::string("__builtin_array_push__"));
+        environment->define("array_get", std::string("__builtin_array_get__"));
+        environment->define("array_set", std::string("__builtin_array_set__"));
+        environment->define("array_pop", std::string("__builtin_array_pop__"));
+        environment->define("array_size", std::string("__builtin_array_size__"));
+        environment->define("array_clear", std::string("__builtin_array_clear__"));
+    }
+
+    // Milestone 1: Math Library
+    if (mod == "math") {
+        environment->define("math_sqrt", std::string("__builtin_math_sqrt__"));
+        environment->define("math_pow", std::string("__builtin_math_pow__"));
+        environment->define("math_sin", std::string("__builtin_math_sin__"));
+        environment->define("math_cos", std::string("__builtin_math_cos__"));
+        environment->define("math_tan", std::string("__builtin_math_tan__"));
+        environment->define("math_exp", std::string("__builtin_math_exp__"));
+        environment->define("math_log", std::string("__builtin_math_log__"));
+        environment->define("math_log10", std::string("__builtin_math_log10__"));
+        environment->define("math_abs", std::string("__builtin_math_abs__"));
+        environment->define("math_floor", std::string("__builtin_math_floor__"));
+        environment->define("math_ceil", std::string("__builtin_math_ceil__"));
+        environment->define("math_round", std::string("__builtin_math_round__"));
+        environment->define("math_pi", std::string("__builtin_math_pi__"));
+        environment->define("math_e", std::string("__builtin_math_e__"));
+    }
+
+    // Milestone 1: CSV I/O
+    if (mod == "csv") {
+        environment->define("csv_create", std::string("__builtin_csv_create__"));
+        environment->define("csv_read_file", std::string("__builtin_csv_read_file__"));
+        environment->define("csv_write_file", std::string("__builtin_csv_write_file__"));
+        environment->define("csv_get", std::string("__builtin_csv_get__"));
+        environment->define("csv_set", std::string("__builtin_csv_set__"));
+        environment->define("csv_row_count", std::string("__builtin_csv_row_count__"));
+        environment->define("csv_col_count", std::string("__builtin_csv_col_count__"));
+        environment->define("csv_add_row", std::string("__builtin_csv_add_row__"));
+    }
+
+    // Milestone 2: JSON Support
+    if (mod == "json") {
+        environment->define("json_parse", std::string("__builtin_json_parse__"));
+        environment->define("json_stringify", std::string("__builtin_json_stringify__"));
+        environment->define("json_create_object", std::string("__builtin_json_create_object__"));
+        environment->define("json_create_array", std::string("__builtin_json_create_array__"));
+        environment->define("json_get", std::string("__builtin_json_get__"));
+        environment->define("json_set", std::string("__builtin_json_set__"));
+        environment->define("json_push", std::string("__builtin_json_push__"));
+        environment->define("json_size", std::string("__builtin_json_size__"));
+    }
+
+    // Milestone 2: Random Numbers
+    if (mod == "random") {
+        environment->define("random_seed", std::string("__builtin_random_seed__"));
+        environment->define("random", std::string("__builtin_random__"));
+        environment->define("random_int", std::string("__builtin_random_int__"));
+        environment->define("random_normal", std::string("__builtin_random_normal__"));
+        environment->define("random_boolean", std::string("__builtin_random_boolean__"));
+        environment->define("crypto_random", std::string("__builtin_crypto_random__"));
+        environment->define("crypto_random_int", std::string("__builtin_crypto_random_int__"));
+    }
+
+    // Milestone 3: Data Visualization
+    if (mod == "plotting") {
+        environment->define("plot_create", std::string("__builtin_plot_create__"));
+        environment->define("plot_add_line", std::string("__builtin_plot_add_line__"));
+        environment->define("plot_add_scatter", std::string("__builtin_plot_add_scatter__"));
+        environment->define("plot_add_bar", std::string("__builtin_plot_add_bar__"));
+        environment->define("plot_add_histogram", std::string("__builtin_plot_add_histogram__"));
+        environment->define("plot_set_title", std::string("__builtin_plot_set_title__"));
+        environment->define("plot_set_xlabel", std::string("__builtin_plot_set_xlabel__"));
+        environment->define("plot_set_ylabel", std::string("__builtin_plot_set_ylabel__"));
+        environment->define("plot_show", std::string("__builtin_plot_show__"));
+        environment->define("plot_save_svg", std::string("__builtin_plot_save_svg__"));
+        environment->define("quick_plot", std::string("__builtin_quick_plot__"));
+        environment->define("quick_scatter", std::string("__builtin_quick_scatter__"));
+        environment->define("quick_histogram", std::string("__builtin_quick_histogram__"));
+    }
+
+    // 3D Plotting (browser-based via Plotly.js HTML output)
+    if (mod == "plot3d") {
+        environment->define("plot3d_create",      std::string("__builtin_plot3d_create__"));
+        environment->define("plot3d_add_surface",  std::string("__builtin_plot3d_add_surface__"));
+        environment->define("plot3d_add_scatter",  std::string("__builtin_plot3d_add_scatter__"));
+        environment->define("plot3d_add_line",     std::string("__builtin_plot3d_add_line__"));
+        environment->define("plot3d_set_title",    std::string("__builtin_plot3d_set_title__"));
+        environment->define("plot3d_set_xlabel",   std::string("__builtin_plot3d_set_xlabel__"));
+        environment->define("plot3d_set_ylabel",   std::string("__builtin_plot3d_set_ylabel__"));
+        environment->define("plot3d_set_zlabel",   std::string("__builtin_plot3d_set_zlabel__"));
+        environment->define("plot3d_save_html",    std::string("__builtin_plot3d_save_html__"));
+    }
+
+    // Milestone 4: HTTP Server/Client
+    if (mod == "http") {
+        environment->define("http_server_create", std::string("__builtin_http_server_create__"));
+        environment->define("http_server_start", std::string("__builtin_http_server_start__"));
+        environment->define("http_server_stop", std::string("__builtin_http_server_stop__"));
+        environment->define("http_server_get", std::string("__builtin_http_server_get__"));
+        environment->define("http_server_post", std::string("__builtin_http_server_post__"));
+        environment->define("http_server_put", std::string("__builtin_http_server_put__"));
+        environment->define("http_server_delete", std::string("__builtin_http_server_delete__"));
+        environment->define("http_client_create", std::string("__builtin_http_client_create__"));
+        environment->define("http_client_get", std::string("__builtin_http_client_get__"));
+        environment->define("http_client_post", std::string("__builtin_http_client_post__"));
+        environment->define("http_response_status", std::string("__builtin_http_response_status__"));
+        environment->define("http_response_body", std::string("__builtin_http_response_body__"));
+        environment->define("http_response_header", std::string("__builtin_http_response_header__"));
+        environment->define("http_url_encode", std::string("__builtin_http_url_encode__"));
+        environment->define("http_url_decode", std::string("__builtin_http_url_decode__"));
+        environment->define("http_html_escape", std::string("__builtin_http_html_escape__"));
+    }
+
+    // Milestone 4: WebSocket Support
+    if (mod == "websocket") {
+        environment->define("websocket_server_create", std::string("__builtin_websocket_server_create__"));
+        environment->define("websocket_server_start", std::string("__builtin_websocket_server_start__"));
+        environment->define("websocket_server_stop", std::string("__builtin_websocket_server_stop__"));
+        environment->define("websocket_server_broadcast_text", std::string("__builtin_websocket_server_broadcast_text__"));
+        environment->define("websocket_server_broadcast_binary", std::string("__builtin_websocket_server_broadcast_binary__"));
+        environment->define("websocket_server_connection_count", std::string("__builtin_websocket_server_connection_count__"));
+        environment->define("websocket_client_create", std::string("__builtin_websocket_client_create__"));
+        environment->define("websocket_client_connect", std::string("__builtin_websocket_client_connect__"));
+        environment->define("websocket_client_disconnect", std::string("__builtin_websocket_client_disconnect__"));
+        environment->define("websocket_client_send_text", std::string("__builtin_websocket_client_send_text__"));
+        environment->define("websocket_client_send_binary", std::string("__builtin_websocket_client_send_binary__"));
+        environment->define("websocket_client_is_connected", std::string("__builtin_websocket_client_is_connected__"));
+        environment->define("websocket_base64_encode", std::string("__builtin_websocket_base64_encode__"));
+        environment->define("websocket_base64_decode", std::string("__builtin_websocket_base64_decode__"));
+    }
+
+    // Milestone 4: Template Engine
+    if (mod == "template") {
+        environment->define("html_template_engine_create", std::string("__builtin_html_template_engine_create__"));
+        environment->define("html_template_render", std::string("__builtin_html_template_render__"));
+        environment->define("html_template_render_file", std::string("__builtin_html_template_render_file__"));
+        environment->define("html_template_set_dir", std::string("__builtin_html_template_set_dir__"));
+        environment->define("html_template_cache", std::string("__builtin_html_template_cache__"));
+    }
+
+    // Milestone 4: Database Drivers
+    if (mod == "database") {
+        environment->define("postgresql_create", std::string("__builtin_postgresql_create__"));
+        environment->define("postgresql_connect", std::string("__builtin_postgresql_connect__"));
+        environment->define("postgresql_disconnect", std::string("__builtin_postgresql_disconnect__"));
+        environment->define("postgresql_query", std::string("__builtin_postgresql_query__"));
+        environment->define("postgresql_execute", std::string("__builtin_postgresql_execute__"));
+        environment->define("mysql_create", std::string("__builtin_mysql_create__"));
+        environment->define("mysql_connect", std::string("__builtin_mysql_connect__"));
+        environment->define("mysql_disconnect", std::string("__builtin_mysql_disconnect__"));
+        environment->define("mysql_query", std::string("__builtin_mysql_query__"));
+        environment->define("mysql_execute", std::string("__builtin_mysql_execute__"));
+    }
+
+    // Milestone 5: ORM Framework
+    if (mod == "orm") {
+        environment->define("orm_model_create", std::string("__builtin_orm_model_create__"));
+        environment->define("orm_model_add_field", std::string("__builtin_orm_model_add_field__"));
+        environment->define("orm_model_add_primary_key", std::string("__builtin_orm_model_add_primary_key__"));
+        environment->define("orm_model_get_sql", std::string("__builtin_orm_model_get_sql__"));
+        environment->define("orm_record_create", std::string("__builtin_orm_record_create__"));
+        environment->define("orm_record_set", std::string("__builtin_orm_record_set__"));
+        environment->define("orm_record_get", std::string("__builtin_orm_record_get__"));
+        environment->define("orm_record_to_json", std::string("__builtin_orm_record_to_json__"));
+        environment->define("orm_query_create", std::string("__builtin_orm_query_create__"));
+        environment->define("orm_query_where", std::string("__builtin_orm_query_where__"));
+        environment->define("orm_query_limit", std::string("__builtin_orm_query_limit__"));
+        environment->define("orm_query_offset", std::string("__builtin_orm_query_offset__"));
+        environment->define("orm_query_order_by", std::string("__builtin_orm_query_order_by__"));
+        environment->define("orm_query_to_sql", std::string("__builtin_orm_query_to_sql__"));
+        environment->define("orm_db_create", std::string("__builtin_orm_db_create__"));
+        environment->define("orm_db_connect", std::string("__builtin_orm_db_connect__"));
+        environment->define("orm_db_execute", std::string("__builtin_orm_db_execute__"));
+    }
+
+    // Milestone 5: Auth Framework
+    if (mod == "auth") {
+        environment->define("jwt_create", std::string("__builtin_jwt_create__"));
+        environment->define("jwt_generate", std::string("__builtin_jwt_generate__"));
+        environment->define("jwt_validate", std::string("__builtin_jwt_validate__"));
+        environment->define("jwt_get_subject", std::string("__builtin_jwt_get_subject__"));
+        environment->define("jwt_get_claim", std::string("__builtin_jwt_get_claim__"));
+        environment->define("jwt_refresh", std::string("__builtin_jwt_refresh__"));
+        environment->define("jwt_blacklist", std::string("__builtin_jwt_blacklist__"));
+        environment->define("jwt_is_blacklisted", std::string("__builtin_jwt_is_blacklisted__"));
+        environment->define("session_manager_create", std::string("__builtin_session_manager_create__"));
+        environment->define("session_create", std::string("__builtin_session_create__"));
+        environment->define("session_is_valid", std::string("__builtin_session_is_valid__"));
+        environment->define("session_set_data", std::string("__builtin_session_set_data__"));
+        environment->define("session_get_data", std::string("__builtin_session_get_data__"));
+        environment->define("session_destroy", std::string("__builtin_session_destroy__"));
+        environment->define("session_regenerate", std::string("__builtin_session_regenerate__"));
+        environment->define("session_cleanup", std::string("__builtin_session_cleanup__"));
+        environment->define("session_get_user_id", std::string("__builtin_session_get_user_id__"));
+        environment->define("rbac_create", std::string("__builtin_rbac_create__"));
+        environment->define("rbac_define_role", std::string("__builtin_rbac_define_role__"));
+        environment->define("rbac_add_permission", std::string("__builtin_rbac_add_permission__"));
+        environment->define("rbac_assign_role", std::string("__builtin_rbac_assign_role__"));
+        environment->define("rbac_revoke_role", std::string("__builtin_rbac_revoke_role__"));
+        environment->define("rbac_has_permission", std::string("__builtin_rbac_has_permission__"));
+        environment->define("rbac_has_role", std::string("__builtin_rbac_has_role__"));
+        environment->define("oauth2_create", std::string("__builtin_oauth2_create__"));
+        environment->define("oauth2_register_provider", std::string("__builtin_oauth2_register_provider__"));
+        environment->define("oauth2_get_auth_url", std::string("__builtin_oauth2_get_auth_url__"));
+        environment->define("oauth2_generate_state", std::string("__builtin_oauth2_generate_state__"));
+        environment->define("oauth2_validate_state", std::string("__builtin_oauth2_validate_state__"));
+        environment->define("oauth2_has_provider", std::string("__builtin_oauth2_has_provider__"));
+    }
+
+    // Milestone 5: REST API Framework
+    if (mod == "rest") {
+        environment->define("rest_router_create", std::string("__builtin_rest_router_create__"));
+        environment->define("rest_router_generate_crud", std::string("__builtin_rest_router_generate_crud__"));
+        environment->define("rest_router_add_custom", std::string("__builtin_rest_router_add_custom__"));
+        environment->define("rest_router_require_auth", std::string("__builtin_rest_router_require_auth__"));
+        environment->define("rest_router_route_count", std::string("__builtin_rest_router_route_count__"));
+        environment->define("rest_router_route_table", std::string("__builtin_rest_router_route_table__"));
+        environment->define("rest_router_get_prefix", std::string("__builtin_rest_router_get_prefix__"));
+        environment->define("rest_validator_create", std::string("__builtin_rest_validator_create__"));
+        environment->define("rest_validator_add_rule", std::string("__builtin_rest_validator_add_rule__"));
+        environment->define("rest_validator_validate", std::string("__builtin_rest_validator_validate__"));
+        environment->define("rest_validator_has_schema", std::string("__builtin_rest_validator_has_schema__"));
+        environment->define("rest_validator_schema_count", std::string("__builtin_rest_validator_schema_count__"));
+        environment->define("rest_formatter_create", std::string("__builtin_rest_formatter_create__"));
+        environment->define("rest_formatter_success", std::string("__builtin_rest_formatter_success__"));
+        environment->define("rest_formatter_created", std::string("__builtin_rest_formatter_created__"));
+        environment->define("rest_formatter_error", std::string("__builtin_rest_formatter_error__"));
+        environment->define("rest_formatter_not_found", std::string("__builtin_rest_formatter_not_found__"));
+        environment->define("rest_formatter_unauthorized", std::string("__builtin_rest_formatter_unauthorized__"));
+        environment->define("rest_formatter_forbidden", std::string("__builtin_rest_formatter_forbidden__"));
+        environment->define("rest_formatter_validation_error", std::string("__builtin_rest_formatter_validation_error__"));
+        environment->define("rest_formatter_paginated", std::string("__builtin_rest_formatter_paginated__"));
+        environment->define("rest_formatter_pretty", std::string("__builtin_rest_formatter_pretty__"));
+        environment->define("rest_docs_create", std::string("__builtin_rest_docs_create__"));
+        environment->define("rest_docs_add_endpoint", std::string("__builtin_rest_docs_add_endpoint__"));
+        environment->define("rest_docs_from_router", std::string("__builtin_rest_docs_from_router__"));
+        environment->define("rest_docs_openapi", std::string("__builtin_rest_docs_openapi__"));
+        environment->define("rest_docs_markdown", std::string("__builtin_rest_docs_markdown__"));
+        environment->define("rest_docs_html", std::string("__builtin_rest_docs_html__"));
+        environment->define("rest_docs_endpoint_count", std::string("__builtin_rest_docs_endpoint_count__"));
+    }
+
+    // Milestone 5: GraphQL Engine
+    if (mod == "graphql") {
+        environment->define("gql_schema_create", std::string("__builtin_gql_schema_create__"));
+        environment->define("gql_schema_add_type", std::string("__builtin_gql_schema_add_type__"));
+        environment->define("gql_schema_add_field", std::string("__builtin_gql_schema_add_field__"));
+        environment->define("gql_schema_add_scalar", std::string("__builtin_gql_schema_add_scalar__"));
+        environment->define("gql_schema_add_enum", std::string("__builtin_gql_schema_add_enum__"));
+        environment->define("gql_schema_set_query", std::string("__builtin_gql_schema_set_query__"));
+        environment->define("gql_schema_set_mutation", std::string("__builtin_gql_schema_set_mutation__"));
+        environment->define("gql_schema_set_subscription", std::string("__builtin_gql_schema_set_subscription__"));
+        environment->define("gql_schema_has_type", std::string("__builtin_gql_schema_has_type__"));
+        environment->define("gql_schema_type_count", std::string("__builtin_gql_schema_type_count__"));
+        environment->define("gql_schema_validate", std::string("__builtin_gql_schema_validate__"));
+        environment->define("gql_schema_to_sdl", std::string("__builtin_gql_schema_to_sdl__"));
+        environment->define("gql_schema_introspect", std::string("__builtin_gql_schema_introspect__"));
+        environment->define("gql_query_engine_create", std::string("__builtin_gql_query_engine_create__"));
+        environment->define("gql_query_engine_register_data", std::string("__builtin_gql_query_engine_register_data__"));
+        environment->define("gql_query_execute", std::string("__builtin_gql_query_execute__"));
+        environment->define("gql_query_complexity", std::string("__builtin_gql_query_complexity__"));
+        environment->define("gql_query_resolver_count", std::string("__builtin_gql_query_resolver_count__"));
+        environment->define("gql_mutation_engine_create", std::string("__builtin_gql_mutation_engine_create__"));
+        environment->define("gql_mutation_register", std::string("__builtin_gql_mutation_register__"));
+        environment->define("gql_mutation_execute", std::string("__builtin_gql_mutation_execute__"));
+        environment->define("gql_mutation_count", std::string("__builtin_gql_mutation_count__"));
+        environment->define("gql_subscription_manager_create", std::string("__builtin_gql_subscription_manager_create__"));
+        environment->define("gql_subscribe", std::string("__builtin_gql_subscribe__"));
+        environment->define("gql_unsubscribe", std::string("__builtin_gql_unsubscribe__"));
+        environment->define("gql_unsubscribe_client", std::string("__builtin_gql_unsubscribe_client__"));
+        environment->define("gql_publish", std::string("__builtin_gql_publish__"));
+        environment->define("gql_subscription_count", std::string("__builtin_gql_subscription_count__"));
+        environment->define("gql_client_subscription_count", std::string("__builtin_gql_client_subscription_count__"));
+        environment->define("gql_is_subscribed", std::string("__builtin_gql_is_subscribed__"));
+    }
+
+    if (mod == "blockchain") {
+        environment->define("bc_sha256",              std::string("__builtin_bc_sha256__"));
+        environment->define("bc_sha256_double",       std::string("__builtin_bc_sha256_double__"));
+        environment->define("bc_merkle_create",       std::string("__builtin_bc_merkle_create__"));
+        environment->define("bc_merkle_add_leaf",     std::string("__builtin_bc_merkle_add_leaf__"));
+        environment->define("bc_merkle_build",        std::string("__builtin_bc_merkle_build__"));
+        environment->define("bc_merkle_root",         std::string("__builtin_bc_merkle_root__"));
+        environment->define("bc_merkle_leaf_count",   std::string("__builtin_bc_merkle_leaf_count__"));
+        environment->define("bc_tx_create",           std::string("__builtin_bc_tx_create__"));
+        environment->define("bc_tx_id",               std::string("__builtin_bc_tx_id__"));
+        environment->define("bc_tx_hash",             std::string("__builtin_bc_tx_hash__"));
+        environment->define("bc_tx_to_string",        std::string("__builtin_bc_tx_to_string__"));
+        environment->define("bc_block_create",        std::string("__builtin_bc_block_create__"));
+        environment->define("bc_block_add_tx",        std::string("__builtin_bc_block_add_tx__"));
+        environment->define("bc_block_mine",          std::string("__builtin_bc_block_mine__"));
+        environment->define("bc_block_hash",          std::string("__builtin_bc_block_hash__"));
+        environment->define("bc_block_prev_hash",     std::string("__builtin_bc_block_prev_hash__"));
+        environment->define("bc_block_index",         std::string("__builtin_bc_block_index__"));
+        environment->define("bc_block_nonce",         std::string("__builtin_bc_block_nonce__"));
+        environment->define("bc_block_tx_count",      std::string("__builtin_bc_block_tx_count__"));
+        environment->define("bc_block_is_valid",      std::string("__builtin_bc_block_is_valid__"));
+        environment->define("bc_block_to_string",     std::string("__builtin_bc_block_to_string__"));
+        environment->define("bc_block_merkle_root",   std::string("__builtin_bc_block_merkle_root__"));
+        environment->define("bc_chain_create",        std::string("__builtin_bc_chain_create__"));
+        environment->define("bc_chain_add_tx",        std::string("__builtin_bc_chain_add_tx__"));
+        environment->define("bc_chain_mine_block",    std::string("__builtin_bc_chain_mine_block__"));
+        environment->define("bc_chain_block_count",   std::string("__builtin_bc_chain_block_count__"));
+        environment->define("bc_chain_pending_count", std::string("__builtin_bc_chain_pending_count__"));
+        environment->define("bc_chain_is_valid",      std::string("__builtin_bc_chain_is_valid__"));
+        environment->define("bc_chain_get_balance",   std::string("__builtin_bc_chain_get_balance__"));
+        environment->define("bc_chain_last_hash",     std::string("__builtin_bc_chain_last_hash__"));
+        environment->define("bc_chain_get_block_hash",std::string("__builtin_bc_chain_get_block_hash__"));
+        environment->define("bc_chain_stats",         std::string("__builtin_bc_chain_stats__"));
+        environment->define("bc_chain_add_validator", std::string("__builtin_bc_chain_add_validator__"));
+        environment->define("bc_chain_select_validator",std::string("__builtin_bc_chain_select_validator__"));
+        environment->define("bc_p2p_create",          std::string("__builtin_bc_p2p_create__"));
+        environment->define("bc_p2p_add_node",        std::string("__builtin_bc_p2p_add_node__"));
+        environment->define("bc_p2p_connect",         std::string("__builtin_bc_p2p_connect__"));
+        environment->define("bc_p2p_disconnect",      std::string("__builtin_bc_p2p_disconnect__"));
+        environment->define("bc_p2p_broadcast_block", std::string("__builtin_bc_p2p_broadcast_block__"));
+        environment->define("bc_p2p_broadcast_tx",    std::string("__builtin_bc_p2p_broadcast_tx__"));
+        environment->define("bc_p2p_node_count",      std::string("__builtin_bc_p2p_node_count__"));
+        environment->define("bc_p2p_connected_count", std::string("__builtin_bc_p2p_connected_count__"));
+        environment->define("bc_p2p_status",          std::string("__builtin_bc_p2p_status__"));
+        return;
+    }
+
+    if (mod == "crypto") {
+        environment->define("crypto_sha256",             std::string("__builtin_crypto_sha256__"));
+        environment->define("crypto_sha512",             std::string("__builtin_crypto_sha512__"));
+        environment->define("crypto_sha1",               std::string("__builtin_crypto_sha1__"));
+        environment->define("crypto_md5",                std::string("__builtin_crypto_md5__"));
+        environment->define("crypto_ripemd160",          std::string("__builtin_crypto_ripemd160__"));
+        environment->define("crypto_hmac_sha256",        std::string("__builtin_crypto_hmac_sha256__"));
+        environment->define("crypto_hmac_sha512",        std::string("__builtin_crypto_hmac_sha512__"));
+        environment->define("crypto_to_base64",          std::string("__builtin_crypto_to_base64__"));
+        environment->define("crypto_from_base64",        std::string("__builtin_crypto_from_base64__"));
+        environment->define("crypto_keypair_generate",   std::string("__builtin_crypto_keypair_generate__"));
+        environment->define("crypto_keypair_from_private",std::string("__builtin_crypto_keypair_from_private__"));
+        environment->define("crypto_keypair_destroy",    std::string("__builtin_crypto_keypair_destroy__"));
+        environment->define("crypto_keypair_private_pem",std::string("__builtin_crypto_keypair_private_pem__"));
+        environment->define("crypto_keypair_public_pem", std::string("__builtin_crypto_keypair_public_pem__"));
+        environment->define("crypto_keypair_private_hex",std::string("__builtin_crypto_keypair_private_hex__"));
+        environment->define("crypto_keypair_public_hex", std::string("__builtin_crypto_keypair_public_hex__"));
+        environment->define("crypto_keypair_curve",      std::string("__builtin_crypto_keypair_curve__"));
+        environment->define("crypto_ecdsa_sign",         std::string("__builtin_crypto_ecdsa_sign__"));
+        environment->define("crypto_ecdsa_verify",       std::string("__builtin_crypto_ecdsa_verify__"));
+        environment->define("crypto_ecdsa_verify_pubhex",std::string("__builtin_crypto_ecdsa_verify_pubhex__"));
+        environment->define("crypto_pubkey_to_eth_address",std::string("__builtin_crypto_pubkey_to_eth_address__"));
+        environment->define("crypto_pubkey_to_btc_address",std::string("__builtin_crypto_pubkey_to_btc_address__"));
+        environment->define("crypto_privkey_to_wif",     std::string("__builtin_crypto_privkey_to_wif__"));
+        environment->define("crypto_wif_to_privkey",     std::string("__builtin_crypto_wif_to_privkey__"));
+        environment->define("crypto_aes_encrypt",        std::string("__builtin_crypto_aes_encrypt__"));
+        environment->define("crypto_aes_result_destroy", std::string("__builtin_crypto_aes_result_destroy__"));
+        environment->define("crypto_aes_ciphertext",     std::string("__builtin_crypto_aes_ciphertext__"));
+        environment->define("crypto_aes_iv",             std::string("__builtin_crypto_aes_iv__"));
+        environment->define("crypto_aes_tag",            std::string("__builtin_crypto_aes_tag__"));
+        environment->define("crypto_aes_decrypt",        std::string("__builtin_crypto_aes_decrypt__"));
+        environment->define("crypto_pbkdf2",             std::string("__builtin_crypto_pbkdf2__"));
+        environment->define("crypto_random_bytes",       std::string("__builtin_crypto_random_bytes__"));
+        return;
+    }
+
+    if (mod == "smartcontract") {
+        environment->define("sc_vm_create",            std::string("__builtin_sc_vm_create__"));
+        environment->define("sc_vm_destroy",           std::string("__builtin_sc_vm_destroy__"));
+        environment->define("sc_vm_set_storage",       std::string("__builtin_sc_vm_set_storage__"));
+        environment->define("sc_vm_get_storage",       std::string("__builtin_sc_vm_get_storage__"));
+        environment->define("sc_vm_set_balance",       std::string("__builtin_sc_vm_set_balance__"));
+        environment->define("sc_vm_get_balance",       std::string("__builtin_sc_vm_get_balance__"));
+        environment->define("sc_vm_state_dump",        std::string("__builtin_sc_vm_state_dump__"));
+        environment->define("sc_bytecode_create",      std::string("__builtin_sc_bytecode_create__"));
+        environment->define("sc_bytecode_destroy",     std::string("__builtin_sc_bytecode_destroy__"));
+        environment->define("sc_bytecode_push_int",    std::string("__builtin_sc_bytecode_push_int__"));
+        environment->define("sc_bytecode_push_str",    std::string("__builtin_sc_bytecode_push_str__"));
+        environment->define("sc_bytecode_push_bool",   std::string("__builtin_sc_bytecode_push_bool__"));
+        environment->define("sc_bytecode_push_double", std::string("__builtin_sc_bytecode_push_double__"));
+        environment->define("sc_bytecode_emit",        std::string("__builtin_sc_bytecode_emit__"));
+        environment->define("sc_bytecode_label",       std::string("__builtin_sc_bytecode_label__"));
+        environment->define("sc_bytecode_jump",        std::string("__builtin_sc_bytecode_jump__"));
+        environment->define("sc_bytecode_jumpi",       std::string("__builtin_sc_bytecode_jumpi__"));
+        environment->define("sc_bytecode_size",        std::string("__builtin_sc_bytecode_size__"));
+        environment->define("sc_ctx_create",           std::string("__builtin_sc_ctx_create__"));
+        environment->define("sc_ctx_destroy",          std::string("__builtin_sc_ctx_destroy__"));
+        environment->define("sc_ctx_set_block",        std::string("__builtin_sc_ctx_set_block__"));
+        environment->define("sc_execute",              std::string("__builtin_sc_execute__"));
+        environment->define("sc_result_destroy",       std::string("__builtin_sc_result_destroy__"));
+        environment->define("sc_result_success",       std::string("__builtin_sc_result_success__"));
+        environment->define("sc_result_return_value",  std::string("__builtin_sc_result_return_value__"));
+        environment->define("sc_result_revert_reason", std::string("__builtin_sc_result_revert_reason__"));
+        environment->define("sc_result_gas_used",      std::string("__builtin_sc_result_gas_used__"));
+        environment->define("sc_result_event_count",   std::string("__builtin_sc_result_event_count__"));
+        environment->define("sc_result_event_name",    std::string("__builtin_sc_result_event_name__"));
+        environment->define("sc_result_event_data",    std::string("__builtin_sc_result_event_data__"));
+        return;
+    }
+
+    if (mod == "dapp") {
+        // Wallet
+        environment->define("dapp_wallet_create",        std::string("__builtin_dapp_wallet_create__"));
+        environment->define("dapp_wallet_from_privkey",  std::string("__builtin_dapp_wallet_from_privkey__"));
+        environment->define("dapp_wallet_destroy",       std::string("__builtin_dapp_wallet_destroy__"));
+        environment->define("dapp_wallet_address",       std::string("__builtin_dapp_wallet_address__"));
+        environment->define("dapp_wallet_pubkey_hex",    std::string("__builtin_dapp_wallet_pubkey_hex__"));
+        environment->define("dapp_wallet_privkey_hex",   std::string("__builtin_dapp_wallet_privkey_hex__"));
+        environment->define("dapp_wallet_balance",       std::string("__builtin_dapp_wallet_balance__"));
+        environment->define("dapp_wallet_network",       std::string("__builtin_dapp_wallet_network__"));
+        environment->define("dapp_wallet_sign",          std::string("__builtin_dapp_wallet_sign__"));
+        environment->define("dapp_wallet_verify",        std::string("__builtin_dapp_wallet_verify__"));
+        environment->define("dapp_wallet_to_string",     std::string("__builtin_dapp_wallet_to_string__"));
+        // Provider
+        environment->define("dapp_provider_create",          std::string("__builtin_dapp_provider_create__"));
+        environment->define("dapp_provider_destroy",         std::string("__builtin_dapp_provider_destroy__"));
+        environment->define("dapp_provider_network",         std::string("__builtin_dapp_provider_network__"));
+        environment->define("dapp_provider_chain_id",        std::string("__builtin_dapp_provider_chain_id__"));
+        environment->define("dapp_provider_block_number",    std::string("__builtin_dapp_provider_block_number__"));
+        environment->define("dapp_provider_mine_block",      std::string("__builtin_dapp_provider_mine_block__"));
+        environment->define("dapp_provider_get_balance",     std::string("__builtin_dapp_provider_get_balance__"));
+        environment->define("dapp_provider_set_balance",     std::string("__builtin_dapp_provider_set_balance__"));
+        environment->define("dapp_provider_transfer",        std::string("__builtin_dapp_provider_transfer__"));
+        environment->define("dapp_provider_status",          std::string("__builtin_dapp_provider_status__"));
+        environment->define("dapp_provider_tx_count",        std::string("__builtin_dapp_provider_tx_count__"));
+        environment->define("dapp_provider_get_tx",          std::string("__builtin_dapp_provider_get_tx__"));
+        environment->define("dapp_provider_contract_count",  std::string("__builtin_dapp_provider_contract_count__"));
+        // Contract deployment
+        environment->define("dapp_deploy_contract",      std::string("__builtin_dapp_deploy_contract__"));
+        environment->define("dapp_contract_destroy",     std::string("__builtin_dapp_contract_destroy__"));
+        environment->define("dapp_contract_address",     std::string("__builtin_dapp_contract_address__"));
+        environment->define("dapp_contract_name",        std::string("__builtin_dapp_contract_name__"));
+        environment->define("dapp_contract_deployer",    std::string("__builtin_dapp_contract_deployer__"));
+        environment->define("dapp_contract_deploy_block",std::string("__builtin_dapp_contract_deploy_block__"));
+        environment->define("dapp_contract_to_string",   std::string("__builtin_dapp_contract_to_string__"));
+        // Contract call / tx
+        environment->define("dapp_call_contract",        std::string("__builtin_dapp_call_contract__"));
+        environment->define("dapp_tx_destroy",           std::string("__builtin_dapp_tx_destroy__"));
+        environment->define("dapp_tx_success",           std::string("__builtin_dapp_tx_success__"));
+        environment->define("dapp_tx_hash",              std::string("__builtin_dapp_tx_hash__"));
+        environment->define("dapp_tx_from",              std::string("__builtin_dapp_tx_from__"));
+        environment->define("dapp_tx_to",                std::string("__builtin_dapp_tx_to__"));
+        environment->define("dapp_tx_value",             std::string("__builtin_dapp_tx_value__"));
+        environment->define("dapp_tx_gas_used",          std::string("__builtin_dapp_tx_gas_used__"));
+        environment->define("dapp_tx_block",             std::string("__builtin_dapp_tx_block__"));
+        environment->define("dapp_tx_revert_reason",     std::string("__builtin_dapp_tx_revert_reason__"));
+        environment->define("dapp_tx_to_string",         std::string("__builtin_dapp_tx_to_string__"));
+        // ABI
+        environment->define("dapp_abi_encode_call",      std::string("__builtin_dapp_abi_encode_call__"));
+        environment->define("dapp_abi_selector",         std::string("__builtin_dapp_abi_selector__"));
+        return;
+    }
+
+    if (mod == "security") {
+        // VulnScanner
+        environment->define("sec_scanner_create",           std::string("__builtin_sec_scanner_create__"));
+        environment->define("sec_scanner_destroy",          std::string("__builtin_sec_scanner_destroy__"));
+        environment->define("sec_scanner_scan_host",        std::string("__builtin_sec_scanner_scan_host__"));
+        environment->define("sec_scanner_vuln_db_size",     std::string("__builtin_sec_scanner_vuln_db_size__"));
+        // ScanResult
+        environment->define("sec_scanresult_destroy",       std::string("__builtin_sec_scanresult_destroy__"));
+        environment->define("sec_scanresult_target",        std::string("__builtin_sec_scanresult_target__"));
+        environment->define("sec_scanresult_reachable",     std::string("__builtin_sec_scanresult_reachable__"));
+        environment->define("sec_scanresult_open_ports",    std::string("__builtin_sec_scanresult_open_ports__"));
+        environment->define("sec_scanresult_vuln_count",    std::string("__builtin_sec_scanresult_vuln_count__"));
+        environment->define("sec_scanresult_to_json",       std::string("__builtin_sec_scanresult_to_json__"));
+        environment->define("sec_scanresult_port_service",  std::string("__builtin_sec_scanresult_port_service__"));
+        environment->define("sec_scanresult_port_number",   std::string("__builtin_sec_scanresult_port_number__"));
+        environment->define("sec_scanresult_vuln_name",     std::string("__builtin_sec_scanresult_vuln_name__"));
+        environment->define("sec_scanresult_vuln_severity", std::string("__builtin_sec_scanresult_vuln_severity__"));
+        environment->define("sec_scanresult_vuln_remediation", std::string("__builtin_sec_scanresult_vuln_remediation__"));
+        // WebSecurityTester
+        environment->define("sec_web_tester_create",        std::string("__builtin_sec_web_tester_create__"));
+        environment->define("sec_web_tester_destroy",       std::string("__builtin_sec_web_tester_destroy__"));
+        environment->define("sec_web_scan",                 std::string("__builtin_sec_web_scan__"));
+        environment->define("sec_web_test_sqli",            std::string("__builtin_sec_web_test_sqli__"));
+        environment->define("sec_web_test_xss",             std::string("__builtin_sec_web_test_xss__"));
+        environment->define("sec_web_test_csrf",            std::string("__builtin_sec_web_test_csrf__"));
+        environment->define("sec_web_test_auth_bypass",     std::string("__builtin_sec_web_test_auth_bypass__"));
+        environment->define("sec_web_test_path_traversal",  std::string("__builtin_sec_web_test_path_traversal__"));
+        environment->define("sec_web_encode_payload",       std::string("__builtin_sec_web_encode_payload__"));
+        environment->define("sec_web_get_payloads",         std::string("__builtin_sec_web_get_payloads__"));
+        // WebScanResult
+        environment->define("sec_webscan_destroy",          std::string("__builtin_sec_webscan_destroy__"));
+        environment->define("sec_webscan_finding_count",    std::string("__builtin_sec_webscan_finding_count__"));
+        environment->define("sec_webscan_finding_name",     std::string("__builtin_sec_webscan_finding_name__"));
+        environment->define("sec_webscan_finding_severity", std::string("__builtin_sec_webscan_finding_severity__"));
+        environment->define("sec_webscan_finding_param",    std::string("__builtin_sec_webscan_finding_param__"));
+        environment->define("sec_webscan_finding_payload",  std::string("__builtin_sec_webscan_finding_payload__"));
+        environment->define("sec_webscan_to_json",          std::string("__builtin_sec_webscan_to_json__"));
+        // MalwareAnalyzer
+        environment->define("sec_malware_analyzer_create",  std::string("__builtin_sec_malware_analyzer_create__"));
+        environment->define("sec_malware_analyzer_destroy", std::string("__builtin_sec_malware_analyzer_destroy__"));
+        environment->define("sec_malware_static_analysis",  std::string("__builtin_sec_malware_static_analysis__"));
+        environment->define("sec_malware_dynamic_analysis", std::string("__builtin_sec_malware_dynamic_analysis__"));
+        environment->define("sec_malware_add_yara_rule",    std::string("__builtin_sec_malware_add_yara_rule__"));
+        // StaticAnalysisResult
+        environment->define("sec_static_result_destroy",       std::string("__builtin_sec_static_result_destroy__"));
+        environment->define("sec_static_result_threat_level",  std::string("__builtin_sec_static_result_threat_level__"));
+        environment->define("sec_static_result_file_type",     std::string("__builtin_sec_static_result_file_type__"));
+        environment->define("sec_static_result_sha256",        std::string("__builtin_sec_static_result_sha256__"));
+        environment->define("sec_static_result_md5",           std::string("__builtin_sec_static_result_md5__"));
+        environment->define("sec_static_result_entropy",       std::string("__builtin_sec_static_result_entropy__"));
+        environment->define("sec_static_result_string_count",  std::string("__builtin_sec_static_result_string_count__"));
+        environment->define("sec_static_result_string_value",  std::string("__builtin_sec_static_result_string_value__"));
+        environment->define("sec_static_result_string_category", std::string("__builtin_sec_static_result_string_category__"));
+        environment->define("sec_static_result_suspicious_count", std::string("__builtin_sec_static_result_suspicious_count__"));
+        environment->define("sec_static_result_suspicious",    std::string("__builtin_sec_static_result_suspicious__"));
+        environment->define("sec_static_result_to_json",       std::string("__builtin_sec_static_result_to_json__"));
+        // DynamicAnalysisResult
+        environment->define("sec_dynamic_result_destroy",      std::string("__builtin_sec_dynamic_result_destroy__"));
+        environment->define("sec_dynamic_result_threat_level", std::string("__builtin_sec_dynamic_result_threat_level__"));
+        environment->define("sec_dynamic_result_event_count",  std::string("__builtin_sec_dynamic_result_event_count__"));
+        environment->define("sec_dynamic_result_event_type",   std::string("__builtin_sec_dynamic_result_event_type__"));
+        environment->define("sec_dynamic_result_event_target", std::string("__builtin_sec_dynamic_result_event_target__"));
+        environment->define("sec_dynamic_result_ioc_count",    std::string("__builtin_sec_dynamic_result_ioc_count__"));
+        environment->define("sec_dynamic_result_ioc",          std::string("__builtin_sec_dynamic_result_ioc__"));
+        environment->define("sec_dynamic_result_to_json",      std::string("__builtin_sec_dynamic_result_to_json__"));
+        // EducationalPlatform
+        environment->define("sec_edu_platform_create",         std::string("__builtin_sec_edu_platform_create__"));
+        environment->define("sec_edu_platform_destroy",        std::string("__builtin_sec_edu_platform_destroy__"));
+        environment->define("sec_edu_challenge_count",         std::string("__builtin_sec_edu_challenge_count__"));
+        environment->define("sec_edu_challenge_id",            std::string("__builtin_sec_edu_challenge_id__"));
+        environment->define("sec_edu_challenge_name",          std::string("__builtin_sec_edu_challenge_name__"));
+        environment->define("sec_edu_challenge_category",      std::string("__builtin_sec_edu_challenge_category__"));
+        environment->define("sec_edu_challenge_points",        std::string("__builtin_sec_edu_challenge_points__"));
+        environment->define("sec_edu_challenge_description",   std::string("__builtin_sec_edu_challenge_description__"));
+        environment->define("sec_edu_challenge_hint",          std::string("__builtin_sec_edu_challenge_hint__"));
+        environment->define("sec_edu_create_session",          std::string("__builtin_sec_edu_create_session__"));
+        environment->define("sec_edu_session_destroy",         std::string("__builtin_sec_edu_session_destroy__"));
+        environment->define("sec_edu_session_submit",          std::string("__builtin_sec_edu_session_submit__"));
+        environment->define("sec_edu_session_score",           std::string("__builtin_sec_edu_session_score__"));
+        environment->define("sec_edu_session_player",          std::string("__builtin_sec_edu_session_player__"));
+        environment->define("sec_edu_leaderboard",             std::string("__builtin_sec_edu_leaderboard__"));
+        environment->define("sec_edu_get_tutorial",            std::string("__builtin_sec_edu_get_tutorial__"));
+        return;
+    }
+
+    if (mod == "mobile") {
+        // AppConfig
+        environment->define("mobile_app_config_create",          std::string("__builtin_mobile_app_config_create__"));
+        environment->define("mobile_app_config_destroy",         std::string("__builtin_mobile_app_config_destroy__"));
+        environment->define("mobile_app_config_set_orientation", std::string("__builtin_mobile_app_config_set_orientation__"));
+        environment->define("mobile_app_config_add_permission",  std::string("__builtin_mobile_app_config_add_permission__"));
+        // MobileApp
+        environment->define("mobile_app_create",                 std::string("__builtin_mobile_app_create__"));
+        environment->define("mobile_app_destroy",                std::string("__builtin_mobile_app_destroy__"));
+        environment->define("mobile_app_screen_count",           std::string("__builtin_mobile_app_screen_count__"));
+        environment->define("mobile_app_platform_name",          std::string("__builtin_mobile_app_platform_name__"));
+        environment->define("mobile_app_build_ios",              std::string("__builtin_mobile_app_build_ios__"));
+        environment->define("mobile_app_build_android",          std::string("__builtin_mobile_app_build_android__"));
+        environment->define("mobile_app_export_manifest",        std::string("__builtin_mobile_app_export_manifest__"));
+        environment->define("mobile_app_add_screen",             std::string("__builtin_mobile_app_add_screen__"));
+        // Screen
+        environment->define("mobile_screen_create",              std::string("__builtin_mobile_screen_create__"));
+        environment->define("mobile_screen_destroy",             std::string("__builtin_mobile_screen_destroy__"));
+        environment->define("mobile_screen_set_background",      std::string("__builtin_mobile_screen_set_background__"));
+        environment->define("mobile_screen_set_nav_bar",         std::string("__builtin_mobile_screen_set_nav_bar__"));
+        environment->define("mobile_screen_to_json",             std::string("__builtin_mobile_screen_to_json__"));
+        environment->define("mobile_screen_set_layout",          std::string("__builtin_mobile_screen_set_layout__"));
+        // UIComponent
+        environment->define("mobile_component_create",           std::string("__builtin_mobile_component_create__"));
+        environment->define("mobile_component_destroy",          std::string("__builtin_mobile_component_destroy__"));
+        environment->define("mobile_component_set_text",         std::string("__builtin_mobile_component_set_text__"));
+        environment->define("mobile_component_set_visible",      std::string("__builtin_mobile_component_set_visible__"));
+        environment->define("mobile_component_set_enabled",      std::string("__builtin_mobile_component_set_enabled__"));
+        environment->define("mobile_component_set_value",        std::string("__builtin_mobile_component_set_value__"));
+        environment->define("mobile_component_set_prop",         std::string("__builtin_mobile_component_set_prop__"));
+        environment->define("mobile_component_set_style_color",  std::string("__builtin_mobile_component_set_style_color__"));
+        environment->define("mobile_component_set_style_font",   std::string("__builtin_mobile_component_set_style_font__"));
+        environment->define("mobile_component_set_style_size",   std::string("__builtin_mobile_component_set_style_size__"));
+        environment->define("mobile_component_set_style_padding",std::string("__builtin_mobile_component_set_style_padding__"));
+        environment->define("mobile_component_add_child",        std::string("__builtin_mobile_component_add_child__"));
+        environment->define("mobile_component_to_json",          std::string("__builtin_mobile_component_to_json__"));
+        environment->define("mobile_component_type_name",        std::string("__builtin_mobile_component_type_name__"));
+        environment->define("mobile_component_get_text",         std::string("__builtin_mobile_component_get_text__"));
+        environment->define("mobile_component_get_value",        std::string("__builtin_mobile_component_get_value__"));
+        // UILayout
+        environment->define("mobile_layout_create",              std::string("__builtin_mobile_layout_create__"));
+        environment->define("mobile_layout_destroy",             std::string("__builtin_mobile_layout_destroy__"));
+        environment->define("mobile_layout_set_spacing",         std::string("__builtin_mobile_layout_set_spacing__"));
+        environment->define("mobile_layout_set_columns",         std::string("__builtin_mobile_layout_set_columns__"));
+        environment->define("mobile_layout_add_item",            std::string("__builtin_mobile_layout_add_item__"));
+        environment->define("mobile_layout_to_json",             std::string("__builtin_mobile_layout_to_json__"));
+        // Navigation
+        environment->define("mobile_nav_create",                 std::string("__builtin_mobile_nav_create__"));
+        environment->define("mobile_nav_destroy",                std::string("__builtin_mobile_nav_destroy__"));
+        environment->define("mobile_nav_push",                   std::string("__builtin_mobile_nav_push__"));
+        environment->define("mobile_nav_pop",                    std::string("__builtin_mobile_nav_pop__"));
+        environment->define("mobile_nav_current",                std::string("__builtin_mobile_nav_current__"));
+        environment->define("mobile_nav_depth",                  std::string("__builtin_mobile_nav_depth__"));
+        // DeviceAPI
+        environment->define("mobile_device_create",              std::string("__builtin_mobile_device_create__"));
+        environment->define("mobile_device_destroy",             std::string("__builtin_mobile_device_destroy__"));
+        environment->define("mobile_device_capture_photo",       std::string("__builtin_mobile_device_capture_photo__"));
+        environment->define("mobile_device_record_video",        std::string("__builtin_mobile_device_record_video__"));
+        environment->define("mobile_device_get_location",        std::string("__builtin_mobile_device_get_location__"));
+        environment->define("mobile_location_destroy",           std::string("__builtin_mobile_location_destroy__"));
+        environment->define("mobile_location_latitude",          std::string("__builtin_mobile_location_latitude__"));
+        environment->define("mobile_location_longitude",         std::string("__builtin_mobile_location_longitude__"));
+        environment->define("mobile_location_altitude",          std::string("__builtin_mobile_location_altitude__"));
+        environment->define("mobile_location_accuracy",          std::string("__builtin_mobile_location_accuracy__"));
+        environment->define("mobile_device_get_accelerometer",   std::string("__builtin_mobile_device_get_accelerometer__"));
+        environment->define("mobile_accel_destroy",              std::string("__builtin_mobile_accel_destroy__"));
+        environment->define("mobile_accel_x",                    std::string("__builtin_mobile_accel_x__"));
+        environment->define("mobile_accel_y",                    std::string("__builtin_mobile_accel_y__"));
+        environment->define("mobile_accel_z",                    std::string("__builtin_mobile_accel_z__"));
+        environment->define("mobile_device_storage_set",         std::string("__builtin_mobile_device_storage_set__"));
+        environment->define("mobile_device_storage_get",         std::string("__builtin_mobile_device_storage_get__"));
+        environment->define("mobile_device_storage_delete",      std::string("__builtin_mobile_device_storage_delete__"));
+        environment->define("mobile_device_is_connected",        std::string("__builtin_mobile_device_is_connected__"));
+        environment->define("mobile_device_network_type",        std::string("__builtin_mobile_device_network_type__"));
+        environment->define("mobile_device_model",               std::string("__builtin_mobile_device_model__"));
+        environment->define("mobile_device_os_version",          std::string("__builtin_mobile_device_os_version__"));
+        environment->define("mobile_device_id",                  std::string("__builtin_mobile_device_id__"));
+        environment->define("mobile_device_battery_level",       std::string("__builtin_mobile_device_battery_level__"));
+        environment->define("mobile_device_is_charging",         std::string("__builtin_mobile_device_is_charging__"));
+        environment->define("mobile_device_check_permission",    std::string("__builtin_mobile_device_check_permission__"));
+        environment->define("mobile_device_request_permission",  std::string("__builtin_mobile_device_request_permission__"));
+        environment->define("mobile_device_schedule_notification",std::string("__builtin_mobile_device_schedule_notification__"));
+        environment->define("mobile_device_cancel_notification", std::string("__builtin_mobile_device_cancel_notification__"));
+        environment->define("mobile_device_pending_notifications",std::string("__builtin_mobile_device_pending_notifications__"));
+        return;
+    }
+
+    if (mod == "game") {
+        // Phase 1: Graphics Engine
+        environment->define("game_renderer_create",       std::string("__builtin_game_renderer_create__"));
+        environment->define("game_renderer_destroy",      std::string("__builtin_game_renderer_destroy__"));
+        environment->define("game_renderer_clear",        std::string("__builtin_game_renderer_clear__"));
+        environment->define("game_renderer_present",      std::string("__builtin_game_renderer_present__"));
+        environment->define("game_renderer_width",        std::string("__builtin_game_renderer_width__"));
+        environment->define("game_renderer_height",       std::string("__builtin_game_renderer_height__"));
+        environment->define("game_renderer_title",        std::string("__builtin_game_renderer_title__"));
+        environment->define("game_texture_create",        std::string("__builtin_game_texture_create__"));
+        environment->define("game_texture_load",          std::string("__builtin_game_texture_load__"));
+        environment->define("game_texture_destroy",       std::string("__builtin_game_texture_destroy__"));
+        environment->define("game_texture_width",         std::string("__builtin_game_texture_width__"));
+        environment->define("game_texture_height",        std::string("__builtin_game_texture_height__"));
+        environment->define("game_texture_path",          std::string("__builtin_game_texture_path__"));
+        environment->define("game_sprite_create",         std::string("__builtin_game_sprite_create__"));
+        environment->define("game_sprite_destroy",        std::string("__builtin_game_sprite_destroy__"));
+        environment->define("game_sprite_set_position",   std::string("__builtin_game_sprite_set_position__"));
+        environment->define("game_sprite_set_scale",      std::string("__builtin_game_sprite_set_scale__"));
+        environment->define("game_sprite_set_rotation",   std::string("__builtin_game_sprite_set_rotation__"));
+        environment->define("game_sprite_set_color",      std::string("__builtin_game_sprite_set_color__"));
+        environment->define("game_sprite_set_visible",    std::string("__builtin_game_sprite_set_visible__"));
+        environment->define("game_sprite_x",              std::string("__builtin_game_sprite_x__"));
+        environment->define("game_sprite_y",              std::string("__builtin_game_sprite_y__"));
+        environment->define("game_sprite_scale_x",        std::string("__builtin_game_sprite_scale_x__"));
+        environment->define("game_sprite_scale_y",        std::string("__builtin_game_sprite_scale_y__"));
+        environment->define("game_sprite_rotation",       std::string("__builtin_game_sprite_rotation__"));
+        environment->define("game_sprite_to_string",      std::string("__builtin_game_sprite_to_string__"));
+        environment->define("game_shader_create",         std::string("__builtin_game_shader_create__"));
+        environment->define("game_shader_destroy",        std::string("__builtin_game_shader_destroy__"));
+        environment->define("game_shader_set_float",      std::string("__builtin_game_shader_set_float__"));
+        environment->define("game_shader_set_int",        std::string("__builtin_game_shader_set_int__"));
+        environment->define("game_shader_set_vec2",       std::string("__builtin_game_shader_set_vec2__"));
+        environment->define("game_shader_set_vec3",       std::string("__builtin_game_shader_set_vec3__"));
+        environment->define("game_shader_set_vec4",       std::string("__builtin_game_shader_set_vec4__"));
+        environment->define("game_shader_name",           std::string("__builtin_game_shader_name__"));
+        environment->define("game_shader_uniform_count",  std::string("__builtin_game_shader_uniform_count__"));
+        environment->define("game_shader_uniform_name",   std::string("__builtin_game_shader_uniform_name__"));
+        environment->define("game_camera2d_create",       std::string("__builtin_game_camera2d_create__"));
+        environment->define("game_camera2d_destroy",      std::string("__builtin_game_camera2d_destroy__"));
+        environment->define("game_camera2d_set_position", std::string("__builtin_game_camera2d_set_position__"));
+        environment->define("game_camera2d_set_zoom",     std::string("__builtin_game_camera2d_set_zoom__"));
+        environment->define("game_camera2d_move",         std::string("__builtin_game_camera2d_move__"));
+        environment->define("game_camera2d_x",            std::string("__builtin_game_camera2d_x__"));
+        environment->define("game_camera2d_y",            std::string("__builtin_game_camera2d_y__"));
+        environment->define("game_camera2d_zoom",         std::string("__builtin_game_camera2d_zoom__"));
+        environment->define("game_camera3d_create",       std::string("__builtin_game_camera3d_create__"));
+        environment->define("game_camera3d_destroy",      std::string("__builtin_game_camera3d_destroy__"));
+        environment->define("game_camera3d_set_position", std::string("__builtin_game_camera3d_set_position__"));
+        environment->define("game_camera3d_set_target",   std::string("__builtin_game_camera3d_set_target__"));
+        environment->define("game_camera3d_set_fov",      std::string("__builtin_game_camera3d_set_fov__"));
+        environment->define("game_camera3d_pos_x",        std::string("__builtin_game_camera3d_pos_x__"));
+        environment->define("game_camera3d_pos_y",        std::string("__builtin_game_camera3d_pos_y__"));
+        environment->define("game_camera3d_pos_z",        std::string("__builtin_game_camera3d_pos_z__"));
+        environment->define("game_camera3d_fov",          std::string("__builtin_game_camera3d_fov__"));
+        // Phase 2: Physics Engine
+        environment->define("game_physics_world_create",  std::string("__builtin_game_physics_world_create__"));
+        environment->define("game_physics_world_destroy", std::string("__builtin_game_physics_world_destroy__"));
+        environment->define("game_physics_world_step",    std::string("__builtin_game_physics_world_step__"));
+        environment->define("game_physics_world_set_gravity", std::string("__builtin_game_physics_world_set_gravity__"));
+        environment->define("game_physics_world_body_count", std::string("__builtin_game_physics_world_body_count__"));
+        environment->define("game_rigidbody_create",      std::string("__builtin_game_rigidbody_create__"));
+        environment->define("game_rigidbody_destroy",     std::string("__builtin_game_rigidbody_destroy__"));
+        environment->define("game_rigidbody_set_position",std::string("__builtin_game_rigidbody_set_position__"));
+        environment->define("game_rigidbody_set_velocity",std::string("__builtin_game_rigidbody_set_velocity__"));
+        environment->define("game_rigidbody_apply_force", std::string("__builtin_game_rigidbody_apply_force__"));
+        environment->define("game_rigidbody_apply_impulse",std::string("__builtin_game_rigidbody_apply_impulse__"));
+        environment->define("game_rigidbody_set_restitution",std::string("__builtin_game_rigidbody_set_restitution__"));
+        environment->define("game_rigidbody_set_friction",std::string("__builtin_game_rigidbody_set_friction__"));
+        environment->define("game_rigidbody_x",           std::string("__builtin_game_rigidbody_x__"));
+        environment->define("game_rigidbody_y",           std::string("__builtin_game_rigidbody_y__"));
+        environment->define("game_rigidbody_vx",          std::string("__builtin_game_rigidbody_vx__"));
+        environment->define("game_rigidbody_vy",          std::string("__builtin_game_rigidbody_vy__"));
+        environment->define("game_rigidbody_mass",        std::string("__builtin_game_rigidbody_mass__"));
+        environment->define("game_rigidbody_is_static",   std::string("__builtin_game_rigidbody_is_static__"));
+        environment->define("game_rigidbody_to_string",   std::string("__builtin_game_rigidbody_to_string__"));
+        environment->define("game_collider_box",          std::string("__builtin_game_collider_box__"));
+        environment->define("game_collider_circle",       std::string("__builtin_game_collider_circle__"));
+        environment->define("game_collider_destroy",      std::string("__builtin_game_collider_destroy__"));
+        environment->define("game_collider_check",        std::string("__builtin_game_collider_check__"));
+        environment->define("game_collider_type",         std::string("__builtin_game_collider_type__"));
+        environment->define("game_particles_create",      std::string("__builtin_game_particles_create__"));
+        environment->define("game_particles_destroy",     std::string("__builtin_game_particles_destroy__"));
+        environment->define("game_particles_emit",        std::string("__builtin_game_particles_emit__"));
+        environment->define("game_particles_update",      std::string("__builtin_game_particles_update__"));
+        environment->define("game_particles_set_velocity",std::string("__builtin_game_particles_set_velocity__"));
+        environment->define("game_particles_set_lifetime",std::string("__builtin_game_particles_set_lifetime__"));
+        environment->define("game_particles_set_color",   std::string("__builtin_game_particles_set_color__"));
+        environment->define("game_particles_set_size",    std::string("__builtin_game_particles_set_size__"));
+        environment->define("game_particles_active_count",std::string("__builtin_game_particles_active_count__"));
+        environment->define("game_particles_max_count",   std::string("__builtin_game_particles_max_count__"));
+        environment->define("game_particles_to_string",   std::string("__builtin_game_particles_to_string__"));
+        // Phase 3: Audio System
+        environment->define("game_audio_engine_create",   std::string("__builtin_game_audio_engine_create__"));
+        environment->define("game_audio_engine_destroy",  std::string("__builtin_game_audio_engine_destroy__"));
+        environment->define("game_audio_engine_set_master_volume", std::string("__builtin_game_audio_engine_set_master_volume__"));
+        environment->define("game_audio_engine_master_volume", std::string("__builtin_game_audio_engine_master_volume__"));
+        environment->define("game_audio_engine_channel_count", std::string("__builtin_game_audio_engine_channel_count__"));
+        environment->define("game_sound_load",            std::string("__builtin_game_sound_load__"));
+        environment->define("game_sound_create",          std::string("__builtin_game_sound_create__"));
+        environment->define("game_sound_destroy",         std::string("__builtin_game_sound_destroy__"));
+        environment->define("game_sound_play",            std::string("__builtin_game_sound_play__"));
+        environment->define("game_sound_stop",            std::string("__builtin_game_sound_stop__"));
+        environment->define("game_sound_pause",           std::string("__builtin_game_sound_pause__"));
+        environment->define("game_sound_resume",          std::string("__builtin_game_sound_resume__"));
+        environment->define("game_sound_set_volume",      std::string("__builtin_game_sound_set_volume__"));
+        environment->define("game_sound_set_pitch",       std::string("__builtin_game_sound_set_pitch__"));
+        environment->define("game_sound_set_loop",        std::string("__builtin_game_sound_set_loop__"));
+        environment->define("game_sound_is_playing",      std::string("__builtin_game_sound_is_playing__"));
+        environment->define("game_sound_volume",          std::string("__builtin_game_sound_volume__"));
+        environment->define("game_sound_pitch",           std::string("__builtin_game_sound_pitch__"));
+        environment->define("game_sound_name",            std::string("__builtin_game_sound_name__"));
+        environment->define("game_sound_type",            std::string("__builtin_game_sound_type__"));
+        environment->define("game_music_load",            std::string("__builtin_game_music_load__"));
+        environment->define("game_music_create",          std::string("__builtin_game_music_create__"));
+        environment->define("game_music_destroy",         std::string("__builtin_game_music_destroy__"));
+        environment->define("game_music_play",            std::string("__builtin_game_music_play__"));
+        environment->define("game_music_stop",            std::string("__builtin_game_music_stop__"));
+        environment->define("game_music_pause",           std::string("__builtin_game_music_pause__"));
+        environment->define("game_music_resume",          std::string("__builtin_game_music_resume__"));
+        environment->define("game_music_set_volume",      std::string("__builtin_game_music_set_volume__"));
+        environment->define("game_music_set_loop",        std::string("__builtin_game_music_set_loop__"));
+        environment->define("game_music_is_playing",      std::string("__builtin_game_music_is_playing__"));
+        environment->define("game_music_name",            std::string("__builtin_game_music_name__"));
+        environment->define("game_audio3d_create",        std::string("__builtin_game_audio3d_create__"));
+        environment->define("game_audio3d_destroy",       std::string("__builtin_game_audio3d_destroy__"));
+        environment->define("game_audio3d_set_listener",  std::string("__builtin_game_audio3d_set_listener__"));
+        environment->define("game_audio3d_play_at",       std::string("__builtin_game_audio3d_play_at__"));
+        environment->define("game_audio3d_set_rolloff",   std::string("__builtin_game_audio3d_set_rolloff__"));
+        environment->define("game_mixer_create",          std::string("__builtin_game_mixer_create__"));
+        environment->define("game_mixer_destroy",         std::string("__builtin_game_mixer_destroy__"));
+        environment->define("game_mixer_set_channel_volume", std::string("__builtin_game_mixer_set_channel_volume__"));
+        environment->define("game_mixer_channel_volume",  std::string("__builtin_game_mixer_channel_volume__"));
+        environment->define("game_mixer_play_on_channel", std::string("__builtin_game_mixer_play_on_channel__"));
+        environment->define("game_mixer_channels",        std::string("__builtin_game_mixer_channels__"));
+        // Phase 4: Game Framework
+        environment->define("game_loop_create",           std::string("__builtin_game_loop_create__"));
+        environment->define("game_loop_destroy",          std::string("__builtin_game_loop_destroy__"));
+        environment->define("game_loop_start",            std::string("__builtin_game_loop_start__"));
+        environment->define("game_loop_stop",             std::string("__builtin_game_loop_stop__"));
+        environment->define("game_loop_tick",             std::string("__builtin_game_loop_tick__"));
+        environment->define("game_loop_is_running",       std::string("__builtin_game_loop_is_running__"));
+        environment->define("game_loop_delta_time",       std::string("__builtin_game_loop_delta_time__"));
+        environment->define("game_loop_fps",              std::string("__builtin_game_loop_fps__"));
+        environment->define("game_loop_target_fps",       std::string("__builtin_game_loop_target_fps__"));
+        environment->define("game_loop_frame_count",      std::string("__builtin_game_loop_frame_count__"));
+        environment->define("game_loop_elapsed",          std::string("__builtin_game_loop_elapsed__"));
+        environment->define("game_scene_create",          std::string("__builtin_game_scene_create__"));
+        environment->define("game_scene_destroy",         std::string("__builtin_game_scene_destroy__"));
+        environment->define("game_scene_add_sprite",      std::string("__builtin_game_scene_add_sprite__"));
+        environment->define("game_scene_add_body",        std::string("__builtin_game_scene_add_body__"));
+        environment->define("game_scene_update",          std::string("__builtin_game_scene_update__"));
+        environment->define("game_scene_sprite_count",    std::string("__builtin_game_scene_sprite_count__"));
+        environment->define("game_scene_body_count",      std::string("__builtin_game_scene_body_count__"));
+        environment->define("game_scene_name",            std::string("__builtin_game_scene_name__"));
+        environment->define("game_scene_manager_create",  std::string("__builtin_game_scene_manager_create__"));
+        environment->define("game_scene_manager_destroy", std::string("__builtin_game_scene_manager_destroy__"));
+        environment->define("game_scene_manager_push",    std::string("__builtin_game_scene_manager_push__"));
+        environment->define("game_scene_manager_pop",     std::string("__builtin_game_scene_manager_pop__"));
+        environment->define("game_scene_manager_current", std::string("__builtin_game_scene_manager_current__"));
+        environment->define("game_scene_manager_depth",   std::string("__builtin_game_scene_manager_depth__"));
+        environment->define("game_input_create",          std::string("__builtin_game_input_create__"));
+        environment->define("game_input_destroy",         std::string("__builtin_game_input_destroy__"));
+        environment->define("game_input_key_press",       std::string("__builtin_game_input_key_press__"));
+        environment->define("game_input_key_release",     std::string("__builtin_game_input_key_release__"));
+        environment->define("game_input_mouse_move",      std::string("__builtin_game_input_mouse_move__"));
+        environment->define("game_input_mouse_press",     std::string("__builtin_game_input_mouse_press__"));
+        environment->define("game_input_mouse_release",   std::string("__builtin_game_input_mouse_release__"));
+        environment->define("game_input_is_key_down",     std::string("__builtin_game_input_is_key_down__"));
+        environment->define("game_input_is_key_pressed",  std::string("__builtin_game_input_is_key_pressed__"));
+        environment->define("game_input_is_mouse_down",   std::string("__builtin_game_input_is_mouse_down__"));
+        environment->define("game_input_mouse_x",         std::string("__builtin_game_input_mouse_x__"));
+        environment->define("game_input_mouse_y",         std::string("__builtin_game_input_mouse_y__"));
+        environment->define("game_input_update",          std::string("__builtin_game_input_update__"));
+        environment->define("game_assets_create",         std::string("__builtin_game_assets_create__"));
+        environment->define("game_assets_destroy",        std::string("__builtin_game_assets_destroy__"));
+        environment->define("game_assets_register",       std::string("__builtin_game_assets_register__"));
+        environment->define("game_assets_get_path",       std::string("__builtin_game_assets_get_path__"));
+        environment->define("game_assets_get_type",       std::string("__builtin_game_assets_get_type__"));
+        environment->define("game_assets_count",          std::string("__builtin_game_assets_count__"));
+        environment->define("game_assets_name_at",        std::string("__builtin_game_assets_name_at__"));
+        environment->define("game_assets_to_json",        std::string("__builtin_game_assets_to_json__"));
+        return;
+    }
+
+    if (mod == "system") {
+        // Phase 1: Inline Assembly
+        environment->define("asm_context_create",       std::string("__builtin_asm_context_create__"));
+        environment->define("asm_context_destroy",      std::string("__builtin_asm_context_destroy__"));
+        environment->define("asm_context_arch",         std::string("__builtin_asm_context_arch__"));
+        environment->define("asm_assemble",             std::string("__builtin_asm_assemble__"));
+        environment->define("asm_disassemble",          std::string("__builtin_asm_disassemble__"));
+        environment->define("asm_execute",              std::string("__builtin_asm_execute__"));
+        environment->define("asm_set_reg",              std::string("__builtin_asm_set_reg__"));
+        environment->define("asm_get_reg",              std::string("__builtin_asm_get_reg__"));
+        environment->define("asm_dump_regs",            std::string("__builtin_asm_dump_regs__"));
+        environment->define("asm_instruction_count",    std::string("__builtin_asm_instruction_count__"));
+        environment->define("asm_instruction_at",       std::string("__builtin_asm_instruction_at__"));
+        environment->define("asm_optimize",             std::string("__builtin_asm_optimize__"));
+        // Phase 2: GPIO & Hardware
+        environment->define("gpio_controller_create",   std::string("__builtin_gpio_controller_create__"));
+        environment->define("gpio_controller_destroy",  std::string("__builtin_gpio_controller_destroy__"));
+        environment->define("gpio_controller_board",    std::string("__builtin_gpio_controller_board__"));
+        environment->define("gpio_controller_pin_count",std::string("__builtin_gpio_controller_pin_count__"));
+        environment->define("gpio_pin_create",          std::string("__builtin_gpio_pin_create__"));
+        environment->define("gpio_pin_destroy",         std::string("__builtin_gpio_pin_destroy__"));
+        environment->define("gpio_pin_write",           std::string("__builtin_gpio_pin_write__"));
+        environment->define("gpio_pin_read",            std::string("__builtin_gpio_pin_read__"));
+        environment->define("gpio_pin_number",          std::string("__builtin_gpio_pin_number__"));
+        environment->define("gpio_pin_mode",            std::string("__builtin_gpio_pin_mode__"));
+        environment->define("gpio_pin_set_pull",        std::string("__builtin_gpio_pin_set_pull__"));
+        environment->define("gpio_pin_to_string",       std::string("__builtin_gpio_pin_to_string__"));
+        environment->define("pwm_create",               std::string("__builtin_pwm_create__"));
+        environment->define("pwm_destroy",              std::string("__builtin_pwm_destroy__"));
+        environment->define("pwm_set_frequency",        std::string("__builtin_pwm_set_frequency__"));
+        environment->define("pwm_set_duty_cycle",       std::string("__builtin_pwm_set_duty_cycle__"));
+        environment->define("pwm_start",                std::string("__builtin_pwm_start__"));
+        environment->define("pwm_stop",                 std::string("__builtin_pwm_stop__"));
+        environment->define("pwm_frequency",            std::string("__builtin_pwm_frequency__"));
+        environment->define("pwm_duty_cycle",           std::string("__builtin_pwm_duty_cycle__"));
+        environment->define("pwm_is_running",           std::string("__builtin_pwm_is_running__"));
+        environment->define("adc_create",               std::string("__builtin_adc_create__"));
+        environment->define("adc_destroy",              std::string("__builtin_adc_destroy__"));
+        environment->define("adc_read_raw",             std::string("__builtin_adc_read_raw__"));
+        environment->define("adc_read_voltage",         std::string("__builtin_adc_read_voltage__"));
+        environment->define("adc_resolution",           std::string("__builtin_adc_resolution__"));
+        environment->define("adc_channel",              std::string("__builtin_adc_channel__"));
+        environment->define("dac_create",               std::string("__builtin_dac_create__"));
+        environment->define("dac_destroy",              std::string("__builtin_dac_destroy__"));
+        environment->define("dac_write_raw",            std::string("__builtin_dac_write_raw__"));
+        environment->define("dac_write_voltage",        std::string("__builtin_dac_write_voltage__"));
+        environment->define("dac_resolution",           std::string("__builtin_dac_resolution__"));
+        environment->define("dac_channel",              std::string("__builtin_dac_channel__"));
+        environment->define("spi_bus_create",           std::string("__builtin_spi_bus_create__"));
+        environment->define("spi_bus_destroy",          std::string("__builtin_spi_bus_destroy__"));
+        environment->define("spi_transfer",             std::string("__builtin_spi_transfer__"));
+        environment->define("spi_set_clock",            std::string("__builtin_spi_set_clock__"));
+        environment->define("spi_clock",                std::string("__builtin_spi_clock__"));
+        environment->define("spi_bus_num",              std::string("__builtin_spi_bus_num__"));
+        environment->define("i2c_bus_create",           std::string("__builtin_i2c_bus_create__"));
+        environment->define("i2c_bus_destroy",          std::string("__builtin_i2c_bus_destroy__"));
+        environment->define("i2c_write",                std::string("__builtin_i2c_write__"));
+        environment->define("i2c_read",                 std::string("__builtin_i2c_read__"));
+        environment->define("i2c_scan",                 std::string("__builtin_i2c_scan__"));
+        environment->define("i2c_bus_num",              std::string("__builtin_i2c_bus_num__"));
+        environment->define("uart_create",              std::string("__builtin_uart_create__"));
+        environment->define("uart_destroy",             std::string("__builtin_uart_destroy__"));
+        environment->define("uart_write",               std::string("__builtin_uart_write__"));
+        environment->define("uart_read",                std::string("__builtin_uart_read__"));
+        environment->define("uart_set_baud",            std::string("__builtin_uart_set_baud__"));
+        environment->define("uart_baud",                std::string("__builtin_uart_baud__"));
+        environment->define("uart_port",                std::string("__builtin_uart_port__"));
+        environment->define("uart_bytes_available",     std::string("__builtin_uart_bytes_available__"));
+        // Phase 3: RTOS
+        environment->define("rtos_kernel_create",       std::string("__builtin_rtos_kernel_create__"));
+        environment->define("rtos_kernel_destroy",      std::string("__builtin_rtos_kernel_destroy__"));
+        environment->define("rtos_kernel_start",        std::string("__builtin_rtos_kernel_start__"));
+        environment->define("rtos_kernel_stop",         std::string("__builtin_rtos_kernel_stop__"));
+        environment->define("rtos_kernel_is_running",   std::string("__builtin_rtos_kernel_is_running__"));
+        environment->define("rtos_kernel_name",         std::string("__builtin_rtos_kernel_name__"));
+        environment->define("rtos_kernel_tick",         std::string("__builtin_rtos_kernel_tick__"));
+        environment->define("rtos_kernel_task_count",   std::string("__builtin_rtos_kernel_task_count__"));
+        environment->define("rtos_task_create",         std::string("__builtin_rtos_task_create__"));
+        environment->define("rtos_task_destroy",        std::string("__builtin_rtos_task_destroy__"));
+        environment->define("rtos_task_start",          std::string("__builtin_rtos_task_start__"));
+        environment->define("rtos_task_suspend",        std::string("__builtin_rtos_task_suspend__"));
+        environment->define("rtos_task_resume",         std::string("__builtin_rtos_task_resume__"));
+        environment->define("rtos_task_delete",         std::string("__builtin_rtos_task_delete__"));
+        environment->define("rtos_task_name",           std::string("__builtin_rtos_task_name__"));
+        environment->define("rtos_task_priority",       std::string("__builtin_rtos_task_priority__"));
+        environment->define("rtos_task_state",          std::string("__builtin_rtos_task_state__"));
+        environment->define("rtos_task_stack_size",     std::string("__builtin_rtos_task_stack_size__"));
+        environment->define("rtos_semaphore_create",    std::string("__builtin_rtos_semaphore_create__"));
+        environment->define("rtos_semaphore_destroy",   std::string("__builtin_rtos_semaphore_destroy__"));
+        environment->define("rtos_semaphore_take",      std::string("__builtin_rtos_semaphore_take__"));
+        environment->define("rtos_semaphore_give",      std::string("__builtin_rtos_semaphore_give__"));
+        environment->define("rtos_semaphore_count",     std::string("__builtin_rtos_semaphore_count__"));
+        environment->define("rtos_mutex_create",        std::string("__builtin_rtos_mutex_create__"));
+        environment->define("rtos_mutex_destroy",       std::string("__builtin_rtos_mutex_destroy__"));
+        environment->define("rtos_mutex_lock",          std::string("__builtin_rtos_mutex_lock__"));
+        environment->define("rtos_mutex_unlock",        std::string("__builtin_rtos_mutex_unlock__"));
+        environment->define("rtos_mutex_is_locked",     std::string("__builtin_rtos_mutex_is_locked__"));
+        environment->define("rtos_queue_create",        std::string("__builtin_rtos_queue_create__"));
+        environment->define("rtos_queue_destroy",       std::string("__builtin_rtos_queue_destroy__"));
+        environment->define("rtos_queue_send",          std::string("__builtin_rtos_queue_send__"));
+        environment->define("rtos_queue_receive",       std::string("__builtin_rtos_queue_receive__"));
+        environment->define("rtos_queue_size",          std::string("__builtin_rtos_queue_size__"));
+        environment->define("rtos_queue_capacity",      std::string("__builtin_rtos_queue_capacity__"));
+        environment->define("rtos_queue_is_full",       std::string("__builtin_rtos_queue_is_full__"));
+        environment->define("rtos_queue_is_empty",      std::string("__builtin_rtos_queue_is_empty__"));
+        environment->define("rtos_timer_create",        std::string("__builtin_rtos_timer_create__"));
+        environment->define("rtos_timer_destroy",       std::string("__builtin_rtos_timer_destroy__"));
+        environment->define("rtos_timer_start",         std::string("__builtin_rtos_timer_start__"));
+        environment->define("rtos_timer_stop",          std::string("__builtin_rtos_timer_stop__"));
+        environment->define("rtos_timer_reset",         std::string("__builtin_rtos_timer_reset__"));
+        environment->define("rtos_timer_is_active",     std::string("__builtin_rtos_timer_is_active__"));
+        environment->define("rtos_timer_period",        std::string("__builtin_rtos_timer_period__"));
+        environment->define("rtos_timer_fire_count",    std::string("__builtin_rtos_timer_fire_count__"));
+        environment->define("rtos_timer_name",          std::string("__builtin_rtos_timer_name__"));
+        // Phase 4: Bootloader & Kernel
+        environment->define("mem_map_create",           std::string("__builtin_mem_map_create__"));
+        environment->define("mem_map_destroy",          std::string("__builtin_mem_map_destroy__"));
+        environment->define("mem_map_add_region",       std::string("__builtin_mem_map_add_region__"));
+        environment->define("mem_map_region_count",     std::string("__builtin_mem_map_region_count__"));
+        environment->define("mem_map_region_name",      std::string("__builtin_mem_map_region_name__"));
+        environment->define("mem_map_region_addr",      std::string("__builtin_mem_map_region_addr__"));
+        environment->define("mem_map_region_size",      std::string("__builtin_mem_map_region_size__"));
+        environment->define("mem_map_region_type",      std::string("__builtin_mem_map_region_type__"));
+        environment->define("mem_map_to_string",        std::string("__builtin_mem_map_to_string__"));
+        environment->define("interrupt_table_create",   std::string("__builtin_interrupt_table_create__"));
+        environment->define("interrupt_table_destroy",  std::string("__builtin_interrupt_table_destroy__"));
+        environment->define("interrupt_table_register", std::string("__builtin_interrupt_table_register__"));
+        environment->define("interrupt_table_fire",     std::string("__builtin_interrupt_table_fire__"));
+        environment->define("interrupt_table_handler",  std::string("__builtin_interrupt_table_handler__"));
+        environment->define("interrupt_table_name",     std::string("__builtin_interrupt_table_name__"));
+        environment->define("interrupt_table_fire_count",std::string("__builtin_interrupt_table_fire_count__"));
+        environment->define("interrupt_table_size",     std::string("__builtin_interrupt_table_size__"));
+        environment->define("process_table_create",     std::string("__builtin_process_table_create__"));
+        environment->define("process_table_destroy",    std::string("__builtin_process_table_destroy__"));
+        environment->define("process_table_create_process",std::string("__builtin_process_table_create_process__"));
+        environment->define("process_table_kill",       std::string("__builtin_process_table_kill__"));
+        environment->define("process_table_name",       std::string("__builtin_process_table_name__"));
+        environment->define("process_table_priority",   std::string("__builtin_process_table_priority__"));
+        environment->define("process_table_state",      std::string("__builtin_process_table_state__"));
+        environment->define("process_table_count",      std::string("__builtin_process_table_count__"));
+        environment->define("process_table_schedule",   std::string("__builtin_process_table_schedule__"));
+        environment->define("process_table_to_string",  std::string("__builtin_process_table_to_string__"));
+        environment->define("kernel_create",            std::string("__builtin_kernel_create__"));
+        environment->define("kernel_destroy",           std::string("__builtin_kernel_destroy__"));
+        environment->define("kernel_boot",              std::string("__builtin_kernel_boot__"));
+        environment->define("kernel_panic",             std::string("__builtin_kernel_panic__"));
+        environment->define("kernel_name",              std::string("__builtin_kernel_name__"));
+        environment->define("kernel_arch",              std::string("__builtin_kernel_arch__"));
+        environment->define("kernel_state",             std::string("__builtin_kernel_state__"));
+        environment->define("kernel_uptime_ms",         std::string("__builtin_kernel_uptime_ms__"));
+        environment->define("kernel_syscall",           std::string("__builtin_kernel_syscall__"));
+        environment->define("kernel_log",               std::string("__builtin_kernel_log__"));
+        environment->define("kernel_log_count",         std::string("__builtin_kernel_log_count__"));
+        return;
+    }
+    if (mod == "gui") {
+        // Phase 1: Text Rendering
+        environment->define("gui_font_manager_create",    std::string("__builtin_gui_font_manager_create__"));
+        environment->define("gui_font_manager_destroy",   std::string("__builtin_gui_font_manager_destroy__"));
+        environment->define("gui_font_load",              std::string("__builtin_gui_font_load__"));
+        environment->define("gui_font_manager_count",     std::string("__builtin_gui_font_manager_count__"));
+        environment->define("gui_font_name",              std::string("__builtin_gui_font_name__"));
+        environment->define("gui_font_size",              std::string("__builtin_gui_font_size__"));
+        environment->define("gui_font_style",             std::string("__builtin_gui_font_style__"));
+        environment->define("gui_text_renderer_create",   std::string("__builtin_gui_text_renderer_create__"));
+        environment->define("gui_text_renderer_destroy",  std::string("__builtin_gui_text_renderer_destroy__"));
+        environment->define("gui_text_renderer_set_font", std::string("__builtin_gui_text_renderer_set_font__"));
+        environment->define("gui_text_renderer_set_color",std::string("__builtin_gui_text_renderer_set_color__"));
+        environment->define("gui_text_renderer_set_align",std::string("__builtin_gui_text_renderer_set_align__"));
+        environment->define("gui_text_renderer_set_antialias", std::string("__builtin_gui_text_renderer_set_antialias__"));
+        environment->define("gui_text_renderer_render",   std::string("__builtin_gui_text_renderer_render__"));
+        environment->define("gui_text_renderer_line_count",std::string("__builtin_gui_text_renderer_line_count__"));
+        environment->define("gui_text_renderer_line_at",  std::string("__builtin_gui_text_renderer_line_at__"));
+        environment->define("gui_text_metrics_measure",   std::string("__builtin_gui_text_metrics_measure__"));
+        environment->define("gui_text_metrics_destroy",   std::string("__builtin_gui_text_metrics_destroy__"));
+        environment->define("gui_text_metrics_width",     std::string("__builtin_gui_text_metrics_width__"));
+        environment->define("gui_text_metrics_height",    std::string("__builtin_gui_text_metrics_height__"));
+        environment->define("gui_text_metrics_ascent",    std::string("__builtin_gui_text_metrics_ascent__"));
+        environment->define("gui_text_metrics_descent",   std::string("__builtin_gui_text_metrics_descent__"));
+        environment->define("gui_text_metrics_line_height",std::string("__builtin_gui_text_metrics_line_height__"));
+        // Phase 2: Mouse Support
+        environment->define("gui_mouse_handler_create",   std::string("__builtin_gui_mouse_handler_create__"));
+        environment->define("gui_mouse_handler_destroy",  std::string("__builtin_gui_mouse_handler_destroy__"));
+        environment->define("gui_mouse_handler_click",    std::string("__builtin_gui_mouse_handler_click__"));
+        environment->define("gui_mouse_handler_move",     std::string("__builtin_gui_mouse_handler_move__"));
+        environment->define("gui_mouse_handler_press",    std::string("__builtin_gui_mouse_handler_press__"));
+        environment->define("gui_mouse_handler_release",  std::string("__builtin_gui_mouse_handler_release__"));
+        environment->define("gui_mouse_handler_scroll",   std::string("__builtin_gui_mouse_handler_scroll__"));
+        environment->define("gui_mouse_handler_event_count",  std::string("__builtin_gui_mouse_handler_event_count__"));
+        environment->define("gui_mouse_handler_event_type",   std::string("__builtin_gui_mouse_handler_event_type__"));
+        environment->define("gui_mouse_handler_event_x",      std::string("__builtin_gui_mouse_handler_event_x__"));
+        environment->define("gui_mouse_handler_event_y",      std::string("__builtin_gui_mouse_handler_event_y__"));
+        environment->define("gui_mouse_handler_event_button", std::string("__builtin_gui_mouse_handler_event_button__"));
+        environment->define("gui_mouse_handler_cursor_x",     std::string("__builtin_gui_mouse_handler_cursor_x__"));
+        environment->define("gui_mouse_handler_cursor_y",     std::string("__builtin_gui_mouse_handler_cursor_y__"));
+        environment->define("gui_mouse_handler_is_button_down",std::string("__builtin_gui_mouse_handler_is_button_down__"));
+        environment->define("gui_drag_drop_create",       std::string("__builtin_gui_drag_drop_create__"));
+        environment->define("gui_drag_drop_destroy",      std::string("__builtin_gui_drag_drop_destroy__"));
+        environment->define("gui_drag_drop_start",        std::string("__builtin_gui_drag_drop_start__"));
+        environment->define("gui_drag_drop_move",         std::string("__builtin_gui_drag_drop_move__"));
+        environment->define("gui_drag_drop_drop",         std::string("__builtin_gui_drag_drop_drop__"));
+        environment->define("gui_drag_drop_is_dragging",  std::string("__builtin_gui_drag_drop_is_dragging__"));
+        environment->define("gui_drag_drop_data",         std::string("__builtin_gui_drag_drop_data__"));
+        environment->define("gui_drag_drop_mime",         std::string("__builtin_gui_drag_drop_mime__"));
+        environment->define("gui_drag_drop_start_x",      std::string("__builtin_gui_drag_drop_start_x__"));
+        environment->define("gui_drag_drop_start_y",      std::string("__builtin_gui_drag_drop_start_y__"));
+        environment->define("gui_context_menu_create",    std::string("__builtin_gui_context_menu_create__"));
+        environment->define("gui_context_menu_destroy",   std::string("__builtin_gui_context_menu_destroy__"));
+        environment->define("gui_context_menu_add_item",  std::string("__builtin_gui_context_menu_add_item__"));
+        environment->define("gui_context_menu_add_separator", std::string("__builtin_gui_context_menu_add_separator__"));
+        environment->define("gui_context_menu_show",      std::string("__builtin_gui_context_menu_show__"));
+        environment->define("gui_context_menu_hide",      std::string("__builtin_gui_context_menu_hide__"));
+        environment->define("gui_context_menu_item_count",std::string("__builtin_gui_context_menu_item_count__"));
+        environment->define("gui_context_menu_item_label",std::string("__builtin_gui_context_menu_item_label__"));
+        environment->define("gui_context_menu_item_action",std::string("__builtin_gui_context_menu_item_action__"));
+        environment->define("gui_context_menu_is_visible",std::string("__builtin_gui_context_menu_is_visible__"));
+        environment->define("gui_context_menu_x",         std::string("__builtin_gui_context_menu_x__"));
+        environment->define("gui_context_menu_y",         std::string("__builtin_gui_context_menu_y__"));
+        // Phase 3: Advanced Widgets
+        environment->define("gui_text_input_create",      std::string("__builtin_gui_text_input_create__"));
+        environment->define("gui_text_input_destroy",     std::string("__builtin_gui_text_input_destroy__"));
+        environment->define("gui_text_input_set_text",    std::string("__builtin_gui_text_input_set_text__"));
+        environment->define("gui_text_input_set_placeholder", std::string("__builtin_gui_text_input_set_placeholder__"));
+        environment->define("gui_text_input_set_max_length",  std::string("__builtin_gui_text_input_set_max_length__"));
+        environment->define("gui_text_input_set_password",    std::string("__builtin_gui_text_input_set_password__"));
+        environment->define("gui_text_input_set_multiline",   std::string("__builtin_gui_text_input_set_multiline__"));
+        environment->define("gui_text_input_insert",      std::string("__builtin_gui_text_input_insert__"));
+        environment->define("gui_text_input_clear",       std::string("__builtin_gui_text_input_clear__"));
+        environment->define("gui_text_input_text",        std::string("__builtin_gui_text_input_text__"));
+        environment->define("gui_text_input_length",      std::string("__builtin_gui_text_input_length__"));
+        environment->define("gui_text_input_cursor_pos",  std::string("__builtin_gui_text_input_cursor_pos__"));
+        environment->define("gui_text_input_is_focused",  std::string("__builtin_gui_text_input_is_focused__"));
+        environment->define("gui_text_input_focus",       std::string("__builtin_gui_text_input_focus__"));
+        environment->define("gui_text_input_blur",        std::string("__builtin_gui_text_input_blur__"));
+        environment->define("gui_dropdown_create",        std::string("__builtin_gui_dropdown_create__"));
+        environment->define("gui_dropdown_destroy",       std::string("__builtin_gui_dropdown_destroy__"));
+        environment->define("gui_dropdown_add_option",    std::string("__builtin_gui_dropdown_add_option__"));
+        environment->define("gui_dropdown_set_selected",  std::string("__builtin_gui_dropdown_set_selected__"));
+        environment->define("gui_dropdown_set_placeholder",std::string("__builtin_gui_dropdown_set_placeholder__"));
+        environment->define("gui_dropdown_open",          std::string("__builtin_gui_dropdown_open__"));
+        environment->define("gui_dropdown_close",         std::string("__builtin_gui_dropdown_close__"));
+        environment->define("gui_dropdown_option_count",  std::string("__builtin_gui_dropdown_option_count__"));
+        environment->define("gui_dropdown_option_label",  std::string("__builtin_gui_dropdown_option_label__"));
+        environment->define("gui_dropdown_option_value",  std::string("__builtin_gui_dropdown_option_value__"));
+        environment->define("gui_dropdown_selected_index",std::string("__builtin_gui_dropdown_selected_index__"));
+        environment->define("gui_dropdown_selected_value",std::string("__builtin_gui_dropdown_selected_value__"));
+        environment->define("gui_dropdown_is_open",       std::string("__builtin_gui_dropdown_is_open__"));
+        environment->define("gui_table_create",           std::string("__builtin_gui_table_create__"));
+        environment->define("gui_table_destroy",          std::string("__builtin_gui_table_destroy__"));
+        environment->define("gui_table_add_column",       std::string("__builtin_gui_table_add_column__"));
+        environment->define("gui_table_add_row",          std::string("__builtin_gui_table_add_row__"));
+        environment->define("gui_table_set_cell",         std::string("__builtin_gui_table_set_cell__"));
+        environment->define("gui_table_get_cell",         std::string("__builtin_gui_table_get_cell__"));
+        environment->define("gui_table_row_count",        std::string("__builtin_gui_table_row_count__"));
+        environment->define("gui_table_col_count",        std::string("__builtin_gui_table_col_count__"));
+        environment->define("gui_table_column_header",    std::string("__builtin_gui_table_column_header__"));
+        environment->define("gui_table_column_width",     std::string("__builtin_gui_table_column_width__"));
+        environment->define("gui_table_set_selected_row", std::string("__builtin_gui_table_set_selected_row__"));
+        environment->define("gui_table_selected_row",     std::string("__builtin_gui_table_selected_row__"));
+        environment->define("gui_table_sort_by_column",   std::string("__builtin_gui_table_sort_by_column__"));
+        environment->define("gui_table_to_csv",           std::string("__builtin_gui_table_to_csv__"));
+        environment->define("gui_tree_view_create",       std::string("__builtin_gui_tree_view_create__"));
+        environment->define("gui_tree_view_destroy",      std::string("__builtin_gui_tree_view_destroy__"));
+        environment->define("gui_tree_view_add_node",     std::string("__builtin_gui_tree_view_add_node__"));
+        environment->define("gui_tree_view_expand",       std::string("__builtin_gui_tree_view_expand__"));
+        environment->define("gui_tree_view_collapse",     std::string("__builtin_gui_tree_view_collapse__"));
+        environment->define("gui_tree_view_select",       std::string("__builtin_gui_tree_view_select__"));
+        environment->define("gui_tree_view_node_count",   std::string("__builtin_gui_tree_view_node_count__"));
+        environment->define("gui_tree_view_node_label",   std::string("__builtin_gui_tree_view_node_label__"));
+        environment->define("gui_tree_view_node_data",    std::string("__builtin_gui_tree_view_node_data__"));
+        environment->define("gui_tree_view_node_parent",  std::string("__builtin_gui_tree_view_node_parent__"));
+        environment->define("gui_tree_view_node_is_expanded", std::string("__builtin_gui_tree_view_node_is_expanded__"));
+        environment->define("gui_tree_view_selected_node",std::string("__builtin_gui_tree_view_selected_node__"));
+        environment->define("gui_tree_view_child_count",  std::string("__builtin_gui_tree_view_child_count__"));
+        environment->define("gui_tabs_create",            std::string("__builtin_gui_tabs_create__"));
+        environment->define("gui_tabs_destroy",           std::string("__builtin_gui_tabs_destroy__"));
+        environment->define("gui_tabs_add_tab",           std::string("__builtin_gui_tabs_add_tab__"));
+        environment->define("gui_tabs_set_active",        std::string("__builtin_gui_tabs_set_active__"));
+        environment->define("gui_tabs_remove_tab",        std::string("__builtin_gui_tabs_remove_tab__"));
+        environment->define("gui_tabs_count",             std::string("__builtin_gui_tabs_count__"));
+        environment->define("gui_tabs_label",             std::string("__builtin_gui_tabs_label__"));
+        environment->define("gui_tabs_content_id",        std::string("__builtin_gui_tabs_content_id__"));
+        environment->define("gui_tabs_active_index",      std::string("__builtin_gui_tabs_active_index__"));
+        environment->define("gui_tabs_active_label",      std::string("__builtin_gui_tabs_active_label__"));
+        // Phase 4: Layout Management
+        environment->define("gui_flex_layout_create",     std::string("__builtin_gui_flex_layout_create__"));
+        environment->define("gui_flex_layout_destroy",    std::string("__builtin_gui_flex_layout_destroy__"));
+        environment->define("gui_flex_layout_add_item",   std::string("__builtin_gui_flex_layout_add_item__"));
+        environment->define("gui_flex_layout_set_gap",    std::string("__builtin_gui_flex_layout_set_gap__"));
+        environment->define("gui_flex_layout_set_padding",std::string("__builtin_gui_flex_layout_set_padding__"));
+        environment->define("gui_flex_layout_set_wrap",   std::string("__builtin_gui_flex_layout_set_wrap__"));
+        environment->define("gui_flex_layout_set_align",  std::string("__builtin_gui_flex_layout_set_align__"));
+        environment->define("gui_flex_layout_set_justify",std::string("__builtin_gui_flex_layout_set_justify__"));
+        environment->define("gui_flex_layout_item_count", std::string("__builtin_gui_flex_layout_item_count__"));
+        environment->define("gui_flex_layout_item_id",    std::string("__builtin_gui_flex_layout_item_id__"));
+        environment->define("gui_flex_layout_item_flex",  std::string("__builtin_gui_flex_layout_item_flex__"));
+        environment->define("gui_flex_layout_compute",    std::string("__builtin_gui_flex_layout_compute__"));
+        environment->define("gui_flex_layout_direction",  std::string("__builtin_gui_flex_layout_direction__"));
+        environment->define("gui_grid_layout_create",     std::string("__builtin_gui_grid_layout_create__"));
+        environment->define("gui_grid_layout_destroy",    std::string("__builtin_gui_grid_layout_destroy__"));
+        environment->define("gui_grid_layout_place",      std::string("__builtin_gui_grid_layout_place__"));
+        environment->define("gui_grid_layout_set_col_width",  std::string("__builtin_gui_grid_layout_set_col_width__"));
+        environment->define("gui_grid_layout_set_row_height", std::string("__builtin_gui_grid_layout_set_row_height__"));
+        environment->define("gui_grid_layout_set_gap",    std::string("__builtin_gui_grid_layout_set_gap__"));
+        environment->define("gui_grid_layout_cols",       std::string("__builtin_gui_grid_layout_cols__"));
+        environment->define("gui_grid_layout_rows",       std::string("__builtin_gui_grid_layout_rows__"));
+        environment->define("gui_grid_layout_item_count", std::string("__builtin_gui_grid_layout_item_count__"));
+        environment->define("gui_grid_layout_item_id",    std::string("__builtin_gui_grid_layout_item_id__"));
+        environment->define("gui_grid_layout_compute",    std::string("__builtin_gui_grid_layout_compute__"));
+        environment->define("gui_anchor_layout_create",   std::string("__builtin_gui_anchor_layout_create__"));
+        environment->define("gui_anchor_layout_destroy",  std::string("__builtin_gui_anchor_layout_destroy__"));
+        environment->define("gui_anchor_layout_add_item", std::string("__builtin_gui_anchor_layout_add_item__"));
+        environment->define("gui_anchor_layout_set_anchor",   std::string("__builtin_gui_anchor_layout_set_anchor__"));
+        environment->define("gui_anchor_layout_set_relative", std::string("__builtin_gui_anchor_layout_set_relative__"));
+        environment->define("gui_anchor_layout_item_count",   std::string("__builtin_gui_anchor_layout_item_count__"));
+        environment->define("gui_anchor_layout_item_id",      std::string("__builtin_gui_anchor_layout_item_id__"));
+        environment->define("gui_anchor_layout_compute",      std::string("__builtin_gui_anchor_layout_compute__"));
+        // Window system
+        environment->define("gui_init",                    std::string("__builtin_gui_init__"));
+        environment->define("gui_quit",                    std::string("__builtin_gui_quit__"));
+        environment->define("gui_has_display",             std::string("__builtin_gui_has_display__"));
+        environment->define("gui_window_create",           std::string("__builtin_gui_window_create__"));
+        environment->define("gui_window_destroy",          std::string("__builtin_gui_window_destroy__"));
+        environment->define("gui_window_show",             std::string("__builtin_gui_window_show__"));
+        environment->define("gui_window_hide",             std::string("__builtin_gui_window_hide__"));
+        environment->define("gui_window_set_title",        std::string("__builtin_gui_window_set_title__"));
+        environment->define("gui_window_title",            std::string("__builtin_gui_window_title__"));
+        environment->define("gui_window_width",            std::string("__builtin_gui_window_width__"));
+        environment->define("gui_window_height",           std::string("__builtin_gui_window_height__"));
+        environment->define("gui_window_is_open",          std::string("__builtin_gui_window_is_open__"));
+        environment->define("gui_window_close",            std::string("__builtin_gui_window_close__"));
+        environment->define("gui_window_resize",           std::string("__builtin_gui_window_resize__"));
+        environment->define("gui_window_set_resizable",    std::string("__builtin_gui_window_set_resizable__"));
+        environment->define("gui_window_set_fullscreen",   std::string("__builtin_gui_window_set_fullscreen__"));
+        environment->define("gui_window_is_fullscreen",    std::string("__builtin_gui_window_is_fullscreen__"));
+        environment->define("gui_window_poll",             std::string("__builtin_gui_window_poll__"));
+        environment->define("gui_key_down",                std::string("__builtin_gui_key_down__"));
+        environment->define("gui_key_pressed",             std::string("__builtin_gui_key_pressed__"));
+        environment->define("gui_key",                     std::string("__builtin_gui_key__"));
+        environment->define("gui_mouse_x",                 std::string("__builtin_gui_mouse_x__"));
+        environment->define("gui_mouse_y",                 std::string("__builtin_gui_mouse_y__"));
+        environment->define("gui_mouse_button",            std::string("__builtin_gui_mouse_button__"));
+        environment->define("gui_clear",                   std::string("__builtin_gui_clear__"));
+        environment->define("gui_present",                 std::string("__builtin_gui_present__"));
+        environment->define("gui_set_color",               std::string("__builtin_gui_set_color__"));
+        environment->define("gui_draw_point",              std::string("__builtin_gui_draw_point__"));
+        environment->define("gui_draw_line",               std::string("__builtin_gui_draw_line__"));
+        environment->define("gui_draw_rect",               std::string("__builtin_gui_draw_rect__"));
+        environment->define("gui_fill_rect",               std::string("__builtin_gui_fill_rect__"));
+        environment->define("gui_draw_circle",             std::string("__builtin_gui_draw_circle__"));
+        environment->define("gui_fill_circle",             std::string("__builtin_gui_fill_circle__"));
+        environment->define("gui_draw_triangle",           std::string("__builtin_gui_draw_triangle__"));
+        environment->define("gui_fill_triangle",           std::string("__builtin_gui_fill_triangle__"));
+        environment->define("gui_draw_text",               std::string("__builtin_gui_draw_text__"));
+        environment->define("gui_text_width",              std::string("__builtin_gui_text_width__"));
+        environment->define("gui_text_height",             std::string("__builtin_gui_text_height__"));
+        environment->define("gui_image_load",              std::string("__builtin_gui_image_load__"));
+        environment->define("gui_image_destroy",           std::string("__builtin_gui_image_destroy__"));
+        environment->define("gui_image_draw",              std::string("__builtin_gui_image_draw__"));
+        environment->define("gui_image_draw_scaled",       std::string("__builtin_gui_image_draw_scaled__"));
+        environment->define("gui_image_width",             std::string("__builtin_gui_image_width__"));
+        environment->define("gui_image_height",            std::string("__builtin_gui_image_height__"));
+        environment->define("gui_delay",                   std::string("__builtin_gui_delay__"));
+        environment->define("gui_ticks",                   std::string("__builtin_gui_ticks__"));
+        environment->define("gui_delta_time",              std::string("__builtin_gui_delta_time__"));
+        return;
+    }
+
+    if (mod == "network") {
+        // Phase 1: TCP sockets
+        environment->define("net_tcp_socket_create",      std::string("__builtin_net_tcp_socket_create__"));
+        environment->define("net_tcp_socket_destroy",     std::string("__builtin_net_tcp_socket_destroy__"));
+        environment->define("net_tcp_connect",            std::string("__builtin_net_tcp_connect__"));
+        environment->define("net_tcp_bind",               std::string("__builtin_net_tcp_bind__"));
+        environment->define("net_tcp_listen",             std::string("__builtin_net_tcp_listen__"));
+        environment->define("net_tcp_accept",             std::string("__builtin_net_tcp_accept__"));
+        environment->define("net_tcp_send",               std::string("__builtin_net_tcp_send__"));
+        environment->define("net_tcp_recv",               std::string("__builtin_net_tcp_recv__"));
+        environment->define("net_tcp_recv_data",          std::string("__builtin_net_tcp_recv_data__"));
+        environment->define("net_tcp_close",              std::string("__builtin_net_tcp_close__"));
+        environment->define("net_tcp_is_connected",       std::string("__builtin_net_tcp_is_connected__"));
+        environment->define("net_tcp_remote_addr",        std::string("__builtin_net_tcp_remote_addr__"));
+        environment->define("net_tcp_remote_port",        std::string("__builtin_net_tcp_remote_port__"));
+        environment->define("net_tcp_set_nonblocking",    std::string("__builtin_net_tcp_set_nonblocking__"));
+        environment->define("net_tcp_set_timeout",        std::string("__builtin_net_tcp_set_timeout__"));
+        environment->define("net_tcp_bytes_available",    std::string("__builtin_net_tcp_bytes_available__"));
+        // UDP sockets
+        environment->define("net_udp_socket_create",      std::string("__builtin_net_udp_socket_create__"));
+        environment->define("net_udp_socket_destroy",     std::string("__builtin_net_udp_socket_destroy__"));
+        environment->define("net_udp_bind",               std::string("__builtin_net_udp_bind__"));
+        environment->define("net_udp_send_to",            std::string("__builtin_net_udp_send_to__"));
+        environment->define("net_udp_recv_from",          std::string("__builtin_net_udp_recv_from__"));
+        environment->define("net_udp_recv_data",          std::string("__builtin_net_udp_recv_data__"));
+        environment->define("net_udp_recv_addr",          std::string("__builtin_net_udp_recv_addr__"));
+        environment->define("net_udp_recv_port",          std::string("__builtin_net_udp_recv_port__"));
+        environment->define("net_udp_close",              std::string("__builtin_net_udp_close__"));
+        environment->define("net_udp_set_broadcast",      std::string("__builtin_net_udp_set_broadcast__"));
+        environment->define("net_udp_set_timeout",        std::string("__builtin_net_udp_set_timeout__"));
+        // Address helpers
+        environment->define("net_resolve_host",           std::string("__builtin_net_resolve_host__"));
+        environment->define("net_local_ip",               std::string("__builtin_net_local_ip__"));
+        environment->define("net_hostname",               std::string("__builtin_net_hostname__"));
+        // Phase 2: DNS
+        environment->define("net_dns_create",             std::string("__builtin_net_dns_create__"));
+        environment->define("net_dns_destroy",            std::string("__builtin_net_dns_destroy__"));
+        environment->define("net_dns_lookup",             std::string("__builtin_net_dns_lookup__"));
+        environment->define("net_dns_reverse",            std::string("__builtin_net_dns_reverse__"));
+        environment->define("net_dns_lookup_count",       std::string("__builtin_net_dns_lookup_count__"));
+        environment->define("net_dns_lookup_result",      std::string("__builtin_net_dns_lookup_result__"));
+        environment->define("net_dns_set_server",         std::string("__builtin_net_dns_set_server__"));
+        environment->define("net_dns_server",             std::string("__builtin_net_dns_server__"));
+        // SMTP
+        environment->define("net_smtp_create",            std::string("__builtin_net_smtp_create__"));
+        environment->define("net_smtp_destroy",           std::string("__builtin_net_smtp_destroy__"));
+        environment->define("net_smtp_connect",           std::string("__builtin_net_smtp_connect__"));
+        environment->define("net_smtp_auth",              std::string("__builtin_net_smtp_auth__"));
+        environment->define("net_smtp_send_mail",         std::string("__builtin_net_smtp_send_mail__"));
+        environment->define("net_smtp_disconnect",        std::string("__builtin_net_smtp_disconnect__"));
+        environment->define("net_smtp_is_connected",      std::string("__builtin_net_smtp_is_connected__"));
+        environment->define("net_smtp_last_response",     std::string("__builtin_net_smtp_last_response__"));
+        environment->define("net_smtp_set_tls",           std::string("__builtin_net_smtp_set_tls__"));
+        // FTP
+        environment->define("net_ftp_create",             std::string("__builtin_net_ftp_create__"));
+        environment->define("net_ftp_destroy",            std::string("__builtin_net_ftp_destroy__"));
+        environment->define("net_ftp_connect",            std::string("__builtin_net_ftp_connect__"));
+        environment->define("net_ftp_login",              std::string("__builtin_net_ftp_login__"));
+        environment->define("net_ftp_list",               std::string("__builtin_net_ftp_list__"));
+        environment->define("net_ftp_file_count",         std::string("__builtin_net_ftp_file_count__"));
+        environment->define("net_ftp_file_name",          std::string("__builtin_net_ftp_file_name__"));
+        environment->define("net_ftp_file_size",          std::string("__builtin_net_ftp_file_size__"));
+        environment->define("net_ftp_download",           std::string("__builtin_net_ftp_download__"));
+        environment->define("net_ftp_upload",             std::string("__builtin_net_ftp_upload__"));
+        environment->define("net_ftp_mkdir",              std::string("__builtin_net_ftp_mkdir__"));
+        environment->define("net_ftp_delete",             std::string("__builtin_net_ftp_delete__"));
+        environment->define("net_ftp_disconnect",         std::string("__builtin_net_ftp_disconnect__"));
+        environment->define("net_ftp_cwd",                std::string("__builtin_net_ftp_cwd__"));
+        // SSH
+        environment->define("net_ssh_create",             std::string("__builtin_net_ssh_create__"));
+        environment->define("net_ssh_destroy",            std::string("__builtin_net_ssh_destroy__"));
+        environment->define("net_ssh_connect",            std::string("__builtin_net_ssh_connect__"));
+        environment->define("net_ssh_auth_password",      std::string("__builtin_net_ssh_auth_password__"));
+        environment->define("net_ssh_auth_key",           std::string("__builtin_net_ssh_auth_key__"));
+        environment->define("net_ssh_exec",               std::string("__builtin_net_ssh_exec__"));
+        environment->define("net_ssh_output",             std::string("__builtin_net_ssh_output__"));
+        environment->define("net_ssh_stderr",             std::string("__builtin_net_ssh_stderr__"));
+        environment->define("net_ssh_exit_code",          std::string("__builtin_net_ssh_exit_code__"));
+        environment->define("net_ssh_upload",             std::string("__builtin_net_ssh_upload__"));
+        environment->define("net_ssh_download",           std::string("__builtin_net_ssh_download__"));
+        environment->define("net_ssh_disconnect",         std::string("__builtin_net_ssh_disconnect__"));
+        environment->define("net_ssh_is_connected",       std::string("__builtin_net_ssh_is_connected__"));
+        // Phase 3: Packet capture
+        environment->define("net_capture_create",         std::string("__builtin_net_capture_create__"));
+        environment->define("net_capture_destroy",        std::string("__builtin_net_capture_destroy__"));
+        environment->define("net_capture_start",          std::string("__builtin_net_capture_start__"));
+        environment->define("net_capture_stop",           std::string("__builtin_net_capture_stop__"));
+        environment->define("net_capture_packet_count",   std::string("__builtin_net_capture_packet_count__"));
+        environment->define("net_capture_packet_src",     std::string("__builtin_net_capture_packet_src__"));
+        environment->define("net_capture_packet_dst",     std::string("__builtin_net_capture_packet_dst__"));
+        environment->define("net_capture_packet_proto",   std::string("__builtin_net_capture_packet_proto__"));
+        environment->define("net_capture_packet_size",    std::string("__builtin_net_capture_packet_size__"));
+        environment->define("net_capture_packet_data",    std::string("__builtin_net_capture_packet_data__"));
+        environment->define("net_capture_set_filter",     std::string("__builtin_net_capture_set_filter__"));
+        environment->define("net_capture_to_json",        std::string("__builtin_net_capture_to_json__"));
+        // Network monitor
+        environment->define("net_monitor_create",         std::string("__builtin_net_monitor_create__"));
+        environment->define("net_monitor_destroy",        std::string("__builtin_net_monitor_destroy__"));
+        environment->define("net_monitor_add_interface",  std::string("__builtin_net_monitor_add_interface__"));
+        environment->define("net_monitor_sample",         std::string("__builtin_net_monitor_sample__"));
+        environment->define("net_monitor_interface_count",std::string("__builtin_net_monitor_interface_count__"));
+        environment->define("net_monitor_interface_name", std::string("__builtin_net_monitor_interface_name__"));
+        environment->define("net_monitor_bytes_sent",     std::string("__builtin_net_monitor_bytes_sent__"));
+        environment->define("net_monitor_bytes_recv",     std::string("__builtin_net_monitor_bytes_recv__"));
+        environment->define("net_monitor_packets_sent",   std::string("__builtin_net_monitor_packets_sent__"));
+        environment->define("net_monitor_packets_recv",   std::string("__builtin_net_monitor_packets_recv__"));
+        environment->define("net_monitor_to_json",        std::string("__builtin_net_monitor_to_json__"));
+        // Bandwidth
+        environment->define("net_bandwidth_create",       std::string("__builtin_net_bandwidth_create__"));
+        environment->define("net_bandwidth_destroy",      std::string("__builtin_net_bandwidth_destroy__"));
+        environment->define("net_bandwidth_test_upload",  std::string("__builtin_net_bandwidth_test_upload__"));
+        environment->define("net_bandwidth_test_download",std::string("__builtin_net_bandwidth_test_download__"));
+        environment->define("net_bandwidth_last_upload_mbps",  std::string("__builtin_net_bandwidth_last_upload_mbps__"));
+        environment->define("net_bandwidth_last_download_mbps",std::string("__builtin_net_bandwidth_last_download_mbps__"));
+        environment->define("net_bandwidth_report",       std::string("__builtin_net_bandwidth_report__"));
+        // Ping
+        environment->define("net_ping_create",            std::string("__builtin_net_ping_create__"));
+        environment->define("net_ping_destroy",           std::string("__builtin_net_ping_destroy__"));
+        environment->define("net_ping_host",              std::string("__builtin_net_ping_host__"));
+        environment->define("net_ping_min",               std::string("__builtin_net_ping_min__"));
+        environment->define("net_ping_max",               std::string("__builtin_net_ping_max__"));
+        environment->define("net_ping_avg",               std::string("__builtin_net_ping_avg__"));
+        environment->define("net_ping_jitter",            std::string("__builtin_net_ping_jitter__"));
+        environment->define("net_ping_packet_loss",       std::string("__builtin_net_ping_packet_loss__"));
+        environment->define("net_ping_report",            std::string("__builtin_net_ping_report__"));
+        // Phase 4: Event loop
+        environment->define("net_event_loop_create",      std::string("__builtin_net_event_loop_create__"));
+        environment->define("net_event_loop_destroy",     std::string("__builtin_net_event_loop_destroy__"));
+        environment->define("net_event_loop_add_socket",  std::string("__builtin_net_event_loop_add_socket__"));
+        environment->define("net_event_loop_remove_socket",std::string("__builtin_net_event_loop_remove_socket__"));
+        environment->define("net_event_loop_run_once",    std::string("__builtin_net_event_loop_run_once__"));
+        environment->define("net_event_loop_run",         std::string("__builtin_net_event_loop_run__"));
+        environment->define("net_event_loop_stop",        std::string("__builtin_net_event_loop_stop__"));
+        environment->define("net_event_loop_pending_count",std::string("__builtin_net_event_loop_pending_count__"));
+        environment->define("net_event_loop_next_event",  std::string("__builtin_net_event_loop_next_event__"));
+        environment->define("net_event_loop_is_running",  std::string("__builtin_net_event_loop_is_running__"));
+        // Connection pool
+        environment->define("net_pool_create",            std::string("__builtin_net_pool_create__"));
+        environment->define("net_pool_destroy",           std::string("__builtin_net_pool_destroy__"));
+        environment->define("net_pool_acquire",           std::string("__builtin_net_pool_acquire__"));
+        environment->define("net_pool_release",           std::string("__builtin_net_pool_release__"));
+        environment->define("net_pool_size",              std::string("__builtin_net_pool_size__"));
+        environment->define("net_pool_active",            std::string("__builtin_net_pool_active__"));
+        environment->define("net_pool_idle",              std::string("__builtin_net_pool_idle__"));
+        environment->define("net_pool_host",              std::string("__builtin_net_pool_host__"));
+        environment->define("net_pool_port",              std::string("__builtin_net_pool_port__"));
+        environment->define("net_pool_set_timeout",       std::string("__builtin_net_pool_set_timeout__"));
+        // Async request
+        environment->define("net_async_request_create",   std::string("__builtin_net_async_request_create__"));
+        environment->define("net_async_request_destroy",  std::string("__builtin_net_async_request_destroy__"));
+        environment->define("net_async_get",              std::string("__builtin_net_async_get__"));
+        environment->define("net_async_post",             std::string("__builtin_net_async_post__"));
+        environment->define("net_async_is_done",          std::string("__builtin_net_async_is_done__"));
+        environment->define("net_async_status_code",      std::string("__builtin_net_async_status_code__"));
+        environment->define("net_async_response",         std::string("__builtin_net_async_response__"));
+        environment->define("net_async_error",            std::string("__builtin_net_async_error__"));
+        environment->define("net_async_elapsed_ms",       std::string("__builtin_net_async_elapsed_ms__"));
+        // Load balancer
+        environment->define("net_lb_create",              std::string("__builtin_net_lb_create__"));
+        environment->define("net_lb_destroy",             std::string("__builtin_net_lb_destroy__"));
+        environment->define("net_lb_add_backend",         std::string("__builtin_net_lb_add_backend__"));
+        environment->define("net_lb_next_host",           std::string("__builtin_net_lb_next_host__"));
+        environment->define("net_lb_next_port",           std::string("__builtin_net_lb_next_port__"));
+        environment->define("net_lb_backend_count",       std::string("__builtin_net_lb_backend_count__"));
+        environment->define("net_lb_mark_down",           std::string("__builtin_net_lb_mark_down__"));
+        environment->define("net_lb_mark_up",             std::string("__builtin_net_lb_mark_up__"));
+        environment->define("net_lb_strategy",            std::string("__builtin_net_lb_strategy__"));
+        environment->define("net_lb_stats",               std::string("__builtin_net_lb_stats__"));
+        return;
+    }
+
     if (stmt.is_from_import) {
-        // from module import name1, name2
-        // For now, just define empty values for imported names
         for (const auto& name : stmt.imported_names) {
             environment->define(name, Value{});
         }
     } else {
-        // import module
-        // import module as alias
         std::string import_name = stmt.alias.empty() ? stmt.module_name : stmt.alias;
-        
-        // Create a simple module object (empty for now)
-        // In a real implementation, this would be a proper module object
-        // with the module's exported symbols
         environment->define(import_name, Value{});
     }
 }

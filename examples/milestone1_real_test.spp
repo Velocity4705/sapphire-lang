@@ -1,3 +1,6 @@
+import collections
+import math
+import csv
 # Milestone 1: Data Science Foundation - Real Implementation Test
 # Testing what should be implemented directly in Sapphire language
 

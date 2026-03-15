@@ -273,6 +273,7 @@ extern "C" {
     void orm_model_add_int_field(void* model, const char* name);
     void orm_model_add_primary_key(void* model, const char* name);
     int orm_model_create_table(void* model);
+    const char* orm_model_get_create_sql(void* model);
     
     // Record operations
     void* orm_record_create();
@@ -288,6 +289,7 @@ extern "C" {
     void orm_query_destroy(void* query);
     void orm_query_where_eq(void* query, const char* field, const char* value);
     void orm_query_limit(void* query, int count);
+    const char* orm_query_to_sql(void* query);
     void* orm_query_get_all(void* query); // Returns array of records
     void* orm_query_first(void* query);   // Returns single record
     

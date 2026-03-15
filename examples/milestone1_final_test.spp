@@ -1,3 +1,5 @@
+import collections
+import math
 # 🎯 Milestone 1: Data Science Foundation - FINAL COMPLETE TEST
 print("╔══════════════════════════════════════════════════════════════╗")
 print("║           MILESTONE 1: FINAL COMPLETE TEST                  ║")

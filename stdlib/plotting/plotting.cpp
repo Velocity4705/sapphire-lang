@@ -151,9 +151,18 @@ void Plot::calculate_auto_limits() {
         
         for (const auto& s : series) {
             if (!s->x_data.empty()) {
-                auto x_minmax = std::minmax_element(s->x_data.begin(), s->x_data.end());
-                x_min = std::min(x_min, *x_minmax.first);
-                x_max = std::max(x_max, *x_minmax.second);
+                if (chart_type == ChartType::HISTOGRAM) {
+                    // Extend to bin edges, not just centers
+                    size_t n = s->x_data.size();
+                    double half_w = n > 1 ? (s->x_data[1] - s->x_data[0]) / 2.0
+                                          : 0.5;
+                    x_min = std::min(x_min, s->x_data.front() - half_w);
+                    x_max = std::max(x_max, s->x_data.back()  + half_w);
+                } else {
+                    auto mm = std::minmax_element(s->x_data.begin(), s->x_data.end());
+                    x_min = std::min(x_min, *mm.first);
+                    x_max = std::max(x_max, *mm.second);
+                }
             }
         }
         
@@ -172,7 +181,10 @@ void Plot::calculate_auto_limits() {
                 y_max = std::max(y_max, *y_minmax.second);
             }
         }
-        
+        // Histograms always start at 0
+        if (chart_type == ChartType::HISTOGRAM || chart_type == ChartType::BAR) {
+            y_min = 0;
+        }
         y_axis.min_value = y_min;
         y_axis.max_value = y_max;
     }
@@ -270,36 +282,219 @@ void Plot::save_png(const std::string& filename, int dpi) {
 }
 
 void Plot::save_svg(const std::string& filename) {
-    // Basic SVG export
+    calculate_auto_limits();
+
     std::ofstream file(filename);
-    if (file.is_open()) {
-        file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        file << "<svg width=\"" << width << "\" height=\"" << height << "\" xmlns=\"http://www.w3.org/2000/svg\">\n";
-        file << "  <rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n";
-        file << "  <text x=\"" << width/2 << "\" y=\"30\" text-anchor=\"middle\" font-size=\"16\">" << title << "</text>\n";
-        
-        // Simple data representation
-        for (size_t s_idx = 0; s_idx < series.size(); s_idx++) {
-            const auto& s = series[s_idx];
-            std::string color = "rgb(" + std::to_string(int(s->color.r * 255)) + "," +
-                                       std::to_string(int(s->color.g * 255)) + "," +
-                                       std::to_string(int(s->color.b * 255)) + ")";
-            
-            for (size_t i = 0; i < s->x_data.size() && i < s->y_data.size(); i++) {
-                double x_norm = (s->x_data[i] - x_axis.min_value) / (x_axis.max_value - x_axis.min_value);
-                double y_norm = (s->y_data[i] - y_axis.min_value) / (y_axis.max_value - y_axis.min_value);
-                
-                double x_pos = 50 + x_norm * (width - 100);
-                double y_pos = height - 50 - y_norm * (height - 100);
-                
-                file << "  <circle cx=\"" << x_pos << "\" cy=\"" << y_pos << "\" r=\"2\" fill=\"" << color << "\"/>\n";
+    if (!file.is_open()) return;
+
+    // Layout constants
+    const double margin_left   = 70;
+    const double margin_right  = 30;
+    const double margin_top    = 50;
+    const double margin_bottom = 60;
+    const double plot_w = width  - margin_left - margin_right;
+    const double plot_h = height - margin_top  - margin_bottom;
+
+    double x_min = x_axis.min_value, x_max = x_axis.max_value;
+    double y_min = y_axis.min_value, y_max = y_axis.max_value;
+    // Avoid divide-by-zero
+    if (x_max == x_min) { x_min -= 1; x_max += 1; }
+    if (y_max == y_min) { y_min -= 1; y_max += 1; }
+    // Add 5% padding on y top
+    y_max += (y_max - y_min) * 0.05;
+
+    // Helper lambdas: data coords -> SVG coords
+    auto sx = [&](double v) { return margin_left + (v - x_min) / (x_max - x_min) * plot_w; };
+    auto sy = [&](double v) { return margin_top  + (1.0 - (v - y_min) / (y_max - y_min)) * plot_h; };
+
+    // Series colors
+    static const char* palette[] = {
+        "#2196F3","#F44336","#4CAF50","#FF9800",
+        "#9C27B0","#00BCD4","#FFEB3B","#795548"
+    };
+
+    file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    file << "<svg width=\"" << width << "\" height=\"" << height
+         << "\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+
+    // Background
+    file << "  <rect width=\"" << width << "\" height=\"" << height << "\" fill=\"#ffffff\"/>\n";
+    // Plot area background
+    file << "  <rect x=\"" << margin_left << "\" y=\"" << margin_top
+         << "\" width=\"" << plot_w << "\" height=\"" << plot_h
+         << "\" fill=\"#f8f9fa\" stroke=\"#cccccc\" stroke-width=\"1\"/>\n";
+
+    // Grid lines + tick labels
+    const int num_ticks = 5;
+    file << "  <g stroke=\"#dddddd\" stroke-width=\"1\" stroke-dasharray=\"4,3\">\n";
+    for (int i = 0; i <= num_ticks; i++) {
+        double frac = (double)i / num_ticks;
+        // Horizontal grid
+        double gy = margin_top + frac * plot_h;
+        file << "    <line x1=\"" << margin_left << "\" y1=\"" << gy
+             << "\" x2=\"" << (margin_left + plot_w) << "\" y2=\"" << gy << "\"/>\n";
+        // Vertical grid
+        double gx = margin_left + frac * plot_w;
+        file << "    <line x1=\"" << gx << "\" y1=\"" << margin_top
+             << "\" x2=\"" << gx << "\" y2=\"" << (margin_top + plot_h) << "\"/>\n";
+    }
+    file << "  </g>\n";
+
+    // Axis lines
+    file << "  <g stroke=\"#333333\" stroke-width=\"2\">\n";
+    // X axis
+    file << "    <line x1=\"" << margin_left << "\" y1=\"" << (margin_top + plot_h)
+         << "\" x2=\"" << (margin_left + plot_w) << "\" y2=\"" << (margin_top + plot_h) << "\"/>\n";
+    // Y axis
+    file << "    <line x1=\"" << margin_left << "\" y1=\"" << margin_top
+         << "\" x2=\"" << margin_left << "\" y2=\"" << (margin_top + plot_h) << "\"/>\n";
+    file << "  </g>\n";
+
+    // Tick marks and labels
+    file << "  <g font-family=\"Arial,sans-serif\" font-size=\"11\" fill=\"#444444\">\n";
+    for (int i = 0; i <= num_ticks; i++) {
+        double frac = (double)i / num_ticks;
+        // X ticks
+        double xv = x_min + frac * (x_max - x_min);
+        double gx = margin_left + frac * plot_w;
+        double gy_base = margin_top + plot_h;
+        file << "    <line x1=\"" << gx << "\" y1=\"" << gy_base
+             << "\" x2=\"" << gx << "\" y2=\"" << (gy_base + 5)
+             << "\" stroke=\"#333333\" stroke-width=\"1\"/>\n";
+        // Format tick value
+        std::ostringstream xss;
+        if (std::abs(xv) >= 1000 || (std::abs(xv) < 0.01 && xv != 0))
+            xss << std::scientific;
+        xss.precision(3);
+        xss << xv;
+        file << "    <text x=\"" << gx << "\" y=\"" << (gy_base + 18)
+             << "\" text-anchor=\"middle\">" << xss.str() << "</text>\n";
+        // Y ticks
+        double yv = y_min + (1.0 - frac) * (y_max - y_min);
+        double gy = margin_top + frac * plot_h;
+        file << "    <line x1=\"" << (margin_left - 5) << "\" y1=\"" << gy
+             << "\" x2=\"" << margin_left << "\" y2=\"" << gy
+             << "\" stroke=\"#333333\" stroke-width=\"1\"/>\n";
+        std::ostringstream yss;
+        if (std::abs(yv) >= 10000 || (std::abs(yv) < 0.01 && yv != 0))
+            yss << std::scientific;
+        yss.precision(3);
+        yss << yv;
+        file << "    <text x=\"" << (margin_left - 8) << "\" y=\"" << (gy + 4)
+             << "\" text-anchor=\"end\">" << yss.str() << "</text>\n";
+    }
+    file << "  </g>\n";
+
+    // Axis labels
+    file << "  <text x=\"" << (margin_left + plot_w / 2) << "\" y=\"" << (height - 10)
+         << "\" text-anchor=\"middle\" font-family=\"Arial,sans-serif\" font-size=\"13\" fill=\"#222222\">"
+         << x_axis.label << "</text>\n";
+    // Y label (rotated)
+    file << "  <text transform=\"rotate(-90)\" x=\"" << -(margin_top + plot_h / 2)
+         << "\" y=\"18\" text-anchor=\"middle\" font-family=\"Arial,sans-serif\" font-size=\"13\" fill=\"#222222\">"
+         << y_axis.label << "</text>\n";
+
+    // Title
+    if (!title.empty()) {
+        file << "  <text x=\"" << (margin_left + plot_w / 2) << "\" y=\"" << (margin_top - 12)
+             << "\" text-anchor=\"middle\" font-family=\"Arial,sans-serif\" font-size=\"16\" font-weight=\"bold\" fill=\"#111111\">"
+             << title << "</text>\n";
+    }
+
+    // Clip region for data
+    file << "  <clipPath id=\"plotarea\">\n";
+    file << "    <rect x=\"" << margin_left << "\" y=\"" << margin_top
+         << "\" width=\"" << plot_w << "\" height=\"" << plot_h << "\"/>\n";
+    file << "  </clipPath>\n";
+
+    // Draw series data
+    for (size_t s_idx = 0; s_idx < series.size(); s_idx++) {
+        const auto& s = series[s_idx];
+        const char* col = palette[s_idx % 8];
+        size_t n = std::min(s->x_data.size(), s->y_data.size());
+        if (n == 0) continue;
+
+        file << "  <g clip-path=\"url(#plotarea)\">\n";
+
+        if (chart_type == ChartType::HISTOGRAM) {
+            // Each bar spans exactly from its left bin edge to its right bin edge.
+            // Bin edges are midpoints between adjacent centers; outermost edges
+            // are already accounted for in calculate_auto_limits.
+            double bin_w = n > 1 ? (s->x_data[1] - s->x_data[0]) : (x_max - x_min);
+            for (size_t i = 0; i < n; i++) {
+                double left  = sx(s->x_data[i] - bin_w / 2.0);
+                double right = sx(s->x_data[i] + bin_w / 2.0);
+                double bw = right - left;
+                double by = sy(s->y_data[i]);
+                double bh = (margin_top + plot_h) - by;
+                if (bh < 0) { by = margin_top + plot_h; bh = -bh; }
+                file << "    <rect x=\"" << left << "\" y=\"" << by
+                     << "\" width=\"" << bw << "\" height=\"" << bh
+                     << "\" fill=\"" << col << "\" opacity=\"0.85\""
+                     << " stroke=\"white\" stroke-width=\"1\"/>\n";
+            }
+        } else if (chart_type == ChartType::BAR) {
+            // Grouped bar chart — fixed pixel width with small gaps
+            double bar_w = (plot_w / (double)n) * 0.7 / (double)series.size();
+            for (size_t i = 0; i < n; i++) {
+                double cx = sx(s->x_data[i]);
+                double offset = (s_idx - (series.size() - 1) / 2.0) * bar_w;
+                double bx = cx + offset - bar_w / 2.0;
+                double by = sy(s->y_data[i]);
+                double bh = (margin_top + plot_h) - by;
+                if (bh < 0) { by = margin_top + plot_h; bh = -bh; }
+                file << "    <rect x=\"" << bx << "\" y=\"" << by
+                     << "\" width=\"" << bar_w << "\" height=\"" << bh
+                     << "\" fill=\"" << col << "\" opacity=\"0.85\""
+                     << " stroke=\"white\" stroke-width=\"1\"/>\n";
+            }
+        } else if (chart_type == ChartType::LINE) {
+            // Polyline
+            file << "    <polyline fill=\"none\" stroke=\"" << col
+                 << "\" stroke-width=\"2\" stroke-linejoin=\"round\" points=\"";
+            for (size_t i = 0; i < n; i++) {
+                file << sx(s->x_data[i]) << "," << sy(s->y_data[i]);
+                if (i + 1 < n) file << " ";
+            }
+            file << "\"/>\n";
+            // Dots on data points
+            for (size_t i = 0; i < n; i++) {
+                file << "    <circle cx=\"" << sx(s->x_data[i]) << "\" cy=\"" << sy(s->y_data[i])
+                     << "\" r=\"3\" fill=\"" << col << "\"/>\n";
+            }
+        } else {
+            // Scatter
+            for (size_t i = 0; i < n; i++) {
+                file << "    <circle cx=\"" << sx(s->x_data[i]) << "\" cy=\"" << sy(s->y_data[i])
+                     << "\" r=\"4\" fill=\"" << col << "\" opacity=\"0.8\"/>\n";
             }
         }
-        
-        file << "</svg>\n";
-        file.close();
-        std::cout << "Plot saved to " << filename << "\n";
+
+        file << "  </g>\n";
     }
+
+    // Legend
+    if (!series.empty()) {
+        double lx = margin_left + plot_w - 10;
+        double ly = margin_top + 10;
+        double lw = 120, lh = series.size() * 20 + 10;
+        file << "  <rect x=\"" << (lx - lw) << "\" y=\"" << ly
+             << "\" width=\"" << lw << "\" height=\"" << lh
+             << "\" fill=\"white\" stroke=\"#cccccc\" stroke-width=\"1\" rx=\"3\"/>\n";
+        for (size_t i = 0; i < series.size(); i++) {
+            const char* col = palette[i % 8];
+            double ey = ly + 10 + i * 20 + 6;
+            file << "  <rect x=\"" << (lx - lw + 8) << "\" y=\"" << (ey - 6)
+                 << "\" width=\"14\" height=\"12\" fill=\"" << col << "\" rx=\"2\"/>\n";
+            file << "  <text x=\"" << (lx - lw + 28) << "\" y=\"" << ey
+                 << "\" font-family=\"Arial,sans-serif\" font-size=\"11\" fill=\"#333333\">"
+                 << series[i]->label << "</text>\n";
+        }
+    }
+
+    file << "</svg>\n";
+    file.close();
+    std::cout << "Plot saved to " << filename << "\n";
 }
 
 void Plot::save_pdf(const std::string& filename) {

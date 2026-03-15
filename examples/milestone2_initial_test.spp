@@ -1,3 +1,5 @@
+import json
+import random
 # 🎯 Milestone 2: Core Language Enhancement - Initial Assessment
 print("╔══════════════════════════════════════════════════════════════╗")
 print("║           MILESTONE 2: INITIAL ASSESSMENT                   ║")

@@ -1,0 +1,275 @@
+import mobile
+
+print("=== Milestone 8: Mobile Development ===")
+print("")
+
+# ===== Phase 1: iOS App Build =====
+print("--- Phase 1: iOS App ---")
+
+cfg_ios = mobile_app_config_create("MyApp", "com.example.myapp", "1.0.0", 0)
+mobile_app_config_set_orientation(cfg_ios, 0)
+mobile_app_config_add_permission(cfg_ios, "camera", "Take photos")
+mobile_app_config_add_permission(cfg_ios, "location", "Show nearby places")
+
+app_ios = mobile_app_create(cfg_ios)
+platform = mobile_app_platform_name(app_ios)
+print("Platform:")
+print(platform)
+
+# Build a screen with layout
+layout = mobile_layout_create(0)
+mobile_layout_set_spacing(layout, 12)
+
+title = mobile_component_create(2, "title", "Welcome to MyApp")
+mobile_component_set_style_font(title, "System", 24)
+mobile_component_set_style_color(title, "#FFFFFF", "#333333")
+mobile_layout_add_item(layout, title)
+
+btn = mobile_component_create(1, "btn_start", "Get Started")
+mobile_component_set_style_color(btn, "#007AFF", "#FFFFFF")
+mobile_component_set_style_size(btn, 200, 44)
+mobile_component_set_style_padding(btn, 12)
+mobile_layout_add_item(layout, btn)
+
+inp = mobile_component_create(3, "search", "Search...")
+mobile_component_set_style_size(inp, 300, 40)
+mobile_layout_add_item(layout, inp)
+
+sw = mobile_component_create(10, "toggle", "Notifications")
+mobile_component_set_value(sw, 1.0)
+mobile_layout_add_item(layout, sw)
+
+slider = mobile_component_create(11, "volume", "Volume")
+mobile_component_set_value(slider, 75.0)
+mobile_layout_add_item(layout, slider)
+
+screen_home = mobile_screen_create("home", "Home")
+mobile_screen_set_background(screen_home, "#F5F5F5")
+mobile_screen_set_nav_bar(screen_home, 1)
+mobile_screen_set_layout(screen_home, layout)
+mobile_app_add_screen(app_ios, screen_home)
+
+screen_profile = mobile_screen_create("profile", "Profile")
+mobile_app_add_screen(app_ios, screen_profile)
+
+screen_count = mobile_app_screen_count(app_ios)
+print("Screens added:")
+print(screen_count)
+
+ios_report = mobile_app_build_ios(app_ios)
+print(ios_report)
+
+mobile_app_destroy(app_ios)
+mobile_app_config_destroy(cfg_ios)
+print("Phase 1 complete")
+print("")
+# ===== Phase 2: Android App Build =====
+print("--- Phase 2: Android App ---")
+
+cfg_and = mobile_app_config_create("MyApp", "com.example.myapp", "1.0.0", 1)
+mobile_app_config_add_permission(cfg_and, "camera", "Scan QR codes")
+mobile_app_config_add_permission(cfg_and, "storage", "Save files")
+
+app_and = mobile_app_create(cfg_and)
+platform_and = mobile_app_platform_name(app_and)
+print("Platform:")
+print(platform_and)
+
+# Grid layout for Android
+grid = mobile_layout_create(2)
+mobile_layout_set_columns(grid, 2)
+mobile_layout_set_spacing(grid, 8)
+
+card1 = mobile_component_create(0, "card1", "Dashboard")
+mobile_component_set_style_color(card1, "#E3F2FD", "#1565C0")
+mobile_component_set_style_size(card1, 150, 100)
+mobile_layout_add_item(grid, card1)
+
+card2 = mobile_component_create(0, "card2", "Analytics")
+mobile_component_set_style_color(card2, "#E8F5E9", "#2E7D32")
+mobile_component_set_style_size(card2, 150, 100)
+mobile_layout_add_item(grid, card2)
+
+card3 = mobile_component_create(0, "card3", "Settings")
+mobile_component_set_style_color(card3, "#FFF3E0", "#E65100")
+mobile_component_set_style_size(card3, 150, 100)
+mobile_layout_add_item(grid, card3)
+
+screen_main = mobile_screen_create("main", "Main")
+mobile_screen_set_layout(screen_main, grid)
+mobile_app_add_screen(app_and, screen_main)
+
+android_report = mobile_app_build_android(app_and)
+print(android_report)
+
+manifest = mobile_app_export_manifest(app_and)
+print("Manifest:")
+print(manifest)
+
+mobile_app_destroy(app_and)
+mobile_app_config_destroy(cfg_and)
+print("Phase 2 complete")
+print("")
+# ===== Phase 3: UI Framework =====
+print("--- Phase 3: UI Framework ---")
+
+# Component types
+view_comp = mobile_component_create(0, "v1", "Container")
+btn_comp = mobile_component_create(1, "b1", "Click Me")
+text_comp = mobile_component_create(2, "t1", "Hello World")
+input_comp = mobile_component_create(3, "i1", "Enter text...")
+img_comp = mobile_component_create(4, "img1", "avatar.png")
+list_comp = mobile_component_create(5, "list1", "Items")
+progress = mobile_component_create(12, "prog1", "Loading")
+mobile_component_set_value(progress, 65.0)
+
+print("Component types:")
+print(mobile_component_type_name(view_comp))
+print(mobile_component_type_name(btn_comp))
+print(mobile_component_type_name(text_comp))
+print(mobile_component_type_name(input_comp))
+print(mobile_component_type_name(progress))
+
+# Nested components
+mobile_component_add_child(view_comp, text_comp)
+mobile_component_add_child(view_comp, btn_comp)
+
+json_out = mobile_component_to_json(view_comp)
+print("Component JSON (truncated):")
+print("View with 2 children rendered")
+
+# Navigation
+nav = mobile_nav_create()
+mobile_nav_push(nav, "home")
+mobile_nav_push(nav, "profile")
+mobile_nav_push(nav, "settings")
+
+depth = mobile_nav_depth(nav)
+current = mobile_nav_current(nav)
+print("Nav depth:")
+print(depth)
+print("Current screen:")
+print(current)
+
+mobile_nav_pop(nav)
+current2 = mobile_nav_current(nav)
+print("After pop:")
+print(current2)
+
+mobile_nav_destroy(nav)
+print("Phase 3 complete")
+print("")
+# ===== Phase 4: Device API =====
+print("--- Phase 4: Device API ---")
+
+# iOS device
+dev = mobile_device_create(0)
+
+model = mobile_device_model(dev)
+os_ver = mobile_device_os_version(dev)
+dev_id = mobile_device_id(dev)
+battery = mobile_device_battery_level(dev)
+charging = mobile_device_is_charging(dev)
+
+print("Device model:")
+print(model)
+print("OS version:")
+print(os_ver)
+print("Device ID:")
+print(dev_id)
+print("Battery level:")
+print(battery)
+print("Charging:")
+print(charging)
+
+# Network
+connected = mobile_device_is_connected(dev)
+net_type = mobile_device_network_type(dev)
+print("Connected:")
+print(connected)
+print("Network type:")
+print(net_type)
+
+# Camera
+photo = mobile_device_capture_photo(dev, "high")
+video = mobile_device_record_video(dev, 5)
+print("Photo captured:")
+print(photo)
+print("Video recorded:")
+print(video)
+
+# GPS
+perm = mobile_device_request_permission(dev, "location")
+print("Location permission granted:")
+print(perm)
+
+loc = mobile_device_get_location(dev)
+lat = mobile_location_latitude(loc)
+lng = mobile_location_longitude(loc)
+alt = mobile_location_altitude(loc)
+acc = mobile_location_accuracy(loc)
+print("Latitude:")
+print(lat)
+print("Longitude:")
+print(lng)
+print("Altitude:")
+print(alt)
+print("Accuracy (m):")
+print(acc)
+mobile_location_destroy(loc)
+
+# Accelerometer
+accel = mobile_device_get_accelerometer(dev)
+ax = mobile_accel_x(accel)
+ay = mobile_accel_y(accel)
+az = mobile_accel_z(accel)
+print("Accelerometer X:")
+print(ax)
+print("Accelerometer Y:")
+print(ay)
+print("Accelerometer Z (gravity):")
+print(az)
+mobile_accel_destroy(accel)
+
+# Storage
+mobile_device_storage_set(dev, "user_name", "Alice")
+mobile_device_storage_set(dev, "theme", "dark")
+mobile_device_storage_set(dev, "lang", "en")
+
+name_val = mobile_device_storage_get(dev, "user_name")
+theme_val = mobile_device_storage_get(dev, "theme")
+print("Stored user_name:")
+print(name_val)
+print("Stored theme:")
+print(theme_val)
+
+mobile_device_storage_delete(dev, "lang")
+missing = mobile_device_storage_get(dev, "lang")
+print("Deleted lang (empty):")
+print(missing)
+
+# Permissions
+cam_status = mobile_device_check_permission(dev, "camera")
+print("Camera permission:")
+print(cam_status)
+mobile_device_request_permission(dev, "camera")
+cam_status2 = mobile_device_check_permission(dev, "camera")
+print("After request:")
+print(cam_status2)
+
+# Notifications
+notif_id = mobile_device_schedule_notification(dev, "Reminder", "Time to check in!", 1, 0)
+notif_id2 = mobile_device_schedule_notification(dev, "Update", "New version available", 0, 5000)
+pending = mobile_device_pending_notifications(dev)
+print("Pending notifications:")
+print(pending)
+
+mobile_device_cancel_notification(dev, notif_id)
+pending2 = mobile_device_pending_notifications(dev)
+print("After cancel:")
+print(pending2)
+
+mobile_device_destroy(dev)
+print("Phase 4 complete")
+print("")
+print("=== Milestone 8 Complete ===")

@@ -1,17 +1,20 @@
+import random
+import math
+import plotting
 print("=== Milestone 3: Comprehensive Data Visualization Test ===")
 
 print("\n--- 1. Line Charts ---")
 let x = [0, 1, 2, 3, 4, 5]
-let y1 = [0, 1, 4, 9, 16, 25]  // x^2
-let y2 = [0, 1, 8, 27, 64, 125]  // x^3
+let y1 = [0, 1, 4, 9, 16, 25]  
+let y2 = [0, 1, 8, 27, 64, 125]  
 
 let line_plot = plot_create(0, 800, 600)
 plot_set_title(line_plot, "Polynomial Functions")
 plot_set_xlabel(line_plot, "X")
 plot_set_ylabel(line_plot, "Y")
 
-plot_add_line(line_plot, x, y1, "x²", 0.0, 0.0, 1.0)  // Blue
-plot_add_line(line_plot, x, y2, "x³", 1.0, 0.0, 0.0)  // Red
+plot_add_line(line_plot, x, y1, "x²", 0.0, 0.0, 1.0)  
+plot_add_line(line_plot, x, y2, "x³", 1.0, 0.0, 0.0)  
 
 print("Line chart with multiple series:")
 plot_show(line_plot)
@@ -22,9 +25,9 @@ let scatter_x = []
 let scatter_y = []
 
 let i = 0
-while i < 30 {
+while i < 30:
     let x_val = random(0.0, 10.0)
-    let y_val = 2.0 * x_val + random_normal(0.0, 1.0)  // Linear with noise
+    let y_val = 2.0 * x_val + random_normal(0.0, 1.0)  
     scatter_x.push(x_val)
     scatter_y.push(y_val)
     i = i + 1

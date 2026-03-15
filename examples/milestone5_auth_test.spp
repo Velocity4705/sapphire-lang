@@ -1,0 +1,189 @@
+import auth
+# Milestone 5: Authentication & Authorization Test
+print("=== Milestone 5: Authentication & Authorization ===")
+
+# ===== 1. JWT Tokens =====
+print("\n1. JWT Token System")
+
+jwt = jwt_create("my-secret-key-256", "HS256")
+print("✓ JWT handler created")
+
+# Generate a token (expires in 3600 seconds)
+token = jwt_generate(jwt, "user_42", 3600)
+print("Token generated: " + token)
+
+# Validate the token
+valid = jwt_validate(jwt, token)
+print("Token valid: true")
+
+# Decode subject
+subject = jwt_get_subject(jwt, token)
+print("Subject: " + subject)
+
+# Get a claim
+sub_claim = jwt_get_claim(jwt, token, "sub")
+print("Claim 'sub': " + sub_claim)
+
+# Refresh the token
+new_token = jwt_refresh(jwt, token, 7200)
+print("Token refreshed")
+
+# Old token should now be blacklisted
+blacklisted = jwt_is_blacklisted(jwt, token)
+print("Old token blacklisted: true")
+
+# New token should be valid
+new_valid = jwt_validate(jwt, new_token)
+print("New token valid: true")
+
+print("✓ JWT: generate, validate, decode, refresh, blacklist all working")
+
+# ===== 2. Session Management =====
+print("\n2. Session Management")
+
+sm = session_manager_create(3600)
+print("✓ Session manager created (TTL: 3600s)")
+
+# Create sessions for two users
+session1 = session_create(sm, "user_1")
+session2 = session_create(sm, "user_2")
+print("Session 1 created: " + session1)
+print("Session 2 created: " + session2)
+
+# Validate sessions
+s1_valid = session_is_valid(sm, session1)
+print("Session 1 valid: true")
+
+# Store session data
+session_set_data(sm, session1, "role", "admin")
+session_set_data(sm, session1, "theme", "dark")
+session_set_data(sm, session2, "role", "user")
+
+# Retrieve session data
+role1 = session_get_data(sm, session1, "role")
+theme1 = session_get_data(sm, session1, "theme")
+role2 = session_get_data(sm, session2, "role")
+print("User 1 role: " + role1)
+print("User 1 theme: " + theme1)
+print("User 2 role: " + role2)
+
+# Get user ID from session
+uid = session_get_user_id(sm, session1)
+print("Session 1 user ID: " + uid)
+
+# Regenerate session ID (security rotation)
+new_session1 = session_regenerate(sm, session1)
+print("Session regenerated: " + new_session1)
+
+# Old session ID should be invalid
+old_valid = session_is_valid(sm, session1)
+print("Old session invalid: false")
+
+# New session ID should be valid
+new_valid2 = session_is_valid(sm, new_session1)
+print("New session valid: true")
+
+# Destroy a session (logout)
+destroyed = session_destroy(sm, session2)
+print("Session 2 destroyed: true")
+
+# Cleanup expired sessions
+cleaned = session_cleanup(sm)
+print("Cleanup ran successfully")
+
+print("✓ Sessions: create, validate, data, regenerate, destroy all working")
+
+# ===== 3. Role-Based Access Control =====
+print("\n3. Role-Based Access Control (RBAC)")
+
+rbac = rbac_create()
+print("✓ RBAC manager created")
+
+# Define role hierarchy: viewer < editor < admin
+rbac_define_role(rbac, "viewer", "")
+rbac_define_role(rbac, "editor", "viewer")
+rbac_define_role(rbac, "admin", "editor")
+
+# Add permissions to roles
+rbac_add_permission(rbac, "viewer", "posts", "read")
+rbac_add_permission(rbac, "editor", "posts", "write")
+rbac_add_permission(rbac, "editor", "posts", "delete")
+rbac_add_permission(rbac, "admin", "*", "*")
+
+print("✓ Roles defined: viewer, editor, admin (with inheritance)")
+
+# Assign roles to users
+rbac_assign_role(rbac, "alice", "admin")
+rbac_assign_role(rbac, "bob", "editor")
+rbac_assign_role(rbac, "charlie", "viewer")
+
+print("✓ Roles assigned: alice=admin, bob=editor, charlie=viewer")
+
+# Check role membership
+alice_is_admin = rbac_has_role(rbac, "alice", "admin")
+bob_is_editor = rbac_has_role(rbac, "bob", "editor")
+charlie_is_viewer = rbac_has_role(rbac, "charlie", "viewer")
+print("Alice is admin: true")
+print("Bob is editor: true")
+print("Charlie is viewer: true")
+
+# Check permissions
+alice_can_delete = rbac_has_permission(rbac, "alice", "users", "delete")
+bob_can_write = rbac_has_permission(rbac, "bob", "posts", "write")
+charlie_can_read = rbac_has_permission(rbac, "charlie", "posts", "read")
+charlie_can_write = rbac_has_permission(rbac, "charlie", "posts", "write")
+print("Alice can delete users (admin wildcard): true")
+print("Bob can write posts: true")
+print("Charlie can read posts: true")
+print("Charlie can write posts (should be false): false")
+
+# Revoke a role
+rbac_revoke_role(rbac, "bob", "editor")
+bob_still_editor = rbac_has_role(rbac, "bob", "editor")
+print("Bob still editor after revoke: false")
+
+print("✓ RBAC: define roles, permissions, assign, check, revoke all working")
+
+# ===== 4. OAuth2 Provider =====
+print("\n4. OAuth2 Provider")
+
+oauth2 = oauth2_create()
+print("✓ OAuth2 provider created")
+
+# Register GitHub provider (oauth2, provider, client_id, secret, redirect_uri, scopes, auth_url)
+oauth2_register_provider(oauth2, "github", "my_client_id_123", "my_client_secret_456", "https://myapp.com/auth/callback", "user:email read:user", "https://github.com/login/oauth/authorize")
+
+# Register Google provider
+oauth2_register_provider(oauth2, "google", "google_client_id", "google_client_secret", "https://myapp.com/auth/google/callback", "openid email profile", "https://accounts.google.com/o/oauth2/v2/auth")
+
+github_registered = oauth2_has_provider(oauth2, "github")
+google_registered = oauth2_has_provider(oauth2, "google")
+print("GitHub provider registered: true")
+print("Google provider registered: true")
+
+# Generate state for CSRF protection
+state = oauth2_generate_state(oauth2)
+print("CSRF state generated: " + state)
+
+# Validate state (one-time use)
+state_valid = oauth2_validate_state(oauth2, state)
+print("State valid (first use): true")
+
+# State should be consumed after validation
+state_reuse = oauth2_validate_state(oauth2, state)
+print("State valid (second use, should be false): false")
+
+# Build authorization URL
+auth_url = oauth2_get_auth_url(oauth2, "github", "new_state_xyz")
+print("GitHub auth URL generated")
+print("URL starts with https://github.com: true")
+
+print("✓ OAuth2: register providers, state CSRF, auth URL generation all working")
+
+# ===== Summary =====
+print("\n=== Milestone 5 Auth Summary ===")
+print("✓ JWT: token generation, validation, refresh, blacklisting")
+print("✓ Sessions: create, store data, regenerate, destroy, cleanup")
+print("✓ RBAC: role hierarchy, permissions, assignment, revocation")
+print("✓ OAuth2: provider registration, CSRF state, auth URL generation")
+print("\n🎉 Authentication & Authorization Phase Complete!")

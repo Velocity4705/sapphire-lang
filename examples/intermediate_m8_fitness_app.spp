@@ -1,0 +1,74 @@
+import mobile
+
+# Intermediate M8: Fitness Tracker App
+print("=== M8: Fitness Tracker App ===")
+
+# --- App config (name, version, bundle_id) ---
+print("\n1. App Config")
+let config = mobile_app_config_create("FitTrack", "1.0.0", "com.example.fittrack")
+mobile_app_config_set_orientation(config, 0)
+mobile_app_config_add_permission(config, "sensors", "ACTIVITY_RECOGNITION")
+mobile_app_config_add_permission(config, "sensors", "BODY_SENSORS")
+
+# --- Create app ---
+let app = mobile_app_create(config)
+print("Platform: " + mobile_app_platform_name(app))
+
+# --- Screens: mobile_screen_create(name, type) ---
+print("\n2. Screens")
+let home    = mobile_screen_create("Home",    "main")
+let workout = mobile_screen_create("Workout", "detail")
+let profile = mobile_screen_create("Profile", "detail")
+mobile_screen_set_background(home,    "#1a1a2e")
+mobile_screen_set_background(workout, "#16213e")
+mobile_screen_set_background(profile, "#0f3460")
+print("Screens created: 3")
+
+# --- Components: mobile_component_create(type_int, id, text) ---
+# TEXT=2, BUTTON=1, PROGRESS_BAR=12
+print("\n3. Components")
+let title_label = mobile_component_create(2, "title", "Today's Goal: 10,000 steps")
+mobile_component_set_style_font(title_label, "bold", 18)
+mobile_component_set_style_color(title_label, "color", "#ffffff")
+
+let start_btn = mobile_component_create(1, "start_btn", "Start Workout")
+mobile_component_set_style_color(start_btn, "background", "#e94560")
+
+let progress = mobile_component_create(12, "progress", "")
+mobile_component_set_value(progress, 0.42)
+mobile_component_set_prop(progress, "color", "#00b4d8")
+
+print("Title:    " + mobile_component_get_text(title_label))
+print("Button:   " + mobile_component_get_text(start_btn))
+print("Progress: " + mobile_component_get_value(progress))
+
+# --- Layout ---
+print("\n4. Layout")
+let layout = mobile_layout_create(0)
+mobile_layout_set_spacing(layout, 16)
+mobile_layout_add_item(layout, title_label)
+mobile_layout_add_item(layout, progress)
+mobile_layout_add_item(layout, start_btn)
+mobile_screen_set_layout(home, layout)
+print("Layout JSON: " + mobile_layout_to_json(layout))
+
+# --- Navigation ---
+print("\n5. Navigation")
+let nav = mobile_nav_create()
+mobile_nav_push(nav, "Home")
+mobile_nav_push(nav, "Workout")
+print("Nav depth: " + mobile_nav_depth(nav))
+print("Current:   " + mobile_nav_current(nav))
+
+# --- Add screens ---
+mobile_app_add_screen(app, home)
+mobile_app_add_screen(app, workout)
+mobile_app_add_screen(app, profile)
+print("Screens: " + mobile_app_screen_count(app))
+
+# --- Export ---
+print("\n6. Export")
+let manifest = mobile_app_export_manifest(app)
+print("Manifest: " + manifest)
+
+print("\n=== FitTrack app ready ===")

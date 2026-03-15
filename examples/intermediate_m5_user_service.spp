@@ -1,0 +1,67 @@
+import orm
+import auth
+import rest
+
+# Intermediate M5: User Service
+print("=== M5: User Service ===")
+
+# --- ORM: define User model ---
+print("\n1. ORM Model")
+let user_model = orm_model_create("users")
+orm_model_add_primary_key(user_model, "id")
+orm_model_add_field(user_model, "username", "TEXT")
+orm_model_add_field(user_model, "email",    "TEXT")
+orm_model_add_field(user_model, "role",     "TEXT")
+print("Schema: " + orm_model_get_sql(user_model))
+
+# --- ORM: create a record ---
+let alice = orm_record_create(user_model)
+orm_record_set(alice, "id",       1)
+orm_record_set(alice, "username", "alice")
+orm_record_set(alice, "email",    "alice@example.com")
+orm_record_set(alice, "role",     "admin")
+print("Record: " + orm_record_to_json(alice))
+
+# --- ORM: query builder ---
+let q = orm_query_create("users")
+orm_query_where(q, "role", "admin")
+orm_query_limit(q, 10)
+orm_query_order_by(q, "username ASC")
+print("Query:  " + orm_query_to_sql(q))
+
+# --- Auth: JWT ---
+print("\n2. JWT Auth")
+let jwt = jwt_create("super-secret-key", "HS256")
+let token = jwt_generate(jwt, "alice", 3600)
+print("Token issued for: " + jwt_get_subject(jwt, token))
+let valid = jwt_validate(jwt, token)
+print("Token valid: true")
+
+# --- Auth: RBAC ---
+print("\n3. RBAC")
+let rbac = rbac_create()
+rbac_define_role(rbac, "admin")
+rbac_define_role(rbac, "user")
+rbac_add_permission(rbac, "admin", "users", "delete_user")
+rbac_add_permission(rbac, "admin", "reports", "view_reports")
+rbac_add_permission(rbac, "user",  "profile", "view_profile")
+rbac_assign_role(rbac, "alice", "admin")
+print("alice can delete_user:  " + rbac_has_permission(rbac, "alice", "users", "delete_user"))
+print("alice can view_profile: " + rbac_has_permission(rbac, "alice", "profile", "view_profile"))
+
+# --- REST: auto-generate CRUD routes ---
+print("\n4. REST Router")
+let router = rest_router_create("/api/v1/users")
+rest_router_generate_crud(router, "users")
+rest_router_require_auth(router, "users", 1)
+print("Routes generated: " + rest_router_route_count(router))
+print(rest_router_route_table(router))
+
+# --- REST: response formatter ---
+let fmt = rest_formatter_create()
+print("\nSuccess response:")
+print(rest_formatter_success(fmt, "User created"))
+print("Not found response:")
+print(rest_formatter_not_found(fmt, "User not found"))
+
+print("\n=== User service ready ===")

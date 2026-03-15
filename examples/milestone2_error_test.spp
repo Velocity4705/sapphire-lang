@@ -1,3 +1,4 @@
+import json
 print("=== Enhanced Error Handling Test ===")
 
 print("1. Testing basic error handling")

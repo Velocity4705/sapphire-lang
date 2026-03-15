@@ -165,3 +165,5 @@ editors/vscode/node_modules/
 editors/vscode/out/
 
 docs/ROADMAP.md
+
+test_all_examples.sh

@@ -1,0 +1,52 @@
+import blockchain
+import crypto
+
+# Intermediate M6: Token Ledger
+print("=== M6: Token Ledger ===")
+
+# --- Hash some data ---
+print("\n1. Cryptographic Hashing")
+let msg = "Transfer 50 tokens from Alice to Bob"
+let hash1 = bc_sha256(msg)
+let hash2 = bc_sha256_double(msg)
+print("SHA-256:        " + hash1)
+print("Double SHA-256: " + hash2)
+
+# --- Merkle tree ---
+print("\n2. Merkle Tree")
+let tree = bc_merkle_create()
+bc_merkle_add_leaf(tree, "Alice->Bob: 50")
+bc_merkle_add_leaf(tree, "Bob->Carol: 20")
+bc_merkle_add_leaf(tree, "Carol->Dave: 10")
+bc_merkle_add_leaf(tree, "Dave->Alice: 5")
+bc_merkle_build(tree)
+print("Leaves: " + bc_merkle_leaf_count(tree))
+print("Root:   " + bc_merkle_root(tree))
+
+# --- Chain with direct sender/receiver/amount ---
+print("\n3. Building Chain")
+let chain = bc_chain_create(2)
+bc_chain_add_tx(chain, "Alice", "Bob",   50.0)
+bc_chain_add_tx(chain, "Bob",   "Carol", 20.0)
+bc_chain_add_tx(chain, "Carol", "Dave",  10.0)
+print("Pending txs: " + bc_chain_pending_count(chain))
+
+# --- Mine ---
+print("\n4. Mining Block (difficulty 2)")
+bc_chain_mine_block(chain, "miner_alice")
+print("Blocks in chain: " + bc_chain_block_count(chain))
+print("Chain valid:     " + bc_chain_is_valid(chain))
+print("Last hash:       " + bc_chain_last_hash(chain))
+
+# --- Balances ---
+print("\n5. Balances")
+print("Alice:  " + bc_chain_get_balance(chain, "Alice"))
+print("Bob:    " + bc_chain_get_balance(chain, "Bob"))
+print("Carol:  " + bc_chain_get_balance(chain, "Carol"))
+print("Dave:   " + bc_chain_get_balance(chain, "Dave"))
+
+# --- Chain stats ---
+print("\n6. Stats")
+print(bc_chain_stats(chain))
+
+print("\n=== Ledger complete ===")

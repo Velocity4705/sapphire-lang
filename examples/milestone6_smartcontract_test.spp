@@ -1,0 +1,276 @@
+# Milestone 6 Phase 3: Smart Contract VM Test
+import smartcontract
+# Opcode constants (match Opcode enum in smartcontract.h)
+# Stack
+OP_PUSH  = 1
+OP_POP   = 2
+OP_DUP   = 3
+OP_SWAP  = 4
+# Arithmetic
+OP_ADD   = 16
+OP_SUB   = 17
+OP_MUL   = 18
+OP_DIV   = 19
+OP_MOD   = 20
+# Comparison
+OP_EQ    = 32
+OP_NEQ   = 33
+OP_LT    = 34
+OP_GT    = 35
+OP_LTE   = 36
+OP_GTE   = 37
+# Logic
+OP_AND   = 48
+OP_OR    = 49
+OP_NOT   = 50
+# Control
+OP_JUMP  = 64
+OP_JUMPI = 65
+OP_CALL  = 66
+OP_RETURN = 67
+OP_REVERT = 68
+OP_HALT  = 69
+# State
+OP_SLOAD  = 80
+OP_SSTORE = 81
+OP_MLOAD  = 82
+OP_MSTORE = 83
+# Context
+OP_CALLER      = 96
+OP_ORIGIN      = 97
+OP_VALUE       = 98
+OP_BALANCE     = 99
+OP_BLOCKNUMBER = 100
+OP_TIMESTAMP   = 101
+# Events
+OP_LOG0 = 112
+OP_LOG1 = 113
+OP_LOG2 = 114
+# Crypto
+OP_SHA256OP = 128
+# String
+OP_CONCAT = 144
+OP_STRLEN = 145
+
+print("=== Milestone 6 Phase 3: Smart Contract VM ===")
+print("")
+
+# ===== Create VM =====
+vm = sc_vm_create()
+print("VM created")
+
+# ===== Test 1: Arithmetic =====
+print("")
+print("--- Test 1: Arithmetic (10 + 5 * 2) ---")
+bc1 = sc_bytecode_create()
+sc_bytecode_push_int(bc1, 10)
+sc_bytecode_push_int(bc1, 5)
+sc_bytecode_push_int(bc1, 2)
+sc_bytecode_emit(bc1, OP_MUL)
+sc_bytecode_emit(bc1, OP_ADD)
+sc_bytecode_emit(bc1, OP_RETURN)
+
+ctx1 = sc_ctx_create("0xAlice", "0xContract1", 0, 1000000)
+res1 = sc_execute(vm, bc1, ctx1)
+print("Success: ")
+print(sc_result_success(res1))
+print("Result (expect 20): ")
+print(sc_result_return_value(res1))
+print("Gas used: ")
+print(sc_result_gas_used(res1))
+sc_result_destroy(res1)
+sc_bytecode_destroy(bc1)
+sc_ctx_destroy(ctx1)
+
+# ===== Test 2: State Storage (SSTORE/SLOAD) =====
+print("")
+print("--- Test 2: State Storage ---")
+bc2 = sc_bytecode_create()
+# Store "balance" = 1000
+sc_bytecode_push_str(bc2, "balance")
+sc_bytecode_push_int(bc2, 1000)
+sc_bytecode_emit(bc2, OP_SSTORE)
+# Load it back
+sc_bytecode_push_str(bc2, "balance")
+sc_bytecode_emit(bc2, OP_SLOAD)
+sc_bytecode_emit(bc2, OP_RETURN)
+
+ctx2 = sc_ctx_create("0xAlice", "0xTokenContract", 0, 1000000)
+res2 = sc_execute(vm, bc2, ctx2)
+print("Success: ")
+print(sc_result_success(res2))
+print("Stored+loaded balance (expect 1000): ")
+print(sc_result_return_value(res2))
+
+# Verify persisted in VM state
+stored = sc_vm_get_storage(vm, "0xTokenContract", "balance")
+print("Persisted in VM state: ")
+print(stored)
+sc_result_destroy(res2)
+sc_bytecode_destroy(bc2)
+sc_ctx_destroy(ctx2)
+
+# ===== Test 3: Conditional Logic (JUMPI) =====
+print("")
+print("--- Test 3: Conditional Branch ---")
+bc3 = sc_bytecode_create()
+# if 10 > 5: push "big" else push "small"
+sc_bytecode_push_int(bc3, 10)
+sc_bytecode_push_int(bc3, 5)
+sc_bytecode_emit(bc3, OP_GT)
+# JUMPI to "big_branch" if true
+sc_bytecode_jumpi(bc3, "big_branch")
+# else branch
+sc_bytecode_push_str(bc3, "small")
+sc_bytecode_emit(bc3, OP_RETURN)
+# big_branch label
+sc_bytecode_label(bc3, "big_branch")
+sc_bytecode_push_str(bc3, "big")
+sc_bytecode_emit(bc3, OP_RETURN)
+
+ctx3 = sc_ctx_create("0xAlice", "0xContract3", 0, 1000000)
+res3 = sc_execute(vm, bc3, ctx3)
+print("Success: ")
+print(sc_result_success(res3))
+print("Result (expect big): ")
+print(sc_result_return_value(res3))
+sc_result_destroy(res3)
+sc_bytecode_destroy(bc3)
+sc_ctx_destroy(ctx3)
+
+# ===== Test 4: Event Emission =====
+print("")
+print("--- Test 4: Event System ---")
+bc4 = sc_bytecode_create()
+# Emit Transfer event: LOG1(name, data, topic)
+sc_bytecode_push_str(bc4, "100")
+sc_bytecode_push_str(bc4, "0xAlice->0xBob")
+sc_bytecode_push_str(bc4, "Transfer")
+sc_bytecode_emit(bc4, OP_LOG1)
+# Emit Approval event
+sc_bytecode_push_str(bc4, "500")
+sc_bytecode_push_str(bc4, "0xAlice approved 0xBob")
+sc_bytecode_push_str(bc4, "Approval")
+sc_bytecode_emit(bc4, OP_LOG1)
+sc_bytecode_push_str(bc4, "ok")
+sc_bytecode_emit(bc4, OP_RETURN)
+
+ctx4 = sc_ctx_create("0xAlice", "0xERC20", 0, 1000000)
+sc_ctx_set_block(ctx4, 42, 1700000000)
+res4 = sc_execute(vm, bc4, ctx4)
+print("Success: ")
+print(sc_result_success(res4))
+event_count = sc_result_event_count(res4)
+print("Events emitted: ")
+print(event_count)
+ev0_name = sc_result_event_name(res4, 0)
+print("Event 0 name: ")
+print(ev0_name)
+ev0_data = sc_result_event_data(res4, 0)
+print("Event 0 data: ")
+print(ev0_data)
+ev1_name = sc_result_event_name(res4, 1)
+print("Event 1 name: ")
+print(ev1_name)
+sc_result_destroy(res4)
+sc_bytecode_destroy(bc4)
+sc_ctx_destroy(ctx4)
+
+# ===== Test 5: Blockchain Context Opcodes =====
+print("")
+print("--- Test 5: Blockchain Context ---")
+bc5 = sc_bytecode_create()
+sc_bytecode_emit(bc5, OP_CALLER)
+sc_bytecode_emit(bc5, OP_RETURN)
+
+ctx5 = sc_ctx_create("0xMiner42", "0xContract5", 100, 1000000)
+res5 = sc_execute(vm, bc5, ctx5)
+print("Caller (expect 0xMiner42): ")
+print(sc_result_return_value(res5))
+sc_result_destroy(res5)
+sc_bytecode_destroy(bc5)
+sc_ctx_destroy(ctx5)
+
+# ===== Test 6: Balance Management =====
+print("")
+print("--- Test 6: Balance Management ---")
+sc_vm_set_balance(vm, "0xAlice", 5000)
+sc_vm_set_balance(vm, "0xBob", 1000)
+
+bc6 = sc_bytecode_create()
+sc_bytecode_push_str(bc6, "0xAlice")
+sc_bytecode_emit(bc6, OP_BALANCE)
+sc_bytecode_emit(bc6, OP_RETURN)
+
+ctx6 = sc_ctx_create("0xAlice", "0xContract6", 0, 1000000)
+res6 = sc_execute(vm, bc6, ctx6)
+print("Alice balance (expect 5000): ")
+print(sc_result_return_value(res6))
+sc_result_destroy(res6)
+sc_bytecode_destroy(bc6)
+sc_ctx_destroy(ctx6)
+
+# ===== Test 7: SHA256 Opcode =====
+print("")
+print("--- Test 7: SHA256 Opcode ---")
+bc7 = sc_bytecode_create()
+sc_bytecode_push_str(bc7, "hello")
+sc_bytecode_emit(bc7, OP_SHA256OP)
+sc_bytecode_emit(bc7, OP_RETURN)
+
+ctx7 = sc_ctx_create("0xAlice", "0xContract7", 0, 1000000)
+res7 = sc_execute(vm, bc7, ctx7)
+print("SHA256('hello'): ")
+print(sc_result_return_value(res7))
+sc_result_destroy(res7)
+sc_bytecode_destroy(bc7)
+sc_ctx_destroy(ctx7)
+
+# ===== Test 8: REVERT (out of gas simulation) =====
+print("")
+print("--- Test 8: REVERT ---")
+bc8 = sc_bytecode_create()
+sc_bytecode_push_str(bc8, "insufficient balance")
+sc_bytecode_emit(bc8, OP_REVERT)
+
+ctx8 = sc_ctx_create("0xAlice", "0xContract8", 0, 1000000)
+res8 = sc_execute(vm, bc8, ctx8)
+print("Success (expect false): ")
+print(sc_result_success(res8))
+print("Revert reason: ")
+print(sc_result_revert_reason(res8))
+sc_result_destroy(res8)
+sc_bytecode_destroy(bc8)
+sc_ctx_destroy(ctx8)
+
+# ===== Test 9: Gas metering (out of gas) =====
+print("")
+print("--- Test 9: Gas Metering ---")
+bc9 = sc_bytecode_create()
+sc_bytecode_push_int(bc9, 1)
+sc_bytecode_push_int(bc9, 2)
+sc_bytecode_emit(bc9, OP_ADD)
+sc_bytecode_emit(bc9, OP_RETURN)
+
+# Very low gas limit
+ctx9 = sc_ctx_create("0xAlice", "0xContract9", 0, 3)
+res9 = sc_execute(vm, bc9, ctx9)
+print("Out of gas (expect false): ")
+print(sc_result_success(res9))
+print("Reason: ")
+print(sc_result_revert_reason(res9))
+sc_result_destroy(res9)
+sc_bytecode_destroy(bc9)
+sc_ctx_destroy(ctx9)
+
+# ===== State dump =====
+print("")
+print("--- VM State Dump ---")
+state = sc_vm_state_dump(vm)
+print("State: ")
+print(state)
+
+sc_vm_destroy(vm)
+
+print("")
+print("=== Milestone 6 Phase 3 Smart Contract VM Tests Complete ===")

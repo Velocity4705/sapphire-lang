@@ -1,0 +1,52 @@
+import plotting
+import math
+
+# Intermediate M3: Monthly Sales Chart
+print("=== M3: Monthly Sales Chart ===")
+
+let months  = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+let revenue = [4200, 3800, 5100, 6300, 7200, 8100, 7600, 8900, 9400, 8700, 9800, 11200]
+
+# Compute stats
+let total = 0
+let n = len(revenue)
+let i = 0
+while i < n:
+    total = total + revenue[i]
+    i = i + 1
+let avg = total / n
+print("Total annual revenue: " + total)
+print("Monthly average:      " + avg)
+
+# Line chart (type 0 = line)
+let line = plot_create(0, 800, 600)
+plot_add_line(line, months, revenue, "Monthly Revenue")
+plot_set_title(line, "Annual Revenue Trend")
+plot_set_xlabel(line, "Month")
+plot_set_ylabel(line, "Revenue ($)")
+plot_save_svg(line, "revenue_trend.svg")
+print("Line chart saved: revenue_trend.svg")
+
+# Bar chart (type 1 = bar)
+let bar = plot_create(1, 800, 600)
+plot_add_bar(bar, months, revenue, "Revenue by Month")
+plot_set_title(bar, "Revenue by Month")
+plot_set_xlabel(bar, "Month")
+plot_set_ylabel(bar, "Revenue ($)")
+plot_save_svg(bar, "revenue_bar.svg")
+print("Bar chart saved:  revenue_bar.svg")
+
+# Scatter: sqrt of revenue (type 2 = scatter)
+let sqrt_rev = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+i = 0
+while i < n:
+    sqrt_rev[i] = math_sqrt(revenue[i])
+    i = i + 1
+
+let scatter = plot_create(2, 800, 600)
+plot_add_scatter(scatter, months, sqrt_rev, "sqrt(Revenue)")
+plot_set_title(scatter, "Revenue Growth Curve")
+plot_save_svg(scatter, "revenue_growth.svg")
+print("Scatter chart saved: revenue_growth.svg")
+
+print("\n=== Charts generated ===")

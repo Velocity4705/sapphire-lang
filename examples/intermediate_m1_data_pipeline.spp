@@ -1,0 +1,73 @@
+import collections
+import math
+import csv
+
+# Intermediate M1: Student Grade Pipeline
+# Loads scores, computes stats, writes a report CSV
+
+print("=== M1: Student Grade Pipeline ===")
+
+# --- Raw scores ---
+let scores = [72, 88, 95, 61, 79, 84, 90, 55, 68, 77]
+print("Scores: " + scores)
+print("Count:  " + len(scores))
+
+# --- Stats via math module ---
+let total = 0
+let i = 0
+while i < len(scores)
+    total = total + scores[i]
+    i = i + 1
+
+let avg = total / len(scores)
+print("Sum:    " + total)
+print("Avg:    " + avg)
+
+let sq_sum = 0.0
+i = 0
+while i < len(scores)
+    let diff = scores[i] - avg
+    sq_sum = sq_sum + math_pow(diff, 2)
+    i = i + 1
+
+let stddev = math_sqrt(sq_sum / len(scores))
+print("StdDev: " + stddev)
+
+# --- Grade assignment ---
+print("\nGrade breakdown:")
+let grade_a = 0
+let grade_b = 0
+let grade_c = 0
+let grade_f = 0
+
+i = 0
+while i < len(scores)
+    let s = scores[i]
+    if s >= 90
+        grade_a = grade_a + 1
+    else
+        if s >= 80
+            grade_b = grade_b + 1
+        else
+            if s >= 70
+                grade_c = grade_c + 1
+            else
+                grade_f = grade_f + 1
+    i = i + 1
+
+print("  A (90+): " + grade_a)
+print("  B (80+): " + grade_b)
+print("  C (70+): " + grade_c)
+print("  F (<70): " + grade_f)
+
+# --- Write report to CSV ---
+let report = csv_create()
+csv_add_row(report, "score,grade")
+csv_add_row(report, "90+,A")
+csv_add_row(report, "80-89,B")
+csv_add_row(report, "70-79,C")
+csv_add_row(report, "below 70,F")
+csv_write_file(report, "grade_report.csv")
+print("\nReport saved to grade_report.csv")
+
+print("\n=== Pipeline complete ===")

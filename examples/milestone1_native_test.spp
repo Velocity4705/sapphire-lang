@@ -1,3 +1,5 @@
+import collections
+import math
 # Milestone 1: Data Science Foundation - Native Implementation Test
 print("=== MILESTONE 1: NATIVE FEATURES TEST ===")
 print("")

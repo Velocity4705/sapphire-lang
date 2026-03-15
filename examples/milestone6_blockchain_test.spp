@@ -1,0 +1,177 @@
+# Milestone 6: Blockchain Foundation Test
+import blockchain
+# Tests: SHA-256, Merkle Tree, Transactions, PoW, Chain, PoS, P2P
+
+print("=== Milestone 6: Blockchain Foundation ===")
+print("")
+
+# ===== SHA-256 =====
+print("--- SHA-256 Hashing ---")
+h1 = bc_sha256("Hello, Sapphire!")
+print("SHA-256: ")
+print(h1)
+
+h2 = bc_sha256_double("double hash test")
+print("SHA-256 double: ")
+print(h2)
+
+h_empty = bc_sha256("")
+print("SHA-256 empty: ")
+print(h_empty)
+
+# ===== Merkle Tree =====
+print("")
+print("--- Merkle Tree ---")
+tree = bc_merkle_create()
+bc_merkle_add_leaf(tree, "tx1")
+bc_merkle_add_leaf(tree, "tx2")
+bc_merkle_add_leaf(tree, "tx3")
+bc_merkle_add_leaf(tree, "tx4")
+root = bc_merkle_build(tree)
+print("Merkle root: ")
+print(root)
+leaf_count = bc_merkle_leaf_count(tree)
+print("Leaf count: ")
+print(leaf_count)
+
+# ===== Standalone Transaction =====
+print("")
+print("--- Standalone Transaction ---")
+tx = bc_tx_create("Alice", "Bob", 50.0, "payment")
+tx_id = bc_tx_id(tx)
+print("TX ID: ")
+print(tx_id)
+tx_hash = bc_tx_hash(tx)
+print("TX hash: ")
+print(tx_hash)
+tx_str = bc_tx_to_string(tx)
+print("TX info: ")
+print(tx_str)
+
+# ===== Standalone Block (PoW) =====
+print("")
+print("--- Standalone Block Mining (PoW) ---")
+genesis_hash = bc_sha256("genesis")
+block = bc_block_create(1, genesis_hash, 2)
+bc_block_add_tx(block, tx)
+print("Mining block (difficulty=2)...")
+bc_block_mine(block)
+blk_hash = bc_block_hash(block)
+print("Block hash: ")
+print(blk_hash)
+blk_nonce = bc_block_nonce(block)
+print("Nonce: ")
+print(blk_nonce)
+blk_valid = bc_block_is_valid(block)
+print("Block valid: ")
+print(blk_valid)
+blk_tx_count = bc_block_tx_count(block)
+print("TX count: ")
+print(blk_tx_count)
+blk_merkle = bc_block_merkle_root(block)
+print("Merkle root: ")
+print(blk_merkle)
+
+# ===== Blockchain Chain (PoW) =====
+print("")
+print("--- Blockchain Chain (PoW) ---")
+chain = bc_chain_create(2, 0)
+block_count = bc_chain_block_count(chain)
+print("Initial blocks (genesis): ")
+print(block_count)
+
+# Add transactions
+tx_id1 = bc_chain_add_tx(chain, "Alice", "Bob", 100.0, "transfer")
+print("Added TX: ")
+print(tx_id1)
+tx_id2 = bc_chain_add_tx(chain, "Bob", "Carol", 30.0, "payment")
+print("Added TX: ")
+print(tx_id2)
+
+pending = bc_chain_pending_count(chain)
+print("Pending TX: ")
+print(pending)
+
+# Mine block
+mined = bc_chain_mine_block(chain, "Miner1")
+print("Block mined: ")
+print(mined)
+
+block_count2 = bc_chain_block_count(chain)
+print("Block count after mining: ")
+print(block_count2)
+
+# Check balances
+alice_bal = bc_chain_get_balance(chain, "Alice")
+print("Alice balance: ")
+print(alice_bal)
+bob_bal = bc_chain_get_balance(chain, "Bob")
+print("Bob balance: ")
+print(bob_bal)
+carol_bal = bc_chain_get_balance(chain, "Carol")
+print("Carol balance: ")
+print(carol_bal)
+
+# Validate chain
+valid = bc_chain_is_valid(chain)
+print("Chain valid: ")
+print(valid)
+
+last_hash = bc_chain_last_hash(chain)
+print("Last block hash: ")
+print(last_hash)
+
+stats = bc_chain_stats(chain)
+print("Chain stats: ")
+print(stats)
+
+# ===== PoS Consensus =====
+print("")
+print("--- Proof of Stake (PoS) ---")
+pos_chain = bc_chain_create(1, 1)
+bc_chain_add_validator(pos_chain, "Validator_A", 1000.0)
+bc_chain_add_validator(pos_chain, "Validator_B", 500.0)
+bc_chain_add_validator(pos_chain, "Validator_C", 2000.0)
+selected = bc_chain_select_validator(pos_chain)
+print("Selected validator: ")
+print(selected)
+
+# ===== P2P Network =====
+print("")
+print("--- P2P Network Simulation ---")
+net = bc_p2p_create()
+node1 = bc_p2p_add_node(net, "192.168.1.1", 8333)
+print("Node 1: ")
+print(node1)
+node2 = bc_p2p_add_node(net, "192.168.1.2", 8333)
+print("Node 2: ")
+print(node2)
+node3 = bc_p2p_add_node(net, "192.168.1.3", 8333)
+print("Node 3: ")
+print(node3)
+
+node_count = bc_p2p_node_count(net)
+print("Total nodes: ")
+print(node_count)
+
+conn1 = bc_p2p_connect(net, node1)
+print("Node1 connected: ")
+print(conn1)
+conn2 = bc_p2p_connect(net, node2)
+print("Node2 connected: ")
+print(conn2)
+
+connected = bc_p2p_connected_count(net)
+print("Connected nodes: ")
+print(connected)
+
+# Broadcast
+bc_p2p_broadcast_block(net, node1, blk_hash)
+bc_p2p_broadcast_tx(net, node2, tx_id1)
+
+status = bc_p2p_status(net)
+print("Network status: ")
+print(status)
+
+print("")
+print("=== Milestone 6 Blockchain Tests Complete ===")

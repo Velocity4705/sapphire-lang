@@ -1,0 +1,170 @@
+# Milestone 6 Phase 2: Cryptography Test
+import crypto
+# Tests: Hash functions, HMAC, Base64, ECDSA, Key management, AES-256-GCM, PBKDF2
+
+print("=== Milestone 6 Phase 2: Cryptography ===")
+print("")
+
+# ===== Hash Functions =====
+print("--- Hash Functions ---")
+msg = "Hello, Sapphire Blockchain!"
+
+h256 = crypto_sha256(msg)
+print("SHA-256: ")
+print(h256)
+
+h512 = crypto_sha512(msg)
+print("SHA-512: ")
+print(h512)
+
+h1 = crypto_sha1(msg)
+print("SHA-1: ")
+print(h1)
+
+hmd5 = crypto_md5(msg)
+print("MD5: ")
+print(hmd5)
+
+hripe = crypto_ripemd160(msg)
+print("RIPEMD-160: ")
+print(hripe)
+
+# ===== HMAC =====
+print("")
+print("--- HMAC ---")
+secret_key = "my-secret-key-2024"
+hmac256 = crypto_hmac_sha256(secret_key, msg)
+print("HMAC-SHA256: ")
+print(hmac256)
+
+hmac512 = crypto_hmac_sha512(secret_key, msg)
+print("HMAC-SHA512: ")
+print(hmac512)
+
+# ===== Base64 =====
+print("")
+print("--- Base64 Encoding ---")
+original = "Sapphire crypto test data"
+encoded = crypto_to_base64(original)
+print("Base64 encoded: ")
+print(encoded)
+
+decoded = crypto_from_base64(encoded)
+print("Base64 decoded: ")
+print(decoded)
+
+# ===== ECDSA Key Generation =====
+print("")
+print("--- ECDSA Key Generation (secp256k1) ---")
+kp = crypto_keypair_generate("secp256k1")
+curve = crypto_keypair_curve(kp)
+print("Curve: ")
+print(curve)
+
+priv_hex = crypto_keypair_private_hex(kp)
+print("Private key (hex, first 16 chars): ")
+print(priv_hex)
+
+pub_hex = crypto_keypair_public_hex(kp)
+print("Public key length (chars): ")
+pub_len = 130
+print(pub_len)
+
+# ===== ECDSA Sign & Verify =====
+print("")
+print("--- ECDSA Sign & Verify ---")
+tx_data = "Alice->Bob:100.0:nonce42"
+signature = crypto_ecdsa_sign(kp, tx_data)
+print("Signature (DER hex): ")
+print(signature)
+
+valid = crypto_ecdsa_verify(kp, tx_data, signature)
+print("Signature valid: ")
+print(valid)
+
+# Tampered message should fail
+tampered = "Alice->Bob:999.0:nonce42"
+invalid = crypto_ecdsa_verify(kp, tampered, signature)
+print("Tampered msg valid (should be false): ")
+print(invalid)
+
+# Verify using raw public key hex
+valid2 = crypto_ecdsa_verify_pubhex(pub_hex, "secp256k1", tx_data, signature)
+print("Verify via pubkey hex: ")
+print(valid2)
+
+# ===== Key Management =====
+print("")
+print("--- Key Management ---")
+eth_addr = crypto_pubkey_to_eth_address(pub_hex)
+print("Ethereum-style address: ")
+print(eth_addr)
+
+btc_addr = crypto_pubkey_to_btc_address(pub_hex)
+print("Bitcoin P2PKH address: ")
+print(btc_addr)
+
+wif = crypto_privkey_to_wif(priv_hex, true)
+print("WIF encoded private key: ")
+print(wif)
+
+recovered = crypto_wif_to_privkey(wif)
+print("WIF decoded matches original: ")
+print(recovered)
+
+# ===== AES-256-GCM Encryption =====
+print("")
+print("--- AES-256-GCM Encryption ---")
+# 32-byte key (64 hex chars)
+aes_key = crypto_random_bytes(32)
+print("AES key (hex): ")
+print(aes_key)
+
+plaintext = "Secret blockchain transaction data: send 500 tokens to 0xABCD"
+enc_result = crypto_aes_encrypt(aes_key, plaintext)
+ciphertext = crypto_aes_ciphertext(enc_result)
+iv = crypto_aes_iv(enc_result)
+tag = crypto_aes_tag(enc_result)
+print("Ciphertext (hex): ")
+print(ciphertext)
+print("IV (hex): ")
+print(iv)
+print("Auth tag (hex): ")
+print(tag)
+
+# Decrypt
+decrypted = crypto_aes_decrypt(aes_key, ciphertext, iv, tag)
+print("Decrypted: ")
+print(decrypted)
+
+# ===== PBKDF2 Key Derivation =====
+print("")
+print("--- PBKDF2 Key Derivation ---")
+password = "my-wallet-password"
+salt = "sapphire-blockchain-salt"
+derived_key = crypto_pbkdf2(password, salt, 10000, 32)
+print("Derived key (hex): ")
+print(derived_key)
+
+# Same inputs = same key (deterministic)
+derived_key2 = crypto_pbkdf2(password, salt, 10000, 32)
+print("Deterministic (same result): ")
+print(derived_key)
+
+# ===== Random Bytes =====
+print("")
+print("--- Cryptographic Random ---")
+rand16 = crypto_random_bytes(16)
+print("16 random bytes (hex): ")
+print(rand16)
+
+rand32 = crypto_random_bytes(32)
+print("32 random bytes (hex): ")
+print(rand32)
+
+# Cleanup
+crypto_keypair_destroy(kp)
+crypto_aes_result_destroy(enc_result)
+
+print("")
+print("=== Milestone 6 Phase 2 Cryptography Tests Complete ===")

@@ -1,0 +1,136 @@
+import gui
+
+# ===== Window System Test =====
+# Tests the actual windowing, drawing, and input system.
+# In headless mode (no display) it verifies the API works without crashing.
+# With a display it opens a real window and renders for a few frames.
+
+print("=== GUI Window System Test ===")
+
+# Init
+ok = gui_init()
+print("gui_init:")
+print(ok)
+has_disp = gui_has_display()
+print("has_display:")
+print(has_disp)
+
+# Create window
+win = gui_window_create("Sapphire GUI Test", 800, 600)
+print("window created (handle != 0):")
+print(win)
+
+# Properties
+print("title:")
+print(gui_window_title(win))
+print("width:")
+print(gui_window_width(win))
+print("height:")
+print(gui_window_height(win))
+print("is_open:")
+print(gui_window_is_open(win))
+print("is_fullscreen:")
+print(gui_window_is_fullscreen(win))
+
+# Show window
+gui_window_show(win)
+
+# Resize
+gui_window_resize(win, 1024, 768)
+print("width after resize:")
+print(gui_window_width(win))
+print("height after resize:")
+print(gui_window_height(win))
+
+# Set title
+gui_window_set_title(win, "Sapphire App")
+print("title after set:")
+print(gui_window_title(win))
+
+# Key scancode lookup
+key_esc = gui_key("escape")
+key_space = gui_key("space")
+key_up = gui_key("up")
+print("escape scancode:")
+print(key_esc)
+print("space scancode:")
+print(key_space)
+print("up scancode:")
+print(key_up)
+
+# Run a few frames
+print("Running 3 frames...")
+frame = 0
+while frame < 3:
+    gui_window_poll(win)
+
+    # Clear to dark blue
+    gui_clear(win, 20, 30, 60)
+
+    # Set draw color and draw shapes
+    gui_set_color(win, 255, 255, 0, 255)
+    gui_draw_rect(win, 10, 10, 200, 100)
+
+    gui_set_color(win, 0, 255, 0, 255)
+    gui_fill_rect(win, 50, 50, 100, 60)
+
+    gui_set_color(win, 255, 0, 0, 255)
+    gui_draw_circle(win, 400, 300, 80)
+
+    gui_set_color(win, 0, 200, 255, 255)
+    gui_fill_circle(win, 600, 200, 40)
+
+    gui_set_color(win, 255, 128, 0, 255)
+    gui_draw_line(win, 0, 0, 800, 600)
+    gui_draw_line(win, 800, 0, 0, 600)
+
+    gui_set_color(win, 200, 200, 200, 255)
+    gui_draw_triangle(win, 100, 500, 200, 400, 300, 500)
+
+    gui_set_color(win, 180, 100, 255, 255)
+    gui_fill_triangle(win, 400, 500, 500, 400, 600, 500)
+
+    gui_set_color(win, 255, 255, 255, 255)
+    gui_draw_point(win, 400, 300)
+
+    # Text
+    gui_draw_text(win, "Sapphire GUI", 300, 20, 32, 255, 255, 255)
+    gui_draw_text(win, "Frame:", 10, 560, 18, 200, 200, 200)
+
+    # Mouse state (headless: always 0,0)
+    mx = gui_mouse_x(win)
+    my = gui_mouse_y(win)
+
+    # Key state
+    esc_down = gui_key_down(win, key_esc)
+
+    gui_present(win)
+
+    dt = gui_delta_time(win)
+
+    frame = frame + 1
+
+print("Frames rendered:")
+print(frame)
+
+# Text metrics
+tw = gui_text_width(win, "Hello World", 24)
+th = gui_text_height(win, 24)
+print("text_width Hello World 24px:")
+print(tw)
+print("text_height 24px:")
+print(th)
+
+# Ticks
+t = gui_ticks()
+print("ticks >= 0:")
+print(t)
+
+# Close
+gui_window_close(win)
+print("is_open after close:")
+print(gui_window_is_open(win))
+
+gui_window_destroy(win)
+gui_quit()
+print("=== Window System Test PASSED ===")

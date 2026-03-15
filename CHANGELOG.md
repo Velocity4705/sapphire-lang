@@ -2,9 +2,9 @@
 
 All notable changes to Sapphire will be documented in this file.
 
-## [1.0-beta.4] - 2026-03-13
+## [1.0-beta.5] - 2026-03-13
 
-### 🚀 v1.0-beta.4 - Web Development Foundation Complete (Milestone 4)
+### 🚀 v1.0-beta.5 - Web Development Foundation Complete (Milestone 4)
 
 Complete web development platform with HTTP, WebSocket, templating, and database support.
 

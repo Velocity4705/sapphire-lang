@@ -1,0 +1,47 @@
+import security
+
+# Intermediate M7: Security Platform
+print("=== M7: Security Platform ===")
+
+# --- Vulnerability scanner ---
+print("\n1. Host Scanner")
+let scanner = sec_scanner_create()
+print("Vuln DB size: " + sec_scanner_vuln_db_size(scanner))
+let result = sec_scanner_scan_host(scanner, "127.0.0.1", "22,80,443,8080")
+print("Target:      " + sec_scanresult_target(result))
+print("Reachable:   " + sec_scanresult_reachable(result))
+print("Open ports:  " + sec_scanresult_open_ports(result))
+print("Vulns found: " + sec_scanresult_vuln_count(result))
+
+# --- Web security tester ---
+print("\n2. Web Security Tests")
+let tester = sec_web_tester_create()
+let sqli_result  = sec_web_test_sqli(tester, "http://localhost:8080/login", "username")
+print("SQLi test complete")
+let xss_result   = sec_web_test_xss(tester, "http://localhost:8080/search", "q")
+print("XSS test complete")
+let path_result  = sec_web_test_path_traversal(tester, "http://localhost:8080/file", "path")
+print("Path traversal test complete")
+
+# --- Full web scan ---
+print("\n3. Full Web Scan")
+let scan = sec_web_scan(tester, "http://localhost:8080")
+print("Findings: " + sec_webscan_finding_count(scan))
+let fi = 0
+let nf = sec_webscan_finding_count(scan)
+while fi < 3:
+    print("  [" + sec_webscan_finding_severity(scan, fi) + "] " + sec_webscan_finding_name(scan, fi))
+    fi = fi + 1
+
+# --- Malware analyzer ---
+print("\n4. Static Analysis")
+let analyzer = sec_malware_analyzer_create()
+sec_malware_add_yara_rule(analyzer, "suspicious_eval", "rule suspicious { strings: $s = \"eval(\" condition: $s }")
+let static_res = sec_malware_static_analysis(analyzer, "examples/hello.spp")
+print("Threat level: " + sec_static_result_threat_level(static_res))
+print("File type:    " + sec_static_result_file_type(static_res))
+print("SHA-256:      " + sec_static_result_sha256(static_res))
+print("Entropy:      " + sec_static_result_entropy(static_res))
+print("Suspicious:   " + sec_static_result_suspicious_count(static_res))
+
+print("\n=== Security scan complete ===")

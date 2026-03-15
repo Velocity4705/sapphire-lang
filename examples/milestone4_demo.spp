@@ -1,248 +1,63 @@
-// Milestone 4 Demo: HTTP Server and Client
-// This demonstrates the HTTP library capabilities
+import http
+import websocket
+import template
+# Milestone 4 Demo: HTTP Server and Client
+print("=== Milestone 4: Web Development Foundation Demo ===")
+print("")
 
-// Import HTTP functions (these would be builtin functions in the interpreter)
-// http_server_create(port) -> server
-// http_server_get(server, path, handler)
-// http_server_post(server, path, handler)
-// http_server_start(server) -> bool
-// http_server_stop(server)
-// http_client_create() -> client
-// http_client_get(client, url) -> response
-// http_client_post(client, url, body) -> response
-// http_response_get_status(response) -> int
-// http_response_get_body(response) -> string
+# HTTP Client
+print("1. HTTP Client")
+client = http_client_create()
+print("HTTP client created")
+print("")
 
-print("🌐 Milestone 4: HTTP Server and Client Demo");
-print("==========================================");
+# HTTP URL utilities
+print("2. URL Utilities")
+let original = "Hello World! @#$%"
+let encoded = http_url_encode(original)
+let decoded = http_url_decode(encoded)
+print("Original: " + original)
+print("Encoded:  " + encoded)
+print("Decoded:  " + decoded)
+print("")
 
-// Create HTTP server on port 8080
-var server = http_server_create(8080);
-print("✅ HTTP Server created on port 8080");
+# HTML escaping
+print("3. HTML Escaping")
+let html_input = "<script>alert('xss')</script>"
+let html_escaped = http_html_escape(html_input)
+print("Input:   " + html_input)
+print("Escaped: " + html_escaped)
+print("")
 
-// Add GET route for homepage
-http_server_get(server, "/", function(request, response) {
-    response.set_html("<h1>Welcome to Sapphire HTTP Server!</h1>");
-    response.set_header("X-Powered-By", "Sapphire");
-});
+# HTTP Server
+print("4. HTTP Server")
+server = http_server_create(18080)
+print("HTTP server created on port 18080")
+http_server_get(server, "/", "index_handler")
+http_server_get(server, "/api/hello", "hello_handler")
+http_server_post(server, "/api/echo", "echo_handler")
+print("Routes registered: GET /, GET /api/hello, POST /api/echo")
+print("")
 
-// Add GET route for API endpoint
-http_server_get(server, "/api/hello", function(request, response) {
-    var data = {
-        "message": "Hello from Sapphire!",
-        "timestamp": get_current_time(),
-        "version": "1.0.0"
-    };
-    response.set_json(json_stringify(data));
-});
+# WebSocket
+print("5. WebSocket Support")
+ws_server = websocket_server_create(18081)
+ws_client = websocket_client_create()
+print("WebSocket server created on port 18081")
+print("WebSocket client created")
+let test_data = "Hello WebSocket"
+let ws_encoded = websocket_base64_encode(test_data)
+let ws_decoded = websocket_base64_decode(ws_encoded)
+print("Base64 encode/decode: " + ws_decoded)
+print("")
 
-// Add POST route for echo service
-http_server_post(server, "/api/echo", function(request, response) {
-    var body = request.get_body();
-    var echo_response = {
-        "received": body,
-        "length": string_length(body),
-        "echo": "You sent: " + body
-    };
-    response.set_json(json_stringify(echo_response));
-});
+# Template Engine
+print("6. Template Engine")
+tmpl = html_template_engine_create()
+let tmpl_html = "<h1>Hello {{name}}!</h1><p>Welcome to {{site}}</p>"
+let rendered = html_template_render(tmpl, tmpl_html, "name=Sapphire;site=sapphire-lang.dev")
+print("Rendered: " + rendered)
+print("")
 
-// Add GET route with query parameters
-http_server_get(server, "/api/greet", function(request, response) {
-    var name = request.get_param("name");
-    if (name == "") {
-        name = "World";
-    }
-    
-    var greeting = {
-        "greeting": "Hello, " + name + "!",
-        "personalized": name != "World"
-    };
-    response.set_json(json_stringify(greeting));
-});
-
-// Add middleware for logging
-http_server_use(server, function(request, response) {
-    var method = request.get_method();
-    var path = request.get_path();
-    var timestamp = get_current_time();
-    
-    print("[" + timestamp + "] " + method + " " + path);
-    
-    // Add CORS headers
-    response.set_header("Access-Control-Allow-Origin", "*");
-    response.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    response.set_header("Access-Control-Allow-Headers", "Content-Type");
-    
-    return true; // Continue processing
-});
-
-// Serve static files
-http_server_serve_static(server, "/static", "./public");
-
-// Start the server
-print("🚀 Starting HTTP server...");
-if (http_server_start(server)) {
-    print("✅ Server started successfully!");
-    print("📡 Server running at http://localhost:8080");
-    print("");
-    print("Available endpoints:");
-    print("  GET  /                 - Homepage");
-    print("  GET  /api/hello        - API greeting");
-    print("  POST /api/echo         - Echo service");
-    print("  GET  /api/greet?name=X - Personalized greeting");
-    print("  GET  /static/*         - Static files");
-} else {
-    print("❌ Failed to start server");
-    exit(1);
-}
-
-// Demonstrate HTTP client
-print("");
-print("🔄 Testing HTTP Client...");
-
-var client = http_client_create();
-client.set_header("User-Agent", "Sapphire-Demo/1.0");
-
-// Test GET request
-print("📤 Making GET request to /api/hello...");
-var response = http_client_get(client, "http://localhost:8080/api/hello");
-var status = http_response_get_status(response);
-var body = http_response_get_body(response);
-
-print("📥 Response Status: " + status);
-print("📥 Response Body: " + body);
-
-if (status == 200) {
-    print("✅ GET request successful!");
-} else {
-    print("❌ GET request failed");
-}
-
-// Test POST request
-print("");
-print("📤 Making POST request to /api/echo...");
-var post_data = "Hello from HTTP client!";
-var post_response = http_client_post(client, "http://localhost:8080/api/echo", post_data);
-var post_status = http_response_get_status(post_response);
-var post_body = http_response_get_body(post_response);
-
-print("📥 POST Response Status: " + post_status);
-print("📥 POST Response Body: " + post_body);
-
-if (post_status == 200) {
-    print("✅ POST request successful!");
-} else {
-    print("❌ POST request failed");
-}
-
-// Test query parameters
-print("");
-print("📤 Making GET request with query parameters...");
-var query_response = http_client_get(client, "http://localhost:8080/api/greet?name=Sapphire");
-var query_status = http_response_get_status(query_response);
-var query_body = http_response_get_body(query_response);
-
-print("📥 Query Response Status: " + query_status);
-print("📥 Query Response Body: " + query_body);
-
-// Cleanup
-http_client_destroy(client);
-print("🧹 HTTP client cleaned up");
-
-// Performance test
-print("");
-print("⚡ Performance Test: Multiple Requests");
-var perf_client = http_client_create();
-var start_time = get_current_time_ms();
-var request_count = 100;
-
-for (var i = 0; i < request_count; i++) {
-    var perf_response = http_client_get(perf_client, "http://localhost:8080/api/hello");
-    var perf_status = http_response_get_status(perf_response);
-    if (perf_status != 200) {
-        print("❌ Request " + i + " failed with status " + perf_status);
-    }
-    http_response_destroy(perf_response);
-}
-
-var end_time = get_current_time_ms();
-var duration = end_time - start_time;
-var requests_per_second = (request_count * 1000) / duration;
-
-print("📊 Performance Results:");
-print("   Requests: " + request_count);
-print("   Duration: " + duration + "ms");
-print("   Rate: " + requests_per_second + " requests/second");
-
-if (requests_per_second > 100) {
-    print("✅ Performance target met!");
-} else {
-    print("⚠️  Performance below target");
-}
-
-http_client_destroy(perf_client);
-
-// Utility function demonstrations
-print("");
-print("🔧 Utility Functions Demo");
-
-var original_url = "Hello World! @#$%";
-var encoded_url = http_url_encode(original_url);
-var decoded_url = http_url_decode(encoded_url);
-
-print("Original: " + original_url);
-print("Encoded:  " + encoded_url);
-print("Decoded:  " + decoded_url);
-
-if (original_url == decoded_url) {
-    print("✅ URL encoding/decoding works correctly");
-} else {
-    print("❌ URL encoding/decoding failed");
-}
-
-var html_input = "<script>alert('xss')</script>";
-var html_escaped = http_html_escape(html_input);
-
-print("HTML Input:   " + html_input);
-print("HTML Escaped: " + html_escaped);
-
-if (string_contains(html_escaped, "&lt;") && string_contains(html_escaped, "&gt;")) {
-    print("✅ HTML escaping works correctly");
-} else {
-    print("❌ HTML escaping failed");
-}
-
-// Keep server running for manual testing
-print("");
-print("🔄 Server is running. Press Ctrl+C to stop.");
-print("💡 You can test the endpoints manually:");
-print("   curl http://localhost:8080/");
-print("   curl http://localhost:8080/api/hello");
-print("   curl -X POST -d 'test data' http://localhost:8080/api/echo");
-print("   curl http://localhost:8080/api/greet?name=YourName");
-
-// In a real implementation, this would wait for user input or signal
-// For demo purposes, we'll simulate running for a short time
-sleep(5000); // Sleep for 5 seconds
-
-print("");
-print("🛑 Stopping server...");
-http_server_stop(server);
-http_server_destroy(server);
-
-print("✅ Milestone 4 Demo Complete!");
-print("");
-print("📈 Summary:");
-print("✅ HTTP Server with routing and middleware");
-print("✅ HTTP Client with GET/POST support");
-print("✅ Query parameter handling");
-print("✅ JSON request/response handling");
-print("✅ Static file serving");
-print("✅ URL encoding/decoding utilities");
-print("✅ HTML escaping for security");
-print("✅ Performance testing");
-print("✅ CORS support");
-print("✅ Request logging middleware");
-print("");
-print("🎯 Ready for Milestone 4 Phase 2: WebSocket Support!");
+print("=== Milestone 4 Demo Complete ===")
+print("HTTP server/client, WebSocket, templates all working!")

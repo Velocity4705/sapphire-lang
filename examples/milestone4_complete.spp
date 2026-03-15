@@ -1,3 +1,7 @@
+import http
+import websocket
+import template
+import database
 // Milestone 4: Web Development Foundation - Complete Demo
 print("=== Milestone 4: Web Development Foundation ===")
 

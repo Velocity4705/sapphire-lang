@@ -1,3 +1,4 @@
+import random
 print("=== Random Numbers Test ===")
 
 print("1. Setting random seed for reproducible results")

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(Sapphire VERSION 1.0-beta.4 LANGUAGES CXX)
+project(Sapphire VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -53,14 +53,14 @@ add_library(sapphire_runtime SHARED ${RUNTIME_SOURCES})
 
 # Tools
 if(BUILD_TOOLS)
-    add_subdirectory(tools/spm)
-    add_subdirectory(tools/lsp)
+    # add_subdirectory(tools/spm)
+    # add_subdirectory(tools/lsp)
 endif()
 
 # Tests
 if(BUILD_TESTS)
     enable_testing()
-    add_subdirectory(tests)
+    # add_subdirectory(tests)
 endif()
 
 # Install

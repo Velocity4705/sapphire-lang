@@ -1,3 +1,6 @@
+import collections
+import math
+import csv
 # Milestone 1: Data Science Foundation Demo
 # This example demonstrates all M1 deliverables
 

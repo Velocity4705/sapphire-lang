@@ -1,0 +1,501 @@
+import system
+
+print("=== Milestone 10: System Programming ===")
+print("")
+
+# ============================================================
+# Phase 1: Inline Assembly
+# ============================================================
+print("--- Phase 1: Inline Assembly ---")
+
+ctx = asm_context_create("x86_64")
+print("ASM arch:")
+print(asm_context_arch(ctx))
+
+asm_set_reg(ctx, "rax", 10)
+asm_set_reg(ctx, "rbx", 5)
+print("RAX before:")
+print(asm_get_reg(ctx, "rax"))
+
+asm_execute(ctx, "ADD RAX, RBX")
+print("RAX after ADD RAX, RBX:")
+print(asm_get_reg(ctx, "rax"))
+
+asm_execute(ctx, "MOV RCX, 42")
+print("RCX after MOV RCX, 42:")
+print(asm_get_reg(ctx, "rcx"))
+
+asm_execute(ctx, "XOR RDX, RDX")
+print("RDX after XOR:")
+print(asm_get_reg(ctx, "rdx"))
+
+asm_execute(ctx, "INC RCX")
+print("RCX after INC:")
+print(asm_get_reg(ctx, "rcx"))
+
+asm_execute(ctx, "NOP")
+asm_execute(ctx, "PUSH RAX")
+asm_execute(ctx, "POP RBX")
+
+hex_nop = asm_assemble(ctx, "NOP")
+print("NOP assembled:")
+print(hex_nop)
+
+mnemonic = asm_disassemble(ctx, "90")
+print("0x90 disassembled:")
+print(mnemonic)
+
+hex_mov = asm_assemble(ctx, "MOV RAX, RBX")
+print("MOV assembled:")
+print(hex_mov)
+
+print("Instructions executed:")
+print(asm_instruction_count(ctx))
+print(asm_instruction_at(ctx, 0))
+
+opt1 = asm_optimize(ctx, "MOV RAX, 0")
+print("Optimized MOV RAX, 0:")
+print(opt1)
+
+opt2 = asm_optimize(ctx, "ADD RAX, RBX")
+print("No-op optimization:")
+print(opt2)
+
+# ARM64
+ctx_arm = asm_context_create("arm64")
+print("ARM64 arch:")
+print(asm_context_arch(ctx_arm))
+
+asm_set_reg(ctx_arm, "x0", 100)
+asm_set_reg(ctx_arm, "x1", 50)
+asm_execute(ctx_arm, "ADD X2, X0, X1")
+print("ARM64 X2 after ADD:")
+print(asm_get_reg(ctx_arm, "x2"))
+
+asm_execute(ctx_arm, "SUB X3, X0, X1")
+print("ARM64 X3 after SUB:")
+print(asm_get_reg(ctx_arm, "x3"))
+
+arm_hex = asm_assemble(ctx_arm, "NOP")
+print("ARM64 NOP hex:")
+print(arm_hex)
+
+print("Phase 1 PASSED")
+print("")
+
+# ============================================================
+# Phase 2: GPIO & Hardware
+# ============================================================
+print("--- Phase 2: GPIO & Hardware ---")
+
+ctrl = gpio_controller_create("raspberry_pi")
+print("Board:")
+print(gpio_controller_board(ctrl))
+print(gpio_controller_pin_count(ctrl))
+
+ctrl2 = gpio_controller_create("arduino")
+print(gpio_controller_board(ctrl2))
+print(gpio_controller_pin_count(ctrl2))
+
+# GPIO pins
+led = gpio_pin_create(ctrl, 18, "output")
+btn = gpio_pin_create(ctrl, 17, "input")
+gpio_pin_set_pull(btn, "up")
+
+gpio_pin_write(led, 1)
+print("LED pin:")
+print(gpio_pin_number(led))
+print(gpio_pin_mode(led))
+print(gpio_pin_read(led))
+print(gpio_pin_to_string(led))
+
+gpio_pin_write(led, 0)
+print("LED after write 0:")
+print(gpio_pin_read(led))
+
+print("Button mode:")
+print(gpio_pin_mode(btn))
+
+# PWM
+pwm_pin = gpio_pin_create(ctrl, 12, "pwm")
+pwm = pwm_create(pwm_pin, 1000, 0.5)
+pwm_start(pwm)
+print("PWM:")
+print(pwm_frequency(pwm))
+print(pwm_duty_cycle(pwm))
+print(pwm_is_running(pwm))
+
+pwm_set_frequency(pwm, 2000)
+pwm_set_duty_cycle(pwm, 0.75)
+print("PWM after update:")
+print(pwm_frequency(pwm))
+print(pwm_duty_cycle(pwm))
+
+pwm_stop(pwm)
+print("PWM running after stop:")
+print(pwm_is_running(pwm))
+
+# ADC
+adc = adc_create(ctrl, 0, 12)
+print("ADC channel:")
+print(adc_channel(adc))
+print("ADC resolution:")
+print(adc_resolution(adc))
+print("ADC raw:")
+print(adc_read_raw(adc))
+print("ADC voltage:")
+print(adc_read_voltage(adc, 3.3))
+
+# DAC
+dac = dac_create(ctrl, 0, 8)
+dac_write_raw(dac, 128)
+print("DAC channel:")
+print(dac_channel(dac))
+print("DAC resolution:")
+print(dac_resolution(dac))
+
+dac_write_voltage(dac, 1.65, 3.3)
+print("DAC resolution after voltage write:")
+print(dac_resolution(dac))
+
+# SPI
+spi = spi_bus_create(ctrl, 0, 1000000)
+print("SPI bus num:")
+print(spi_bus_num(spi))
+print("SPI clock:")
+print(spi_clock(spi))
+
+rx = spi_transfer(spi, "AA BB CC")
+print("SPI transfer result:")
+print(rx)
+
+spi_set_clock(spi, 4000000)
+print("SPI clock after update:")
+print(spi_clock(spi))
+
+# I2C  (use decimal addresses: 72=0x48, 118=0x76)
+i2c = i2c_bus_create(ctrl, 1, 400000)
+print("I2C bus num:")
+print(i2c_bus_num(i2c))
+
+i2c_write(i2c, 72, "FF 00")
+i2c_write(i2c, 118, "12 34")
+print("I2C devices after writes:")
+print(i2c_scan(i2c))
+
+i2c_data = i2c_read(i2c, 72, 2)
+print("I2C read from addr 72:")
+print(i2c_data)
+
+# UART
+uart = uart_create(ctrl, 0, 115200)
+print("UART port:")
+print(uart_port(uart))
+print("UART baud:")
+print(uart_baud(uart))
+
+bytes_written = uart_write(uart, "Hello UART")
+print("UART bytes written:")
+print(bytes_written)
+print("UART bytes available:")
+print(uart_bytes_available(uart))
+
+uart_msg = uart_read(uart, 64)
+print("UART read:")
+print(uart_msg)
+
+uart_set_baud(uart, 9600)
+print("UART baud after update:")
+print(uart_baud(uart))
+
+print("Phase 2 PASSED")
+print("")
+
+# ============================================================
+# Phase 3: RTOS Integration
+# ============================================================
+print("--- Phase 3: RTOS Integration ---")
+
+rtos = rtos_kernel_create("FreeRTOS-Sapphire")
+print("RTOS name:")
+print(rtos_kernel_name(rtos))
+print("Running initially:")
+print(rtos_kernel_is_running(rtos))
+
+rtos_kernel_start(rtos)
+print("Running after start:")
+print(rtos_kernel_is_running(rtos))
+
+tick1 = rtos_kernel_tick(rtos)
+tick2 = rtos_kernel_tick(rtos)
+tick3 = rtos_kernel_tick(rtos)
+print("Ticks:")
+print(tick1)
+print(tick2)
+print(tick3)
+
+task1 = rtos_task_create(rtos, "sensor_task", 3, 1024)
+task2 = rtos_task_create(rtos, "comm_task", 2, 2048)
+task3 = rtos_task_create(rtos, "idle_task", 0, 512)
+print("Task count:")
+print(rtos_kernel_task_count(rtos))
+
+rtos_task_start(task1)
+print("Task1 name:")
+print(rtos_task_name(task1))
+print("Task1 state:")
+print(rtos_task_state(task1))
+print("Task1 priority:")
+print(rtos_task_priority(task1))
+print("Task1 stack:")
+print(rtos_task_stack_size(task1))
+
+rtos_task_suspend(task2)
+print("Task2 state after suspend:")
+print(rtos_task_state(task2))
+
+rtos_task_resume(task2)
+print("Task2 state after resume:")
+print(rtos_task_state(task2))
+
+rtos_task_delete(task3)
+print("Task3 state after delete:")
+print(rtos_task_state(task3))
+
+# Semaphore
+sem = rtos_semaphore_create(3, 5)
+print("Semaphore count:")
+print(rtos_semaphore_count(sem))
+
+taken = rtos_semaphore_take(sem, 100)
+print("Take result:")
+print(taken)
+print("Count after take:")
+print(rtos_semaphore_count(sem))
+
+given = rtos_semaphore_give(sem)
+print("Give result:")
+print(given)
+print("Count after give:")
+print(rtos_semaphore_count(sem))
+
+# Mutex
+mtx = rtos_mutex_create()
+print("Mutex locked initially:")
+print(rtos_mutex_is_locked(mtx))
+
+locked = rtos_mutex_lock(mtx, 100)
+print("Lock result:")
+print(locked)
+print("Mutex locked after lock:")
+print(rtos_mutex_is_locked(mtx))
+
+locked2 = rtos_mutex_lock(mtx, 0)
+print("Second lock attempt (should fail):")
+print(locked2)
+
+rtos_mutex_unlock(mtx)
+print("Mutex locked after unlock:")
+print(rtos_mutex_is_locked(mtx))
+
+# Message Queue
+queue = rtos_queue_create(5, 64)
+print("Queue capacity:")
+print(rtos_queue_capacity(queue))
+print("Queue empty initially:")
+print(rtos_queue_is_empty(queue))
+
+rtos_queue_send(queue, "sensor_data_1", 100)
+rtos_queue_send(queue, "sensor_data_2", 100)
+rtos_queue_send(queue, "sensor_data_3", 100)
+print("Queue size after 3 sends:")
+print(rtos_queue_size(queue))
+print("Queue full:")
+print(rtos_queue_is_full(queue))
+
+qmsg = rtos_queue_receive(queue, 100)
+print("Received:")
+print(qmsg)
+print("Queue size after receive:")
+print(rtos_queue_size(queue))
+
+# Timer
+timer = rtos_timer_create("watchdog", 1000, 1)
+print("Timer name:")
+print(rtos_timer_name(timer))
+print("Timer period:")
+print(rtos_timer_period(timer))
+print("Timer active initially:")
+print(rtos_timer_is_active(timer))
+
+rtos_timer_start(timer)
+print("Timer active after start:")
+print(rtos_timer_is_active(timer))
+
+rtos_timer_reset(timer)
+print("Fire count after reset:")
+print(rtos_timer_fire_count(timer))
+
+rtos_timer_stop(timer)
+print("Timer active after stop:")
+print(rtos_timer_is_active(timer))
+
+rtos_kernel_stop(rtos)
+print("RTOS running after stop:")
+print(rtos_kernel_is_running(rtos))
+
+print("Phase 3 PASSED")
+print("")
+
+# ============================================================
+# Phase 4: Bootloader & Kernel
+# ============================================================
+print("--- Phase 4: Bootloader & Kernel ---")
+
+# Memory Map (use int-safe values, max ~2.1B)
+mmap = mem_map_create(0, 1073741824)
+mem_map_add_region(mmap, "bootloader", 0, 65536, "rom")
+mem_map_add_region(mmap, "kernel_text", 1048576, 2097152, "code")
+mem_map_add_region(mmap, "kernel_data", 3145728, 1048576, "data")
+mem_map_add_region(mmap, "heap", 4194304, 268435456, "ram")
+mem_map_add_region(mmap, "mmio", 805306368, 134217728, "mmio")
+
+print("Memory map regions:")
+print(mem_map_region_count(mmap))
+print(mem_map_region_name(mmap, 0))
+print(mem_map_region_type(mmap, 0))
+print(mem_map_region_name(mmap, 1))
+print(mem_map_region_type(mmap, 1))
+print(mem_map_region_name(mmap, 3))
+print(mem_map_region_type(mmap, 3))
+print(mem_map_to_string(mmap))
+
+# Interrupt Table
+ivt = interrupt_table_create(256)
+interrupt_table_register(ivt, 0, "divide_error", "divide_error_handler")
+interrupt_table_register(ivt, 1, "debug", "debug_handler")
+interrupt_table_register(ivt, 8, "double_fault", "double_fault_handler")
+interrupt_table_register(ivt, 14, "page_fault", "page_fault_handler")
+interrupt_table_register(ivt, 32, "timer_irq", "timer_interrupt_handler")
+interrupt_table_register(ivt, 33, "keyboard_irq", "keyboard_interrupt_handler")
+
+print("IVT size:")
+print(interrupt_table_size(ivt))
+print("Vector 0 name:")
+print(interrupt_table_name(ivt, 0))
+print("Vector 0 handler:")
+print(interrupt_table_handler(ivt, 0))
+print("Vector 14 name:")
+print(interrupt_table_name(ivt, 14))
+print("Vector 32 handler:")
+print(interrupt_table_handler(ivt, 32))
+
+fired1 = interrupt_table_fire(ivt, 32)
+fired2 = interrupt_table_fire(ivt, 32)
+fired3 = interrupt_table_fire(ivt, 33)
+print("Timer IRQ fired:")
+print(fired1)
+print("Timer fire count:")
+print(interrupt_table_fire_count(ivt, 32))
+print("Keyboard fire count:")
+print(interrupt_table_fire_count(ivt, 33))
+
+fired_bad = interrupt_table_fire(ivt, 200)
+print("Unregistered vector fire:")
+print(fired_bad)
+
+# Process Table
+ptable = process_table_create(64)
+pid1 = process_table_create_process(ptable, "init", 0)
+pid2 = process_table_create_process(ptable, "kernel_thread", 1)
+pid3 = process_table_create_process(ptable, "shell", 5)
+pid4 = process_table_create_process(ptable, "httpd", 10)
+
+print("Process count:")
+print(process_table_count(ptable))
+print("PID1:")
+print(pid1)
+print("PID1 name:")
+print(process_table_name(ptable, pid1))
+print("PID1 state:")
+print(process_table_state(ptable, pid1))
+print("PID3 priority:")
+print(process_table_priority(ptable, pid3))
+
+next1 = process_table_schedule(ptable)
+next2 = process_table_schedule(ptable)
+next3 = process_table_schedule(ptable)
+print("Scheduler round-robin:")
+print(next1)
+print(next2)
+print(next3)
+
+process_table_kill(ptable, pid2)
+print("PID2 state after kill:")
+print(process_table_state(ptable, pid2))
+print(process_table_to_string(ptable))
+
+# Kernel
+kern = kernel_create("SapphireOS", "x86_64")
+print("Kernel name:")
+print(kernel_name(kern))
+print("Kernel arch:")
+print(kernel_arch(kern))
+print("Kernel state before boot:")
+print(kernel_state(kern))
+
+kernel_boot(kern)
+print("Kernel state after boot:")
+print(kernel_state(kern))
+print("Log entries after boot:")
+print(kernel_log_count(kern))
+print(kernel_log(kern))
+
+kernel_syscall(kern, "open", "/dev/null, O_RDONLY")
+kernel_syscall(kern, "mmap", "NULL, 4096, PROT_READ|PROT_WRITE")
+kernel_syscall(kern, "write", "1, hello_world, 11")
+print("Log count after syscalls:")
+print(kernel_log_count(kern))
+
+uptime = kernel_uptime_ms(kern)
+print("Uptime >= 0:")
+print(uptime >= 0)
+
+kernel_panic(kern, "Null pointer dereference at 0x0000")
+print("Kernel state after panic:")
+print(kernel_state(kern))
+print("Final log count:")
+print(kernel_log_count(kern))
+
+# Cleanup
+asm_context_destroy(ctx)
+asm_context_destroy(ctx_arm)
+gpio_pin_destroy(led)
+gpio_pin_destroy(btn)
+gpio_pin_destroy(pwm_pin)
+pwm_destroy(pwm)
+adc_destroy(adc)
+dac_destroy(dac)
+spi_bus_destroy(spi)
+i2c_bus_destroy(i2c)
+uart_destroy(uart)
+gpio_controller_destroy(ctrl)
+gpio_controller_destroy(ctrl2)
+rtos_semaphore_destroy(sem)
+rtos_mutex_destroy(mtx)
+rtos_queue_destroy(queue)
+rtos_timer_destroy(timer)
+rtos_kernel_destroy(rtos)
+mem_map_destroy(mmap)
+interrupt_table_destroy(ivt)
+process_table_destroy(ptable)
+kernel_destroy(kern)
+
+print("Phase 4 PASSED")
+print("")
+print("=== Milestone 10 COMPLETE ===")
+print("All 4 phases passed:")
+print("  Phase 1: Inline Assembly (x86_64/ARM64 assemble/disassemble/execute/optimize)")
+print("  Phase 2: GPIO & Hardware (GPIO, PWM, ADC, DAC, SPI, I2C, UART)")
+print("  Phase 3: RTOS Integration (Tasks, Semaphores, Mutexes, Queues, Timers)")
+print("  Phase 4: Bootloader & Kernel (MemMap, InterruptTable, ProcessTable, Kernel)")

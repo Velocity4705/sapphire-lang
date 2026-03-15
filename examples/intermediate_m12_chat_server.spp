@@ -1,0 +1,77 @@
+import network
+
+# Intermediate M12: Chat Server Infrastructure
+print("=== M12: Chat Server ===")
+
+# --- TCP socket ---
+print("\n1. TCP Server Socket")
+let server = net_tcp_socket_create()
+net_tcp_bind(server, 9000)
+net_tcp_listen(server, 10)
+net_tcp_set_nonblocking(server, 1)
+print("Listening on port 9000")
+print("Connected: " + net_tcp_is_connected(server))
+
+# --- DNS ---
+print("\n2. DNS")
+let dns = net_dns_create()
+net_dns_set_server(dns, "8.8.8.8")
+print("DNS server: " + net_dns_server(dns))
+let ip = net_dns_lookup(dns, "localhost")
+print("localhost -> " + ip)
+let reverse = net_dns_reverse(dns, "127.0.0.1")
+print("127.0.0.1 reverse -> " + reverse)
+
+# --- Ping ---
+print("\n3. Ping")
+let pinger = net_ping_create()
+net_ping_host(pinger, "127.0.0.1", 4)
+print("Min:  " + net_ping_min(pinger) + " ms")
+print("Max:  " + net_ping_max(pinger) + " ms")
+print("Avg:  " + net_ping_avg(pinger) + " ms")
+print("Loss: " + net_ping_packet_loss(pinger) + "%")
+
+# --- Bandwidth (no args, no start needed) ---
+print("\n4. Bandwidth")
+let bw = net_bandwidth_create()
+print("Upload:   " + net_bandwidth_last_upload_mbps(bw) + " Mbps")
+print("Download: " + net_bandwidth_last_download_mbps(bw) + " Mbps")
+
+# --- Connection pool ---
+print("\n5. Connection Pool")
+let pool = net_pool_create("127.0.0.1", 9001, 10)
+net_pool_set_timeout(pool, 30)
+print("Pool -> " + net_pool_host(pool) + ":" + net_pool_port(pool))
+print("Size: " + net_pool_size(pool) + ", Active: " + net_pool_active(pool))
+
+# --- Async requests ---
+print("\n6. Async Requests")
+let req1 = net_async_request_create()
+let req2 = net_async_request_create()
+net_async_get(req1,  "http://127.0.0.1:8080/health")
+net_async_post(req2, "http://127.0.0.1:8080/log", "msg=started")
+print("req1 done: " + net_async_is_done(req1))
+print("req2 done: " + net_async_is_done(req2))
+
+# --- Load balancer ---
+print("\n7. Load Balancer")
+let lb = net_lb_create("round_robin")
+net_lb_add_backend(lb, "127.0.0.1", 9001)
+net_lb_add_backend(lb, "127.0.0.1", 9002)
+net_lb_add_backend(lb, "127.0.0.1", 9003)
+print("Backends: " + net_lb_backend_count(lb))
+print("Strategy: " + net_lb_strategy(lb))
+print("Next: " + net_lb_next_host(lb) + ":" + net_lb_next_port(lb))
+print("Next: " + net_lb_next_host(lb) + ":" + net_lb_next_port(lb))
+print(net_lb_stats(lb))
+
+# --- Event loop ---
+print("\n8. Event Loop")
+let loop = net_event_loop_create()
+net_event_loop_add_socket(loop, server, "read", "chat_handler")
+net_event_loop_run_once(loop, 100)
+print("Pending: " + net_event_loop_pending_count(loop))
+
+net_tcp_close(server)
+print("\nSocket closed")
+print("=== Chat server setup complete ===")

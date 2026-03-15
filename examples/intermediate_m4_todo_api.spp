@@ -1,0 +1,45 @@
+import http
+import json
+
+# Intermediate M4: Todo API Server
+# Sets up REST-style routes for a simple todo list
+
+print("=== M4: Todo API Server ===")
+
+# --- In-memory todo store as JSON array ---
+let todos = json_create_array()
+json_push(todos, "Buy groceries")
+json_push(todos, "Write unit tests")
+json_push(todos, "Deploy to staging")
+
+print("Initial todos:")
+print(json_stringify(todos))
+print("Count: " + json_size(todos))
+
+# --- HTTP server setup ---
+let server = http_server_create(8080)
+
+http_server_get(server, "/todos", "list_todos")
+http_server_post(server, "/todos", "create_todo")
+http_server_delete(server, "/todos", "delete_todo")
+
+print("\nRoutes registered:")
+print("  GET    /todos  -> list all todos")
+print("  POST   /todos  -> add a todo")
+print("  DELETE /todos  -> remove a todo")
+
+# --- Simulate a client request ---
+let client = http_client_create()
+
+# URL encode a query param
+let encoded = http_url_encode("Buy groceries")
+print("\nURL-encoded item: " + encoded)
+let decoded = http_url_decode(encoded)
+print("URL-decoded item: " + decoded)
+
+# HTML escape for safe output
+let safe = http_html_escape("<script>alert('xss')</script>")
+print("HTML-escaped:     " + safe)
+
+print("\nServer ready on port 8080 (not started in demo mode)")
+print("=== Todo API setup complete ===")

@@ -1,0 +1,50 @@
+import json
+import random
+
+# Intermediate M2: Inventory Manager
+# Uses JSON objects for product records and random for restocking
+
+print("=== M2: Inventory Manager ===")
+
+# --- Build inventory as JSON ---
+let inventory = json_create_object()
+json_set(inventory, "apples",  50)
+json_set(inventory, "bananas", 30)
+json_set(inventory, "oranges", 20)
+json_set(inventory, "grapes",  15)
+
+print("Initial inventory:")
+print(json_stringify(inventory))
+
+# --- Simulate daily sales with random draws ---
+random_seed(99)
+let items = ["apples", "bananas", "oranges", "grapes"]
+
+print("\nSimulating 5 days of sales...")
+let day = 1
+while day <= 5
+    let item_idx = random_int(0, 3)
+    let item = items[item_idx]
+    let sold = random_int(1, 8)
+    let current = json_get(inventory, item)
+    let remaining = current - sold
+    if remaining < 0
+        remaining = 0
+    json_set(inventory, item, remaining)
+    print("Day " + day + ": sold " + sold + " " + item + " -> " + remaining + " left")
+    day = day + 1
+
+print("\nFinal inventory:")
+print(json_stringify(inventory))
+
+# --- Flag low stock ---
+print("\nLow stock alerts (< 10):")
+let i = 0
+while i < len(items)
+    let item = items[i]
+    let qty = json_get(inventory, item)
+    if qty < 10
+        print("  RESTOCK: " + item + " (" + qty + " remaining)")
+    i = i + 1
+
+print("\n=== Inventory check complete ===")

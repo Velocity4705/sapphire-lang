@@ -1,8 +1,10 @@
+import random
+import plotting
 print("=== Milestone 3: Export Test ===")
 
 print("1. Creating a plot for export")
 let x_data = [0, 1, 2, 3, 4, 5]
-let y_data = [0, 1, 4, 9, 16, 25]  // x^2
+let y_data = [0, 1, 4, 9, 16, 25]  
 
 let plot1 = quick_scatter(x_data, y_data, "Quadratic Function")
 plot_show(plot1)
@@ -14,7 +16,7 @@ print("3. Creating histogram for export")
 random_seed(42)
 let hist_data = []
 let i = 0
-while i < 10 {
+while i < 10:
     hist_data.push(random_normal(0.0, 1.0))
     i = i + 1
 }

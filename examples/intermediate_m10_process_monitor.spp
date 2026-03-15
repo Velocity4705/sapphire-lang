@@ -1,0 +1,75 @@
+import system
+
+# Intermediate M10: Embedded System Monitor
+print("=== M10: Embedded System Monitor ===")
+
+# --- Assembly context ---
+print("\n1. Assembly")
+let ctx = asm_context_create("x86_64")
+print("Arch: " + asm_context_arch(ctx))
+let asm_code = asm_assemble(ctx, "mov rax, 42\nret")
+print("Assembled: " + asm_code)
+let disasm = asm_disassemble(ctx, asm_code)
+print("Disasm: " + disasm)
+
+# --- GPIO ---
+print("\n2. GPIO")
+let gpio = gpio_controller_create("rpi4")
+print("Board: " + gpio_controller_board(gpio))
+print("Pins:  " + gpio_controller_pin_count(gpio))
+
+let led = gpio_pin_create(gpio, 18, "output")
+gpio_pin_write(led, 1)
+print("LED pin " + gpio_pin_number(led) + " -> " + gpio_pin_read(led))
+
+let sensor = gpio_pin_create(gpio, 24, "input")
+gpio_pin_set_pull(sensor, "up")
+print("Sensor pin " + gpio_pin_number(sensor) + " mode: " + gpio_pin_mode(sensor))
+
+# --- PWM ---
+print("\n3. PWM")
+let pwm = pwm_create(gpio, 12, 1000)
+pwm_set_frequency(pwm, 1000)
+pwm_set_duty_cycle(pwm, 0.5)
+pwm_start(pwm)
+print("PWM freq: " + pwm_frequency(pwm) + " Hz, duty: " + pwm_duty_cycle(pwm))
+print("Running: " + pwm_is_running(pwm))
+
+# --- RTOS ---
+print("\n4. RTOS Kernel")
+let rtos = rtos_kernel_create("FreeRTOS")
+print("Kernel: " + rtos_kernel_name(rtos))
+
+let task1 = rtos_task_create(rtos, "sensor_read",  2, 512)
+let task2 = rtos_task_create(rtos, "data_process", 1, 1024)
+rtos_task_start(task1)
+rtos_task_start(task2)
+print("Tasks: " + rtos_kernel_task_count(rtos))
+print("Task1: " + rtos_task_name(task1) + " priority=" + rtos_task_priority(task1))
+print("Task2: " + rtos_task_name(task2) + " state=" + rtos_task_state(task2))
+
+# --- RTOS Queue ---
+print("\n5. RTOS Queue")
+let queue = rtos_queue_create(10, 64)
+rtos_queue_send(queue, "reading_1", 100)
+rtos_queue_send(queue, "reading_2", 100)
+rtos_queue_send(queue, "reading_3", 100)
+print("Queue size: " + rtos_queue_size(queue))
+let msg = rtos_queue_receive(queue, 100)
+print("Received: " + msg)
+
+# --- RTOS Timer ---
+print("\n6. RTOS Timer")
+let timer = rtos_timer_create("watchdog", 5000, 1)
+rtos_timer_start(timer)
+print("Timer '" + rtos_timer_name(timer) + "' active: " + rtos_timer_is_active(timer))
+print("Period: " + rtos_timer_period(timer) + " ms")
+
+# --- Kernel ---
+print("\n7. Kernel")
+let os = kernel_create("SapphireOS", "arm64")
+print("Kernel: " + kernel_name(os) + " on " + kernel_arch(os))
+kernel_log(os, "System monitor initialized")
+print("Log entries: " + kernel_log_count(os))
+
+print("\n=== Embedded monitor ready ===")

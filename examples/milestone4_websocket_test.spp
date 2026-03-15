@@ -1,3 +1,4 @@
+import websocket
 # Milestone 4: WebSocket Test - Core Functionality
 print("=== WebSocket Core Test ===")
 

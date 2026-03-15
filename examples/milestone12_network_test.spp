@@ -1,0 +1,201 @@
+import network
+
+print("=== Milestone 12: Network Programming ===")
+print("")
+
+# Phase 1: Address helpers
+print("--- Phase 1: Address Helpers ---")
+print("Hostname:")
+print(net_hostname())
+print("Local IP:")
+print(net_local_ip())
+print("localhost resolves to:")
+print(net_resolve_host("localhost"))
+print("")
+
+# Phase 1: TCP socket
+print("--- Phase 1: TCP Socket ---")
+c = net_tcp_socket_create()
+net_tcp_set_timeout(c, 1000)
+r = net_tcp_connect(c, "127.0.0.1", 80)
+print("TCP connect to 127.0.0.1:80:")
+print(r)
+print("Is connected:")
+print(net_tcp_is_connected(c))
+net_tcp_close(c)
+net_tcp_socket_destroy(c)
+print("")
+
+# Phase 1: UDP socket
+print("--- Phase 1: UDP Socket ---")
+usrv = net_udp_socket_create()
+net_udp_set_timeout(usrv, 500)
+ubound = net_udp_bind(usrv, 19877)
+print("UDP bind port 19877:")
+print(ubound)
+
+ucli = net_udp_socket_create()
+net_udp_send_to(ucli, "ping", 4, "127.0.0.1", 19877)
+
+un = net_udp_recv_from(usrv, 64)
+if un > 0:
+    print("UDP received:")
+    print(net_udp_recv_data(usrv))
+    print("from:")
+    print(net_udp_recv_addr(usrv))
+else:
+    print("UDP recv (no data in time, expected in test)")
+
+net_udp_close(ucli)
+net_udp_socket_destroy(ucli)
+net_udp_close(usrv)
+net_udp_socket_destroy(usrv)
+print("")
+
+# Phase 2: DNS
+print("--- Phase 2: DNS Client ---")
+dns = net_dns_create()
+net_dns_set_server(dns, "8.8.8.8")
+print("DNS server:")
+print(net_dns_server(dns))
+print("localhost ->")
+print(net_dns_lookup(dns, "localhost"))
+print("127.0.0.1 ->")
+print(net_dns_lookup(dns, "127.0.0.1"))
+print("Total lookups:")
+print(net_dns_lookup_count(dns))
+net_dns_destroy(dns)
+print("")
+
+# Phase 2: SMTP (simulated)
+print("--- Phase 2: SMTP Client ---")
+smtp = net_smtp_create("mail.example.com", 587)
+net_smtp_set_tls(smtp, 1)
+sc = net_smtp_connect(smtp)
+print("SMTP connect:")
+print(sc)
+print("Response:")
+print(net_smtp_last_response(smtp))
+net_smtp_auth(smtp, "user@example.com", "password")
+sent = net_smtp_send_mail(smtp, "from@example.com", "to@example.com", "Test Subject", "Hello World!")
+print("Mail sent:")
+print(sent)
+print("Response:")
+print(net_smtp_last_response(smtp))
+net_smtp_disconnect(smtp)
+net_smtp_destroy(smtp)
+print("")
+
+# Phase 2: FTP (simulated)
+print("--- Phase 2: FTP Client ---")
+ftp = net_ftp_create("ftp.example.com", 21)
+net_ftp_connect(ftp)
+net_ftp_login(ftp, "anonymous", "guest")
+fc = net_ftp_list(ftp, "/pub")
+print("Files in /pub:")
+print(fc)
+i = 0
+while i < fc:
+    print(net_ftp_file_name(ftp, i))
+    i = i + 1
+net_ftp_disconnect(ftp)
+net_ftp_destroy(ftp)
+print("")
+
+# Phase 2: SSH (simulated)
+print("--- Phase 2: SSH Client ---")
+ssh = net_ssh_create("192.168.1.1", 22)
+net_ssh_connect(ssh)
+net_ssh_auth_password(ssh, "admin", "secret")
+net_ssh_exec(ssh, "uname -a")
+print("SSH output:")
+print(net_ssh_output(ssh))
+print("Exit code:")
+print(net_ssh_exit_code(ssh))
+net_ssh_disconnect(ssh)
+net_ssh_destroy(ssh)
+print("")
+
+# Phase 3: Packet capture (simulated)
+print("--- Phase 3: Packet Capture ---")
+cap = net_capture_create("eth0")
+net_capture_set_filter(cap, "tcp")
+net_capture_start(cap)
+pcount = net_capture_packet_count(cap)
+print("Captured packets:")
+print(pcount)
+p = 0
+while p < pcount:
+    print(net_capture_packet_proto(cap, p))
+    print(net_capture_packet_src(cap, p))
+    print(net_capture_packet_dst(cap, p))
+    p = p + 1
+net_capture_stop(cap)
+net_capture_destroy(cap)
+print("")
+
+# Phase 3: Network monitor
+print("--- Phase 3: Network Monitor ---")
+mon = net_monitor_create()
+net_monitor_add_interface(mon, "lo")
+net_monitor_sample(mon)
+icount = net_monitor_interface_count(mon)
+mi = 0
+while mi < icount:
+    print(net_monitor_interface_name(mon, mi))
+    print(net_monitor_bytes_recv(mon, mi))
+    mi = mi + 1
+print("JSON:")
+print(net_monitor_to_json(mon))
+net_monitor_destroy(mon)
+print("")
+
+# Phase 4: Load balancer
+print("--- Phase 4: Load Balancer ---")
+lb = net_lb_create("round_robin")
+net_lb_add_backend(lb, "10.0.0.1", 8080, 1)
+net_lb_add_backend(lb, "10.0.0.2", 8080, 1)
+net_lb_add_backend(lb, "10.0.0.3", 8080, 1)
+print("Backends:")
+print(net_lb_backend_count(lb))
+print("Strategy:")
+print(net_lb_strategy(lb))
+req = 0
+while req < 6:
+    print(net_lb_next_host(lb))
+    req = req + 1
+net_lb_mark_down(lb, "10.0.0.2", 8080)
+print("After marking 10.0.0.2 down, next:")
+print(net_lb_next_host(lb))
+print("Stats:")
+print(net_lb_stats(lb))
+net_lb_destroy(lb)
+print("")
+
+# Phase 4: Connection pool
+print("--- Phase 4: Connection Pool ---")
+pool = net_pool_create("127.0.0.1", 8080, 5)
+net_pool_set_timeout(pool, 1000)
+print("Pool host:")
+print(net_pool_host(pool))
+print("Pool port:")
+print(net_pool_port(pool))
+print("Pool size:")
+print(net_pool_size(pool))
+net_pool_destroy(pool)
+print("")
+
+# Phase 4: Async request
+print("--- Phase 4: Async HTTP Request ---")
+areq = net_async_request_create()
+net_async_get(areq, "http://localhost/")
+print("Done:")
+print(net_async_is_done(areq))
+print("Status:")
+print(net_async_status_code(areq))
+print("Elapsed ms:")
+print(net_async_elapsed_ms(areq))
+net_async_request_destroy(areq)
+print("")
+
+print("=== Milestone 12 Complete ===")

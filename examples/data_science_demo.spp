@@ -1,3 +1,6 @@
+import collections
+import math
+import csv
 # Data Science Demo - Milestone 1
 print("╔══════════════════════════════════════════════════════════════╗")
 print("║              SAPPHIRE DATA SCIENCE DEMO                     ║")

@@ -1,3 +1,5 @@
+import random
+import plotting
 print("=== Milestone 3: Simple Plotting Test ===")
 
 print("1. Creating sample data")

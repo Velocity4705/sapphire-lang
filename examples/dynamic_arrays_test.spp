@@ -1,3 +1,4 @@
+import collections
 # Dynamic Arrays Test - Milestone 1 Implementation
 
 print("=== Dynamic Arrays Test ===")

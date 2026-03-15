@@ -1,3 +1,6 @@
+import collections
+import math
+import csv
 # Milestone 1 Integration Test
 print("=== MILESTONE 1 INTEGRATION TEST ===")
 print("")

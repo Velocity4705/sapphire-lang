@@ -1,3 +1,5 @@
+import collections
+import math
 # 🎯 Milestone 1: Data Science Foundation - SUCCESS!
 print("╔══════════════════════════════════════════════════════════════╗")
 print("║           MILESTONE 1: COMPLETE SUCCESS! ✅                 ║")

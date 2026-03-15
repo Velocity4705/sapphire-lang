@@ -1,0 +1,102 @@
+import gui
+
+# Sapphire GUI Window Demo
+# Close with the X button or press ESC
+
+gui_init()
+
+win = gui_window_create("Sapphire - GUI Demo", 800, 600)
+gui_window_show(win)
+
+key_esc = gui_key("escape")
+
+frame = 0
+
+# Main loop — gui_window_poll returns 0 the moment X is clicked
+while gui_window_poll(win) == 1:
+    esc = gui_key_down(win, key_esc)
+    if esc == 1:
+        gui_window_close(win)
+
+    # Background
+    gui_clear(win, 15, 20, 40)
+
+    # Title bar
+    gui_set_color(win, 40, 60, 100, 255)
+    gui_fill_rect(win, 0, 0, 800, 60)
+    gui_draw_text(win, "Sapphire GUI Window System", 20, 15, 28, 255, 255, 255)
+
+    # Colored rectangles
+    gui_set_color(win, 220, 60, 60, 255)
+    gui_fill_rect(win, 40, 100, 160, 100)
+    gui_draw_text(win, "fill_rect", 65, 140, 16, 255, 255, 255)
+
+    gui_set_color(win, 60, 180, 60, 255)
+    gui_fill_rect(win, 240, 100, 160, 100)
+    gui_draw_text(win, "fill_rect", 265, 140, 16, 255, 255, 255)
+
+    gui_set_color(win, 60, 120, 220, 255)
+    gui_fill_rect(win, 440, 100, 160, 100)
+    gui_draw_text(win, "fill_rect", 465, 140, 16, 255, 255, 255)
+
+    gui_set_color(win, 200, 160, 40, 255)
+    gui_fill_rect(win, 640, 100, 120, 100)
+    gui_draw_text(win, "fill_rect", 655, 140, 16, 255, 255, 255)
+
+    # Filled circles
+    gui_set_color(win, 255, 80, 80, 255)
+    gui_fill_circle(win, 100, 320, 60)
+    gui_draw_text(win, "circle", 68, 390, 16, 255, 255, 255)
+
+    gui_set_color(win, 80, 220, 120, 255)
+    gui_fill_circle(win, 280, 320, 60)
+    gui_draw_text(win, "circle", 248, 390, 16, 255, 255, 255)
+
+    gui_set_color(win, 80, 160, 255, 255)
+    gui_fill_circle(win, 460, 320, 60)
+    gui_draw_text(win, "circle", 428, 390, 16, 255, 255, 255)
+
+    # Filled triangle
+    gui_set_color(win, 255, 200, 40, 255)
+    gui_fill_triangle(win, 620, 260, 760, 260, 690, 380)
+    gui_draw_text(win, "triangle", 628, 390, 16, 255, 255, 255)
+
+    # Divider line
+    gui_set_color(win, 180, 180, 180, 255)
+    gui_draw_line(win, 40, 430, 760, 430)
+
+    # Outline shapes
+    gui_set_color(win, 255, 255, 255, 255)
+    gui_draw_rect(win, 40, 450, 160, 80)
+    gui_draw_text(win, "draw_rect", 55, 480, 16, 200, 200, 200)
+
+    gui_set_color(win, 255, 200, 100, 255)
+    gui_draw_circle(win, 320, 490, 40)
+    gui_draw_text(win, "draw_circle", 280, 540, 16, 200, 200, 200)
+
+    gui_set_color(win, 100, 255, 200, 255)
+    gui_draw_triangle(win, 500, 450, 620, 450, 560, 530)
+    gui_draw_text(win, "draw_triangle", 500, 540, 16, 200, 200, 200)
+
+    # Mouse cursor dot
+    mx = gui_mouse_x(win)
+    my = gui_mouse_y(win)
+    gui_set_color(win, 255, 255, 100, 255)
+    gui_fill_circle(win, mx, my, 6)
+
+    # Footer
+    gui_set_color(win, 30, 40, 70, 255)
+    gui_fill_rect(win, 0, 570, 800, 30)
+    gui_draw_text(win, "Click X or press ESC to close  |  Mouse cursor tracked", 15, 575, 14, 150, 150, 200)
+
+    gui_present(win)
+    gui_delay(16)
+
+    frame = frame + 1
+    # no frame limit — runs until X button or ESC
+
+gui_window_destroy(win)
+gui_quit()
+
+print("Closed after frames:")
+print(frame)

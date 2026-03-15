@@ -1,0 +1,67 @@
+import game
+
+# Intermediate M9: Space Shooter
+print("=== M9: Space Shooter ===")
+
+# --- Renderer ---
+print("\n1. Renderer")
+let renderer = game_renderer_create("Space Shooter", 800, 600)
+print("Window: " + game_renderer_width(renderer) + "x" + game_renderer_height(renderer))
+print("Title:  " + game_renderer_title(renderer))
+
+# --- Sprites (renderer, x, y) ---
+print("\n2. Sprites")
+let player = game_sprite_create(renderer, 400.0, 550.0)
+game_sprite_set_scale(player, 1.0, 1.0)
+game_sprite_set_color(player, 0, 200, 255, 255)
+print("Player at (" + game_sprite_x(player) + ", " + game_sprite_y(player) + ")")
+
+let enemy1 = game_sprite_create(renderer, 200.0, 80.0)
+game_sprite_set_color(enemy1, 255, 60, 60, 255)
+
+let enemy2 = game_sprite_create(renderer, 600.0, 120.0)
+game_sprite_set_color(enemy2, 255, 60, 60, 255)
+
+let bullet = game_sprite_create(renderer, 400.0, 510.0)
+game_sprite_set_scale(bullet, 0.3, 1.0)
+game_sprite_set_color(bullet, 255, 255, 0, 255)
+print("Sprites: player + 2 enemies + bullet")
+
+# --- Physics world ---
+print("\n3. Physics")
+let world = game_physics_world_create(0.0, 0.0)
+game_physics_world_set_gravity(world, 0.0, 0.0)
+print("Bodies: " + game_physics_world_body_count(world))
+
+# --- Scene ---
+print("\n4. Scene")
+let scene = game_scene_create("gameplay")
+game_scene_add_sprite(scene, player)
+game_scene_add_sprite(scene, enemy1)
+game_scene_add_sprite(scene, enemy2)
+game_scene_add_sprite(scene, bullet)
+print("Scene '" + game_scene_name(scene) + "' sprites: " + game_scene_sprite_count(scene))
+
+# --- Input ---
+print("\n5. Input")
+let input = game_input_create()
+game_input_key_press(input, "SPACE")
+game_input_mouse_move(input, 400, 550)
+print("SPACE pressed: " + game_input_is_key_pressed(input, "SPACE"))
+print("Mouse: (" + game_input_mouse_x(input) + ", " + game_input_mouse_y(input) + ")")
+
+# --- Audio ---
+print("\n6. Audio")
+let audio = game_audio_engine_create()
+game_audio_engine_set_master_volume(audio, 0.8)
+print("Master volume: " + game_audio_engine_master_volume(audio))
+print("Channels: " + game_audio_engine_channel_count(audio))
+
+# --- Game loop (1 tick) ---
+print("\n7. Game Loop")
+let loop = game_loop_create(60)
+game_loop_tick(loop)
+print("FPS target: " + game_loop_target_fps(loop))
+print("Frame:      " + game_loop_frame_count(loop))
+
+print("\n=== Space Shooter ready ===")

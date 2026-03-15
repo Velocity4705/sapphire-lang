@@ -1,0 +1,169 @@
+# Milestone 6 Phase 4: DApp Framework Test
+import dapp
+
+print("=== Milestone 6 Phase 4: DApp Framework ===")
+print("")
+
+# ===== Wallet Creation =====
+print("--- Wallet Creation ---")
+alice = dapp_wallet_create("local")
+alice_addr = dapp_wallet_address(alice)
+print("Alice address: ")
+print(alice_addr)
+print("Alice network: ")
+print(dapp_wallet_network(alice))
+
+bob = dapp_wallet_create("local")
+bob_addr = dapp_wallet_address(bob)
+print("Bob address: ")
+print(bob_addr)
+
+# Wallet from existing private key
+alice_priv = dapp_wallet_privkey_hex(alice)
+alice2 = dapp_wallet_from_privkey(alice_priv, "local")
+alice2_addr = dapp_wallet_address(alice2)
+print("Restored wallet matches: ")
+print(alice_addr)
+
+# ===== Transaction Signing =====
+print("")
+print("--- Transaction Signing ---")
+tx_data = "transfer(0xBob,100)"
+sig = dapp_wallet_sign(alice, tx_data)
+print("Signature: ")
+print(sig)
+
+verified = dapp_wallet_verify(alice_addr, tx_data, sig)
+print("Signature verified: ")
+print(verified)
+
+# ===== Web3 Provider =====
+print("")
+print("--- Web3 Provider (local) ---")
+provider = dapp_provider_create("local", "http://127.0.0.1:8545")
+print("Network: ")
+print(dapp_provider_network(provider))
+print("Chain ID: ")
+print(dapp_provider_chain_id(provider))
+print("Block number: ")
+print(dapp_provider_block_number(provider))
+
+# Fund wallets
+dapp_provider_set_balance(provider, alice_addr, 10000.0)
+dapp_provider_set_balance(provider, bob_addr, 5000.0)
+
+alice_bal = dapp_provider_get_balance(provider, alice_addr)
+print("Alice balance: ")
+print(alice_bal)
+bob_bal = dapp_provider_get_balance(provider, bob_addr)
+print("Bob balance: ")
+print(bob_bal)
+
+# Transfer ETH
+dapp_provider_transfer(provider, alice_addr, bob_addr, 500.0)
+alice_bal2 = dapp_provider_get_balance(provider, alice_addr)
+print("Alice after transfer: ")
+print(alice_bal2)
+bob_bal2 = dapp_provider_get_balance(provider, bob_addr)
+print("Bob after transfer: ")
+print(bob_bal2)
+
+# ===== Contract Deployment =====
+print("")
+print("--- Contract Deployment ---")
+# Simulated ERC-20 bytecode and ABI
+bytecode = "6080604052348015600f57600080fd5b50"
+abi = "{\"name\":\"SimpleToken\",\"functions\":[\"transfer\",\"balanceOf\",\"approve\"]}"
+
+contract = dapp_deploy_contract(provider, "SimpleToken", bytecode, abi, alice, 0)
+contract_addr = dapp_contract_address(contract)
+print("Contract deployed at: ")
+print(contract_addr)
+print("Contract name: ")
+print(dapp_contract_name(contract))
+print("Deployer: ")
+print(dapp_contract_deployer(contract))
+print("Deploy block: ")
+print(dapp_contract_deploy_block(contract))
+print("Contract info: ")
+print(dapp_contract_to_string(contract))
+
+# ===== Contract Calls =====
+print("")
+print("--- Contract Calls ---")
+# Call transfer(bob_addr, 100)
+tx1 = dapp_call_contract(provider, contract_addr, "transfer", bob_addr, alice, 0, 100000)
+print("Transfer tx success: ")
+print(dapp_tx_success(tx1))
+print("TX hash: ")
+print(dapp_tx_hash(tx1))
+print("From: ")
+print(dapp_tx_from(tx1))
+print("To: ")
+print(dapp_tx_to(tx1))
+print("Gas used: ")
+print(dapp_tx_gas_used(tx1))
+print("Block: ")
+print(dapp_tx_block(tx1))
+print("TX info: ")
+print(dapp_tx_to_string(tx1))
+
+# Call balanceOf
+tx2 = dapp_call_contract(provider, contract_addr, "balanceOf", alice_addr, bob, 0, 50000)
+print("balanceOf tx success: ")
+print(dapp_tx_success(tx2))
+
+# Call on non-existent contract (should fail)
+tx3 = dapp_call_contract(provider, "0xdeadbeef", "transfer", bob_addr, alice, 0, 100000)
+print("Bad contract tx success (expect false): ")
+print(dapp_tx_success(tx3))
+print("Revert reason: ")
+print(dapp_tx_revert_reason(tx3))
+
+# ===== ABI Helpers =====
+print("")
+print("--- ABI Helpers ---")
+encoded = dapp_abi_encode_call("transfer", bob_addr)
+print("ABI encoded call: ")
+print(encoded)
+
+selector = dapp_abi_selector("transfer(address,uint256)")
+print("Function selector: ")
+print(selector)
+
+# ===== Transaction History =====
+print("")
+print("--- Transaction History ---")
+tx_count = dapp_provider_tx_count(provider)
+print("Total transactions: ")
+print(tx_count)
+
+contract_count = dapp_provider_contract_count(provider)
+print("Deployed contracts: ")
+print(contract_count)
+
+# ===== Provider Status =====
+print("")
+print("--- Provider Status ---")
+status = dapp_provider_status(provider)
+print("Status: ")
+print(status)
+
+# ===== Mine blocks =====
+dapp_provider_mine_block(provider)
+dapp_provider_mine_block(provider)
+print("Block after mining: ")
+print(dapp_provider_block_number(provider))
+
+# Cleanup
+dapp_wallet_destroy(alice)
+dapp_wallet_destroy(alice2)
+dapp_wallet_destroy(bob)
+dapp_contract_destroy(contract)
+dapp_tx_destroy(tx1)
+dapp_tx_destroy(tx2)
+dapp_tx_destroy(tx3)
+dapp_provider_destroy(provider)
+
+print("")
+print("=== Milestone 6 Phase 4 DApp Framework Tests Complete ===")

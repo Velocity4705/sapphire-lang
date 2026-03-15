@@ -1,3 +1,5 @@
+import json
+import random
 print("=== Milestone 2 Complete Feature Test ===")
 
 print("\n--- Hash Maps ---")
@@ -35,18 +37,12 @@ print("- Boolean (70%):", random_boolean(0.7))
 print("- Crypto random:", crypto_random())
 
 print("\n--- Data Processing Example ---")
-let dataset = {
-    "samples": [
-        {"value": random_normal(100.0, 15.0), "category": "A"},
-        {"value": random_normal(100.0, 15.0), "category": "B"},
-        {"value": random_normal(100.0, 15.0), "category": "A"}
-    ],
-    "metadata": {
-        "created": "2026-03-13",
-        "version": "1.0"
-    }
-}
-
+let dataset = json_create_object()
+json_set(dataset, "created", "2026-03-13")
+json_set(dataset, "version", "1.0")
+json_set(dataset, "sample1", random_normal(100.0, 15.0))
+json_set(dataset, "sample2", random_normal(100.0, 15.0))
+json_set(dataset, "sample3", random_normal(100.0, 15.0))
 let dataset_json = json_stringify(dataset, true)
 print("Dataset as JSON:")
 print(dataset_json)

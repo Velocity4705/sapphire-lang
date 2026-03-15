@@ -1,0 +1,69 @@
+import gui
+
+# Intermediate M11: Stats Dashboard
+print("=== M11: Stats Dashboard ===")
+
+gui_init()
+let has_display = gui_has_display()
+print("Display available: " + has_display)
+
+# --- Window ---
+let win = gui_window_create("Stats Dashboard", 900, 600)
+print("Window: " + gui_window_width(win) + "x" + gui_window_height(win))
+print("Title:  " + gui_window_title(win))
+gui_window_show(win)
+
+# --- Font manager + text renderer ---
+print("\n1. Text")
+let fonts = gui_font_manager_create()
+let text_r = gui_text_renderer_create(fonts)
+gui_text_renderer_set_color(text_r, 255, 255, 255, 255)
+gui_text_renderer_set_align(text_r, "left")
+gui_text_renderer_render(text_r, "Stats Dashboard", 220, 20)
+gui_text_renderer_render(text_r, "System Overview", 220, 50)
+print("Text rendered: " + gui_text_renderer_line_count(text_r) + " lines")
+
+# --- Draw sidebar ---
+print("\n2. Drawing")
+gui_set_color(win, 30, 30, 45, 255)
+gui_fill_rect(win, 0, 0, 200, 600)
+
+gui_set_color(win, 20, 20, 35, 255)
+gui_fill_rect(win, 200, 0, 700, 600)
+
+# Stat labels
+gui_draw_text(win, "CPU: 42%",  220, 100, 100, 220, 100, 255)
+gui_draw_text(win, "RAM: 61%",  220, 130, 220, 200, 80,  255)
+gui_draw_text(win, "Disk: 78%", 220, 160, 220, 100, 100, 255)
+
+# Bar chart (6 hours of CPU data)
+let bar_vals = [30, 55, 42, 70, 38, 62]
+let bx = 220
+let n = len(bar_vals)
+let i = 0
+while i < n:
+    let bh = bar_vals[i] * 2
+    let by = 400 - bh
+    gui_set_color(win, 80, 160, 255, 255)
+    gui_fill_rect(win, bx, by, 55, bh)
+    bx = bx + 75
+    i = i + 1
+print("Bar chart drawn (6 bars)")
+
+# Sidebar nav
+gui_draw_text(win, "Overview", 15, 50,  200, 200, 255, 255)
+gui_draw_text(win, "Network",  15, 90,  200, 200, 255, 255)
+gui_draw_text(win, "Logs",     15, 130, 200, 200, 255, 255)
+
+# --- Mouse handler ---
+print("\n3. Input")
+let mouse = gui_mouse_handler_create()
+gui_mouse_handler_move(mouse, 400, 300)
+print("Cursor: (" + gui_mouse_handler_cursor_x(mouse) + ", " + gui_mouse_handler_cursor_y(mouse) + ")")
+
+# --- Present ---
+gui_present(win)
+print("\nDashboard rendered (1 frame)")
+
+gui_quit()
+print("=== Dashboard complete ===")
