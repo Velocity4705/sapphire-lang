@@ -1,0 +1,22 @@
+import model
+
+# ── OBJ model loading ────────────────────────────────────────────────────────
+print("Testing model module...")
+
+# Try a real OBJ file if present
+m = model_load("examples/graphics_tests/cube.obj")
+if m == 0:
+    print("No OBJ found: " + model_error())
+else:
+    print("Loaded model:")
+    print("  Vertices: " + model_vertex_count(m))
+    print("  Faces:    " + model_face_count(m))
+    model_draw(m, 0)
+    model_destroy(m)
+
+# ── Error handling ────────────────────────────────────────────────────────────
+bad = model_load("nonexistent.obj")
+if bad == 0:
+    print("Expected error: " + model_error())
+
+print("Model demo complete.")

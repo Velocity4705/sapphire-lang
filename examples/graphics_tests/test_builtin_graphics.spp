@@ -1,0 +1,45 @@
+# Test Built-in Graphics Functions
+# Uses the existing sapphire_window_* functions that are already in the compiler
+
+fn main():
+    print("Testing Built-in Graphics Functions")
+    print("Creating window...")
+    
+    # Create window using built-in function
+    let window = sapphire_window_create("Sapphire Graphics Test", 800, 600)
+    sapphire_window_show(window)
+    
+    print("Window created and shown!")
+    print("Running for 3 seconds...")
+    
+    # Simple render loop - 180 frames at 60 FPS = 3 seconds
+    let frame = 0
+    while frame < 180:
+        # Poll events
+        sapphire_window_poll_events(window)
+        
+        # Check if window should close
+        if sapphire_window_should_close(window):
+            print("Window close requested")
+            break
+        
+        # Clear screen to black
+        sapphire_window_clear(window, 0, 0, 0)
+        
+        # Draw colored rectangles
+        sapphire_window_fill_rect(window, 100, 100, 200, 150, 255, 255, 255)  # White
+        sapphire_window_fill_rect(window, 350, 200, 150, 100, 255, 0, 0)      # Red
+        sapphire_window_fill_rect(window, 200, 350, 100, 80, 0, 255, 0)       # Green
+        sapphire_window_fill_rect(window, 500, 300, 120, 120, 0, 0, 255)      # Blue
+        
+        # Present the frame
+        sapphire_window_present(window)
+        
+        # 60 FPS delay
+        SDL_Delay(16)
+        
+        frame = frame + 1
+    
+    print("Cleaning up...")
+    sapphire_window_destroy(window)
+    print("Test complete!")

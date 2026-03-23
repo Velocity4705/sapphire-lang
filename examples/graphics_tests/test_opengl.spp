@@ -1,0 +1,22 @@
+# Test OpenGL functions in Sapphire
+# This will generate LLVM IR with OpenGL calls
+
+# OpenGL constants
+let GL_COLOR_BUFFER_BIT = 16384
+let GL_TRIANGLES = 4
+
+# Clear the screen
+gl_clear_color(0, 0, 0, 1)
+gl_clear(GL_COLOR_BUFFER_BIT)
+
+# Draw a triangle
+gl_begin(GL_TRIANGLES)
+gl_color3f(1, 0, 0)
+gl_vertex3f(0, 1, 0)
+gl_color3f(0, 1, 0)
+gl_vertex3f(0 - 1, 0 - 1, 0)
+gl_color3f(0, 0, 1)
+gl_vertex3f(1, 0 - 1, 0)
+gl_end()
+
+print("OpenGL functions compiled successfully!")

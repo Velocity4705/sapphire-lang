@@ -1,0 +1,30 @@
+import simulation
+
+# ── Particle field simulation ────────────────────────────────────────────────
+# 500 particles in a 100x100 domain with attractors and repulsors
+field = field_sim_create(500, -50.0, -50.0, 50.0, 50.0)
+
+# Central attractor (gravity well)
+field_sim_add_attractor(field, 0.0, 0.0, 5000.0)
+
+# Two repulsors to create interesting flow
+field_sim_add_repulsor(field, -20.0, 0.0, 2000.0)
+field_sim_add_repulsor(field,  20.0, 0.0, 2000.0)
+
+print("Running 200-step particle field simulation...")
+print("Setup: 500 particles, 1 attractor, 2 repulsors")
+
+step = 0
+while step < 200:
+    field_sim_step(field, 0.05)
+    step = step + 1
+
+print("Sample particle positions after 200 steps:")
+i = 0
+while i < 8:
+    pos = field_sim_get_particle_position(field, i * 60)
+    print("  particle " + (i * 60) + ": " + pos)
+    i = i + 1
+
+field_sim_destroy(field)
+print("Field simulation complete.")

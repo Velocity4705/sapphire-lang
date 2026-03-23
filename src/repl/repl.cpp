@@ -175,7 +175,7 @@ void REPL::executeCode(const std::string& code) {
 
 void REPL::printWelcome() {
     std::cout << "╔══════════════════════════════════════════════════════════════╗\n";
-    std::cout << "║         Sapphire REPL v1.0.0-beta.2                          ║\n";
+    std::cout << "║         Sapphire REPL v1.0-beta.6                          ║\n";
     std::cout << "║         Interactive Programming Environment                   ║\n";
     std::cout << "╚══════════════════════════════════════════════════════════════╝\n";
     std::cout << "\n";

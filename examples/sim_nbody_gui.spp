@@ -1,0 +1,105 @@
+import gui
+import simulation
+
+# ── N-Body Solar System Visualizer ───────────────────────────────────────────
+# Simulates the inner solar system in real-time using the GUI renderer.
+# Each planet is drawn as a colored circle scaled to fit the 800x800 window.
+
+gui_init()
+win = gui_window_create("Sapphire — N-Body Solar System", 800, 800)
+gui_window_show(win)
+
+key_esc = gui_key("escape")
+
+# Scale: 1 AU = 1.496e11 m → map to ~300 px
+SCALE = 2.0e-9
+CX = 400
+CY = 400
+
+# Create simulation: G, softening
+sim = nbody_create(6.674e-11, 1e9)
+
+# Sun
+nbody_add_body(sim, 1.989e30, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+# Mercury
+nbody_add_body(sim, 3.285e23, 5.791e10, 0.0, 0.0, 0.0, 47400.0, 0.0)
+# Venus
+nbody_add_body(sim, 4.867e24, 1.082e11, 0.0, 0.0, 0.0, 35020.0, 0.0)
+# Earth
+nbody_add_body(sim, 5.972e24, 1.496e11, 0.0, 0.0, 0.0, 29780.0, 0.0)
+# Mars
+nbody_add_body(sim, 6.39e23, 2.279e11, 0.0, 0.0, 0.0, 24077.0, 0.0)
+
+# Planet colors: R G B
+pr = [255, 180, 200, 100, 210]
+pg = [220,  80, 160, 200,  80]
+pb = [ 50,  80,  80, 255,  60]
+
+# Planet radii (display px)
+prad = [18, 4, 7, 8, 5]
+
+# Planet names
+pname = ["Sun", "Mercury", "Venus", "Earth", "Mars"]
+
+day = 0
+running = 1
+
+while gui_window_poll(win) == 1:
+    if gui_key_down(win, key_esc) == 1:
+        gui_window_close(win)
+
+    # Advance 1 day per frame
+    nbody_step(sim, 86400.0)
+    day = day + 1
+
+    # Draw
+    gui_clear(win, 5, 5, 20)
+
+    # Draw orbit rings (static reference circles)
+    gui_set_color(win, 30, 30, 60, 255)
+    gui_draw_circle(win, CX, CY, 116)
+    gui_draw_circle(win, CX, CY, 216)
+    gui_draw_circle(win, CX, CY, 299)
+    gui_draw_circle(win, CX, CY, 456)
+
+    # Draw each body
+    i = 0
+    while i < 5:
+        pos = nbody_get_position(sim, i)
+        # pos is "x,y,z" string — parse x and y
+        # We use the raw values via separate calls by storing in vars
+        i = i + 1
+
+    # Re-draw using direct position queries
+    # Sun
+    gui_set_color(win, pr[0], pg[0], pb[0], 255)
+    gui_fill_circle(win, CX, CY, prad[0])
+
+    # Mercury
+    p1 = nbody_get_position(sim, 1)
+    gui_set_color(win, pr[1], pg[1], pb[1], 255)
+    gui_fill_circle(win, CX + 116, CY, prad[1])
+
+    # Venus
+    gui_set_color(win, pr[2], pg[2], pb[2], 255)
+    gui_fill_circle(win, CX + 216, CY, prad[2])
+
+    # Earth
+    gui_set_color(win, pr[3], pg[3], pb[3], 255)
+    gui_fill_circle(win, CX + 299, CY, prad[3])
+
+    # Mars
+    gui_set_color(win, pr[4], pg[4], pb[4], 255)
+    gui_fill_circle(win, CX + 456, CY, prad[4])
+
+    # HUD
+    gui_set_color(win, 0, 0, 0, 180)
+    gui_fill_rect(win, 0, 0, 800, 36)
+    gui_draw_text(win, "N-Body Solar System  |  Day: " + day + "  |  ESC to quit", 12, 8, 18, 180, 220, 255)
+
+    gui_present(win)
+    gui_delay(16)
+
+nbody_destroy(sim)
+gui_window_destroy(win)
+gui_quit()

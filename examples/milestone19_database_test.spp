@@ -1,0 +1,104 @@
+# M19 Database — real database connectors
+# Uses: db_open, db_exec, query builder, kv store, doc store
+
+import database
+
+# ── 1. SQLite ────────────────────────────────────────────────────────────────
+print("=== SQLite ===")
+db = db_open("sqlite", ":memory:", "", "", 0, "")
+print("DB opened")
+
+db_exec(db, "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, email TEXT)")
+db_exec(db, "INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com')")
+db_exec(db, "INSERT INTO users (name, email) VALUES ('Bob', 'bob@example.com')")
+
+result = db_exec(db, "SELECT * FROM users")
+print("Rows:", db_result_row_count(result))
+print("Row 0 name:", db_result_get(result, 0, 1))
+print("Row 1 name:", db_result_get(result, 1, 1))
+db_result_destroy(result)
+
+# ── 2. Transactions ──────────────────────────────────────────────────────────
+print("=== Transactions ===")
+db_begin(db)
+try:
+    db_exec(db, "INSERT INTO users (name, email) VALUES ('Carol', 'carol@example.com')")
+    db_commit(db)
+    print("Committed")
+catch e:
+    db_rollback(db)
+    print("Rolled back:", e)
+
+r2 = db_exec(db, "SELECT * FROM users")
+print("Total users:", db_result_row_count(r2))
+db_result_destroy(r2)
+
+# ── 3. Query Builder ─────────────────────────────────────────────────────────
+print("=== Query Builder ===")
+qb = db_qb_select(db, "users")
+db_qb_where(qb, "name = 'Alice'")
+db_qb_limit(qb, 1)
+print("SQL:", db_qb_sql(qb))
+r3 = db_qb_exec(qb)
+print("Found:", db_result_get(r3, 0, 1))
+db_result_destroy(r3)
+db_qb_destroy(qb)
+
+# ── 4. KV Store ──────────────────────────────────────────────────────────────
+print("=== KV Store ===")
+kv = kv_open(":memory:")
+kv_set(kv, "user:1:name", "Alice")
+kv_set(kv, "user:1:email", "alice@example.com")
+kv_setex(kv, "session:abc", "user_id=1", 3600)
+
+print("name:", kv_get(kv, "user:1:name"))
+print("email:", kv_get(kv, "user:1:email"))
+print("session exists:", kv_exists(kv, "session:abc"))
+print("count:", kv_count(kv))
+
+kv_incr(kv, "visits")
+kv_incr(kv, "visits")
+kv_incr(kv, "visits")
+print("visits:", kv_get(kv, "visits"))
+
+kv_lpush(kv, "queue", "job1")
+kv_lpush(kv, "queue", "job2")
+kv_rpush(kv, "queue", "job3")
+print("queue len:", kv_llen(kv, "queue"))
+print("lpop:", kv_lpop(kv, "queue"))
+
+kv_hset(kv, "config", "theme", "dark")
+kv_hset(kv, "config", "lang", "en")
+print("theme:", kv_hget(kv, "config", "theme"))
+print("hlen:", kv_hlen(kv, "config"))
+kv_close(kv)
+
+# ── 5. Document Store ────────────────────────────────────────────────────────
+print("=== Document Store ===")
+doc = doc_open(":memory:")
+
+m1 = doc_map_create()
+doc_map_set(m1, "name", "Alice")
+doc_map_set(m1, "role", "admin")
+doc_insert(doc, "users", m1)
+
+m2 = doc_map_create()
+doc_map_set(m2, "name", "Bob")
+doc_map_set(m2, "role", "user")
+doc_insert(doc, "users", m2)
+
+print("Count:", doc_count(doc, "users"))
+
+found = doc_find(doc, "users", "name", "Alice")
+print("Found name:", doc_map_get(found, "name"))
+print("Found role:", doc_map_get(found, "role"))
+
+all_docs = doc_find_all(doc, "users")
+print("All docs:", doc_list_count(all_docs))
+
+doc_map_destroy(m1)
+doc_map_destroy(m2)
+doc_close(doc)
+
+db_close(db)
+print("M19 Database test complete.")

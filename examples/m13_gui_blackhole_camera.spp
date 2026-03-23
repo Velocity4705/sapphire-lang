@@ -1,0 +1,168 @@
+import gui
+import simulation
+
+# Black Hole — animated particles with camera controls
+# Left-drag: pan  |  Scroll: zoom  |  R: reset  |  ESC: quit
+
+gui_init()
+win = gui_window_create("Sapphire — Black Hole", 900, 900)
+gui_window_show(win)
+
+W = 900
+H = 900
+
+key_esc = gui_key("escape")
+key_r   = gui_key("r")
+
+# Black hole sim — units: metres, seconds
+# Schwarzschild radius ~30 sim units, mass tuned for visible orbits
+bh = blackhole_create(5e14, 30.0)
+
+# Add particles in two rings with tangential velocity
+i = 0
+while i < 120:
+    dist = 60.0 + i * 3.5
+    vt = 2.8e7 / (dist * 0.08)
+    blackhole_add_particle(bh, dist, 0.0, 0.0, vt)
+    i = i + 1
+
+j = 0
+while j < 80:
+    dist = 55.0 + j * 4.0
+    vt = 2.8e7 / (dist * 0.08)
+    blackhole_add_particle(bh, 0.0, dist, -vt, 0.0)
+    j = j + 1
+
+# Camera — world units match sim units (metres ~1:1 pixel at zoom=1)
+cam_x = 0.0
+cam_y = 0.0
+zoom  = 1.0   # pixels per sim unit
+
+DT    = 1e-7
+step  = 0
+NPART = 200
+
+while gui_window_poll(win) == 1:
+
+    if gui_key_down(win, key_esc) == 1:
+        gui_window_close(win)
+
+    # Reset camera
+    if gui_key_pressed(win, key_r) == 1:
+        cam_x = 0.0
+        cam_y = 0.0
+        zoom  = 1.0
+
+    # Scroll zoom centred on mouse
+    scroll = gui_scroll_y(win)
+    if scroll != 0:
+        mx = gui_mouse_x(win)
+        my = gui_mouse_y(win)
+        wx0 = cam_x + (mx - W / 2) / zoom
+        wy0 = cam_y - (my - H / 2) / zoom
+        if scroll > 0:
+            zoom = zoom * 1.15
+        else:
+            zoom = zoom * 0.87
+        if zoom < 0.05:
+            zoom = 0.05
+        if zoom > 20.0:
+            zoom = 20.0
+        cam_x = wx0 - (mx - W / 2) / zoom
+        cam_y = wy0 + (my - H / 2) / zoom
+
+    # Left-drag pan
+    if gui_mouse_button(win, 1) == 1:
+        cam_x = cam_x - gui_mouse_dx(win) / zoom
+        cam_y = cam_y + gui_mouse_dy(win) / zoom
+
+    # Advance simulation
+    blackhole_step(bh, DT)
+    step = step + 1
+
+    # ── Draw ─────────────────────────────────────────────────────────────────
+    gui_clear(win, 2, 2, 10)
+
+    # Stars
+    gui_set_color(win, 180, 180, 210, 255)
+    gui_draw_point(win, 80,  40)
+    gui_draw_point(win, 200, 90)
+    gui_draw_point(win, 350, 25)
+    gui_draw_point(win, 520, 70)
+    gui_draw_point(win, 720, 18)
+    gui_draw_point(win, 800, 220)
+    gui_draw_point(win, 110, 450)
+    gui_draw_point(win, 670, 750)
+    gui_draw_point(win, 230, 800)
+    gui_draw_point(win, 760, 580)
+    gui_draw_point(win, 440, 860)
+    gui_draw_point(win, 60,  700)
+    gui_draw_point(win, 880, 400)
+    gui_draw_point(win, 300, 550)
+    gui_draw_point(win, 600, 300)
+
+    # Black hole screen position
+    bhx = W / 2 - cam_x * zoom
+    bhy = H / 2 + cam_y * zoom
+
+    # Accretion disk glow (screen-space radius = sim_radius * zoom)
+    rs_px = 30 * zoom
+    gui_set_color(win, 40, 15, 0, 255)
+    gui_draw_circle(win, bhx, bhy, rs_px + 40 * zoom)
+    gui_set_color(win, 80, 30, 0, 255)
+    gui_draw_circle(win, bhx, bhy, rs_px + 25 * zoom)
+    gui_set_color(win, 140, 60, 5, 255)
+    gui_draw_circle(win, bhx, bhy, rs_px + 14 * zoom)
+    gui_set_color(win, 220, 130, 20, 255)
+    gui_draw_circle(win, bhx, bhy, rs_px + 6 * zoom)
+
+    # Event horizon
+    gui_set_color(win, 0, 0, 0, 255)
+    gui_fill_circle(win, bhx, bhy, rs_px)
+    gui_set_color(win, 255, 200, 50, 255)
+    gui_draw_circle(win, bhx, bhy, rs_px)
+
+    # Draw all particles using real simulation positions
+    p = 0
+    while p < NPART:
+        px = blackhole_get_particle_x(bh, p)
+        py = blackhole_get_particle_y(bh, p)
+        # NaN check: captured particles return NaN — skip if out of range
+        if px > -1e10:
+            if px < 1e10:
+                # World → screen
+                sx = bhx + px * zoom
+                sy = bhy - py * zoom
+                # Colour by distance from BH
+                dist2 = px * px + py * py
+                if dist2 < 10000:
+                    gui_set_color(win, 255, 220, 80, 255)
+                else:
+                    if dist2 < 40000:
+                        gui_set_color(win, 255, 140, 40, 255)
+                    else:
+                        gui_set_color(win, 120, 180, 255, 200)
+                gui_fill_circle(win, sx, sy, 2)
+        p = p + 1
+
+    # Gravitational lensing ring hint
+    gui_set_color(win, 255, 255, 200, 30)
+    gui_draw_circle(win, bhx, bhy, rs_px * 2.6)
+
+    # HUD
+    captured = blackhole_captured_count(bh)
+    gui_set_color(win, 0, 0, 0, 210)
+    gui_fill_rect(win, 0, 0, 900, 34)
+    gui_draw_text(win, "Black Hole  Step:" + step + "  Captured:" + captured + "  Scroll=zoom  Drag=pan  R=reset  ESC=quit", 8, 8, 14, 255, 180, 60)
+
+    gui_set_color(win, 0, 0, 0, 160)
+    gui_fill_rect(win, 0, 866, 900, 34)
+    gui_draw_text(win, "Zoom: " + zoom + "  Cam: (" + cam_x + ", " + cam_y + ")  Particles: " + NPART, 8, 874, 13, 120, 120, 180)
+
+    gui_present(win)
+    gui_delay(16)
+
+blackhole_destroy(bh)
+gui_window_destroy(win)
+gui_quit()
+print("Black hole closed at step " + step)

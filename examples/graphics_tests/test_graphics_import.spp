@@ -1,0 +1,73 @@
+# Test Graphics Import - SDL2
+# This tests importing and using the SDL2 graphics library
+
+# External SDL2 function declarations
+extern fn sapphire_sdl2_create_window(title: string, width: int, height: int) -> ptr
+extern fn sapphire_sdl2_destroy_window(window: ptr)
+extern fn sapphire_sdl2_show_window(window: ptr)
+extern fn sapphire_sdl2_should_close(window: ptr) -> bool
+extern fn sapphire_sdl2_poll_events(window: ptr)
+extern fn sapphire_sdl2_clear(window: ptr, r: int, g: int, b: int)
+extern fn sapphire_sdl2_present(window: ptr)
+extern fn sapphire_sdl2_fill_rect(window: ptr, x: int, y: int, w: int, h: int, r: int, g: int, b: int)
+extern fn sapphire_sdl2_delay(ms: int)
+
+fn main():
+    print("Testing SDL2 Graphics Library Import")
+    print("Creating window...")
+    
+    # Create window using SDL2 library
+    let window = sapphire_sdl2_create_window("Sapphire Graphics Test", 800, 600)
+    
+    if window == 0:
+        print("Failed to create window!")
+        return
+    
+    print("Window created successfully!")
+    print("Showing window...")
+    
+    # Show the window
+    sapphire_sdl2_show_window(window)
+    
+    print("Running for 3 seconds...")
+    
+    # Simple render loop - run for ~3 seconds (180 frames at 60 FPS)
+    let frame = 0
+    while frame < 180:
+        # Poll events
+        sapphire_sdl2_poll_events(window)
+        
+        # Check if window should close
+        if sapphire_sdl2_should_close(window):
+            print("Window close requested")
+            break
+        
+        # Clear screen to black
+        sapphire_sdl2_clear(window, 0, 0, 0)
+        
+        # Draw a white rectangle
+        sapphire_sdl2_fill_rect(window, 100, 100, 200, 150, 255, 255, 255)
+        
+        # Draw a red rectangle
+        sapphire_sdl2_fill_rect(window, 350, 200, 150, 100, 255, 0, 0)
+        
+        # Draw a green rectangle
+        sapphire_sdl2_fill_rect(window, 200, 350, 100, 80, 0, 255, 0)
+        
+        # Draw a blue rectangle
+        sapphire_sdl2_fill_rect(window, 500, 300, 120, 120, 0, 0, 255)
+        
+        # Present the frame
+        sapphire_sdl2_present(window)
+        
+        # 60 FPS delay
+        sapphire_sdl2_delay(16)
+        
+        frame = frame + 1
+    
+    print("Cleaning up...")
+    
+    # Destroy window
+    sapphire_sdl2_destroy_window(window)
+    
+    print("Test complete!")

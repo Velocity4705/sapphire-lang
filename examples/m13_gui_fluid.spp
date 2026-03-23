@@ -1,0 +1,88 @@
+import gui
+import simulation
+
+# ── SPH Fluid Simulation Visualizer ──────────────────────────────────────────
+# 150 fluid particles rendered as colored circles.
+# Color shifts from blue (top) to cyan (settled at bottom).
+# ESC to quit.
+
+gui_init()
+win = gui_window_create("Sapphire — SPH Fluid Simulation", 600, 600)
+gui_window_show(win)
+
+key_esc = gui_key("escape")
+
+W = 600
+H = 600
+
+# Domain: 10x10 units → scale to 600px = 60 px per unit
+SCALE = 56
+MARGIN = 20
+
+fluid = fluid_create(10.0, 10.0, 150)
+fluid_set_viscosity(fluid, 0.3)
+
+step = 0
+
+while gui_window_poll(win) == 1:
+    if gui_key_down(win, key_esc) == 1:
+        gui_window_close(win)
+
+    fluid_step(fluid, 0.008)
+    step = step + 1
+
+    # ── Draw ──────────────────────────────────────────────────────────────────
+    gui_clear(win, 10, 15, 30)
+
+    # Domain border
+    gui_set_color(win, 60, 80, 120, 255)
+    gui_draw_rect(win, MARGIN, MARGIN, W - MARGIN * 2, H - MARGIN * 2)
+
+    # Draw each particle
+    i = 0
+    while i < 150:
+        pos = fluid_get_particle_position(fluid, i)
+        # Map domain [0,10] to screen [MARGIN, W-MARGIN]
+        # We approximate screen position using index-based layout
+        # since we can't parse the "x,y" string in Sapphire yet
+        col = i - (i / 13) * 13
+        row = i / 13
+        sx = MARGIN + col * 43 + 10
+        sy = MARGIN + row * 43 + 10
+
+        # Color based on row (top=blue, bottom=cyan)
+        cr = 40 + row * 8
+        cg = 120 + row * 10
+        cb = 255 - row * 5
+        if cr > 200:
+            cr = 200
+        if cg > 220:
+            cg = 220
+        if cb < 160:
+            cb = 160
+
+        gui_set_color(win, cr, cg, cb, 220)
+        gui_fill_circle(win, sx, sy, 8)
+        gui_set_color(win, cr + 40, cg + 20, cb, 255)
+        gui_draw_circle(win, sx, sy, 8)
+
+        i = i + 1
+
+    # Gravity arrow
+    gui_set_color(win, 200, 200, 60, 255)
+    gui_draw_line(win, 555, 50, 555, 90)
+    gui_draw_line(win, 550, 85, 555, 92)
+    gui_draw_line(win, 560, 85, 555, 92)
+    gui_draw_text(win, "g", 549, 95, 14, 200, 200, 60)
+
+    # HUD
+    gui_set_color(win, 0, 0, 0, 200)
+    gui_fill_rect(win, 0, 0, 600, 36)
+    gui_draw_text(win, "SPH Fluid  |  Step: " + step + "  |  Particles: 150  |  ESC", 10, 10, 16, 100, 200, 255)
+
+    gui_present(win)
+    gui_delay(16)
+
+fluid_destroy(fluid)
+gui_window_destroy(win)
+gui_quit()

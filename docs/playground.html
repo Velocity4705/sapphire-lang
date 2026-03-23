@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sapphire Playground - Try Sapphire in your browser">
+    <title>Sapphire Playground 💎</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="playground.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- CodeMirror -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/simple.js"></script>
+</head>
+<body>
+    <!-- Nav -->
+    <section class="hero" style="min-height: unset;">
+        <nav class="nav">
+            <div class="nav-content">
+                <div class="nav-left">
+                    <a href="index.html" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;">
+                        <img src="sapphire-icon.svg" alt="Sapphire" class="nav-logo">
+                        <span class="nav-name">Sapphire</span>
+                        <span class="nav-badge">beta.6</span>
+                    </a>
+                </div>
+                <div class="nav-center">
+                    <a href="index.html#features">Features</a>
+                    <a href="index.html#examples">Examples</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/tree/main/docs" target="_blank">Docs</a>
+                    <a href="index.html#download">Download</a>
+                </div>
+                <div class="nav-right">
+                    <a href="playground.html" class="nav-playground" style="color: var(--cyan);">▶ Playground</a>
+                    <a href="https://github.com/velo4705/sapphire-lang" class="nav-github-btn">GitHub</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+
+    <!-- Playground -->
+    <main class="playground-page">
+        <div class="playground-header">
+            <h1 class="playground-title">💎 Sapphire Playground</h1>
+            <p class="playground-subtitle">Try Sapphire right in your browser — no install needed.</p>
+        </div>
+
+        <div class="playground-layout">
+            <!-- Sidebar: examples -->
+            <aside class="playground-sidebar">
+                <div class="sidebar-label">Examples</div>
+                <ul class="example-list" id="exampleList">
+                    <li class="example-item" data-example="hello">Hello World</li>
+                    <li class="example-item" data-example="fibonacci">Fibonacci</li>
+                    <li class="example-item" data-example="fizzbuzz">FizzBuzz</li>
+                    <li class="example-item" data-example="functions">Functions</li>
+                    <li class="example-item" data-example="loops">Loops</li>
+                    <li class="example-item" data-example="arrays">Arrays</li>
+                    <li class="example-item" data-example="pattern">Pattern Matching</li>
+                    <li class="example-item" data-example="errors">Error Handling</li>
+                    <li class="example-item" data-example="hashmap">HashMap</li>
+                    <li class="example-item" data-example="decorators">Decorators</li>
+                    <li class="example-item" data-example="classes">Classes</li>
+                    <li class="example-item" data-example="oop">OOP / Inheritance</li>
+                </ul>
+            </aside>
+
+            <!-- Editor + Output -->
+            <div class="playground-main">
+                <div class="editor-pane">
+                    <div class="pane-header">
+                        <span class="pane-title">
+                            <span class="dot dot-red"></span>
+                            <span class="dot dot-yellow"></span>
+                            <span class="dot dot-green"></span>
+                            <span id="currentFile">hello.spp</span>
+                        </span>
+                        <div class="editor-actions">
+                            <button class="btn-icon" id="btnCopy" title="Copy code">⎘ Copy</button>
+                            <button class="btn-icon" id="btnClear" title="Clear output">✕ Clear</button>
+                            <button class="btn-run" id="btnRun">▶ Run</button>
+                        </div>
+                    </div>
+                    <div id="editor-container">
+                        <textarea id="editor"></textarea>
+                    </div>
+                </div>
+
+                <div class="output-pane">
+                    <div class="pane-header">
+                        <span class="pane-title">Output</span>
+                        <span class="output-status" id="outputStatus"></span>
+                    </div>
+                    <div class="output-body" id="output">
+                        <span class="output-hint">Press ▶ Run to execute your code.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="playground-note">
+            <span>💡</span>
+            <span>The playground simulates Sapphire output for the built-in examples. To run arbitrary code, <a href="index.html#download">install Sapphire</a> locally.</span>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <img src="sapphire-icon.svg" alt="Sapphire" class="footer-logo">
+                    <div class="footer-brand">Sapphire</div>
+                    <div class="footer-tagline">Fast as C. Easy as Python.</div>
+                </div>
+                <div>
+                    <h4>Resources</h4>
+                    <a href="https://github.com/velo4705/sapphire-lang">GitHub</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/blob/main/docs/API_REFERENCE.md">Documentation</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/tree/main/examples">Examples</a>
+                </div>
+                <div>
+                    <h4>Community</h4>
+                    <a href="https://github.com/velo4705/sapphire-lang/issues">Issues</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/discussions">Discussions</a>
+                    <a href="https://github.com/velo4705/sapphire-lang/blob/main/CONTRIBUTING.md">Contributing</a>
+                </div>
+                <div>
+                    <h4>Legal</h4>
+                    <a href="https://github.com/velo4705/sapphire-lang/blob/main/LICENSE">MIT License</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Made with 💎 by the Sapphire community</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="transitions.js"></script>
+    <script src="playground.js"></script>
+</body>
+</html>

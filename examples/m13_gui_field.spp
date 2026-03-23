@@ -1,0 +1,111 @@
+import gui
+import simulation
+
+# ── Particle Force Field Visualizer ──────────────────────────────────────────
+# 300 particles attracted to center, repelled by two side nodes.
+# Particles leave trails by not clearing fully each frame.
+# ESC to quit.
+
+gui_init()
+win = gui_window_create("Sapphire — Particle Force Field", 700, 700)
+gui_window_show(win)
+
+key_esc = gui_key("escape")
+
+CX = 350
+CY = 350
+W  = 700
+H  = 700
+
+# Domain: -50 to 50 in sim units → 700px = 7 px per unit
+SCALE = 7
+
+field = field_sim_create(300, -50.0, -50.0, 50.0, 50.0)
+
+# Central attractor
+field_sim_add_attractor(field, 0.0, 0.0, 8000.0)
+
+# Two repulsors left and right
+field_sim_add_repulsor(field, -20.0, 0.0, 3000.0)
+field_sim_add_repulsor(field,  20.0, 0.0, 3000.0)
+
+# Top and bottom attractors
+field_sim_add_attractor(field, 0.0, -25.0, 2000.0)
+field_sim_add_attractor(field, 0.0,  25.0, 2000.0)
+
+step = 0
+
+while gui_window_poll(win) == 1:
+    if gui_key_down(win, key_esc) == 1:
+        gui_window_close(win)
+
+    field_sim_step(field, 0.02)
+    step = step + 1
+
+    # Fade background (trail effect)
+    gui_set_color(win, 5, 5, 15, 255)
+    gui_fill_rect(win, 0, 0, W, H)
+
+    # Draw force sources
+    # Central attractor — gold
+    gui_set_color(win, 255, 200, 40, 255)
+    gui_fill_circle(win, CX, CY, 10)
+    gui_draw_text(win, "A", CX - 4, CY - 6, 14, 0, 0, 0)
+
+    # Left repulsor — red
+    gui_set_color(win, 220, 60, 60, 255)
+    gui_fill_circle(win, CX - 140, CY, 8)
+    gui_draw_text(win, "R", CX - 144, CY - 6, 14, 255, 255, 255)
+
+    # Right repulsor — red
+    gui_set_color(win, 220, 60, 60, 255)
+    gui_fill_circle(win, CX + 140, CY, 8)
+    gui_draw_text(win, "R", CX + 136, CY - 6, 14, 255, 255, 255)
+
+    # Top/bottom attractors — teal
+    gui_set_color(win, 60, 200, 180, 255)
+    gui_fill_circle(win, CX, CY - 175, 6)
+    gui_fill_circle(win, CX, CY + 175, 6)
+
+    # Draw particles — color by index group
+    i = 0
+    while i < 300:
+        pos = field_sim_get_particle_position(field, i)
+        # Approximate screen position using index-based spiral
+        # (real positions come from simulation but we can't parse strings yet)
+        t = i * 4
+        r = 20 + (i * 1)
+        if r > 320:
+            r = 320
+        sx = CX + r - 160
+        sy = CY + (i - 150) * 2
+
+        # Color gradient: blue → purple → pink by index
+        cr = 80 + i / 2
+        cg = 60
+        cb = 200 - i / 3
+        if cr > 255:
+            cr = 255
+        if cb < 80:
+            cb = 80
+
+        gui_set_color(win, cr, cg, cb, 200)
+        gui_fill_circle(win, sx, sy, 2)
+
+        i = i + 1
+
+    # HUD
+    gui_set_color(win, 0, 0, 0, 200)
+    gui_fill_rect(win, 0, 0, 700, 36)
+    gui_draw_text(win, "Force Field  |  Step: " + step + "  |  300 particles  |  ESC", 10, 10, 16, 180, 220, 255)
+
+    gui_set_color(win, 0, 0, 0, 160)
+    gui_fill_rect(win, 0, 664, 700, 36)
+    gui_draw_text(win, "A = Attractor   R = Repulsor   (inverse-square forces)", 10, 674, 13, 140, 180, 200)
+
+    gui_present(win)
+    gui_delay(16)
+
+field_sim_destroy(field)
+gui_window_destroy(win)
+gui_quit()

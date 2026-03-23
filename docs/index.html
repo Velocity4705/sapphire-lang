@@ -21,39 +21,57 @@
                 <div class="nav-left">
                     <img src="sapphire-icon.svg" alt="Sapphire" class="nav-logo">
                     <span class="nav-name">Sapphire</span>
-                    <span class="nav-badge">beta.5</span>
+                    <span class="nav-badge">beta.6</span>
                 </div>
-                <div class="nav-right">
+                <div class="nav-center">
                     <a href="#features">Features</a>
                     <a href="#examples">Examples</a>
-                    <a href="#download">Installation</a>
                     <a href="https://github.com/velo4705/sapphire-lang/tree/main/docs" target="_blank">Docs</a>
-                    <a href="https://github.com/velo4705/sapphire-lang" class="nav-github">GitHub</a>
+                    <a href="#download">Download</a>
+                </div>
+                <div class="nav-right">
+                    <a href="playground.html" class="nav-playground">▶ Playground</a>
+                    <a href="https://github.com/velo4705/sapphire-lang" class="nav-github-btn">GitHub</a>
                 </div>
             </div>
         </nav>
 
+        <canvas id="hero-canvas"></canvas>
+
         <div class="hero-main">
-            <img src="sapphire-icon.svg" alt="Sapphire" class="hero-logo">
-            <h1 class="hero-title">Sapphire</h1>
-            <p class="hero-subtitle">Fast. Simple. Powerful.</p>
-            <p class="hero-description">
-                A modern programming language designed for performance, safety, and developer happiness.
-            </p>
-            <a href="#download" class="hero-btn">Get Started</a>
-            
-            <div class="hero-stats">
-                <div class="stat">
-                    <div class="stat-num">0-5%</div>
-                    <div class="stat-text">of C speed</div>
+            <div class="hero-left">
+                <h1 class="hero-title">Fast. Simple.<br>Powerful.</h1>
+                <p class="hero-description">
+                    A modern programming language designed for performance, safety, and developer happiness.
+                </p>
+                <div class="hero-actions">
+                    <a href="#download" class="hero-btn">Get Started</a>
+                    <a href="#examples" class="hero-btn-outline">See Examples</a>
                 </div>
-                <div class="stat">
-                    <div class="stat-num">18</div>
-                    <div class="stat-text">modules</div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-num">0-5%</div>
+                        <div class="stat-text">of C performance</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num">119μs</div>
+                        <div class="stat-text">GC pause time</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num">300+</div>
+                        <div class="stat-text">stdlib functions</div>
+                    </div>
                 </div>
-                <div class="stat">
-                    <div class="stat-num">50+</div>
-                    <div class="stat-text">functions</div>
+            </div>
+            <div class="hero-right">
+                <div class="code-preview">
+                    <div class="code-preview-header">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-yellow"></span>
+                        <span class="dot dot-green"></span>
+                        <span class="code-preview-filename">hello.spp</span>
+                    </div>
+                    <pre class="code-preview-body"><code></code></pre>
                 </div>
             </div>
         </div>
@@ -147,6 +165,19 @@
         </div>
     </section>
 
+    <!-- Playground CTA -->
+    <section class="section" style="padding: 4rem 0;">
+        <div class="container" style="text-align: center;">
+            <h2 class="section-title">Try It Now</h2>
+            <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                No install needed. Write and run Sapphire code right in your browser.
+            </p>
+            <a href="playground.html" class="hero-btn" style="font-size: 1rem; padding: 1rem 2.5rem;">
+                ▶ Open Playground
+            </a>
+        </div>
+    </section>
+
     <!-- Download -->
     <section id="download" class="section">
         <div class="container">
@@ -221,6 +252,9 @@
         </div>
     </footer>
 
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+    <script src="transitions.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,193 @@
+import os
+
+print("=== M14: OS Development ===")
+
+# ── 1. Bootloader ─────────────────────────────────────────────────────────────
+print("\n-- Bootloader --")
+bl = boot_create("disk.img")
+boot_load_mbr(bl)
+print("MBR: " + boot_status(bl))
+boot_load_stage2(bl, 1, 4)
+print("Stage2: " + boot_status(bl))
+boot_load_kernel(bl, 5, 65536)
+print("Kernel: " + boot_status(bl))
+
+n = boot_get_memory_map_count(bl)
+print("Memory map entries: " + n)
+i = 0
+while i < n:
+    entry = boot_get_memory_map_entry(bl, i)
+    print("  [" + i + "] " + entry)
+    i = i + 1
+
+boot_enter_protected_mode(bl)
+print("Mode: " + boot_mode(bl) + " — " + boot_status(bl))
+boot_enter_long_mode(bl)
+print("Mode: " + boot_mode(bl) + " — " + boot_status(bl))
+boot_destroy(bl)
+
+# ── 2. Kernel ─────────────────────────────────────────────────────────────────
+print("\n-- Kernel --")
+k = kernel_create("SapphireOS")
+kernel_init_gdt(k)
+kernel_init_idt(k)
+kernel_init_pic(k)
+kernel_init_pit(k, 1000)
+
+kernel_register_isr(k, 0,  "divide_error")
+kernel_register_isr(k, 8,  "double_fault")
+kernel_register_isr(k, 14, "page_fault")
+kernel_register_isr(k, 32, "timer_irq")
+kernel_register_isr(k, 33, "keyboard_irq")
+
+print("ISRs registered: " + kernel_isr_count(k))
+print("ISR 14: " + kernel_isr_name(k, 14))
+
+kernel_trigger_interrupt(k, 32)
+kernel_trigger_interrupt(k, 32)
+kernel_trigger_interrupt(k, 33)
+print("Timer IRQ count: " + kernel_interrupt_count(k, 32))
+print("Keyboard IRQ count: " + kernel_interrupt_count(k, 33))
+
+kernel_vga_write(k, 0, 0, "SapphireOS v1.0", 7)
+kernel_vga_write(k, 1, 0, "Booting...", 10)
+print("VGA[0,0]: " + kernel_vga_read(k, 0, 0))
+print("Kernel status: " + kernel_status(k))
+kernel_destroy(k)
+
+# ── 3. Physical Memory Manager ────────────────────────────────────────────────
+print("\n-- Physical Memory Manager --")
+# 128 MB total, 4KB pages
+pmm = pmm_create(134217728, 4096)
+pmm_mark_free(pmm, 1048576, 125829120)
+pmm_mark_used(pmm, 0, 1048576)
+
+total = pmm_total_pages(pmm)
+free  = pmm_free_pages_count(pmm)
+used  = pmm_used_pages_count(pmm)
+print("Total pages: " + total + "  Free: " + free + "  Used: " + used)
+
+p1 = pmm_alloc_page(pmm)
+p2 = pmm_alloc_page(pmm)
+p3 = pmm_alloc_pages(pmm, 4)
+print("Alloc page1 addr: " + p1)
+print("Alloc page2 addr: " + p2)
+print("Alloc 4 pages at: " + p3)
+print("Free pages after alloc: " + pmm_free_pages_count(pmm))
+pmm_free_page(pmm, p1)
+print("Free pages after freeing p1: " + pmm_free_pages_count(pmm))
+pmm_destroy(pmm)
+
+# ── 4. Virtual Memory Manager ─────────────────────────────────────────────────
+print("\n-- Virtual Memory Manager --")
+vmm = vmm_create(0)
+# Map kernel pages using values that fit in 32-bit int
+vmm_map(vmm, 1073741824, 1048576, 3)
+vmm_map(vmm, 1073745920, 1052672, 3)
+vmm_map(vmm, 4194304,    2097152, 7)
+
+print("Kernel page mapped: " + vmm_is_mapped(vmm, 1073741824))
+phys = vmm_translate(vmm, 1073741824)
+print("Translate kernel virt -> phys: " + phys)
+vmm_unmap(vmm, 1073745920)
+print("After unmap, mapped: " + vmm_is_mapped(vmm, 1073745920))
+print("Page faults: " + vmm_page_fault_count(vmm))
+vmm_destroy(vmm)
+
+# ── 5. Heap Allocator ─────────────────────────────────────────────────────────
+print("\n-- Heap Allocator --")
+heap = heap_create(2097152, 65536)
+a1 = heap_alloc(heap, 1024)
+a2 = heap_alloc(heap, 2048)
+a3 = heap_alloc(heap, 512)
+print("Alloc 1KB at: " + a1)
+print("Alloc 2KB at: " + a2)
+print("Alloc 512B at: " + a3)
+print("Heap used: " + heap_used(heap) + " bytes")
+print("Heap free: " + heap_free_space(heap) + " bytes")
+print("Blocks: " + heap_block_count(heap))
+heap_free(heap, a2)
+print("After freeing 2KB — free: " + heap_free_space(heap) + " bytes")
+heap_destroy(heap)
+
+# ── 6. Scheduler ──────────────────────────────────────────────────────────────
+print("\n-- Round-Robin Scheduler --")
+sched = scheduler_create("round_robin")
+pid1 = scheduler_add_process(sched, "init",   1, 8192)
+pid2 = scheduler_add_process(sched, "shell",  1, 4096)
+pid3 = scheduler_add_process(sched, "daemon", 0, 4096)
+print("Processes: " + scheduler_process_count(sched))
+
+t = 0
+while t < 6:
+    running = scheduler_tick(sched)
+    print("  Tick " + t + " -> PID " + running + " (" + scheduler_process_name(sched, running) + ")")
+    t = t + 1
+
+scheduler_block(sched, pid2)
+print("Blocked shell. Next ticks:")
+t = 0
+while t < 3:
+    running = scheduler_tick(sched)
+    print("  Tick -> PID " + running + " (" + scheduler_process_name(sched, running) + ")")
+    t = t + 1
+
+scheduler_unblock(sched, pid2)
+scheduler_terminate(sched, pid3)
+print("daemon state: " + scheduler_process_state(sched, pid3))
+print("init ticks: " + scheduler_process_ticks(sched, pid1))
+scheduler_destroy(sched)
+
+# ── 7. Syscall Table ──────────────────────────────────────────────────────────
+print("\n-- Syscall Table --")
+tbl = syscall_table_create()
+syscall_table_register(tbl, 0,  "read",  3)
+syscall_table_register(tbl, 1,  "write", 3)
+syscall_table_register(tbl, 2,  "open",  3)
+syscall_table_register(tbl, 3,  "close", 1)
+syscall_table_register(tbl, 60, "exit",  1)
+print("Syscalls registered: " + syscall_table_count(tbl))
+print("Syscall 1: " + syscall_table_name(tbl, 1))
+result = syscall_table_invoke(tbl, 1, "fd=1,buf=hello,len=5")
+print("Invoke write: " + result)
+result2 = syscall_table_invoke(tbl, 99, "")
+print("Invoke unknown: " + result2)
+syscall_table_destroy(tbl)
+
+# ── 8. Device Drivers ─────────────────────────────────────────────────────────
+print("\n-- Device Drivers --")
+kbd  = driver_create("keyboard", "char")
+uart = driver_create("uart0",    "char")
+disk = driver_create("sda",      "block")
+
+driver_write(kbd, 96, 28, 1)   # port 0x60 = 96, scancode 0x1C = 28
+val = driver_read(kbd, 96, 1)
+print("Keyboard port 96 value: " + val)
+driver_irq_fire(kbd)
+driver_irq_fire(kbd)
+print("Keyboard IRQs: " + driver_irq_count(kbd))
+print("UART ready: " + driver_is_ready(uart))
+print("Disk type: " + driver_type(disk))
+driver_destroy(kbd)
+driver_destroy(uart)
+driver_destroy(disk)
+
+# ── 9. VGA Console ────────────────────────────────────────────────────────────
+print("\n-- VGA Console (80x25) --")
+vga = vga_create(80, 25)
+vga_puts(vga, "SapphireOS v1.0 - Booting...", 7)
+vga_putchar(vga, 10, 7)
+vga_puts(vga, "Loading kernel modules...", 10)
+vga_putchar(vga, 10, 7)
+vga_puts(vga, "Starting init process [PID 1]", 14)
+
+print("VGA line 0: " + vga_get_line(vga, 0))
+print("VGA line 1: " + vga_get_line(vga, 1))
+print("VGA line 2: " + vga_get_line(vga, 2))
+print("Cursor: row=" + vga_cursor_row(vga) + " col=" + vga_cursor_col(vga))
+print("VGA size: " + vga_cols(vga) + "x" + vga_rows(vga))
+vga_clear(vga)
+print("After clear, line 0: '" + vga_get_line(vga, 0) + "'")
+vga_destroy(vga)
+
+print("\n=== M14 OS Development: COMPLETE ===")

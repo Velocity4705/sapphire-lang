@@ -261,6 +261,6 @@ Individual tests:
 
 **Status**: All graphics APIs working!  
 **Date**: March 8, 2026  
-**Version**: 1.0-beta.5
+**Version**: 1.0-beta.6
 
 🎮 Happy Game Development! 🎮

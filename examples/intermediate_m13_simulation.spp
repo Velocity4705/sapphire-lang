@@ -1,0 +1,41 @@
+import simulation
+import physics
+
+# ── N-body solar system (8 bodies, 1000 steps) ──────────────────────────────
+sim = nbody_create(6.674e-11, 1e6)
+
+# Sun, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
+nbody_add_body(sim, 1.989e30, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+nbody_add_body(sim, 5.972e24, 1.496e11, 0.0, 0.0, 0.0, 29780.0, 0.0)
+nbody_add_body(sim, 6.39e23, 2.279e11, 0.0, 0.0, 0.0, 24077.0, 0.0)
+nbody_add_body(sim, 1.898e27, 7.783e11, 0.0, 0.0, 0.0, 13070.0, 0.0)
+nbody_add_body(sim, 5.683e26, 1.432e12, 0.0, 0.0, 0.0, 9690.0, 0.0)
+nbody_add_body(sim, 8.681e25, 2.867e12, 0.0, 0.0, 0.0, 6800.0, 0.0)
+nbody_add_body(sim, 1.024e26, 4.515e12, 0.0, 0.0, 0.0, 5430.0, 0.0)
+nbody_add_body(sim, 1.309e22, 5.906e12, 0.0, 0.0, 0.0, 4740.0, 0.0)
+
+i = 0
+while i < 1000:
+    nbody_step(sim, 86400.0)
+    i = i + 1
+
+earth_pos = nbody_get_position(sim, 1)
+print("Earth final position: " + earth_pos)
+nbody_destroy(sim)
+
+# ── Rigid body: box dropped onto static floor ────────────────────────────────
+world = physics_world_create(0.0, -9.81)
+
+floor = rigidbody_create(world, 0.0, 0.0, 0.0)
+collider_add_box(floor, 100.0, 1.0)
+
+box = rigidbody_create(world, 0.0, 10.0, 1.0)
+collider_add_box(box, 1.0, 1.0)
+
+j = 0
+while j < 200:
+    physics_world_step(world, 0.016)
+    j = j + 1
+
+print("Box resting y: " + rigidbody_get_y(box))
+physics_world_destroy(world)

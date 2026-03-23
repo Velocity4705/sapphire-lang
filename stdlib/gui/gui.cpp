@@ -686,7 +686,10 @@ struct GuiWindow {
     // Input state
     std::unordered_set<int> keys_down, keys_pressed;
     int mouse_x=0, mouse_y=0;
+    int mouse_px=0, mouse_py=0;  // previous frame position for delta
+    int mouse_dx=0, mouse_dy=0;  // delta since last poll
     bool mouse_btn[4] = {};
+    int scroll_y = 0;            // accumulated scroll this frame
     // Timing
     std::chrono::steady_clock::time_point last_frame;
     double delta = 0.016;
@@ -767,6 +770,8 @@ int gui_window_is_fullscreen(void* win) { return ((GuiWindow*)win)->fullscreen ?
 int gui_window_poll(void* win) {
     auto* w = (GuiWindow*)win;
     w->keys_pressed.clear();
+    w->scroll_y = 0;
+    w->mouse_dx = 0; w->mouse_dy = 0;
     if (!w->open) return 0;
 #ifdef HAVE_SDL2
     if (s_sdl_ok) {
@@ -779,14 +784,20 @@ int gui_window_poll(void* win) {
                 w->keys_pressed.insert(e.key.keysym.scancode);
             }
             if (e.type == SDL_KEYUP) w->keys_down.erase(e.key.keysym.scancode);
-            if (e.type == SDL_MOUSEMOTION) { w->mouse_x = e.motion.x; w->mouse_y = e.motion.y; }
+            if (e.type == SDL_MOUSEMOTION) {
+                w->mouse_dx += e.motion.xrel;
+                w->mouse_dy += e.motion.yrel;
+                w->mouse_x = e.motion.x;
+                w->mouse_y = e.motion.y;
+            }
             if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button <= 3) w->mouse_btn[e.button.button] = true;
             if (e.type == SDL_MOUSEBUTTONUP   && e.button.button <= 3) w->mouse_btn[e.button.button] = false;
+            if (e.type == SDL_MOUSEWHEEL) w->scroll_y += e.wheel.y;
         }
         return w->open ? 1 : 0;
     }
 #endif
-    return w->open ? 1 : 0; // headless: always open until explicitly closed
+    return w->open ? 1 : 0;
 }
 
 int gui_key_down(void* win, int sc) { return ((GuiWindow*)win)->keys_down.count(sc) ? 1 : 0; }
@@ -820,6 +831,10 @@ int gui_mouse_button(void* win, int btn) {
     if (btn < 1 || btn > 3) return 0;
     return w->mouse_btn[btn] ? 1 : 0;
 }
+
+int gui_scroll_y(void* win) { return ((GuiWindow*)win)->scroll_y; }
+int gui_mouse_dx(void* win) { return ((GuiWindow*)win)->mouse_dx; }
+int gui_mouse_dy(void* win) { return ((GuiWindow*)win)->mouse_dy; }
 
 // ---- Drawing ----
 void gui_clear(void* win, int r, int g, int b) {

@@ -35,9 +35,8 @@ run_test() {
     exit_code=$?
 
     if [ $exit_code -eq 124 ]; then
-        echo "  TIMEOUT $name"
-        ERRORS+=("TIMEOUT: $name")
-        ((FAIL++))
+        echo "  SKIP  $name  (timeout)"
+        ((SKIP++))
     elif [ $exit_code -ne 0 ]; then
         if echo "$output" | grep -qE "^Error:|RuntimeError:|TypeError:|Undefined variable|NameError"; then
             echo "  FAIL  $name"

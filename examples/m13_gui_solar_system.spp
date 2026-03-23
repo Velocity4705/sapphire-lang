@@ -1,0 +1,239 @@
+import gui
+import simulation
+
+# Solar System — animated with real N-body positions
+# Left-drag: pan  |  Scroll: zoom  |  R: reset  |  +/-: speed  |  ESC: quit
+
+gui_init()
+win = gui_window_create("Sapphire — Solar System", 900, 900)
+gui_window_show(win)
+
+W = 900
+H = 900
+
+key_esc   = gui_key("escape")
+key_r     = gui_key("r")
+
+# N-body sim (G, softening)
+sim = nbody_create(6.674e-11, 1e9)
+
+# Sun
+nbody_add_body(sim, 1.989e30,  0.0,      0.0, 0.0,  0.0,      0.0,  0.0)
+# Mercury
+nbody_add_body(sim, 3.285e23,  5.791e10, 0.0, 0.0,  0.0,  47400.0,  0.0)
+# Venus
+nbody_add_body(sim, 4.867e24,  1.082e11, 0.0, 0.0,  0.0,  35020.0,  0.0)
+# Earth
+nbody_add_body(sim, 5.972e24,  1.496e11, 0.0, 0.0,  0.0,  29780.0,  0.0)
+# Mars
+nbody_add_body(sim, 6.39e23,   2.279e11, 0.0, 0.0,  0.0,  24077.0,  0.0)
+# Jupiter
+nbody_add_body(sim, 1.898e27,  7.783e11, 0.0, 0.0,  0.0,  13070.0,  0.0)
+
+# Camera
+cam_x = 0.0
+cam_y = 0.0
+zoom  = 1.8e-9
+
+# Trail ring buffers (80 pts each, screen coords)
+TRAIL = 80
+t1x = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+t1y = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+t2x = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+t2y = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+t3x = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+t3y = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+t4x = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+t4y = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+t5x = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+t5y = [450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450,450]
+
+th = 0    # trail head
+day = 0
+speed = 1
+
+while gui_window_poll(win) == 1:
+
+    # ESC
+    if gui_key_down(win, key_esc) == 1:
+        gui_window_close(win)
+
+    # Reset camera
+    if gui_key_pressed(win, key_r) == 1:
+        cam_x = 0.0
+        cam_y = 0.0
+        zoom  = 1.8e-9
+
+    # Scroll zoom (centred on mouse)
+    scroll = gui_scroll_y(win)
+    if scroll != 0:
+        mx = gui_mouse_x(win)
+        my = gui_mouse_y(win)
+        wx0 = cam_x + (mx - W / 2) / zoom
+        wy0 = cam_y - (my - H / 2) / zoom
+        if scroll > 0:
+            zoom = zoom * 1.15
+        else:
+            zoom = zoom * 0.87
+        if zoom < 5e-11:
+            zoom = 5e-11
+        if zoom > 5e-8:
+            zoom = 5e-8
+        cam_x = wx0 - (mx - W / 2) / zoom
+        cam_y = wy0 + (my - H / 2) / zoom
+
+    # Left-drag pan
+    if gui_mouse_button(win, 1) == 1:
+        cam_x = cam_x - gui_mouse_dx(win) / zoom
+        cam_y = cam_y + gui_mouse_dy(win) / zoom
+
+    # Simulate (1 day = 86400 s per step)
+    s = 0
+    while s < speed:
+        nbody_step(sim, 86400.0)
+        s = s + 1
+    day = day + speed
+
+    # Read real positions from simulation
+    wx1 = nbody_get_x(sim, 1)
+    wy1 = nbody_get_y(sim, 1)
+    wx2 = nbody_get_x(sim, 2)
+    wy2 = nbody_get_y(sim, 2)
+    wx3 = nbody_get_x(sim, 3)
+    wy3 = nbody_get_y(sim, 3)
+    wx4 = nbody_get_x(sim, 4)
+    wy4 = nbody_get_y(sim, 4)
+    wx5 = nbody_get_x(sim, 5)
+    wy5 = nbody_get_y(sim, 5)
+
+    # World → screen
+    sx1 = W / 2 + (wx1 - cam_x) * zoom
+    sy1 = H / 2 - (wy1 - cam_y) * zoom
+    sx2 = W / 2 + (wx2 - cam_x) * zoom
+    sy2 = H / 2 - (wy2 - cam_y) * zoom
+    sx3 = W / 2 + (wx3 - cam_x) * zoom
+    sy3 = H / 2 - (wy3 - cam_y) * zoom
+    sx4 = W / 2 + (wx4 - cam_x) * zoom
+    sy4 = H / 2 - (wy4 - cam_y) * zoom
+    sx5 = W / 2 + (wx5 - cam_x) * zoom
+    sy5 = H / 2 - (wy5 - cam_y) * zoom
+
+    # Store trails
+    t1x[th] = sx1
+    t1y[th] = sy1
+    t2x[th] = sx2
+    t2y[th] = sy2
+    t3x[th] = sx3
+    t3y[th] = sy3
+    t4x[th] = sx4
+    t4y[th] = sy4
+    t5x[th] = sx5
+    t5y[th] = sy5
+    th = th + 1
+    if th >= TRAIL:
+        th = 0
+
+    # ── Draw ─────────────────────────────────────────────────────────────────
+    gui_clear(win, 4, 4, 16)
+
+    # Stars
+    gui_set_color(win, 200, 200, 220, 255)
+    gui_draw_point(win, 80,  40)
+    gui_draw_point(win, 200, 90)
+    gui_draw_point(win, 350, 25)
+    gui_draw_point(win, 520, 70)
+    gui_draw_point(win, 720, 18)
+    gui_draw_point(win, 800, 220)
+    gui_draw_point(win, 110, 450)
+    gui_draw_point(win, 670, 750)
+    gui_draw_point(win, 230, 800)
+    gui_draw_point(win, 760, 580)
+    gui_draw_point(win, 440, 860)
+    gui_draw_point(win, 60,  700)
+    gui_draw_point(win, 880, 400)
+    gui_draw_point(win, 300, 550)
+    gui_draw_point(win, 600, 300)
+    gui_draw_point(win, 150, 160)
+    gui_draw_point(win, 480, 480)
+    gui_draw_point(win, 820, 820)
+    gui_draw_point(win, 40,  300)
+    gui_draw_point(win, 700, 100)
+
+    # Orbit guide circles (sun at screen centre adjusted for cam)
+    scx = W / 2 - cam_x * zoom
+    scy = H / 2 + cam_y * zoom
+    gui_set_color(win, 18, 18, 45, 255)
+    gui_draw_circle(win, scx, scy, 5.791e10 * zoom)
+    gui_draw_circle(win, scx, scy, 1.082e11 * zoom)
+    gui_draw_circle(win, scx, scy, 1.496e11 * zoom)
+    gui_draw_circle(win, scx, scy, 2.279e11 * zoom)
+    gui_draw_circle(win, scx, scy, 7.783e11 * zoom)
+
+    # Trails
+    ti = 0
+    while ti < TRAIL:
+        alpha = ti * 3
+        if alpha > 200:
+            alpha = 200
+        gui_set_color(win, 180, 80, 80, alpha)
+        gui_draw_point(win, t1x[ti], t1y[ti])
+        gui_set_color(win, 200, 150, 80, alpha)
+        gui_draw_point(win, t2x[ti], t2y[ti])
+        gui_set_color(win, 80, 160, 255, alpha)
+        gui_draw_point(win, t3x[ti], t3y[ti])
+        gui_set_color(win, 210, 80, 60, alpha)
+        gui_draw_point(win, t4x[ti], t4y[ti])
+        gui_set_color(win, 220, 160, 60, alpha)
+        gui_draw_point(win, t5x[ti], t5y[ti])
+        ti = ti + 1
+
+    # Sun (world origin)
+    gui_set_color(win, 255, 180, 0, 50)
+    gui_fill_circle(win, scx, scy, 34)
+    gui_set_color(win, 255, 210, 30, 120)
+    gui_fill_circle(win, scx, scy, 26)
+    gui_set_color(win, 255, 240, 80, 255)
+    gui_fill_circle(win, scx, scy, 20)
+    gui_draw_text(win, "Sun", scx - 10, scy + 24, 12, 255, 220, 100)
+
+    # Mercury
+    gui_set_color(win, 180, 80, 80, 255)
+    gui_fill_circle(win, sx1, sy1, 4)
+    gui_draw_text(win, "Mercury", sx1 + 6, sy1 - 6, 11, 180, 80, 80)
+
+    # Venus
+    gui_set_color(win, 230, 150, 80, 255)
+    gui_fill_circle(win, sx2, sy2, 7)
+    gui_draw_text(win, "Venus", sx2 + 8, sy2 - 6, 11, 230, 150, 80)
+
+    # Earth
+    gui_set_color(win, 60, 120, 220, 255)
+    gui_fill_circle(win, sx3, sy3, 8)
+    gui_set_color(win, 80, 200, 255, 255)
+    gui_draw_circle(win, sx3, sy3, 10)
+    gui_draw_text(win, "Earth", sx3 + 10, sy3 - 6, 11, 80, 200, 255)
+
+    # Mars
+    gui_set_color(win, 210, 80, 60, 255)
+    gui_fill_circle(win, sx4, sy4, 6)
+    gui_draw_text(win, "Mars", sx4 + 8, sy4 - 6, 11, 210, 80, 60)
+
+    # Jupiter
+    gui_set_color(win, 220, 160, 60, 255)
+    gui_fill_circle(win, sx5, sy5, 14)
+    gui_set_color(win, 200, 130, 40, 255)
+    gui_draw_circle(win, sx5, sy5, 17)
+    gui_draw_text(win, "Jupiter", sx5 + 16, sy5 - 6, 11, 220, 160, 60)
+
+    # HUD
+    gui_set_color(win, 0, 0, 0, 210)
+    gui_fill_rect(win, 0, 0, 900, 34)
+    gui_draw_text(win, "Solar System  Day:" + day + "  Scroll=zoom  Drag=pan  R=reset  ESC=quit", 8, 8, 14, 140, 200, 255)
+
+    gui_present(win)
+    gui_delay(16)
+
+nbody_destroy(sim)
+gui_window_destroy(win)
+gui_quit()
+print("Closed at day " + day)

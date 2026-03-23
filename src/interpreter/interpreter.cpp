@@ -47,6 +47,38 @@
 #include "../stdlib/system/sysprog.h"
 #include "../stdlib/gui/gui.h"
 
+// Milestone 15 Libraries
+#include "../stdlib/advancedcrypto/advancedcrypto.h"
+// Milestone 16 Libraries
+#include "../stdlib/mathx/mathx.h"
+#include "../stdlib/polish/polish.h"
+#include "../stdlib/ecosystem/ecosystem.h"
+#include "../stdlib/database/database.h"
+
+// Stubs for legacy database dispatch (old M4-era placeholders, never called at runtime)
+inline void* sapphire_postgresql_create() { return nullptr; }
+inline int   sapphire_postgresql_connect(void*, const char*) { return 0; }
+inline char* sapphire_postgresql_query(void*, const char*) { static char e[]=""; return e; }
+inline void* sapphire_mysql_create() { return nullptr; }
+inline int   sapphire_mysql_connect(void*, const char*) { return 0; }
+inline char* sapphire_mysql_query(void*, const char*) { static char e[]=""; return e; }
+inline void  sapphire_database_free_result(char*) {}
+inline void* orm_model_create(const char*) { return nullptr; }
+inline void  orm_model_add_field(void*, const char*, const char*) {}
+inline void  orm_model_add_string_field(void*, const char*, int) {}
+inline void  orm_model_add_int_field(void*, const char*) {}
+inline void  orm_model_add_primary_key(void*, const char*) {}
+inline const char* orm_model_get_sql(void*) { return ""; }
+inline const char* orm_model_get_create_sql(void*) { return ""; }
+
+// Milestone 13 Libraries
+#include "../stdlib/texture/texture.h"
+#include "../stdlib/shader/shader.h"
+#include "../stdlib/model/model.h"
+#include "../stdlib/physics/physics.h"
+#include "../stdlib/simulation/simulation.h"
+#include "../stdlib/os/os.h"
+
 namespace sapphire {
 
 // Environment implementation
@@ -5678,9 +5710,9 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
             last_value = process_table_schedule(_sp(0)); return;
         } else if (func_name == "__builtin_process_table_to_string__") {
             last_value = std::string(process_table_to_string(_sp(0))); return;
-        } else if (func_name == "__builtin_kernel_create__") {
+        } else if (func_name == "__builtin_os_kernel_create__") {
             last_value = static_cast<int>(reinterpret_cast<intptr_t>(kernel_create(std::get<std::string>(arguments[0]).c_str(), std::get<std::string>(arguments[1]).c_str()))); return;
-        } else if (func_name == "__builtin_kernel_destroy__") {
+        } else if (func_name == "__builtin_os_kernel_destroy__") {
             kernel_destroy(_sp(0)); last_value = nullptr; return;
         } else if (func_name == "__builtin_kernel_boot__") {
             kernel_boot(_sp(0)); last_value = nullptr; return;
@@ -5709,6 +5741,12 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
     if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_gui_", 0) == 0) {
         std::string func_name = std::get<std::string>(callee);
         auto _gp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        // Coerce int or double to int (allows physics/simulation floats to be passed to draw calls)
+        auto _gi = [&](int i) -> int {
+            if (std::holds_alternative<int>(arguments[i]))    return std::get<int>(arguments[i]);
+            if (std::holds_alternative<double>(arguments[i])) return (int)std::get<double>(arguments[i]);
+            return 0;
+        };
         // Window system
         if (func_name == "__builtin_gui_init__") {
             last_value = gui_init(); return;
@@ -5737,19 +5775,19 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
         } else if (func_name == "__builtin_gui_window_close__") {
             gui_window_close(_gp(0)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_window_resize__") {
-            gui_window_resize(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+            gui_window_resize(_gp(0), _gi(1), _gi(2)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_window_set_resizable__") {
-            gui_window_set_resizable(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+            gui_window_set_resizable(_gp(0), _gi(1)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_window_set_fullscreen__") {
-            gui_window_set_fullscreen(_gp(0), std::get<int>(arguments[1])); last_value = nullptr; return;
+            gui_window_set_fullscreen(_gp(0), _gi(1)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_window_is_fullscreen__") {
             last_value = gui_window_is_fullscreen(_gp(0)); return;
         } else if (func_name == "__builtin_gui_window_poll__") {
             last_value = gui_window_poll(_gp(0)); return;
         } else if (func_name == "__builtin_gui_key_down__") {
-            last_value = gui_key_down(_gp(0), std::get<int>(arguments[1])); return;
+            last_value = gui_key_down(_gp(0), _gi(1)); return;
         } else if (func_name == "__builtin_gui_key_pressed__") {
-            last_value = gui_key_pressed(_gp(0), std::get<int>(arguments[1])); return;
+            last_value = gui_key_pressed(_gp(0), _gi(1)); return;
         } else if (func_name == "__builtin_gui_key__") {
             last_value = gui_key(std::get<std::string>(arguments[0]).c_str()); return;
         } else if (func_name == "__builtin_gui_mouse_x__") {
@@ -5757,49 +5795,55 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
         } else if (func_name == "__builtin_gui_mouse_y__") {
             last_value = gui_mouse_y(_gp(0)); return;
         } else if (func_name == "__builtin_gui_mouse_button__") {
-            last_value = gui_mouse_button(_gp(0), std::get<int>(arguments[1])); return;
+            last_value = gui_mouse_button(_gp(0), _gi(1)); return;
+        } else if (func_name == "__builtin_gui_scroll_y__") {
+            last_value = gui_scroll_y(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_mouse_dx__") {
+            last_value = gui_mouse_dx(_gp(0)); return;
+        } else if (func_name == "__builtin_gui_mouse_dy__") {
+            last_value = gui_mouse_dy(_gp(0)); return;
         } else if (func_name == "__builtin_gui_clear__") {
-            gui_clear(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+            gui_clear(_gp(0), _gi(1), _gi(2), _gi(3)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_present__") {
             gui_present(_gp(0)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_set_color__") {
-            gui_set_color(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4])); last_value = nullptr; return;
+            gui_set_color(_gp(0), _gi(1), _gi(2), _gi(3), _gi(4)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_draw_point__") {
-            gui_draw_point(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2])); last_value = nullptr; return;
+            gui_draw_point(_gp(0), _gi(1), _gi(2)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_draw_line__") {
-            gui_draw_line(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4])); last_value = nullptr; return;
+            gui_draw_line(_gp(0), _gi(1), _gi(2), _gi(3), _gi(4)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_draw_rect__") {
-            gui_draw_rect(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4])); last_value = nullptr; return;
+            gui_draw_rect(_gp(0), _gi(1), _gi(2), _gi(3), _gi(4)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_fill_rect__") {
-            gui_fill_rect(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4])); last_value = nullptr; return;
+            gui_fill_rect(_gp(0), _gi(1), _gi(2), _gi(3), _gi(4)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_draw_circle__") {
-            gui_draw_circle(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+            gui_draw_circle(_gp(0), _gi(1), _gi(2), _gi(3)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_fill_circle__") {
-            gui_fill_circle(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+            gui_fill_circle(_gp(0), _gi(1), _gi(2), _gi(3)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_draw_triangle__") {
-            gui_draw_triangle(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5]), std::get<int>(arguments[6])); last_value = nullptr; return;
+            gui_draw_triangle(_gp(0), _gi(1), _gi(2), _gi(3), _gi(4), _gi(5), _gi(6)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_fill_triangle__") {
-            gui_fill_triangle(_gp(0), std::get<int>(arguments[1]), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5]), std::get<int>(arguments[6])); last_value = nullptr; return;
+            gui_fill_triangle(_gp(0), _gi(1), _gi(2), _gi(3), _gi(4), _gi(5), _gi(6)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_draw_text__") {
-            gui_draw_text(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5]), std::get<int>(arguments[6]), std::get<int>(arguments[7])); last_value = nullptr; return;
+            gui_draw_text(_gp(0), std::get<std::string>(arguments[1]).c_str(), _gi(2), _gi(3), _gi(4), _gi(5), _gi(6), _gi(7)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_text_width__") {
-            last_value = gui_text_width(_gp(0), std::get<std::string>(arguments[1]).c_str(), std::get<int>(arguments[2])); return;
+            last_value = gui_text_width(_gp(0), std::get<std::string>(arguments[1]).c_str(), _gi(2)); return;
         } else if (func_name == "__builtin_gui_text_height__") {
-            last_value = gui_text_height(_gp(0), std::get<int>(arguments[1])); return;
+            last_value = gui_text_height(_gp(0), _gi(1)); return;
         } else if (func_name == "__builtin_gui_image_load__") {
             last_value = static_cast<int>(reinterpret_cast<intptr_t>(gui_image_load(_gp(0), std::get<std::string>(arguments[1]).c_str()))); return;
         } else if (func_name == "__builtin_gui_image_destroy__") {
             gui_image_destroy(_gp(0)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_image_draw__") {
-            gui_image_draw(_gp(0), _gp(1), std::get<int>(arguments[2]), std::get<int>(arguments[3])); last_value = nullptr; return;
+            gui_image_draw(_gp(0), _gp(1), _gi(2), _gi(3)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_image_draw_scaled__") {
-            gui_image_draw_scaled(_gp(0), _gp(1), std::get<int>(arguments[2]), std::get<int>(arguments[3]), std::get<int>(arguments[4]), std::get<int>(arguments[5])); last_value = nullptr; return;
+            gui_image_draw_scaled(_gp(0), _gp(1), _gi(2), _gi(3), _gi(4), _gi(5)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_image_width__") {
             last_value = gui_image_width(_gp(0)); return;
         } else if (func_name == "__builtin_gui_image_height__") {
             last_value = gui_image_height(_gp(0)); return;
         } else if (func_name == "__builtin_gui_delay__") {
-            gui_delay(std::get<int>(arguments[0])); last_value = nullptr; return;
+            gui_delay(_gi(0)); last_value = nullptr; return;
         } else if (func_name == "__builtin_gui_ticks__") {
             last_value = gui_ticks(); return;
         } else if (func_name == "__builtin_gui_delta_time__") {
@@ -6469,7 +6513,1126 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
         }
     }
 
-    // Handle WaitGroup methods
+    // Milestone 13: texture builtins
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_texture_", 0) == 0
+     || std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_spritesheet_", 0) == 0
+     || std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_atlas_", 0) == 0) {
+        std::string fn = std::get<std::string>(callee);
+        auto _tp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _ts = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        auto _ti = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        if (fn == "__builtin_texture_load__") {
+            void* h = texture_load(_ts(0));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_texture_destroy__") {
+            texture_destroy(_tp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_texture_width__") {
+            last_value = texture_width(_tp(0)); return;
+        } else if (fn == "__builtin_texture_height__") {
+            last_value = texture_height(_tp(0)); return;
+        } else if (fn == "__builtin_texture_bind__") {
+            texture_bind(_tp(0), _ti(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_texture_error__") {
+            last_value = std::string(texture_error()); return;
+        } else if (fn == "__builtin_spritesheet_create__") {
+            void* h = spritesheet_create(_tp(0), _ti(1), _ti(2), _ti(3));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_spritesheet_destroy__") {
+            spritesheet_destroy(_tp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_spritesheet_frame_uv__") {
+            float u0=0,v0=0,u1=0,v1=0;
+            spritesheet_frame_uv(_tp(0), _ti(1), &u0, &v0, &u1, &v1);
+            last_value = std::string(std::to_string(u0)+","+std::to_string(v0)+","+std::to_string(u1)+","+std::to_string(v1)); return;
+        } else if (fn == "__builtin_atlas_load__") {
+            void* h = atlas_load(_tp(0), _ts(1));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_atlas_destroy__") {
+            atlas_destroy(_tp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_atlas_region_uv__") {
+            float u0=0,v0=0,u1=0,v1=0;
+            atlas_region_uv(_tp(0), _ts(1), &u0, &v0, &u1, &v1);
+            last_value = std::string(std::to_string(u0)+","+std::to_string(v0)+","+std::to_string(u1)+","+std::to_string(v1)); return;
+        } else if (fn == "__builtin_atlas_error__") {
+            last_value = std::string(atlas_error()); return;
+        }
+    }
+
+    // Milestone 13: shader builtins
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_shader_", 0) == 0) {
+        std::string fn = std::get<std::string>(callee);
+        auto _sp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _ss = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        auto _sf = [&](int i) -> float {
+            if (std::holds_alternative<double>(arguments[i])) return (float)std::get<double>(arguments[i]);
+            if (std::holds_alternative<int>(arguments[i])) return (float)std::get<int>(arguments[i]);
+            return 0.0f;
+        };
+        if (fn == "__builtin_shader_create__") {
+            void* h = shader_create(_ss(0), _ss(1));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_shader_destroy__") {
+            shader_destroy(_sp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_shader_use__") {
+            shader_use(_sp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_shader_set_uniform_float__") {
+            shader_set_uniform_float(_sp(0), _ss(1), _sf(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_shader_set_uniform_vec3__") {
+            shader_set_uniform_vec3(_sp(0), _ss(1), _sf(2), _sf(3), _sf(4)); last_value = nullptr; return;
+        } else if (fn == "__builtin_shader_set_uniform_mat4__") {
+            // mat4: 16 floats passed as a string "f0,f1,...,f15" or individual args — use string form
+            last_value = nullptr; return;
+        } else if (fn == "__builtin_shader_error__") {
+            last_value = std::string(shader_error()); return;
+        }
+    }
+
+    // Milestone 13: model builtins
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_model_", 0) == 0) {
+        std::string fn = std::get<std::string>(callee);
+        auto _mp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _ms = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        if (fn == "__builtin_model_load__") {
+            void* h = model_load(_ms(0));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_model_destroy__") {
+            model_destroy(_mp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_model_draw__") {
+            model_draw(_mp(0), arguments.size() > 1 ? _mp(1) : nullptr); last_value = nullptr; return;
+        } else if (fn == "__builtin_model_vertex_count__") {
+            last_value = model_vertex_count(_mp(0)); return;
+        } else if (fn == "__builtin_model_face_count__") {
+            last_value = model_face_count(_mp(0)); return;
+        } else if (fn == "__builtin_model_error__") {
+            last_value = std::string(model_error()); return;
+        }
+    }
+
+    // Milestone 13: physics builtins
+    if (std::holds_alternative<std::string>(callee) && (
+        std::get<std::string>(callee).rfind("__builtin_physics_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_rigidbody_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_collider_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_collision_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_constraint_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_particles_", 0) == 0)) {
+        std::string fn = std::get<std::string>(callee);
+        auto _pp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _pi = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        auto _pf = [&](int i) -> float {
+            if (std::holds_alternative<double>(arguments[i])) return (float)std::get<double>(arguments[i]);
+            if (std::holds_alternative<int>(arguments[i])) return (float)std::get<int>(arguments[i]);
+            return 0.0f;
+        };
+        if (fn == "__builtin_physics_world_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(physics_world_create(_pf(0), _pf(1)))); return;
+        } else if (fn == "__builtin_physics_world_destroy__") {
+            physics_world_destroy(_pp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_physics_world_step__") {
+            physics_world_step(_pp(0), _pf(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_rigidbody_create__") {
+            void* h = rigidbody_create(_pp(0), _pf(1), _pf(2), _pf(3));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_rigidbody_destroy__") {
+            rigidbody_destroy(_pp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_rigidbody_apply_force__") {
+            rigidbody_apply_force(_pp(0), _pf(1), _pf(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_rigidbody_apply_impulse__") {
+            rigidbody_apply_impulse(_pp(0), _pf(1), _pf(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_rigidbody_get_x__") {
+            last_value = (double)rigidbody_get_x(_pp(0)); return;
+        } else if (fn == "__builtin_rigidbody_get_y__") {
+            last_value = (double)rigidbody_get_y(_pp(0)); return;
+        } else if (fn == "__builtin_rigidbody_get_vx__") {
+            last_value = (double)rigidbody_get_vx(_pp(0)); return;
+        } else if (fn == "__builtin_rigidbody_get_vy__") {
+            last_value = (double)rigidbody_get_vy(_pp(0)); return;
+        } else if (fn == "__builtin_collider_add_box__") {
+            collider_add_box(_pp(0), _pf(1), _pf(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_collider_add_circle__") {
+            collider_add_circle(_pp(0), _pf(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_collider_add_convex_hull__") {
+            last_value = nullptr; return; // hull passed as array — skip for now
+        } else if (fn == "__builtin_collision_query_pair__") {
+            last_value = collision_query_pair(_pp(0), _pp(1)); return;
+        } else if (fn == "__builtin_constraint_add_distance__") {
+            void* h = constraint_add_distance(_pp(0), _pp(1), _pp(2), _pf(3));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_constraint_add_spring__") {
+            void* h = constraint_add_spring(_pp(0), _pp(1), _pp(2), _pf(3), _pf(4));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_constraint_add_hinge__") {
+            void* h = constraint_add_hinge(_pp(0), _pp(1), _pp(2), _pf(3), _pf(4));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_constraint_destroy__") {
+            constraint_destroy(_pp(0), _pp(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_particles_create__") {
+            void* h = particles_create(_pp(0), _pf(1), _pf(2), _pi(3));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_particles_destroy__") {
+            particles_destroy(_pp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_particles_emit__") {
+            particles_emit(_pp(0), _pi(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_particles_update__") {
+            particles_update(_pp(0), _pf(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_particles_set_color_gradient__") {
+            particles_set_color_gradient(_pp(0), _pf(1), _pf(2), _pf(3), _pf(4), _pf(5), _pf(6));
+            last_value = nullptr; return;
+        } else if (fn == "__builtin_particles_active_count__") {
+            last_value = particles_active_count(_pp(0)); return;
+        } else if (fn == "__builtin_physics_error__") {
+            last_value = std::string(physics_error()); return;
+        }
+    }
+
+    // Milestone 13: simulation builtins
+    if (std::holds_alternative<std::string>(callee) && (
+        std::get<std::string>(callee).rfind("__builtin_nbody_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_fluid_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_blackhole_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_field_sim_", 0) == 0)) {
+        std::string fn = std::get<std::string>(callee);
+        auto _simp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _simi = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        auto _simd = [&](int i) -> double {
+            if (std::holds_alternative<double>(arguments[i])) return std::get<double>(arguments[i]);
+            if (std::holds_alternative<int>(arguments[i])) return (double)std::get<int>(arguments[i]);
+            return 0.0;
+        };
+        if (fn == "__builtin_nbody_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(nbody_create(_simd(0), _simd(1)))); return;
+        } else if (fn == "__builtin_nbody_destroy__") {
+            nbody_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_nbody_add_body__") {
+            last_value = nbody_add_body(_simp(0), _simd(1), _simd(2), _simd(3), _simd(4), _simd(5), _simd(6), _simd(7)); return;
+        } else if (fn == "__builtin_nbody_step__") {
+            nbody_step(_simp(0), _simd(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_nbody_get_position__") {
+            double x=0, y=0, z=0;
+            nbody_get_position(_simp(0), _simi(1), &x, &y, &z);
+            last_value = std::string(std::to_string(x)+","+std::to_string(y)+","+std::to_string(z)); return;
+        } else if (fn == "__builtin_nbody_get_x__") {
+            last_value = nbody_get_x(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_nbody_get_y__") {
+            last_value = nbody_get_y(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_nbody_total_energy__") {
+            last_value = nbody_total_energy(_simp(0)); return;
+        } else if (fn == "__builtin_fluid_create__") {
+            void* h = fluid_create(_simd(0), _simd(1), _simi(2));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_fluid_destroy__") {
+            fluid_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_fluid_step__") {
+            fluid_step(_simp(0), _simd(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_fluid_get_particle_position__") {
+            double x=0, y=0;
+            fluid_get_particle_position(_simp(0), _simi(1), &x, &y);
+            last_value = std::string(std::to_string(x)+","+std::to_string(y)); return;
+        } else if (fn == "__builtin_fluid_get_particle_x__") {
+            last_value = fluid_get_particle_x(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_fluid_get_particle_y__") {
+            last_value = fluid_get_particle_y(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_fluid_set_viscosity__") {
+            fluid_set_viscosity(_simp(0), _simd(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_blackhole_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(blackhole_create(_simd(0), _simd(1)))); return;
+        } else if (fn == "__builtin_blackhole_destroy__") {
+            blackhole_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_blackhole_add_particle__") {
+            last_value = blackhole_add_particle(_simp(0), _simd(1), _simd(2), _simd(3), _simd(4)); return;
+        } else if (fn == "__builtin_blackhole_step__") {
+            blackhole_step(_simp(0), _simd(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_blackhole_get_particle_position__") {
+            double x=0, y=0;
+            blackhole_get_particle_position(_simp(0), _simi(1), &x, &y);
+            last_value = std::string(std::to_string(x)+","+std::to_string(y)); return;
+        } else if (fn == "__builtin_blackhole_get_particle_x__") {
+            last_value = blackhole_get_particle_x(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_blackhole_get_particle_y__") {
+            last_value = blackhole_get_particle_y(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_blackhole_captured_count__") {
+            last_value = blackhole_captured_count(_simp(0)); return;
+        } else if (fn == "__builtin_field_sim_create__") {
+            void* h = field_sim_create(_simi(0), _simd(1), _simd(2), _simd(3), _simd(4));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_field_sim_destroy__") {
+            field_sim_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_field_sim_add_attractor__") {
+            field_sim_add_attractor(_simp(0), _simd(1), _simd(2), _simd(3)); last_value = nullptr; return;
+        } else if (fn == "__builtin_field_sim_add_repulsor__") {
+            field_sim_add_repulsor(_simp(0), _simd(1), _simd(2), _simd(3)); last_value = nullptr; return;
+        } else if (fn == "__builtin_field_sim_step__") {
+            field_sim_step(_simp(0), _simd(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_field_sim_get_particle_position__") {
+            double x=0, y=0;
+            field_sim_get_particle_position(_simp(0), _simi(1), &x, &y);
+            last_value = std::string(std::to_string(x)+","+std::to_string(y)); return;
+        } else if (fn == "__builtin_field_sim_get_particle_x__") {
+            last_value = field_sim_get_particle_x(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_field_sim_get_particle_y__") {
+            last_value = field_sim_get_particle_y(_simp(0), _simi(1)); return;
+        }
+    }
+
+    // Milestone 14: OS Development
+    if (std::holds_alternative<std::string>(callee) && (
+        std::get<std::string>(callee).rfind("__builtin_boot_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_os_kernel_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_pmm_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_vmm_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_heap_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_scheduler_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_syscall_table_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_driver_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_os_vga_", 0) == 0)) {
+        std::string fn = std::get<std::string>(callee);
+        auto _simp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _simi = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        auto _sims = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        auto _simd = [&](int i) -> double {
+            if (std::holds_alternative<double>(arguments[i])) return std::get<double>(arguments[i]);
+            if (std::holds_alternative<int>(arguments[i])) return (double)std::get<int>(arguments[i]);
+            return 0.0;
+        };
+
+        if (fn == "__builtin_boot_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(boot_create(_sims(0)))); return;
+        } else if (fn == "__builtin_boot_destroy__") {
+            boot_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_boot_load_mbr__") {
+            last_value = boot_load_mbr(_simp(0)); return;
+        } else if (fn == "__builtin_boot_load_stage2__") {
+            last_value = boot_load_stage2(_simp(0), (uint32_t)_simi(1), (uint32_t)_simi(2)); return;
+        } else if (fn == "__builtin_boot_load_kernel__") {
+            last_value = boot_load_kernel(_simp(0), (uint32_t)_simi(1), (uint32_t)_simi(2)); return;
+        } else if (fn == "__builtin_boot_status__") {
+            last_value = std::string(boot_status(_simp(0))); return;
+        } else if (fn == "__builtin_boot_get_memory_map_count__") {
+            last_value = boot_get_memory_map_count(_simp(0)); return;
+        } else if (fn == "__builtin_boot_get_memory_map_entry__") {
+            last_value = std::string(boot_get_memory_map_entry(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_boot_enter_protected_mode__") {
+            boot_enter_protected_mode(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_boot_enter_long_mode__") {
+            boot_enter_long_mode(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_boot_mode__") {
+            last_value = std::string(boot_mode(_simp(0))); return;
+        } else if (fn == "__builtin_os_kernel_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(os_kernel_create(_sims(0)))); return;
+        } else if (fn == "__builtin_os_kernel_destroy__") {
+            os_kernel_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_kernel_init_idt__") {
+            os_kernel_init_idt(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_kernel_init_gdt__") {
+            os_kernel_init_gdt(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_kernel_init_pic__") {
+            os_kernel_init_pic(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_kernel_init_pit__") {
+            os_kernel_init_pit(_simp(0), (uint32_t)_simi(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_kernel_register_isr__") {
+            os_kernel_register_isr(_simp(0), _simi(1), _sims(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_kernel_isr_count__") {
+            last_value = os_kernel_isr_count(_simp(0)); return;
+        } else if (fn == "__builtin_os_kernel_isr_name__") {
+            last_value = std::string(os_kernel_isr_name(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_os_kernel_trigger_interrupt__") {
+            os_kernel_trigger_interrupt(_simp(0), _simi(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_kernel_interrupt_count__") {
+            last_value = os_kernel_interrupt_count(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_os_kernel_vga_write__") {
+            os_kernel_vga_write(_simp(0), _simi(1), _simi(2), _sims(3), _simi(4)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_kernel_vga_read__") {
+            last_value = std::string(os_kernel_vga_read(_simp(0), _simi(1), _simi(2))); return;
+        } else if (fn == "__builtin_os_kernel_vga_clear__") {
+            os_kernel_vga_clear(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_kernel_status__") {
+            last_value = std::string(os_kernel_status(_simp(0))); return;
+        } else if (fn == "__builtin_pmm_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(pmm_create((uint64_t)_simd(0), (uint32_t)_simi(1)))); return;
+        } else if (fn == "__builtin_pmm_destroy__") {
+            pmm_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_pmm_mark_free__") {
+            pmm_mark_free(_simp(0), (uint64_t)_simd(1), (uint64_t)_simd(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_pmm_mark_used__") {
+            pmm_mark_used(_simp(0), (uint64_t)_simd(1), (uint64_t)_simd(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_pmm_alloc_page__") {
+            last_value = std::to_string(pmm_alloc_page(_simp(0))); return;
+        } else if (fn == "__builtin_pmm_free_page__") {
+            pmm_free_page(_simp(0), (uint64_t)_simd(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_pmm_alloc_pages__") {
+            last_value = std::to_string(pmm_alloc_pages(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_pmm_free_pages_count__") {
+            last_value = pmm_free_pages_count(_simp(0)); return;
+        } else if (fn == "__builtin_pmm_used_pages_count__") {
+            last_value = pmm_used_pages_count(_simp(0)); return;
+        } else if (fn == "__builtin_pmm_total_pages__") {
+            last_value = pmm_total_pages(_simp(0)); return;
+        } else if (fn == "__builtin_pmm_page_size__") {
+            last_value = (int)pmm_page_size(_simp(0)); return;
+        } else if (fn == "__builtin_vmm_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(vmm_create(_simp(0)))); return;
+        } else if (fn == "__builtin_vmm_destroy__") {
+            vmm_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_vmm_map__") {
+            last_value = vmm_map(_simp(0), (uint64_t)_simd(1), (uint64_t)_simd(2), _simi(3)); return;
+        } else if (fn == "__builtin_vmm_unmap__") {
+            last_value = vmm_unmap(_simp(0), (uint64_t)_simd(1)); return;
+        } else if (fn == "__builtin_vmm_translate__") {
+            last_value = std::to_string(vmm_translate(_simp(0), (uint64_t)_simd(1))); return;
+        } else if (fn == "__builtin_vmm_is_mapped__") {
+            last_value = vmm_is_mapped(_simp(0), (uint64_t)_simd(1)); return;
+        } else if (fn == "__builtin_vmm_page_fault_count__") {
+            last_value = vmm_page_fault_count(_simp(0)); return;
+        } else if (fn == "__builtin_vmm_dump_table__") {
+            last_value = std::string(vmm_dump_table(_simp(0))); return;
+        } else if (fn == "__builtin_heap_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(heap_create((uint64_t)_simd(0), (uint64_t)_simd(1)))); return;
+        } else if (fn == "__builtin_heap_destroy__") {
+            heap_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_heap_alloc__") {
+            last_value = std::to_string(heap_alloc(_simp(0), (uint64_t)_simd(1))); return;
+        } else if (fn == "__builtin_heap_free__") {
+            heap_free(_simp(0), (uint64_t)_simd(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_heap_used__") {
+            last_value = std::to_string(heap_used(_simp(0))); return;
+        } else if (fn == "__builtin_heap_free_space__") {
+            last_value = std::to_string(heap_free_space(_simp(0))); return;
+        } else if (fn == "__builtin_heap_block_count__") {
+            last_value = heap_block_count(_simp(0)); return;
+        } else if (fn == "__builtin_scheduler_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(scheduler_create(_sims(0)))); return;
+        } else if (fn == "__builtin_scheduler_destroy__") {
+            scheduler_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_scheduler_add_process__") {
+            last_value = scheduler_add_process(_simp(0), _sims(1), _simi(2), (uint64_t)_simd(3)); return;
+        } else if (fn == "__builtin_scheduler_terminate__") {
+            scheduler_terminate(_simp(0), _simi(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_scheduler_tick__") {
+            last_value = scheduler_tick(_simp(0)); return;
+        } else if (fn == "__builtin_scheduler_current_pid__") {
+            last_value = scheduler_current_pid(_simp(0)); return;
+        } else if (fn == "__builtin_scheduler_current_name__") {
+            last_value = std::string(scheduler_current_name(_simp(0))); return;
+        } else if (fn == "__builtin_scheduler_process_count__") {
+            last_value = scheduler_process_count(_simp(0)); return;
+        } else if (fn == "__builtin_scheduler_process_name__") {
+            last_value = std::string(scheduler_process_name(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_scheduler_process_state__") {
+            last_value = std::string(scheduler_process_state(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_scheduler_process_priority__") {
+            last_value = scheduler_process_priority(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_scheduler_process_ticks__") {
+            last_value = (int)scheduler_process_ticks(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_scheduler_block__") {
+            scheduler_block(_simp(0), _simi(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_scheduler_unblock__") {
+            scheduler_unblock(_simp(0), _simi(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_syscall_table_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(syscall_table_create())); return;
+        } else if (fn == "__builtin_syscall_table_destroy__") {
+            syscall_table_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_syscall_table_register__") {
+            syscall_table_register(_simp(0), _simi(1), _sims(2), _simi(3)); last_value = nullptr; return;
+        } else if (fn == "__builtin_syscall_table_invoke__") {
+            last_value = std::string(syscall_table_invoke(_simp(0), _simi(1), _sims(2))); return;
+        } else if (fn == "__builtin_syscall_table_count__") {
+            last_value = syscall_table_count(_simp(0)); return;
+        } else if (fn == "__builtin_syscall_table_name__") {
+            last_value = std::string(syscall_table_name(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_driver_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(driver_create(_sims(0), _sims(1)))); return;
+        } else if (fn == "__builtin_driver_destroy__") {
+            driver_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_driver_write__") {
+            driver_write(_simp(0), (uint64_t)_simd(1), (uint64_t)_simd(2), _simi(3)); last_value = nullptr; return;
+        } else if (fn == "__builtin_driver_read__") {
+            last_value = (int)driver_read(_simp(0), (uint64_t)_simd(1), _simi(2)); return;
+        } else if (fn == "__builtin_driver_irq_fire__") {
+            driver_irq_fire(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_driver_irq_count__") {
+            last_value = driver_irq_count(_simp(0)); return;
+        } else if (fn == "__builtin_driver_name__") {
+            last_value = std::string(driver_name(_simp(0))); return;
+        } else if (fn == "__builtin_driver_type__") {
+            last_value = std::string(driver_type(_simp(0))); return;
+        } else if (fn == "__builtin_driver_is_ready__") {
+            last_value = driver_is_ready(_simp(0)); return;
+        } else if (fn == "__builtin_os_vga_create__") {
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(os_vga_create(_simi(0), _simi(1)))); return;
+        } else if (fn == "__builtin_os_vga_destroy__") {
+            os_vga_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_vga_putchar__") {
+            os_vga_putchar(_simp(0), (char)_simi(1), _simi(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_vga_puts__") {
+            os_vga_puts(_simp(0), _sims(1), _simi(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_vga_set_cursor__") {
+            os_vga_set_cursor(_simp(0), _simi(1), _simi(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_vga_clear__") {
+            os_vga_clear(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_os_vga_cursor_row__") {
+            last_value = os_vga_cursor_row(_simp(0)); return;
+        } else if (fn == "__builtin_os_vga_cursor_col__") {
+            last_value = os_vga_cursor_col(_simp(0)); return;
+        } else if (fn == "__builtin_os_vga_get_line__") {
+            last_value = std::string(os_vga_get_line(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_os_vga_cols__") {
+            last_value = os_vga_cols(_simp(0)); return;
+        } else if (fn == "__builtin_os_vga_rows__") {
+            last_value = os_vga_rows(_simp(0)); return;
+        }
+    }
+
+    // Milestone 15: Advanced Cryptography
+    if (std::holds_alternative<std::string>(callee) && (
+        std::get<std::string>(callee).rfind("__builtin_kyber_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_sphincs_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_mceliece_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_rainbow_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_zksnark_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_zkstark_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_bulletproof_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_plonk_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_bgv_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_bfv_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_ckks_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_tfhe_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_shamir_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_smpc_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_threshold_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_ot_", 0) == 0)) {
+        std::string fn = std::get<std::string>(callee);
+        auto _simp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _simi = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        auto _sims = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        auto _simd = [&](int i) -> double { return std::holds_alternative<double>(arguments[i]) ? std::get<double>(arguments[i]) : (double)std::get<int>(arguments[i]); };
+        auto _simll = [&](int i) -> long long { return std::holds_alternative<int>(arguments[i]) ? (long long)std::get<int>(arguments[i]) : (long long)std::get<double>(arguments[i]); };
+        auto _ptr2int = [&](void* p) -> int { return (int)(intptr_t)p; };
+        // ---- Kyber ----
+        if (fn == "__builtin_kyber_keygen__") {
+            last_value = _ptr2int(advcrypto_kyber_keygen(_simi(0))); return;
+        } else if (fn == "__builtin_kyber_destroy_keypair__") {
+            advcrypto_kyber_destroy_keypair(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_kyber_public_key__") {
+            last_value = std::string(advcrypto_kyber_public_key(_simp(0))); return;
+        } else if (fn == "__builtin_kyber_secret_key__") {
+            last_value = std::string(advcrypto_kyber_secret_key(_simp(0))); return;
+        } else if (fn == "__builtin_kyber_security_level__") {
+            last_value = advcrypto_kyber_security_level(_simp(0)); return;
+        } else if (fn == "__builtin_kyber_encapsulate__") {
+            last_value = _ptr2int(advcrypto_kyber_encapsulate(_sims(0), _simi(1))); return;
+        } else if (fn == "__builtin_kyber_destroy_encap__") {
+            advcrypto_kyber_destroy_encap(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_kyber_ciphertext__") {
+            last_value = std::string(advcrypto_kyber_ciphertext(_simp(0))); return;
+        } else if (fn == "__builtin_kyber_shared_secret__") {
+            last_value = std::string(advcrypto_kyber_shared_secret(_simp(0))); return;
+        } else if (fn == "__builtin_kyber_decapsulate__") {
+            last_value = std::string(advcrypto_kyber_decapsulate(_sims(0), _sims(1), _simi(2))); return;
+        // ---- SPHINCS+ ----
+        } else if (fn == "__builtin_sphincs_keygen__") {
+            last_value = _ptr2int(advcrypto_sphincs_keygen(_sims(0))); return;
+        } else if (fn == "__builtin_sphincs_destroy_keypair__") {
+            advcrypto_sphincs_destroy_keypair(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_sphincs_public_key__") {
+            last_value = std::string(advcrypto_sphincs_public_key(_simp(0))); return;
+        } else if (fn == "__builtin_sphincs_secret_key__") {
+            last_value = std::string(advcrypto_sphincs_secret_key(_simp(0))); return;
+        } else if (fn == "__builtin_sphincs_sign__") {
+            last_value = std::string(advcrypto_sphincs_sign(_sims(0), _sims(1), _sims(2))); return;
+        } else if (fn == "__builtin_sphincs_verify__") {
+            last_value = advcrypto_sphincs_verify(_sims(0), _sims(1), _sims(2), _sims(3)); return;
+        // ---- McEliece ----
+        } else if (fn == "__builtin_mceliece_keygen__") {
+            last_value = _ptr2int(advcrypto_mceliece_keygen(_simi(0), _simi(1), _simi(2))); return;
+        } else if (fn == "__builtin_mceliece_destroy_keypair__") {
+            advcrypto_mceliece_destroy_keypair(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_mceliece_public_key__") {
+            last_value = std::string(advcrypto_mceliece_public_key(_simp(0))); return;
+        } else if (fn == "__builtin_mceliece_secret_key__") {
+            last_value = std::string(advcrypto_mceliece_secret_key(_simp(0))); return;
+        } else if (fn == "__builtin_mceliece_encrypt__") {
+            last_value = std::string(advcrypto_mceliece_encrypt(_sims(0), _sims(1))); return;
+        } else if (fn == "__builtin_mceliece_decrypt__") {
+            last_value = std::string(advcrypto_mceliece_decrypt(_sims(0), _sims(1))); return;
+        // ---- Rainbow ----
+        } else if (fn == "__builtin_rainbow_keygen__") {
+            last_value = _ptr2int(advcrypto_rainbow_keygen(_sims(0))); return;
+        } else if (fn == "__builtin_rainbow_destroy_keypair__") {
+            advcrypto_rainbow_destroy_keypair(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_rainbow_public_key__") {
+            last_value = std::string(advcrypto_rainbow_public_key(_simp(0))); return;
+        } else if (fn == "__builtin_rainbow_secret_key__") {
+            last_value = std::string(advcrypto_rainbow_secret_key(_simp(0))); return;
+        } else if (fn == "__builtin_rainbow_sign__") {
+            last_value = std::string(advcrypto_rainbow_sign(_sims(0), _sims(1), _sims(2))); return;
+        } else if (fn == "__builtin_rainbow_verify__") {
+            last_value = advcrypto_rainbow_verify(_sims(0), _sims(1), _sims(2), _sims(3)); return;
+        // ---- zk-SNARK ----
+        } else if (fn == "__builtin_zksnark_setup__") {
+            last_value = _ptr2int(advcrypto_zksnark_setup(_sims(0))); return;
+        } else if (fn == "__builtin_zksnark_destroy_keys__") {
+            advcrypto_zksnark_destroy_keys(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_zksnark_proving_key__") {
+            last_value = std::string(advcrypto_zksnark_proving_key(_simp(0))); return;
+        } else if (fn == "__builtin_zksnark_verification_key__") {
+            last_value = std::string(advcrypto_zksnark_verification_key(_simp(0))); return;
+        } else if (fn == "__builtin_zksnark_circuit_id__") {
+            last_value = std::string(advcrypto_zksnark_circuit_id(_simp(0))); return;
+        } else if (fn == "__builtin_zksnark_prove__") {
+            last_value = _ptr2int(advcrypto_zksnark_prove(_sims(0), _sims(1), _sims(2), _sims(3))); return;
+        } else if (fn == "__builtin_zksnark_destroy_proof__") {
+            advcrypto_zksnark_destroy_proof(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_zksnark_proof_hex__") {
+            last_value = std::string(advcrypto_zksnark_proof_hex(_simp(0))); return;
+        } else if (fn == "__builtin_zksnark_public_inputs__") {
+            last_value = std::string(advcrypto_zksnark_public_inputs(_simp(0))); return;
+        } else if (fn == "__builtin_zksnark_verify__") {
+            last_value = advcrypto_zksnark_verify(_sims(0), _sims(1), _sims(2), _sims(3)); return;
+        // ---- zk-STARK ----
+        } else if (fn == "__builtin_zkstark_prove__") {
+            last_value = _ptr2int(advcrypto_zkstark_prove(_sims(0), _simi(1))); return;
+        } else if (fn == "__builtin_zkstark_destroy_proof__") {
+            advcrypto_zkstark_destroy_proof(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_zkstark_proof_hex__") {
+            last_value = std::string(advcrypto_zkstark_proof_hex(_simp(0))); return;
+        } else if (fn == "__builtin_zkstark_trace_commitment__") {
+            last_value = std::string(advcrypto_zkstark_trace_commitment(_simp(0))); return;
+        } else if (fn == "__builtin_zkstark_verify__") {
+            last_value = advcrypto_zkstark_verify(_sims(0), _sims(1), _simi(2)); return;
+        // ---- Bulletproofs ----
+        } else if (fn == "__builtin_bulletproof_prove_range__") {
+            last_value = _ptr2int(advcrypto_bulletproof_prove_range(_simll(0), _simi(1))); return;
+        } else if (fn == "__builtin_bulletproof_destroy__") {
+            advcrypto_bulletproof_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_bulletproof_proof_hex__") {
+            last_value = std::string(advcrypto_bulletproof_proof_hex(_simp(0))); return;
+        } else if (fn == "__builtin_bulletproof_commitment_hex__") {
+            last_value = std::string(advcrypto_bulletproof_commitment_hex(_simp(0))); return;
+        } else if (fn == "__builtin_bulletproof_verify_range__") {
+            last_value = advcrypto_bulletproof_verify_range(_sims(0), _sims(1), _simi(2)); return;
+        // ---- PLONK ----
+        } else if (fn == "__builtin_plonk_setup__") {
+            last_value = _ptr2int(advcrypto_plonk_setup(_simi(0))); return;
+        } else if (fn == "__builtin_plonk_destroy_srs__") {
+            advcrypto_plonk_destroy_srs(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_plonk_srs_hex__") {
+            last_value = std::string(advcrypto_plonk_srs_hex(_simp(0))); return;
+        } else if (fn == "__builtin_plonk_srs_id__") {
+            last_value = std::string(advcrypto_plonk_srs_id(_simp(0))); return;
+        } else if (fn == "__builtin_plonk_prove__") {
+            last_value = _ptr2int(advcrypto_plonk_prove(_sims(0), _sims(1), _sims(2), _sims(3))); return;
+        } else if (fn == "__builtin_plonk_destroy_proof__") {
+            advcrypto_plonk_destroy_proof(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_plonk_proof_hex__") {
+            last_value = std::string(advcrypto_plonk_proof_hex(_simp(0))); return;
+        } else if (fn == "__builtin_plonk_verify__") {
+            last_value = advcrypto_plonk_verify(_sims(0), _sims(1), _sims(2), _sims(3)); return;
+        // ---- BGV ----
+        } else if (fn == "__builtin_bgv_create_context__") {
+            last_value = _ptr2int(advcrypto_bgv_create_context(_simi(0), _simi(1))); return;
+        } else if (fn == "__builtin_bgv_destroy_context__") {
+            advcrypto_bgv_destroy_context(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_bgv_context_id__") {
+            last_value = std::string(advcrypto_bgv_context_id(_simp(0))); return;
+        } else if (fn == "__builtin_bgv_keygen__") {
+            last_value = _ptr2int(advcrypto_bgv_keygen(_sims(0))); return;
+        } else if (fn == "__builtin_bgv_destroy_keypair__") {
+            advcrypto_bgv_destroy_keypair(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_bgv_public_key__") {
+            last_value = std::string(advcrypto_bgv_public_key(_simp(0))); return;
+        } else if (fn == "__builtin_bgv_secret_key__") {
+            last_value = std::string(advcrypto_bgv_secret_key(_simp(0))); return;
+        } else if (fn == "__builtin_bgv_encrypt__") {
+            last_value = _ptr2int(advcrypto_bgv_encrypt(_sims(0), _sims(1), _simll(2))); return;
+        } else if (fn == "__builtin_bgv_destroy_ciphertext__") {
+            advcrypto_bgv_destroy_ciphertext(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_bgv_ciphertext_hex__") {
+            last_value = std::string(advcrypto_bgv_ciphertext_hex(_simp(0))); return;
+        } else if (fn == "__builtin_bgv_decrypt__") {
+            last_value = (int)advcrypto_bgv_decrypt(_sims(0), _sims(1), _sims(2)); return;
+        } else if (fn == "__builtin_bgv_add__") {
+            last_value = _ptr2int(advcrypto_bgv_add(_sims(0), _sims(1), _sims(2))); return;
+        } else if (fn == "__builtin_bgv_multiply__") {
+            last_value = _ptr2int(advcrypto_bgv_multiply(_sims(0), _sims(1), _sims(2))); return;
+        // ---- BFV ----
+        } else if (fn == "__builtin_bfv_create_context__") {
+            last_value = _ptr2int(advcrypto_bfv_create_context(_simi(0), _simi(1))); return;
+        } else if (fn == "__builtin_bfv_destroy_context__") {
+            advcrypto_bfv_destroy_context(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_bfv_context_id__") {
+            last_value = std::string(advcrypto_bfv_context_id(_simp(0))); return;
+        } else if (fn == "__builtin_bfv_keygen__") {
+            last_value = _ptr2int(advcrypto_bfv_keygen(_sims(0))); return;
+        } else if (fn == "__builtin_bfv_destroy_keypair__") {
+            advcrypto_bfv_destroy_keypair(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_bfv_public_key__") {
+            last_value = std::string(advcrypto_bfv_public_key(_simp(0))); return;
+        } else if (fn == "__builtin_bfv_secret_key__") {
+            last_value = std::string(advcrypto_bfv_secret_key(_simp(0))); return;
+        } else if (fn == "__builtin_bfv_encrypt__") {
+            last_value = _ptr2int(advcrypto_bfv_encrypt(_sims(0), _sims(1), _simll(2))); return;
+        } else if (fn == "__builtin_bfv_destroy_ciphertext__") {
+            advcrypto_bfv_destroy_ciphertext(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_bfv_ciphertext_hex__") {
+            last_value = std::string(advcrypto_bfv_ciphertext_hex(_simp(0))); return;
+        } else if (fn == "__builtin_bfv_decrypt__") {
+            last_value = (int)advcrypto_bfv_decrypt(_sims(0), _sims(1), _sims(2)); return;
+        } else if (fn == "__builtin_bfv_add__") {
+            last_value = _ptr2int(advcrypto_bfv_add(_sims(0), _sims(1), _sims(2))); return;
+        } else if (fn == "__builtin_bfv_multiply__") {
+            last_value = _ptr2int(advcrypto_bfv_multiply(_sims(0), _sims(1), _sims(2))); return;
+        // ---- CKKS ----
+        } else if (fn == "__builtin_ckks_create_context__") {
+            last_value = _ptr2int(advcrypto_ckks_create_context(_simi(0), _simi(1))); return;
+        } else if (fn == "__builtin_ckks_destroy_context__") {
+            advcrypto_ckks_destroy_context(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_ckks_context_id__") {
+            last_value = std::string(advcrypto_ckks_context_id(_simp(0))); return;
+        } else if (fn == "__builtin_ckks_keygen__") {
+            last_value = _ptr2int(advcrypto_ckks_keygen(_sims(0))); return;
+        } else if (fn == "__builtin_ckks_destroy_keypair__") {
+            advcrypto_ckks_destroy_keypair(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_ckks_public_key__") {
+            last_value = std::string(advcrypto_ckks_public_key(_simp(0))); return;
+        } else if (fn == "__builtin_ckks_secret_key__") {
+            last_value = std::string(advcrypto_ckks_secret_key(_simp(0))); return;
+        } else if (fn == "__builtin_ckks_encrypt__") {
+            last_value = _ptr2int(advcrypto_ckks_encrypt(_sims(0), _sims(1), _simd(2))); return;
+        } else if (fn == "__builtin_ckks_destroy_ciphertext__") {
+            advcrypto_ckks_destroy_ciphertext(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_ckks_ciphertext_hex__") {
+            last_value = std::string(advcrypto_ckks_ciphertext_hex(_simp(0))); return;
+        } else if (fn == "__builtin_ckks_decrypt__") {
+            last_value = advcrypto_ckks_decrypt(_sims(0), _sims(1), _sims(2)); return;
+        } else if (fn == "__builtin_ckks_add__") {
+            last_value = _ptr2int(advcrypto_ckks_add(_sims(0), _sims(1), _sims(2))); return;
+        } else if (fn == "__builtin_ckks_multiply__") {
+            last_value = _ptr2int(advcrypto_ckks_multiply(_sims(0), _sims(1), _sims(2))); return;
+        // ---- TFHE ----
+        } else if (fn == "__builtin_tfhe_create_context__") {
+            last_value = _ptr2int(advcrypto_tfhe_create_context(_simi(0))); return;
+        } else if (fn == "__builtin_tfhe_destroy_context__") {
+            advcrypto_tfhe_destroy_context(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_tfhe_context_id__") {
+            last_value = std::string(advcrypto_tfhe_context_id(_simp(0))); return;
+        } else if (fn == "__builtin_tfhe_keygen__") {
+            last_value = _ptr2int(advcrypto_tfhe_keygen(_sims(0))); return;
+        } else if (fn == "__builtin_tfhe_destroy_keypair__") {
+            advcrypto_tfhe_destroy_keypair(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_tfhe_secret_key__") {
+            last_value = std::string(advcrypto_tfhe_secret_key(_simp(0))); return;
+        } else if (fn == "__builtin_tfhe_cloud_key__") {
+            last_value = std::string(advcrypto_tfhe_cloud_key(_simp(0))); return;
+        } else if (fn == "__builtin_tfhe_encrypt_bit__") {
+            last_value = _ptr2int(advcrypto_tfhe_encrypt_bit(_sims(0), _sims(1), _simi(2))); return;
+        } else if (fn == "__builtin_tfhe_destroy_ciphertext__") {
+            advcrypto_tfhe_destroy_ciphertext(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_tfhe_ciphertext_hex__") {
+            last_value = std::string(advcrypto_tfhe_ciphertext_hex(_simp(0))); return;
+        } else if (fn == "__builtin_tfhe_decrypt_bit__") {
+            last_value = advcrypto_tfhe_decrypt_bit(_sims(0), _sims(1), _sims(2)); return;
+        } else if (fn == "__builtin_tfhe_gate_and__") {
+            last_value = _ptr2int(advcrypto_tfhe_gate_and(_sims(0), _sims(1), _sims(2), _sims(3))); return;
+        } else if (fn == "__builtin_tfhe_gate_or__") {
+            last_value = _ptr2int(advcrypto_tfhe_gate_or(_sims(0), _sims(1), _sims(2), _sims(3))); return;
+        } else if (fn == "__builtin_tfhe_gate_xor__") {
+            last_value = _ptr2int(advcrypto_tfhe_gate_xor(_sims(0), _sims(1), _sims(2), _sims(3))); return;
+        } else if (fn == "__builtin_tfhe_gate_not__") {
+            last_value = _ptr2int(advcrypto_tfhe_gate_not(_sims(0), _sims(1), _sims(2))); return;
+        // ---- Shamir ----
+        } else if (fn == "__builtin_shamir_split__") {
+            last_value = _ptr2int(advcrypto_shamir_split(_simll(0), _simi(1), _simi(2))); return;
+        } else if (fn == "__builtin_shamir_destroy_shares__") {
+            advcrypto_shamir_destroy_shares(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_shamir_share_count__") {
+            last_value = advcrypto_shamir_share_count(_simp(0)); return;
+        } else if (fn == "__builtin_shamir_share_x__") {
+            last_value = advcrypto_shamir_share_x(_simp(0), _simi(1)); return;
+        } else if (fn == "__builtin_shamir_share_y__") {
+            last_value = std::string(advcrypto_shamir_share_y(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_shamir_reconstruct__") {
+            last_value = (int)advcrypto_shamir_reconstruct(_simp(0), _simi(1)); return;
+        // ---- SMPC ----
+        } else if (fn == "__builtin_smpc_share__") {
+            last_value = _ptr2int(advcrypto_smpc_share(_simll(0), _simi(1), _simi(2))); return;
+        } else if (fn == "__builtin_smpc_destroy_shares__") {
+            advcrypto_smpc_destroy_shares(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_smpc_share_count__") {
+            last_value = advcrypto_smpc_share_count(_simp(0)); return;
+        } else if (fn == "__builtin_smpc_share_hex__") {
+            last_value = std::string(advcrypto_smpc_share_hex(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_smpc_reconstruct__") {
+            last_value = (int)advcrypto_smpc_reconstruct(_simp(0), _simi(1)); return;
+        // ---- Threshold ----
+        } else if (fn == "__builtin_threshold_keygen__") {
+            last_value = _ptr2int(advcrypto_threshold_keygen(_simi(0), _simi(1))); return;
+        } else if (fn == "__builtin_threshold_destroy__") {
+            advcrypto_threshold_destroy(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_threshold_public_key__") {
+            last_value = std::string(advcrypto_threshold_public_key(_simp(0))); return;
+        } else if (fn == "__builtin_threshold_share_count__") {
+            last_value = advcrypto_threshold_share_count(_simp(0)); return;
+        } else if (fn == "__builtin_threshold_share_hex__") {
+            last_value = std::string(advcrypto_threshold_share_hex(_simp(0), _simi(1))); return;
+        } else if (fn == "__builtin_threshold_partial_sign__") {
+            last_value = std::string(advcrypto_threshold_partial_sign(_sims(0), _sims(1), _simi(2))); return;
+        } else if (fn == "__builtin_threshold_combine__") {
+            last_value = std::string(advcrypto_threshold_combine(_sims(0), _sims(1), _simi(2))); return;
+        } else if (fn == "__builtin_threshold_verify__") {
+            last_value = advcrypto_threshold_verify(_sims(0), _sims(1), _sims(2)); return;
+        // ---- Oblivious Transfer ----
+        } else if (fn == "__builtin_ot_sender_init__") {
+            last_value = _ptr2int(advcrypto_ot_sender_init(_sims(0), _sims(1))); return;
+        } else if (fn == "__builtin_ot_destroy_sender__") {
+            advcrypto_ot_destroy_sender(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_ot_sender_state__") {
+            last_value = std::string(advcrypto_ot_sender_state(_simp(0))); return;
+        } else if (fn == "__builtin_ot_receiver_init__") {
+            last_value = _ptr2int(advcrypto_ot_receiver_init(_simi(0))); return;
+        } else if (fn == "__builtin_ot_destroy_receiver__") {
+            advcrypto_ot_destroy_receiver(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_ot_receiver_query__") {
+            last_value = std::string(advcrypto_ot_receiver_query(_simp(0))); return;
+        } else if (fn == "__builtin_ot_sender_respond__") {
+            last_value = _ptr2int(advcrypto_ot_sender_respond(_sims(0), _sims(1))); return;
+        } else if (fn == "__builtin_ot_destroy_message__") {
+            advcrypto_ot_destroy_message(_simp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_ot_message_hex__") {
+            last_value = std::string(advcrypto_ot_message_hex(_simp(0))); return;
+        } else if (fn == "__builtin_ot_receiver_extract__") {
+            last_value = std::string(advcrypto_ot_receiver_extract(_sims(0), _sims(1), _simi(2))); return;
+        }
+    }
+
+    // Milestone 16: Mathematical Computing
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_mathx_", 0) == 0) {
+        std::string fn = std::get<std::string>(callee);
+        auto _simp  = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _simi  = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        auto _simll = [&](int i) -> long long { return std::holds_alternative<int>(arguments[i]) ? (long long)std::get<int>(arguments[i]) : (long long)std::get<double>(arguments[i]); };
+        auto _simd  = [&](int i) -> double { return std::holds_alternative<double>(arguments[i]) ? std::get<double>(arguments[i]) : (double)std::get<int>(arguments[i]); };
+        auto _sims  = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        auto _ptr2int = [&](void* p) -> int { return (int)(intptr_t)p; };
+        // Number Theory
+        if (fn == "__builtin_mathx_sieve__") { last_value = _ptr2int(mathx_sieve(_simi(0))); return; }
+        else if (fn == "__builtin_mathx_sieve_destroy__") { mathx_sieve_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_mathx_sieve_count__") { last_value = mathx_sieve_count(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_sieve_get__") { last_value = mathx_sieve_get(_simp(0), _simi(1)); return; }
+        else if (fn == "__builtin_mathx_is_prime__") { last_value = mathx_is_prime(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_prime_factors__") { last_value = _ptr2int(mathx_prime_factors(_simll(0))); return; }
+        else if (fn == "__builtin_mathx_vec_destroy__") { mathx_vec_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_mathx_vec_count__") { last_value = mathx_vec_count(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_vec_get__") { last_value = (int)mathx_vec_get(_simp(0), _simi(1)); return; }
+        else if (fn == "__builtin_mathx_gcd__") { last_value = (int)mathx_gcd(_simll(0), _simll(1)); return; }
+        else if (fn == "__builtin_mathx_lcm__") { last_value = (int)mathx_lcm(_simll(0), _simll(1)); return; }
+        else if (fn == "__builtin_mathx_mod_pow__") { last_value = (int)mathx_mod_pow(_simll(0), _simll(1), _simll(2)); return; }
+        else if (fn == "__builtin_mathx_mod_inverse__") { last_value = (int)mathx_mod_inverse(_simll(0), _simll(1)); return; }
+        else if (fn == "__builtin_mathx_euler_totient__") { last_value = (int)mathx_euler_totient(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_is_perfect__") { last_value = mathx_is_perfect(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_is_abundant__") { last_value = mathx_is_abundant(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_divisors__") { last_value = _ptr2int(mathx_divisors(_simll(0))); return; }
+        else if (fn == "__builtin_mathx_sum_divisors__") { last_value = (int)mathx_sum_divisors(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_nth_prime__") { last_value = (int)mathx_nth_prime(_simi(0)); return; }
+        else if (fn == "__builtin_mathx_collatz_length__") { last_value = (int)mathx_collatz_length(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_digital_root__") { last_value = (int)mathx_digital_root(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_is_palindrome_num__") { last_value = mathx_is_palindrome_num(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_reverse_num__") { last_value = (int)mathx_reverse_num(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_sum_digits__") { last_value = (int)mathx_sum_digits(_simll(0)); return; }
+        else if (fn == "__builtin_mathx_is_pandigital__") { last_value = mathx_is_pandigital(_simll(0), _simi(1)); return; }
+        // Matrix
+        else if (fn == "__builtin_mathx_mat_create__") { last_value = _ptr2int(mathx_mat_create(_simi(0), _simi(1))); return; }
+        else if (fn == "__builtin_mathx_mat_identity__") { last_value = _ptr2int(mathx_mat_identity(_simi(0))); return; }
+        else if (fn == "__builtin_mathx_mat_destroy__") { mathx_mat_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_mathx_mat_rows__") { last_value = mathx_mat_rows(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_mat_cols__") { last_value = mathx_mat_cols(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_mat_get__") { last_value = mathx_mat_get(_simp(0), _simi(1), _simi(2)); return; }
+        else if (fn == "__builtin_mathx_mat_set__") { mathx_mat_set(_simp(0), _simi(1), _simi(2), _simd(3)); last_value = nullptr; return; }
+        else if (fn == "__builtin_mathx_mat_add__") { last_value = _ptr2int(mathx_mat_add(_simp(0), _simp(1))); return; }
+        else if (fn == "__builtin_mathx_mat_sub__") { last_value = _ptr2int(mathx_mat_sub(_simp(0), _simp(1))); return; }
+        else if (fn == "__builtin_mathx_mat_mul__") { last_value = _ptr2int(mathx_mat_mul(_simp(0), _simp(1))); return; }
+        else if (fn == "__builtin_mathx_mat_scale__") { last_value = _ptr2int(mathx_mat_scale(_simp(0), _simd(1))); return; }
+        else if (fn == "__builtin_mathx_mat_transpose__") { last_value = _ptr2int(mathx_mat_transpose(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_mat_det__") { last_value = mathx_mat_det(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_mat_inverse__") { last_value = _ptr2int(mathx_mat_inverse(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_mat_solve__") { last_value = _ptr2int(mathx_mat_solve(_simp(0), _simp(1))); return; }
+        else if (fn == "__builtin_mathx_mat_trace__") { last_value = mathx_mat_trace(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_mat_to_string__") { last_value = std::string(mathx_mat_to_string(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_mat_dominant_eigenvalue__") { last_value = mathx_mat_dominant_eigenvalue(_simp(0), _simi(1)); return; }
+        else if (fn == "__builtin_mathx_mat_dominant_eigenvector__") { last_value = _ptr2int(mathx_mat_dominant_eigenvector(_simp(0), _simi(1))); return; }
+        // Symbolic
+        else if (fn == "__builtin_mathx_sym_num__") { last_value = _ptr2int(mathx_sym_num(_simd(0))); return; }
+        else if (fn == "__builtin_mathx_sym_var__") { last_value = _ptr2int(mathx_sym_var(_sims(0))); return; }
+        else if (fn == "__builtin_mathx_sym_add__") { last_value = _ptr2int(mathx_sym_add(_simp(0), _simp(1))); return; }
+        else if (fn == "__builtin_mathx_sym_sub__") { last_value = _ptr2int(mathx_sym_sub(_simp(0), _simp(1))); return; }
+        else if (fn == "__builtin_mathx_sym_mul__") { last_value = _ptr2int(mathx_sym_mul(_simp(0), _simp(1))); return; }
+        else if (fn == "__builtin_mathx_sym_div__") { last_value = _ptr2int(mathx_sym_div(_simp(0), _simp(1))); return; }
+        else if (fn == "__builtin_mathx_sym_pow__") { last_value = _ptr2int(mathx_sym_pow(_simp(0), _simp(1))); return; }
+        else if (fn == "__builtin_mathx_sym_neg__") { last_value = _ptr2int(mathx_sym_neg(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_sym_sin__") { last_value = _ptr2int(mathx_sym_sin(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_sym_cos__") { last_value = _ptr2int(mathx_sym_cos(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_sym_exp__") { last_value = _ptr2int(mathx_sym_exp(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_sym_ln__") { last_value = _ptr2int(mathx_sym_ln(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_sym_simplify__") { last_value = _ptr2int(mathx_sym_simplify(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_sym_diff__") { last_value = _ptr2int(mathx_sym_diff(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_mathx_sym_eval__") { last_value = mathx_sym_eval(_simp(0), _sims(1), _simd(2)); return; }
+        else if (fn == "__builtin_mathx_sym_to_string__") { last_value = std::string(mathx_sym_to_string(_simp(0))); return; }
+        else if (fn == "__builtin_mathx_sym_destroy__") { mathx_sym_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_mathx_integrate_expr__") { last_value = mathx_integrate_expr(_simp(0), _sims(1), _simd(2), _simd(3), _simi(4)); return; }
+        else if (fn == "__builtin_mathx_find_root__") { last_value = mathx_find_root(_simp(0), _sims(1), _simd(2), _simi(3)); return; }
+        // Statistics
+        else if (fn == "__builtin_mathx_dvec_create__") { last_value = _ptr2int(mathx_dvec_create()); return; }
+        else if (fn == "__builtin_mathx_dvec_push__") { mathx_dvec_push(_simp(0), _simd(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_mathx_dvec_destroy__") { mathx_dvec_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_mathx_dvec_count__") { last_value = mathx_dvec_count(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_dvec_get__") { last_value = mathx_dvec_get(_simp(0), _simi(1)); return; }
+        else if (fn == "__builtin_mathx_stat_mean__") { last_value = mathx_stat_mean(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_stat_variance__") { last_value = mathx_stat_variance(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_stat_stddev__") { last_value = mathx_stat_stddev(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_stat_median__") { last_value = mathx_stat_median(_simp(0)); return; }
+        else if (fn == "__builtin_mathx_stat_correlation__") { last_value = mathx_stat_correlation(_simp(0), _simp(1)); return; }
+        else if (fn == "__builtin_mathx_stat_linear_regression__") { last_value = _ptr2int(mathx_stat_linear_regression(_simp(0), _simp(1))); return; }
+    }
+
+    // Milestone 17: Polish & Optimization
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_polish_", 0) == 0) {
+        std::string fn = std::get<std::string>(callee);
+        auto _simp    = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _simi    = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        auto _simll   = [&](int i) -> long long { return std::holds_alternative<int>(arguments[i]) ? (long long)std::get<int>(arguments[i]) : (long long)std::get<double>(arguments[i]); };
+        auto _simd    = [&](int i) -> double { return std::holds_alternative<double>(arguments[i]) ? std::get<double>(arguments[i]) : (double)std::get<int>(arguments[i]); };
+        auto _sims    = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        auto _ptr2int = [&](void* p) -> int { return (int)(intptr_t)p; };
+        // Profiler
+        if (fn == "__builtin_polish_profiler_reset__") { polish_profiler_reset(); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_profiler_start__") { polish_profiler_start(_sims(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_profiler_stop__") { polish_profiler_stop(_sims(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_profiler_entry_count__") { last_value = polish_profiler_entry_count(); return; }
+        else if (fn == "__builtin_polish_profiler_entry_name__") { last_value = std::string(polish_profiler_entry_name(_simi(0))); return; }
+        else if (fn == "__builtin_polish_profiler_entry_calls__") { last_value = (int)polish_profiler_entry_calls(_simi(0)); return; }
+        else if (fn == "__builtin_polish_profiler_entry_total_ms__") { last_value = polish_profiler_entry_total_ms(_simi(0)); return; }
+        else if (fn == "__builtin_polish_profiler_entry_mean_ms__") { last_value = polish_profiler_entry_mean_ms(_simi(0)); return; }
+        else if (fn == "__builtin_polish_profiler_entry_min_ms__") { last_value = polish_profiler_entry_min_ms(_simi(0)); return; }
+        else if (fn == "__builtin_polish_profiler_entry_max_ms__") { last_value = polish_profiler_entry_max_ms(_simi(0)); return; }
+        else if (fn == "__builtin_polish_profiler_report__") { last_value = std::string(polish_profiler_report()); return; }
+        // Benchmark
+        else if (fn == "__builtin_polish_bench_create__") { last_value = _ptr2int(polish_bench_create(_sims(0), _simi(1))); return; }
+        else if (fn == "__builtin_polish_bench_destroy__") { polish_bench_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_bench_iter_start__") { polish_bench_iter_start(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_bench_iter_stop__") { polish_bench_iter_stop(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_bench_iterations__") { last_value = polish_bench_iterations(_simp(0)); return; }
+        else if (fn == "__builtin_polish_bench_mean_ms__") { last_value = polish_bench_mean_ms(_simp(0)); return; }
+        else if (fn == "__builtin_polish_bench_min_ms__") { last_value = polish_bench_min_ms(_simp(0)); return; }
+        else if (fn == "__builtin_polish_bench_max_ms__") { last_value = polish_bench_max_ms(_simp(0)); return; }
+        else if (fn == "__builtin_polish_bench_ops_per_sec__") { last_value = polish_bench_ops_per_sec(_simp(0)); return; }
+        else if (fn == "__builtin_polish_bench_report__") { last_value = std::string(polish_bench_report(_simp(0))); return; }
+        // Logger
+        else if (fn == "__builtin_polish_logger_set_level__") { polish_logger_set_level(_simi(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_logger_get_level__") { last_value = polish_logger_get_level(); return; }
+        else if (fn == "__builtin_polish_logger_set_file__") { polish_logger_set_file(_sims(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_logger_close_file__") { polish_logger_close_file(); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_logger_log__") { polish_logger_log(_simi(0), _sims(1), _sims(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_logger_enable_timestamps__") { polish_logger_enable_timestamps(_simi(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_logger_enable_colors__") { polish_logger_enable_colors(_simi(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_logger_message_count__") { last_value = polish_logger_message_count(); return; }
+        else if (fn == "__builtin_polish_logger_get_message__") { last_value = std::string(polish_logger_get_message(_simi(0))); return; }
+        else if (fn == "__builtin_polish_logger_clear__") { polish_logger_clear(); last_value = nullptr; return; }
+        // Stack trace
+        else if (fn == "__builtin_polish_stacktrace_capture__") { last_value = _ptr2int(polish_stacktrace_capture()); return; }
+        else if (fn == "__builtin_polish_stacktrace_destroy__") { polish_stacktrace_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_stacktrace_depth__") { last_value = polish_stacktrace_depth(_simp(0)); return; }
+        else if (fn == "__builtin_polish_stacktrace_frame_function__") { last_value = std::string(polish_stacktrace_frame_function(_simp(0), _simi(1))); return; }
+        else if (fn == "__builtin_polish_stacktrace_frame_file__") { last_value = std::string(polish_stacktrace_frame_file(_simp(0), _simi(1))); return; }
+        else if (fn == "__builtin_polish_stacktrace_frame_line__") { last_value = polish_stacktrace_frame_line(_simp(0), _simi(1)); return; }
+        else if (fn == "__builtin_polish_stacktrace_to_string__") { last_value = std::string(polish_stacktrace_to_string(_simp(0))); return; }
+        // Memory tracker
+        else if (fn == "__builtin_polish_memtrack_reset__") { polish_memtrack_reset(); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_memtrack_alloc__") { polish_memtrack_alloc(_sims(0), _simll(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_memtrack_free__") { polish_memtrack_free(_sims(0), _simll(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_polish_memtrack_current_bytes__") { last_value = (int)polish_memtrack_current_bytes(); return; }
+        else if (fn == "__builtin_polish_memtrack_peak_bytes__") { last_value = (int)polish_memtrack_peak_bytes(); return; }
+        else if (fn == "__builtin_polish_memtrack_alloc_count__") { last_value = polish_memtrack_alloc_count(); return; }
+        else if (fn == "__builtin_polish_memtrack_report__") { last_value = std::string(polish_memtrack_report()); return; }
+    }
+
+    // Milestone 18: Community & Ecosystem
+    if (std::holds_alternative<std::string>(callee) && std::get<std::string>(callee).rfind("__builtin_eco_", 0) == 0) {
+        std::string fn = std::get<std::string>(callee);
+        auto _simp    = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _simi    = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        auto _sims    = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        auto _ptr2int = [&](void* p) -> int { return (int)(intptr_t)p; };
+        // Semver
+        if      (fn == "__builtin_eco_semver_parse__")        { last_value = _ptr2int(eco_semver_parse(_sims(0))); return; }
+        else if (fn == "__builtin_eco_semver_destroy__")      { eco_semver_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_semver_major__")        { last_value = eco_semver_major(_simp(0)); return; }
+        else if (fn == "__builtin_eco_semver_minor__")        { last_value = eco_semver_minor(_simp(0)); return; }
+        else if (fn == "__builtin_eco_semver_patch__")        { last_value = eco_semver_patch(_simp(0)); return; }
+        else if (fn == "__builtin_eco_semver_pre__")          { last_value = std::string(eco_semver_pre(_simp(0))); return; }
+        else if (fn == "__builtin_eco_semver_to_string__")    { last_value = std::string(eco_semver_to_string(_simp(0))); return; }
+        else if (fn == "__builtin_eco_semver_compare__")      { last_value = eco_semver_compare(_simp(0), _simp(1)); return; }
+        else if (fn == "__builtin_eco_semver_satisfies__")    { last_value = eco_semver_satisfies(_simp(0), _sims(1)); return; }
+        else if (fn == "__builtin_eco_semver_bump_major__")   { last_value = _ptr2int(eco_semver_bump_major(_simp(0))); return; }
+        else if (fn == "__builtin_eco_semver_bump_minor__")   { last_value = _ptr2int(eco_semver_bump_minor(_simp(0))); return; }
+        else if (fn == "__builtin_eco_semver_bump_patch__")   { last_value = _ptr2int(eco_semver_bump_patch(_simp(0))); return; }
+        else if (fn == "__builtin_eco_semver_is_valid__")     { last_value = eco_semver_is_valid(_sims(0)); return; }
+        else if (fn == "__builtin_eco_semver_is_prerelease__"){ last_value = eco_semver_is_prerelease(_simp(0)); return; }
+        // Manifest
+        else if (fn == "__builtin_eco_manifest_create__")     { last_value = _ptr2int(eco_manifest_create(_sims(0), _sims(1))); return; }
+        else if (fn == "__builtin_eco_manifest_destroy__")    { eco_manifest_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_manifest_set_description__") { eco_manifest_set_description(_simp(0), _sims(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_manifest_set_author__") { eco_manifest_set_author(_simp(0), _sims(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_manifest_set_license__"){ eco_manifest_set_license(_simp(0), _sims(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_manifest_add_dep__")    { eco_manifest_add_dep(_simp(0), _sims(1), _sims(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_manifest_add_keyword__"){ eco_manifest_add_keyword(_simp(0), _sims(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_manifest_name__")       { last_value = std::string(eco_manifest_name(_simp(0))); return; }
+        else if (fn == "__builtin_eco_manifest_version__")    { last_value = std::string(eco_manifest_version(_simp(0))); return; }
+        else if (fn == "__builtin_eco_manifest_description__"){ last_value = std::string(eco_manifest_description(_simp(0))); return; }
+        else if (fn == "__builtin_eco_manifest_dep_count__")  { last_value = eco_manifest_dep_count(_simp(0)); return; }
+        else if (fn == "__builtin_eco_manifest_dep_name__")   { last_value = std::string(eco_manifest_dep_name(_simp(0), _simi(1))); return; }
+        else if (fn == "__builtin_eco_manifest_dep_range__")  { last_value = std::string(eco_manifest_dep_range(_simp(0), _simi(1))); return; }
+        else if (fn == "__builtin_eco_manifest_to_toml__")    { last_value = std::string(eco_manifest_to_toml(_simp(0))); return; }
+        // Registry
+        else if (fn == "__builtin_eco_registry_reset__")      { eco_registry_reset(); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_registry_publish__")    { last_value = _ptr2int(eco_registry_publish(_sims(0), _sims(1), _sims(2), _sims(3), _sims(4), _simi(5))); return; }
+        else if (fn == "__builtin_eco_registry_pkg_destroy__"){ eco_registry_pkg_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_registry_exists__")     { last_value = eco_registry_exists(_sims(0)); return; }
+        else if (fn == "__builtin_eco_registry_get__")        { last_value = _ptr2int(eco_registry_get(_sims(0))); return; }
+        else if (fn == "__builtin_eco_registry_pkg_name__")   { last_value = std::string(eco_registry_pkg_name(_simp(0))); return; }
+        else if (fn == "__builtin_eco_registry_pkg_latest__") { last_value = std::string(eco_registry_pkg_latest(_simp(0))); return; }
+        else if (fn == "__builtin_eco_registry_pkg_description__") { last_value = std::string(eco_registry_pkg_description(_simp(0))); return; }
+        else if (fn == "__builtin_eco_registry_pkg_author__") { last_value = std::string(eco_registry_pkg_author(_simp(0))); return; }
+        else if (fn == "__builtin_eco_registry_pkg_downloads__") { last_value = eco_registry_pkg_downloads(_simp(0)); return; }
+        else if (fn == "__builtin_eco_registry_package_count__") { last_value = eco_registry_package_count(); return; }
+        else if (fn == "__builtin_eco_registry_search__")     { last_value = _ptr2int(eco_registry_search(_sims(0))); return; }
+        else if (fn == "__builtin_eco_registry_list_all__")   { last_value = _ptr2int(eco_registry_list_all()); return; }
+        // StrVec
+        else if (fn == "__builtin_eco_strvec_destroy__")      { eco_strvec_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_strvec_count__")        { last_value = eco_strvec_count(_simp(0)); return; }
+        else if (fn == "__builtin_eco_strvec_get__")          { last_value = std::string(eco_strvec_get(_simp(0), _simi(1))); return; }
+        // Package manager
+        else if (fn == "__builtin_eco_pkgmgr_reset__")        { eco_pkgmgr_reset(); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_pkgmgr_install__")      { last_value = eco_pkgmgr_install(_sims(0), _sims(1)); return; }
+        else if (fn == "__builtin_eco_pkgmgr_install_message__") { last_value = std::string(eco_pkgmgr_install_message()); return; }
+        else if (fn == "__builtin_eco_pkgmgr_install_manifest__") { last_value = eco_pkgmgr_install_manifest(_simp(0)); return; }
+        else if (fn == "__builtin_eco_pkgmgr_is_installed__") { last_value = eco_pkgmgr_is_installed(_sims(0)); return; }
+        else if (fn == "__builtin_eco_pkgmgr_installed_version__") { last_value = std::string(eco_pkgmgr_installed_version(_sims(0))); return; }
+        else if (fn == "__builtin_eco_pkgmgr_list_installed__") { last_value = _ptr2int(eco_pkgmgr_list_installed()); return; }
+        else if (fn == "__builtin_eco_pkgmgr_uninstall__")    { last_value = eco_pkgmgr_uninstall(_sims(0)); return; }
+        else if (fn == "__builtin_eco_pkgmgr_lockfile__")     { last_value = std::string(eco_pkgmgr_lockfile(_simp(0))); return; }
+        // Template engine
+        else if (fn == "__builtin_eco_tmpl_vars_create__")    { last_value = _ptr2int(eco_tmpl_vars_create()); return; }
+        else if (fn == "__builtin_eco_tmpl_vars_destroy__")   { eco_tmpl_vars_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_tmpl_vars_set__")       { eco_tmpl_vars_set(_simp(0), _sims(1), _sims(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_eco_tmpl_render__")         { last_value = std::string(eco_tmpl_render(_sims(0), _simp(1))); return; }
+        // Formatter
+        else if (fn == "__builtin_eco_fmt_indent__")          { last_value = std::string(eco_fmt_indent(_sims(0), _simi(1))); return; }
+        else if (fn == "__builtin_eco_fmt_trim__")            { last_value = std::string(eco_fmt_trim(_sims(0))); return; }
+        else if (fn == "__builtin_eco_fmt_normalize__")       { last_value = std::string(eco_fmt_normalize(_sims(0))); return; }
+        else if (fn == "__builtin_eco_fmt_count_lines__")     { last_value = eco_fmt_count_lines(_sims(0)); return; }
+        else if (fn == "__builtin_eco_fmt_count_chars__")     { last_value = eco_fmt_count_chars(_sims(0)); return; }
+    }
+
+    // Milestone 19: Database & Storage
+    if (std::holds_alternative<std::string>(callee) && (
+        std::get<std::string>(callee).rfind("__builtin_db_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_kv_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_doc_", 0) == 0 ||
+        std::get<std::string>(callee).rfind("__builtin_orm_", 0) == 0)) {
+        std::string fn = std::get<std::string>(callee);
+        auto _simp    = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _simi    = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        auto _simll   = [&](int i) -> long long { return std::holds_alternative<int>(arguments[i]) ? (long long)std::get<int>(arguments[i]) : (long long)std::get<double>(arguments[i]); };
+        auto _sims    = [&](int i) -> const char* { return std::get<std::string>(arguments[i]).c_str(); };
+        auto _ptr2int = [&](void* p) -> int { return (int)(intptr_t)p; };
+        // DB core
+        if      (fn == "__builtin_db_open__")               { last_value = _ptr2int(db_open_c(_sims(0))); return; }
+        else if (fn == "__builtin_db_close__")              { db_close_c(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_exec__")               { last_value = _ptr2int(db_exec_c(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_db_result_destroy__")     { db_result_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_result_ok__")          { last_value = db_result_ok(_simp(0)); return; }
+        else if (fn == "__builtin_db_result_error__")       { last_value = std::string(db_result_error(_simp(0))); return; }
+        else if (fn == "__builtin_db_result_row_count__")   { last_value = db_result_row_count(_simp(0)); return; }
+        else if (fn == "__builtin_db_result_col_count__")   { last_value = db_result_col_count(_simp(0)); return; }
+        else if (fn == "__builtin_db_result_col_name__")    { last_value = std::string(db_result_col_name(_simp(0), _simi(1))); return; }
+        else if (fn == "__builtin_db_result_get__")         { last_value = std::string(db_result_get(_simp(0), _simi(1), _simi(2))); return; }
+        else if (fn == "__builtin_db_result_rows_affected__") { last_value = (int)db_result_rows_affected(_simp(0)); return; }
+        else if (fn == "__builtin_db_begin__")              { last_value = db_begin(_simp(0)); return; }
+        else if (fn == "__builtin_db_commit__")             { last_value = db_commit(_simp(0)); return; }
+        else if (fn == "__builtin_db_rollback__")           { last_value = db_rollback(_simp(0)); return; }
+        // Query builder
+        else if (fn == "__builtin_db_qb_select__")          { last_value = _ptr2int(db_qb_select(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_db_qb_insert__")          { last_value = _ptr2int(db_qb_insert(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_db_qb_update__")          { last_value = _ptr2int(db_qb_update(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_db_qb_delete__")          { last_value = _ptr2int(db_qb_delete(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_db_qb_create_table__")    { last_value = _ptr2int(db_qb_create_table(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_db_qb_destroy__")         { db_qb_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_qb_cols__")            { db_qb_cols(_simp(0), _sims(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_qb_where__")           { db_qb_where(_simp(0), _sims(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_qb_order__")           { db_qb_order(_simp(0), _sims(1), _simi(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_qb_limit__")           { db_qb_limit(_simp(0), _simi(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_qb_offset__")          { db_qb_offset(_simp(0), _simi(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_qb_set__")             { db_qb_set(_simp(0), _sims(1), _sims(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_qb_value__")           { db_qb_value(_simp(0), _sims(1)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_qb_add_col__")         { db_qb_add_col(_simp(0), _sims(1), _sims(2), _simi(3), _simi(4)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_qb_exec__")            { last_value = _ptr2int(db_qb_exec(_simp(0))); return; }
+        else if (fn == "__builtin_db_qb_sql__")             { last_value = std::string(db_qb_sql(_simp(0))); return; }
+        // KV Store
+        else if (fn == "__builtin_kv_open__")               { last_value = _ptr2int(kv_open_c()); return; }
+        else if (fn == "__builtin_kv_close__")              { kv_close_c(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_kv_set__")                { kv_set_c(_simp(0), _sims(1), _sims(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_kv_setex__")              { kv_setex_c(_simp(0), _sims(1), _sims(2), _simll(3)); last_value = nullptr; return; }
+        else if (fn == "__builtin_kv_get__")                { last_value = std::string(kv_get_c(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_kv_exists__")             { last_value = kv_exists_c(_simp(0), _sims(1)); return; }
+        else if (fn == "__builtin_kv_del__")                { last_value = kv_del_c(_simp(0), _sims(1)); return; }
+        else if (fn == "__builtin_kv_incr__")               { last_value = (int)kv_incr_c(_simp(0), _sims(1)); return; }
+        else if (fn == "__builtin_kv_decr__")               { last_value = (int)kv_decr_c(_simp(0), _sims(1)); return; }
+        else if (fn == "__builtin_kv_keys__")               { last_value = _ptr2int(kv_keys_c(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_kv_flush__")              { kv_flush_c(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_kv_count__")              { last_value = kv_count_c(_simp(0)); return; }
+        else if (fn == "__builtin_kv_lpush__")              { kv_lpush_c(_simp(0), _sims(1), _sims(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_kv_rpush__")              { kv_rpush_c(_simp(0), _sims(1), _sims(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_kv_lpop__")               { last_value = std::string(kv_lpop_c(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_kv_rpop__")               { last_value = std::string(kv_rpop_c(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_kv_llen__")               { last_value = kv_llen_c(_simp(0), _sims(1)); return; }
+        else if (fn == "__builtin_kv_lindex__")             { last_value = std::string(kv_lindex_c(_simp(0), _sims(1), _simi(2))); return; }
+        else if (fn == "__builtin_kv_hset__")               { kv_hset_c(_simp(0), _sims(1), _sims(2), _sims(3)); last_value = nullptr; return; }
+        else if (fn == "__builtin_kv_hget__")               { last_value = std::string(kv_hget_c(_simp(0), _sims(1), _sims(2))); return; }
+        else if (fn == "__builtin_kv_hexists__")            { last_value = kv_hexists_c(_simp(0), _sims(1), _sims(2)); return; }
+        else if (fn == "__builtin_kv_hlen__")               { last_value = kv_hlen_c(_simp(0), _sims(1)); return; }
+        else if (fn == "__builtin_kv_hkeys__")              { last_value = _ptr2int(kv_hkeys_c(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_db_strvec_destroy__")     { db_strvec_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_db_strvec_count__")       { last_value = db_strvec_count(_simp(0)); return; }
+        else if (fn == "__builtin_db_strvec_get__")         { last_value = std::string(db_strvec_get(_simp(0), _simi(1))); return; }
+        // Document store
+        else if (fn == "__builtin_doc_open__")              { last_value = _ptr2int(doc_open_c()); return; }
+        else if (fn == "__builtin_doc_close__")             { doc_close_c(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_doc_map_create__")        { last_value = _ptr2int(doc_map_create()); return; }
+        else if (fn == "__builtin_doc_map_destroy__")       { doc_map_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_doc_map_set__")           { doc_map_set(_simp(0), _sims(1), _sims(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_doc_map_get__")           { last_value = std::string(doc_map_get(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_doc_map_keys__")          { last_value = _ptr2int(doc_map_keys(_simp(0))); return; }
+        else if (fn == "__builtin_doc_insert__")            { last_value = std::string(doc_insert_c(_simp(0), _sims(1), _simp(2))); return; }
+        else if (fn == "__builtin_doc_find__")              { last_value = _ptr2int(doc_find_c(_simp(0), _sims(1), _sims(2), _sims(3))); return; }
+        else if (fn == "__builtin_doc_find_all__")          { last_value = _ptr2int(doc_find_all_c(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_doc_update__")            { last_value = doc_update_c(_simp(0), _sims(1), _sims(2), _sims(3), _sims(4)); return; }
+        else if (fn == "__builtin_doc_delete__")            { last_value = doc_delete_c(_simp(0), _sims(1), _sims(2)); return; }
+        else if (fn == "__builtin_doc_count__")             { last_value = doc_count_c(_simp(0), _sims(1)); return; }
+        else if (fn == "__builtin_doc_list_destroy__")      { doc_list_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_doc_list_count__")        { last_value = doc_list_count(_simp(0)); return; }
+        else if (fn == "__builtin_doc_list_get_map__")      { last_value = _ptr2int(doc_list_get_map(_simp(0), _simi(1))); return; }
+        // ORM
+        else if (fn == "__builtin_orm_create__")            { last_value = _ptr2int(orm_create_c(_simp(0))); return; }
+        else if (fn == "__builtin_orm_destroy__")           { orm_destroy_c(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_orm_fields_create__")     { last_value = _ptr2int(orm_fields_create()); return; }
+        else if (fn == "__builtin_orm_fields_destroy__")    { orm_fields_destroy(_simp(0)); last_value = nullptr; return; }
+        else if (fn == "__builtin_orm_fields_add__")        { orm_fields_add(_simp(0), _sims(1), _sims(2), _simi(3), _simi(4)); last_value = nullptr; return; }
+        else if (fn == "__builtin_orm_register__")          { orm_register_c(_simp(0), _sims(1), _simp(2)); last_value = nullptr; return; }
+        else if (fn == "__builtin_orm_migrate__")           { last_value = orm_migrate_c(_simp(0)); return; }
+        else if (fn == "__builtin_orm_find_all__")          { last_value = _ptr2int(orm_find_all_c(_simp(0), _sims(1))); return; }
+        else if (fn == "__builtin_orm_find_by__")           { last_value = _ptr2int(orm_find_by_c(_simp(0), _sims(1), _sims(2), _sims(3))); return; }
+        else if (fn == "__builtin_orm_insert__")            { last_value = _ptr2int(orm_insert_c(_simp(0), _sims(1), _simp(2))); return; }
+        else if (fn == "__builtin_orm_update__")            { last_value = _ptr2int(orm_update_c(_simp(0), _sims(1), _sims(2), _sims(3), _simp(4))); return; }
+        else if (fn == "__builtin_orm_delete__")            { last_value = _ptr2int(orm_delete_c(_simp(0), _sims(1), _sims(2), _sims(3))); return; }
+    }
 
     if (std::holds_alternative<std::shared_ptr<WaitGroupMethod>>(callee)) {
         auto wgm = std::get<std::shared_ptr<WaitGroupMethod>>(callee);
@@ -8429,8 +9592,8 @@ void Interpreter::visitImportStmt(ImportStmt& stmt) {
         environment->define("process_table_count",      std::string("__builtin_process_table_count__"));
         environment->define("process_table_schedule",   std::string("__builtin_process_table_schedule__"));
         environment->define("process_table_to_string",  std::string("__builtin_process_table_to_string__"));
-        environment->define("kernel_create",            std::string("__builtin_kernel_create__"));
-        environment->define("kernel_destroy",           std::string("__builtin_kernel_destroy__"));
+        environment->define("kernel_create",            std::string("__builtin_os_kernel_create__"));
+        environment->define("kernel_destroy",           std::string("__builtin_os_kernel_destroy__"));
         environment->define("kernel_boot",              std::string("__builtin_kernel_boot__"));
         environment->define("kernel_panic",             std::string("__builtin_kernel_panic__"));
         environment->define("kernel_name",              std::string("__builtin_kernel_name__"));
@@ -8629,6 +9792,9 @@ void Interpreter::visitImportStmt(ImportStmt& stmt) {
         environment->define("gui_mouse_x",                 std::string("__builtin_gui_mouse_x__"));
         environment->define("gui_mouse_y",                 std::string("__builtin_gui_mouse_y__"));
         environment->define("gui_mouse_button",            std::string("__builtin_gui_mouse_button__"));
+        environment->define("gui_scroll_y",                std::string("__builtin_gui_scroll_y__"));
+        environment->define("gui_mouse_dx",                std::string("__builtin_gui_mouse_dx__"));
+        environment->define("gui_mouse_dy",                std::string("__builtin_gui_mouse_dy__"));
         environment->define("gui_clear",                   std::string("__builtin_gui_clear__"));
         environment->define("gui_present",                 std::string("__builtin_gui_present__"));
         environment->define("gui_set_color",               std::string("__builtin_gui_set_color__"));
@@ -8823,6 +9989,677 @@ void Interpreter::visitImportStmt(ImportStmt& stmt) {
         environment->define("net_lb_mark_up",             std::string("__builtin_net_lb_mark_up__"));
         environment->define("net_lb_strategy",            std::string("__builtin_net_lb_strategy__"));
         environment->define("net_lb_stats",               std::string("__builtin_net_lb_stats__"));
+        return;
+    }
+
+    // Milestone 13: texture
+    if (mod == "texture") {
+        environment->define("texture_load",             std::string("__builtin_texture_load__"));
+        environment->define("texture_destroy",          std::string("__builtin_texture_destroy__"));
+        environment->define("texture_width",            std::string("__builtin_texture_width__"));
+        environment->define("texture_height",           std::string("__builtin_texture_height__"));
+        environment->define("texture_bind",             std::string("__builtin_texture_bind__"));
+        environment->define("texture_error",            std::string("__builtin_texture_error__"));
+        environment->define("spritesheet_create",       std::string("__builtin_spritesheet_create__"));
+        environment->define("spritesheet_destroy",      std::string("__builtin_spritesheet_destroy__"));
+        environment->define("spritesheet_frame_uv",     std::string("__builtin_spritesheet_frame_uv__"));
+        environment->define("atlas_load",               std::string("__builtin_atlas_load__"));
+        environment->define("atlas_destroy",            std::string("__builtin_atlas_destroy__"));
+        environment->define("atlas_region_uv",          std::string("__builtin_atlas_region_uv__"));
+        environment->define("atlas_error",              std::string("__builtin_atlas_error__"));
+        return;
+    }
+
+    // Milestone 13: shader
+    if (mod == "shader") {
+        environment->define("shader_create",                std::string("__builtin_shader_create__"));
+        environment->define("shader_destroy",               std::string("__builtin_shader_destroy__"));
+        environment->define("shader_use",                   std::string("__builtin_shader_use__"));
+        environment->define("shader_set_uniform_float",     std::string("__builtin_shader_set_uniform_float__"));
+        environment->define("shader_set_uniform_vec3",      std::string("__builtin_shader_set_uniform_vec3__"));
+        environment->define("shader_set_uniform_mat4",      std::string("__builtin_shader_set_uniform_mat4__"));
+        environment->define("shader_error",                 std::string("__builtin_shader_error__"));
+        return;
+    }
+
+    // Milestone 13: model
+    if (mod == "model") {
+        environment->define("model_load",           std::string("__builtin_model_load__"));
+        environment->define("model_destroy",        std::string("__builtin_model_destroy__"));
+        environment->define("model_draw",           std::string("__builtin_model_draw__"));
+        environment->define("model_vertex_count",   std::string("__builtin_model_vertex_count__"));
+        environment->define("model_face_count",     std::string("__builtin_model_face_count__"));
+        environment->define("model_error",          std::string("__builtin_model_error__"));
+        return;
+    }
+
+    // Milestone 13: physics
+    if (mod == "physics") {
+        environment->define("physics_world_create",     std::string("__builtin_physics_world_create__"));
+        environment->define("physics_world_destroy",    std::string("__builtin_physics_world_destroy__"));
+        environment->define("physics_world_step",       std::string("__builtin_physics_world_step__"));
+        environment->define("rigidbody_create",         std::string("__builtin_rigidbody_create__"));
+        environment->define("rigidbody_destroy",        std::string("__builtin_rigidbody_destroy__"));
+        environment->define("rigidbody_apply_force",    std::string("__builtin_rigidbody_apply_force__"));
+        environment->define("rigidbody_apply_impulse",  std::string("__builtin_rigidbody_apply_impulse__"));
+        environment->define("rigidbody_get_x",          std::string("__builtin_rigidbody_get_x__"));
+        environment->define("rigidbody_get_y",          std::string("__builtin_rigidbody_get_y__"));
+        environment->define("rigidbody_get_vx",         std::string("__builtin_rigidbody_get_vx__"));
+        environment->define("rigidbody_get_vy",         std::string("__builtin_rigidbody_get_vy__"));
+        environment->define("collider_add_box",         std::string("__builtin_collider_add_box__"));
+        environment->define("collider_add_circle",      std::string("__builtin_collider_add_circle__"));
+        environment->define("collider_add_convex_hull", std::string("__builtin_collider_add_convex_hull__"));
+        environment->define("collision_query_pair",     std::string("__builtin_collision_query_pair__"));
+        environment->define("constraint_add_distance",  std::string("__builtin_constraint_add_distance__"));
+        environment->define("constraint_add_spring",    std::string("__builtin_constraint_add_spring__"));
+        environment->define("constraint_add_hinge",     std::string("__builtin_constraint_add_hinge__"));
+        environment->define("constraint_destroy",       std::string("__builtin_constraint_destroy__"));
+        environment->define("particles_create",         std::string("__builtin_particles_create__"));
+        environment->define("particles_destroy",        std::string("__builtin_particles_destroy__"));
+        environment->define("particles_emit",           std::string("__builtin_particles_emit__"));
+        environment->define("particles_update",         std::string("__builtin_particles_update__"));
+        environment->define("particles_set_color_gradient", std::string("__builtin_particles_set_color_gradient__"));
+        environment->define("particles_active_count",   std::string("__builtin_particles_active_count__"));
+        environment->define("physics_error",            std::string("__builtin_physics_error__"));
+        return;
+    }
+
+    // Milestone 13: simulation
+    if (mod == "simulation") {
+        environment->define("nbody_create",                 std::string("__builtin_nbody_create__"));
+        environment->define("nbody_destroy",                std::string("__builtin_nbody_destroy__"));
+        environment->define("nbody_add_body",               std::string("__builtin_nbody_add_body__"));
+        environment->define("nbody_step",                   std::string("__builtin_nbody_step__"));
+        environment->define("nbody_get_position",           std::string("__builtin_nbody_get_position__"));
+        environment->define("nbody_get_x",                  std::string("__builtin_nbody_get_x__"));
+        environment->define("nbody_get_y",                  std::string("__builtin_nbody_get_y__"));
+        environment->define("nbody_total_energy",           std::string("__builtin_nbody_total_energy__"));
+        environment->define("fluid_create",                 std::string("__builtin_fluid_create__"));
+        environment->define("fluid_destroy",                std::string("__builtin_fluid_destroy__"));
+        environment->define("fluid_step",                   std::string("__builtin_fluid_step__"));
+        environment->define("fluid_get_particle_position",  std::string("__builtin_fluid_get_particle_position__"));
+        environment->define("fluid_get_particle_x",         std::string("__builtin_fluid_get_particle_x__"));
+        environment->define("fluid_get_particle_y",         std::string("__builtin_fluid_get_particle_y__"));
+        environment->define("fluid_set_viscosity",          std::string("__builtin_fluid_set_viscosity__"));
+        environment->define("blackhole_create",             std::string("__builtin_blackhole_create__"));
+        environment->define("blackhole_destroy",            std::string("__builtin_blackhole_destroy__"));
+        environment->define("blackhole_add_particle",       std::string("__builtin_blackhole_add_particle__"));
+        environment->define("blackhole_step",               std::string("__builtin_blackhole_step__"));
+        environment->define("blackhole_get_particle_position", std::string("__builtin_blackhole_get_particle_position__"));
+        environment->define("blackhole_get_particle_x",     std::string("__builtin_blackhole_get_particle_x__"));
+        environment->define("blackhole_get_particle_y",     std::string("__builtin_blackhole_get_particle_y__"));
+        environment->define("blackhole_captured_count",     std::string("__builtin_blackhole_captured_count__"));
+        environment->define("field_sim_create",             std::string("__builtin_field_sim_create__"));
+        environment->define("field_sim_destroy",            std::string("__builtin_field_sim_destroy__"));
+        environment->define("field_sim_add_attractor",      std::string("__builtin_field_sim_add_attractor__"));
+        environment->define("field_sim_add_repulsor",       std::string("__builtin_field_sim_add_repulsor__"));
+        environment->define("field_sim_step",               std::string("__builtin_field_sim_step__"));
+        environment->define("field_sim_get_particle_position", std::string("__builtin_field_sim_get_particle_position__"));
+        environment->define("field_sim_get_particle_x",     std::string("__builtin_field_sim_get_particle_x__"));
+        environment->define("field_sim_get_particle_y",     std::string("__builtin_field_sim_get_particle_y__"));
+        return;
+    }
+
+    // Milestone 14: OS Development
+    if (mod == "os") {
+        environment->define("boot_create",                std::string("__builtin_boot_create__"));
+        environment->define("boot_destroy",               std::string("__builtin_boot_destroy__"));
+        environment->define("boot_load_mbr",              std::string("__builtin_boot_load_mbr__"));
+        environment->define("boot_load_stage2",           std::string("__builtin_boot_load_stage2__"));
+        environment->define("boot_load_kernel",           std::string("__builtin_boot_load_kernel__"));
+        environment->define("boot_status",                std::string("__builtin_boot_status__"));
+        environment->define("boot_get_memory_map_count",  std::string("__builtin_boot_get_memory_map_count__"));
+        environment->define("boot_get_memory_map_entry",  std::string("__builtin_boot_get_memory_map_entry__"));
+        environment->define("boot_enter_protected_mode",  std::string("__builtin_boot_enter_protected_mode__"));
+        environment->define("boot_enter_long_mode",       std::string("__builtin_boot_enter_long_mode__"));
+        environment->define("boot_mode",                  std::string("__builtin_boot_mode__"));
+        environment->define("kernel_create",              std::string("__builtin_os_kernel_create__"));
+        environment->define("kernel_destroy",             std::string("__builtin_os_kernel_destroy__"));
+        environment->define("kernel_init_idt",            std::string("__builtin_os_kernel_init_idt__"));
+        environment->define("kernel_init_gdt",            std::string("__builtin_os_kernel_init_gdt__"));
+        environment->define("kernel_init_pic",            std::string("__builtin_os_kernel_init_pic__"));
+        environment->define("kernel_init_pit",            std::string("__builtin_os_kernel_init_pit__"));
+        environment->define("kernel_register_isr",        std::string("__builtin_os_kernel_register_isr__"));
+        environment->define("kernel_isr_count",           std::string("__builtin_os_kernel_isr_count__"));
+        environment->define("kernel_isr_name",            std::string("__builtin_os_kernel_isr_name__"));
+        environment->define("kernel_trigger_interrupt",   std::string("__builtin_os_kernel_trigger_interrupt__"));
+        environment->define("kernel_interrupt_count",     std::string("__builtin_os_kernel_interrupt_count__"));
+        environment->define("kernel_vga_write",           std::string("__builtin_os_kernel_vga_write__"));
+        environment->define("kernel_vga_read",            std::string("__builtin_os_kernel_vga_read__"));
+        environment->define("kernel_vga_clear",           std::string("__builtin_os_kernel_vga_clear__"));
+        environment->define("kernel_status",              std::string("__builtin_os_kernel_status__"));
+        environment->define("pmm_create",                 std::string("__builtin_pmm_create__"));
+        environment->define("pmm_destroy",                std::string("__builtin_pmm_destroy__"));
+        environment->define("pmm_mark_free",              std::string("__builtin_pmm_mark_free__"));
+        environment->define("pmm_mark_used",              std::string("__builtin_pmm_mark_used__"));
+        environment->define("pmm_alloc_page",             std::string("__builtin_pmm_alloc_page__"));
+        environment->define("pmm_free_page",              std::string("__builtin_pmm_free_page__"));
+        environment->define("pmm_alloc_pages",            std::string("__builtin_pmm_alloc_pages__"));
+        environment->define("pmm_free_pages_count",       std::string("__builtin_pmm_free_pages_count__"));
+        environment->define("pmm_used_pages_count",       std::string("__builtin_pmm_used_pages_count__"));
+        environment->define("pmm_total_pages",            std::string("__builtin_pmm_total_pages__"));
+        environment->define("pmm_page_size",              std::string("__builtin_pmm_page_size__"));
+        environment->define("vmm_create",                 std::string("__builtin_vmm_create__"));
+        environment->define("vmm_destroy",                std::string("__builtin_vmm_destroy__"));
+        environment->define("vmm_map",                    std::string("__builtin_vmm_map__"));
+        environment->define("vmm_unmap",                  std::string("__builtin_vmm_unmap__"));
+        environment->define("vmm_translate",              std::string("__builtin_vmm_translate__"));
+        environment->define("vmm_is_mapped",              std::string("__builtin_vmm_is_mapped__"));
+        environment->define("vmm_page_fault_count",       std::string("__builtin_vmm_page_fault_count__"));
+        environment->define("vmm_dump_table",             std::string("__builtin_vmm_dump_table__"));
+        environment->define("heap_create",                std::string("__builtin_heap_create__"));
+        environment->define("heap_destroy",               std::string("__builtin_heap_destroy__"));
+        environment->define("heap_alloc",                 std::string("__builtin_heap_alloc__"));
+        environment->define("heap_free",                  std::string("__builtin_heap_free__"));
+        environment->define("heap_used",                  std::string("__builtin_heap_used__"));
+        environment->define("heap_free_space",            std::string("__builtin_heap_free_space__"));
+        environment->define("heap_block_count",           std::string("__builtin_heap_block_count__"));
+        environment->define("scheduler_create",           std::string("__builtin_scheduler_create__"));
+        environment->define("scheduler_destroy",          std::string("__builtin_scheduler_destroy__"));
+        environment->define("scheduler_add_process",      std::string("__builtin_scheduler_add_process__"));
+        environment->define("scheduler_terminate",        std::string("__builtin_scheduler_terminate__"));
+        environment->define("scheduler_tick",             std::string("__builtin_scheduler_tick__"));
+        environment->define("scheduler_current_pid",      std::string("__builtin_scheduler_current_pid__"));
+        environment->define("scheduler_current_name",     std::string("__builtin_scheduler_current_name__"));
+        environment->define("scheduler_process_count",    std::string("__builtin_scheduler_process_count__"));
+        environment->define("scheduler_process_name",     std::string("__builtin_scheduler_process_name__"));
+        environment->define("scheduler_process_state",    std::string("__builtin_scheduler_process_state__"));
+        environment->define("scheduler_process_priority", std::string("__builtin_scheduler_process_priority__"));
+        environment->define("scheduler_process_ticks",    std::string("__builtin_scheduler_process_ticks__"));
+        environment->define("scheduler_block",            std::string("__builtin_scheduler_block__"));
+        environment->define("scheduler_unblock",          std::string("__builtin_scheduler_unblock__"));
+        environment->define("syscall_table_create",       std::string("__builtin_syscall_table_create__"));
+        environment->define("syscall_table_destroy",      std::string("__builtin_syscall_table_destroy__"));
+        environment->define("syscall_table_register",     std::string("__builtin_syscall_table_register__"));
+        environment->define("syscall_table_invoke",       std::string("__builtin_syscall_table_invoke__"));
+        environment->define("syscall_table_count",        std::string("__builtin_syscall_table_count__"));
+        environment->define("syscall_table_name",         std::string("__builtin_syscall_table_name__"));
+        environment->define("driver_create",              std::string("__builtin_driver_create__"));
+        environment->define("driver_destroy",             std::string("__builtin_driver_destroy__"));
+        environment->define("driver_write",               std::string("__builtin_driver_write__"));
+        environment->define("driver_read",                std::string("__builtin_driver_read__"));
+        environment->define("driver_irq_fire",            std::string("__builtin_driver_irq_fire__"));
+        environment->define("driver_irq_count",           std::string("__builtin_driver_irq_count__"));
+        environment->define("driver_name",                std::string("__builtin_driver_name__"));
+        environment->define("driver_type",                std::string("__builtin_driver_type__"));
+        environment->define("driver_is_ready",            std::string("__builtin_driver_is_ready__"));
+        environment->define("vga_create",                 std::string("__builtin_os_vga_create__"));
+        environment->define("vga_destroy",                std::string("__builtin_os_vga_destroy__"));
+        environment->define("vga_putchar",                std::string("__builtin_os_vga_putchar__"));
+        environment->define("vga_puts",                   std::string("__builtin_os_vga_puts__"));
+        environment->define("vga_set_cursor",             std::string("__builtin_os_vga_set_cursor__"));
+        environment->define("vga_clear",                  std::string("__builtin_os_vga_clear__"));
+        environment->define("vga_cursor_row",             std::string("__builtin_os_vga_cursor_row__"));
+        environment->define("vga_cursor_col",             std::string("__builtin_os_vga_cursor_col__"));
+        environment->define("vga_get_line",               std::string("__builtin_os_vga_get_line__"));
+        environment->define("vga_cols",                   std::string("__builtin_os_vga_cols__"));
+        environment->define("vga_rows",                   std::string("__builtin_os_vga_rows__"));
+        return;
+    }
+
+    // Milestone 15: Advanced Cryptography
+    if (mod == "advancedcrypto") {
+        // Post-Quantum: Kyber
+        environment->define("kyber_keygen",              std::string("__builtin_kyber_keygen__"));
+        environment->define("kyber_destroy_keypair",     std::string("__builtin_kyber_destroy_keypair__"));
+        environment->define("kyber_public_key",          std::string("__builtin_kyber_public_key__"));
+        environment->define("kyber_secret_key",          std::string("__builtin_kyber_secret_key__"));
+        environment->define("kyber_security_level",      std::string("__builtin_kyber_security_level__"));
+        environment->define("kyber_encapsulate",         std::string("__builtin_kyber_encapsulate__"));
+        environment->define("kyber_destroy_encap",       std::string("__builtin_kyber_destroy_encap__"));
+        environment->define("kyber_ciphertext",          std::string("__builtin_kyber_ciphertext__"));
+        environment->define("kyber_shared_secret",       std::string("__builtin_kyber_shared_secret__"));
+        environment->define("kyber_decapsulate",         std::string("__builtin_kyber_decapsulate__"));
+        // Post-Quantum: SPHINCS+
+        environment->define("sphincs_keygen",            std::string("__builtin_sphincs_keygen__"));
+        environment->define("sphincs_destroy_keypair",   std::string("__builtin_sphincs_destroy_keypair__"));
+        environment->define("sphincs_public_key",        std::string("__builtin_sphincs_public_key__"));
+        environment->define("sphincs_secret_key",        std::string("__builtin_sphincs_secret_key__"));
+        environment->define("sphincs_sign",              std::string("__builtin_sphincs_sign__"));
+        environment->define("sphincs_verify",            std::string("__builtin_sphincs_verify__"));
+        // Post-Quantum: McEliece
+        environment->define("mceliece_keygen",           std::string("__builtin_mceliece_keygen__"));
+        environment->define("mceliece_destroy_keypair",  std::string("__builtin_mceliece_destroy_keypair__"));
+        environment->define("mceliece_public_key",       std::string("__builtin_mceliece_public_key__"));
+        environment->define("mceliece_secret_key",       std::string("__builtin_mceliece_secret_key__"));
+        environment->define("mceliece_encrypt",          std::string("__builtin_mceliece_encrypt__"));
+        environment->define("mceliece_decrypt",          std::string("__builtin_mceliece_decrypt__"));
+        // Post-Quantum: Rainbow
+        environment->define("rainbow_keygen",            std::string("__builtin_rainbow_keygen__"));
+        environment->define("rainbow_destroy_keypair",   std::string("__builtin_rainbow_destroy_keypair__"));
+        environment->define("rainbow_public_key",        std::string("__builtin_rainbow_public_key__"));
+        environment->define("rainbow_secret_key",        std::string("__builtin_rainbow_secret_key__"));
+        environment->define("rainbow_sign",              std::string("__builtin_rainbow_sign__"));
+        environment->define("rainbow_verify",            std::string("__builtin_rainbow_verify__"));
+        // ZK: SNARK
+        environment->define("zksnark_setup",             std::string("__builtin_zksnark_setup__"));
+        environment->define("zksnark_destroy_keys",      std::string("__builtin_zksnark_destroy_keys__"));
+        environment->define("zksnark_proving_key",       std::string("__builtin_zksnark_proving_key__"));
+        environment->define("zksnark_verification_key",  std::string("__builtin_zksnark_verification_key__"));
+        environment->define("zksnark_circuit_id",        std::string("__builtin_zksnark_circuit_id__"));
+        environment->define("zksnark_prove",             std::string("__builtin_zksnark_prove__"));
+        environment->define("zksnark_destroy_proof",     std::string("__builtin_zksnark_destroy_proof__"));
+        environment->define("zksnark_proof_hex",         std::string("__builtin_zksnark_proof_hex__"));
+        environment->define("zksnark_public_inputs",     std::string("__builtin_zksnark_public_inputs__"));
+        environment->define("zksnark_verify",            std::string("__builtin_zksnark_verify__"));
+        // ZK: STARK
+        environment->define("zkstark_prove",             std::string("__builtin_zkstark_prove__"));
+        environment->define("zkstark_destroy_proof",     std::string("__builtin_zkstark_destroy_proof__"));
+        environment->define("zkstark_proof_hex",         std::string("__builtin_zkstark_proof_hex__"));
+        environment->define("zkstark_trace_commitment",  std::string("__builtin_zkstark_trace_commitment__"));
+        environment->define("zkstark_verify",            std::string("__builtin_zkstark_verify__"));
+        // ZK: Bulletproofs
+        environment->define("bulletproof_prove_range",   std::string("__builtin_bulletproof_prove_range__"));
+        environment->define("bulletproof_destroy",       std::string("__builtin_bulletproof_destroy__"));
+        environment->define("bulletproof_proof_hex",     std::string("__builtin_bulletproof_proof_hex__"));
+        environment->define("bulletproof_commitment_hex",std::string("__builtin_bulletproof_commitment_hex__"));
+        environment->define("bulletproof_verify_range",  std::string("__builtin_bulletproof_verify_range__"));
+        // ZK: PLONK
+        environment->define("plonk_setup",               std::string("__builtin_plonk_setup__"));
+        environment->define("plonk_destroy_srs",         std::string("__builtin_plonk_destroy_srs__"));
+        environment->define("plonk_srs_hex",             std::string("__builtin_plonk_srs_hex__"));
+        environment->define("plonk_srs_id",              std::string("__builtin_plonk_srs_id__"));
+        environment->define("plonk_prove",               std::string("__builtin_plonk_prove__"));
+        environment->define("plonk_destroy_proof",       std::string("__builtin_plonk_destroy_proof__"));
+        environment->define("plonk_proof_hex",           std::string("__builtin_plonk_proof_hex__"));
+        environment->define("plonk_verify",              std::string("__builtin_plonk_verify__"));
+        // HE: BGV
+        environment->define("bgv_create_context",        std::string("__builtin_bgv_create_context__"));
+        environment->define("bgv_destroy_context",       std::string("__builtin_bgv_destroy_context__"));
+        environment->define("bgv_context_id",            std::string("__builtin_bgv_context_id__"));
+        environment->define("bgv_keygen",                std::string("__builtin_bgv_keygen__"));
+        environment->define("bgv_destroy_keypair",       std::string("__builtin_bgv_destroy_keypair__"));
+        environment->define("bgv_public_key",            std::string("__builtin_bgv_public_key__"));
+        environment->define("bgv_secret_key",            std::string("__builtin_bgv_secret_key__"));
+        environment->define("bgv_encrypt",               std::string("__builtin_bgv_encrypt__"));
+        environment->define("bgv_destroy_ciphertext",    std::string("__builtin_bgv_destroy_ciphertext__"));
+        environment->define("bgv_ciphertext_hex",        std::string("__builtin_bgv_ciphertext_hex__"));
+        environment->define("bgv_decrypt",               std::string("__builtin_bgv_decrypt__"));
+        environment->define("bgv_add",                   std::string("__builtin_bgv_add__"));
+        environment->define("bgv_multiply",              std::string("__builtin_bgv_multiply__"));
+        // HE: BFV
+        environment->define("bfv_create_context",        std::string("__builtin_bfv_create_context__"));
+        environment->define("bfv_destroy_context",       std::string("__builtin_bfv_destroy_context__"));
+        environment->define("bfv_context_id",            std::string("__builtin_bfv_context_id__"));
+        environment->define("bfv_keygen",                std::string("__builtin_bfv_keygen__"));
+        environment->define("bfv_destroy_keypair",       std::string("__builtin_bfv_destroy_keypair__"));
+        environment->define("bfv_public_key",            std::string("__builtin_bfv_public_key__"));
+        environment->define("bfv_secret_key",            std::string("__builtin_bfv_secret_key__"));
+        environment->define("bfv_encrypt",               std::string("__builtin_bfv_encrypt__"));
+        environment->define("bfv_destroy_ciphertext",    std::string("__builtin_bfv_destroy_ciphertext__"));
+        environment->define("bfv_ciphertext_hex",        std::string("__builtin_bfv_ciphertext_hex__"));
+        environment->define("bfv_decrypt",               std::string("__builtin_bfv_decrypt__"));
+        environment->define("bfv_add",                   std::string("__builtin_bfv_add__"));
+        environment->define("bfv_multiply",              std::string("__builtin_bfv_multiply__"));
+        // HE: CKKS
+        environment->define("ckks_create_context",       std::string("__builtin_ckks_create_context__"));
+        environment->define("ckks_destroy_context",      std::string("__builtin_ckks_destroy_context__"));
+        environment->define("ckks_context_id",           std::string("__builtin_ckks_context_id__"));
+        environment->define("ckks_keygen",               std::string("__builtin_ckks_keygen__"));
+        environment->define("ckks_destroy_keypair",      std::string("__builtin_ckks_destroy_keypair__"));
+        environment->define("ckks_public_key",           std::string("__builtin_ckks_public_key__"));
+        environment->define("ckks_secret_key",           std::string("__builtin_ckks_secret_key__"));
+        environment->define("ckks_encrypt",              std::string("__builtin_ckks_encrypt__"));
+        environment->define("ckks_destroy_ciphertext",   std::string("__builtin_ckks_destroy_ciphertext__"));
+        environment->define("ckks_ciphertext_hex",       std::string("__builtin_ckks_ciphertext_hex__"));
+        environment->define("ckks_decrypt",              std::string("__builtin_ckks_decrypt__"));
+        environment->define("ckks_add",                  std::string("__builtin_ckks_add__"));
+        environment->define("ckks_multiply",             std::string("__builtin_ckks_multiply__"));
+        // HE: TFHE
+        environment->define("tfhe_create_context",       std::string("__builtin_tfhe_create_context__"));
+        environment->define("tfhe_destroy_context",      std::string("__builtin_tfhe_destroy_context__"));
+        environment->define("tfhe_context_id",           std::string("__builtin_tfhe_context_id__"));
+        environment->define("tfhe_keygen",               std::string("__builtin_tfhe_keygen__"));
+        environment->define("tfhe_destroy_keypair",      std::string("__builtin_tfhe_destroy_keypair__"));
+        environment->define("tfhe_secret_key",           std::string("__builtin_tfhe_secret_key__"));
+        environment->define("tfhe_cloud_key",            std::string("__builtin_tfhe_cloud_key__"));
+        environment->define("tfhe_encrypt_bit",          std::string("__builtin_tfhe_encrypt_bit__"));
+        environment->define("tfhe_destroy_ciphertext",   std::string("__builtin_tfhe_destroy_ciphertext__"));
+        environment->define("tfhe_ciphertext_hex",       std::string("__builtin_tfhe_ciphertext_hex__"));
+        environment->define("tfhe_decrypt_bit",          std::string("__builtin_tfhe_decrypt_bit__"));
+        environment->define("tfhe_gate_and",             std::string("__builtin_tfhe_gate_and__"));
+        environment->define("tfhe_gate_or",              std::string("__builtin_tfhe_gate_or__"));
+        environment->define("tfhe_gate_xor",             std::string("__builtin_tfhe_gate_xor__"));
+        environment->define("tfhe_gate_not",             std::string("__builtin_tfhe_gate_not__"));
+        // Shamir Secret Sharing
+        environment->define("shamir_split",              std::string("__builtin_shamir_split__"));
+        environment->define("shamir_destroy_shares",     std::string("__builtin_shamir_destroy_shares__"));
+        environment->define("shamir_share_count",        std::string("__builtin_shamir_share_count__"));
+        environment->define("shamir_share_x",            std::string("__builtin_shamir_share_x__"));
+        environment->define("shamir_share_y",            std::string("__builtin_shamir_share_y__"));
+        environment->define("shamir_reconstruct",        std::string("__builtin_shamir_reconstruct__"));
+        // SMPC
+        environment->define("smpc_share",               std::string("__builtin_smpc_share__"));
+        environment->define("smpc_destroy_shares",       std::string("__builtin_smpc_destroy_shares__"));
+        environment->define("smpc_share_count",          std::string("__builtin_smpc_share_count__"));
+        environment->define("smpc_share_hex",            std::string("__builtin_smpc_share_hex__"));
+        environment->define("smpc_reconstruct",          std::string("__builtin_smpc_reconstruct__"));
+        // Threshold Cryptography
+        environment->define("threshold_keygen",          std::string("__builtin_threshold_keygen__"));
+        environment->define("threshold_destroy",         std::string("__builtin_threshold_destroy__"));
+        environment->define("threshold_public_key",      std::string("__builtin_threshold_public_key__"));
+        environment->define("threshold_share_count",     std::string("__builtin_threshold_share_count__"));
+        environment->define("threshold_share_hex",       std::string("__builtin_threshold_share_hex__"));
+        environment->define("threshold_partial_sign",    std::string("__builtin_threshold_partial_sign__"));
+        environment->define("threshold_combine",         std::string("__builtin_threshold_combine__"));
+        environment->define("threshold_verify",          std::string("__builtin_threshold_verify__"));
+        // Oblivious Transfer
+        environment->define("ot_sender_init",            std::string("__builtin_ot_sender_init__"));
+        environment->define("ot_destroy_sender",         std::string("__builtin_ot_destroy_sender__"));
+        environment->define("ot_sender_state",           std::string("__builtin_ot_sender_state__"));
+        environment->define("ot_receiver_init",          std::string("__builtin_ot_receiver_init__"));
+        environment->define("ot_destroy_receiver",       std::string("__builtin_ot_destroy_receiver__"));
+        environment->define("ot_receiver_query",         std::string("__builtin_ot_receiver_query__"));
+        environment->define("ot_sender_respond",         std::string("__builtin_ot_sender_respond__"));
+        environment->define("ot_destroy_message",        std::string("__builtin_ot_destroy_message__"));
+        environment->define("ot_message_hex",            std::string("__builtin_ot_message_hex__"));
+        environment->define("ot_receiver_extract",       std::string("__builtin_ot_receiver_extract__"));
+        return;
+    }
+
+    // Milestone 16: Mathematical Computing
+    if (mod == "mathx") {
+        // Number Theory
+        environment->define("mathx_sieve",              std::string("__builtin_mathx_sieve__"));
+        environment->define("mathx_sieve_destroy",      std::string("__builtin_mathx_sieve_destroy__"));
+        environment->define("mathx_sieve_count",        std::string("__builtin_mathx_sieve_count__"));
+        environment->define("mathx_sieve_get",          std::string("__builtin_mathx_sieve_get__"));
+        environment->define("mathx_is_prime",           std::string("__builtin_mathx_is_prime__"));
+        environment->define("mathx_prime_factors",      std::string("__builtin_mathx_prime_factors__"));
+        environment->define("mathx_vec_destroy",        std::string("__builtin_mathx_vec_destroy__"));
+        environment->define("mathx_vec_count",          std::string("__builtin_mathx_vec_count__"));
+        environment->define("mathx_vec_get",            std::string("__builtin_mathx_vec_get__"));
+        environment->define("mathx_gcd",                std::string("__builtin_mathx_gcd__"));
+        environment->define("mathx_lcm",                std::string("__builtin_mathx_lcm__"));
+        environment->define("mathx_mod_pow",            std::string("__builtin_mathx_mod_pow__"));
+        environment->define("mathx_mod_inverse",        std::string("__builtin_mathx_mod_inverse__"));
+        environment->define("mathx_euler_totient",      std::string("__builtin_mathx_euler_totient__"));
+        environment->define("mathx_is_perfect",         std::string("__builtin_mathx_is_perfect__"));
+        environment->define("mathx_is_abundant",        std::string("__builtin_mathx_is_abundant__"));
+        environment->define("mathx_divisors",           std::string("__builtin_mathx_divisors__"));
+        environment->define("mathx_sum_divisors",       std::string("__builtin_mathx_sum_divisors__"));
+        environment->define("mathx_nth_prime",          std::string("__builtin_mathx_nth_prime__"));
+        environment->define("mathx_collatz_length",     std::string("__builtin_mathx_collatz_length__"));
+        environment->define("mathx_digital_root",       std::string("__builtin_mathx_digital_root__"));
+        environment->define("mathx_is_palindrome_num",  std::string("__builtin_mathx_is_palindrome_num__"));
+        environment->define("mathx_reverse_num",        std::string("__builtin_mathx_reverse_num__"));
+        environment->define("mathx_sum_digits",         std::string("__builtin_mathx_sum_digits__"));
+        environment->define("mathx_is_pandigital",      std::string("__builtin_mathx_is_pandigital__"));
+        // Matrix
+        environment->define("mathx_mat_create",         std::string("__builtin_mathx_mat_create__"));
+        environment->define("mathx_mat_identity",       std::string("__builtin_mathx_mat_identity__"));
+        environment->define("mathx_mat_destroy",        std::string("__builtin_mathx_mat_destroy__"));
+        environment->define("mathx_mat_rows",           std::string("__builtin_mathx_mat_rows__"));
+        environment->define("mathx_mat_cols",           std::string("__builtin_mathx_mat_cols__"));
+        environment->define("mathx_mat_get",            std::string("__builtin_mathx_mat_get__"));
+        environment->define("mathx_mat_set",            std::string("__builtin_mathx_mat_set__"));
+        environment->define("mathx_mat_add",            std::string("__builtin_mathx_mat_add__"));
+        environment->define("mathx_mat_sub",            std::string("__builtin_mathx_mat_sub__"));
+        environment->define("mathx_mat_mul",            std::string("__builtin_mathx_mat_mul__"));
+        environment->define("mathx_mat_scale",          std::string("__builtin_mathx_mat_scale__"));
+        environment->define("mathx_mat_transpose",      std::string("__builtin_mathx_mat_transpose__"));
+        environment->define("mathx_mat_det",            std::string("__builtin_mathx_mat_det__"));
+        environment->define("mathx_mat_inverse",        std::string("__builtin_mathx_mat_inverse__"));
+        environment->define("mathx_mat_solve",          std::string("__builtin_mathx_mat_solve__"));
+        environment->define("mathx_mat_trace",          std::string("__builtin_mathx_mat_trace__"));
+        environment->define("mathx_mat_to_string",      std::string("__builtin_mathx_mat_to_string__"));
+        environment->define("mathx_mat_dominant_eigenvalue",  std::string("__builtin_mathx_mat_dominant_eigenvalue__"));
+        environment->define("mathx_mat_dominant_eigenvector", std::string("__builtin_mathx_mat_dominant_eigenvector__"));
+        // Symbolic
+        environment->define("mathx_sym_num",            std::string("__builtin_mathx_sym_num__"));
+        environment->define("mathx_sym_var",            std::string("__builtin_mathx_sym_var__"));
+        environment->define("mathx_sym_add",            std::string("__builtin_mathx_sym_add__"));
+        environment->define("mathx_sym_sub",            std::string("__builtin_mathx_sym_sub__"));
+        environment->define("mathx_sym_mul",            std::string("__builtin_mathx_sym_mul__"));
+        environment->define("mathx_sym_div",            std::string("__builtin_mathx_sym_div__"));
+        environment->define("mathx_sym_pow",            std::string("__builtin_mathx_sym_pow__"));
+        environment->define("mathx_sym_neg",            std::string("__builtin_mathx_sym_neg__"));
+        environment->define("mathx_sym_sin",            std::string("__builtin_mathx_sym_sin__"));
+        environment->define("mathx_sym_cos",            std::string("__builtin_mathx_sym_cos__"));
+        environment->define("mathx_sym_exp",            std::string("__builtin_mathx_sym_exp__"));
+        environment->define("mathx_sym_ln",             std::string("__builtin_mathx_sym_ln__"));
+        environment->define("mathx_sym_simplify",       std::string("__builtin_mathx_sym_simplify__"));
+        environment->define("mathx_sym_diff",           std::string("__builtin_mathx_sym_diff__"));
+        environment->define("mathx_sym_eval",           std::string("__builtin_mathx_sym_eval__"));
+        environment->define("mathx_sym_to_string",      std::string("__builtin_mathx_sym_to_string__"));
+        environment->define("mathx_sym_destroy",        std::string("__builtin_mathx_sym_destroy__"));
+        environment->define("mathx_integrate_expr",     std::string("__builtin_mathx_integrate_expr__"));
+        environment->define("mathx_find_root",          std::string("__builtin_mathx_find_root__"));
+        // Statistics
+        environment->define("mathx_dvec_create",        std::string("__builtin_mathx_dvec_create__"));
+        environment->define("mathx_dvec_push",          std::string("__builtin_mathx_dvec_push__"));
+        environment->define("mathx_dvec_destroy",       std::string("__builtin_mathx_dvec_destroy__"));
+        environment->define("mathx_dvec_count",         std::string("__builtin_mathx_dvec_count__"));
+        environment->define("mathx_dvec_get",           std::string("__builtin_mathx_dvec_get__"));
+        environment->define("mathx_stat_mean",          std::string("__builtin_mathx_stat_mean__"));
+        environment->define("mathx_stat_variance",      std::string("__builtin_mathx_stat_variance__"));
+        environment->define("mathx_stat_stddev",        std::string("__builtin_mathx_stat_stddev__"));
+        environment->define("mathx_stat_median",        std::string("__builtin_mathx_stat_median__"));
+        environment->define("mathx_stat_correlation",   std::string("__builtin_mathx_stat_correlation__"));
+        environment->define("mathx_stat_linear_regression", std::string("__builtin_mathx_stat_linear_regression__"));
+        return;
+    }
+
+    // Milestone 17: Polish & Optimization
+    if (mod == "polish") {
+        // Profiler
+        environment->define("polish_profiler_reset",        std::string("__builtin_polish_profiler_reset__"));
+        environment->define("polish_profiler_start",        std::string("__builtin_polish_profiler_start__"));
+        environment->define("polish_profiler_stop",         std::string("__builtin_polish_profiler_stop__"));
+        environment->define("polish_profiler_entry_count",  std::string("__builtin_polish_profiler_entry_count__"));
+        environment->define("polish_profiler_entry_name",   std::string("__builtin_polish_profiler_entry_name__"));
+        environment->define("polish_profiler_entry_calls",  std::string("__builtin_polish_profiler_entry_calls__"));
+        environment->define("polish_profiler_entry_total_ms", std::string("__builtin_polish_profiler_entry_total_ms__"));
+        environment->define("polish_profiler_entry_mean_ms",  std::string("__builtin_polish_profiler_entry_mean_ms__"));
+        environment->define("polish_profiler_entry_min_ms",   std::string("__builtin_polish_profiler_entry_min_ms__"));
+        environment->define("polish_profiler_entry_max_ms",   std::string("__builtin_polish_profiler_entry_max_ms__"));
+        environment->define("polish_profiler_report",       std::string("__builtin_polish_profiler_report__"));
+        // Benchmark
+        environment->define("polish_bench_create",          std::string("__builtin_polish_bench_create__"));
+        environment->define("polish_bench_destroy",         std::string("__builtin_polish_bench_destroy__"));
+        environment->define("polish_bench_iter_start",      std::string("__builtin_polish_bench_iter_start__"));
+        environment->define("polish_bench_iter_stop",       std::string("__builtin_polish_bench_iter_stop__"));
+        environment->define("polish_bench_iterations",      std::string("__builtin_polish_bench_iterations__"));
+        environment->define("polish_bench_mean_ms",         std::string("__builtin_polish_bench_mean_ms__"));
+        environment->define("polish_bench_min_ms",          std::string("__builtin_polish_bench_min_ms__"));
+        environment->define("polish_bench_max_ms",          std::string("__builtin_polish_bench_max_ms__"));
+        environment->define("polish_bench_ops_per_sec",     std::string("__builtin_polish_bench_ops_per_sec__"));
+        environment->define("polish_bench_report",          std::string("__builtin_polish_bench_report__"));
+        // Logger
+        environment->define("polish_logger_set_level",      std::string("__builtin_polish_logger_set_level__"));
+        environment->define("polish_logger_get_level",      std::string("__builtin_polish_logger_get_level__"));
+        environment->define("polish_logger_set_file",       std::string("__builtin_polish_logger_set_file__"));
+        environment->define("polish_logger_close_file",     std::string("__builtin_polish_logger_close_file__"));
+        environment->define("polish_logger_log",            std::string("__builtin_polish_logger_log__"));
+        environment->define("polish_logger_enable_timestamps", std::string("__builtin_polish_logger_enable_timestamps__"));
+        environment->define("polish_logger_enable_colors",  std::string("__builtin_polish_logger_enable_colors__"));
+        environment->define("polish_logger_message_count",  std::string("__builtin_polish_logger_message_count__"));
+        environment->define("polish_logger_get_message",    std::string("__builtin_polish_logger_get_message__"));
+        environment->define("polish_logger_clear",          std::string("__builtin_polish_logger_clear__"));
+        // Stack trace
+        environment->define("polish_stacktrace_capture",    std::string("__builtin_polish_stacktrace_capture__"));
+        environment->define("polish_stacktrace_destroy",    std::string("__builtin_polish_stacktrace_destroy__"));
+        environment->define("polish_stacktrace_depth",      std::string("__builtin_polish_stacktrace_depth__"));
+        environment->define("polish_stacktrace_frame_function", std::string("__builtin_polish_stacktrace_frame_function__"));
+        environment->define("polish_stacktrace_frame_file", std::string("__builtin_polish_stacktrace_frame_file__"));
+        environment->define("polish_stacktrace_frame_line", std::string("__builtin_polish_stacktrace_frame_line__"));
+        environment->define("polish_stacktrace_to_string",  std::string("__builtin_polish_stacktrace_to_string__"));
+        // Memory tracker
+        environment->define("polish_memtrack_reset",        std::string("__builtin_polish_memtrack_reset__"));
+        environment->define("polish_memtrack_alloc",        std::string("__builtin_polish_memtrack_alloc__"));
+        environment->define("polish_memtrack_free",         std::string("__builtin_polish_memtrack_free__"));
+        environment->define("polish_memtrack_current_bytes",std::string("__builtin_polish_memtrack_current_bytes__"));
+        environment->define("polish_memtrack_peak_bytes",   std::string("__builtin_polish_memtrack_peak_bytes__"));
+        environment->define("polish_memtrack_alloc_count",  std::string("__builtin_polish_memtrack_alloc_count__"));
+        environment->define("polish_memtrack_report",       std::string("__builtin_polish_memtrack_report__"));
+        return;
+    }
+
+    // Milestone 18: Community & Ecosystem
+    if (mod == "ecosystem") {
+        // Semver
+        environment->define("eco_semver_parse",         std::string("__builtin_eco_semver_parse__"));
+        environment->define("eco_semver_destroy",       std::string("__builtin_eco_semver_destroy__"));
+        environment->define("eco_semver_major",         std::string("__builtin_eco_semver_major__"));
+        environment->define("eco_semver_minor",         std::string("__builtin_eco_semver_minor__"));
+        environment->define("eco_semver_patch",         std::string("__builtin_eco_semver_patch__"));
+        environment->define("eco_semver_pre",           std::string("__builtin_eco_semver_pre__"));
+        environment->define("eco_semver_to_string",     std::string("__builtin_eco_semver_to_string__"));
+        environment->define("eco_semver_compare",       std::string("__builtin_eco_semver_compare__"));
+        environment->define("eco_semver_satisfies",     std::string("__builtin_eco_semver_satisfies__"));
+        environment->define("eco_semver_bump_major",    std::string("__builtin_eco_semver_bump_major__"));
+        environment->define("eco_semver_bump_minor",    std::string("__builtin_eco_semver_bump_minor__"));
+        environment->define("eco_semver_bump_patch",    std::string("__builtin_eco_semver_bump_patch__"));
+        environment->define("eco_semver_is_valid",      std::string("__builtin_eco_semver_is_valid__"));
+        environment->define("eco_semver_is_prerelease", std::string("__builtin_eco_semver_is_prerelease__"));
+        // Manifest
+        environment->define("eco_manifest_create",      std::string("__builtin_eco_manifest_create__"));
+        environment->define("eco_manifest_destroy",     std::string("__builtin_eco_manifest_destroy__"));
+        environment->define("eco_manifest_set_description", std::string("__builtin_eco_manifest_set_description__"));
+        environment->define("eco_manifest_set_author",  std::string("__builtin_eco_manifest_set_author__"));
+        environment->define("eco_manifest_set_license", std::string("__builtin_eco_manifest_set_license__"));
+        environment->define("eco_manifest_add_dep",     std::string("__builtin_eco_manifest_add_dep__"));
+        environment->define("eco_manifest_add_keyword", std::string("__builtin_eco_manifest_add_keyword__"));
+        environment->define("eco_manifest_name",        std::string("__builtin_eco_manifest_name__"));
+        environment->define("eco_manifest_version",     std::string("__builtin_eco_manifest_version__"));
+        environment->define("eco_manifest_description", std::string("__builtin_eco_manifest_description__"));
+        environment->define("eco_manifest_dep_count",   std::string("__builtin_eco_manifest_dep_count__"));
+        environment->define("eco_manifest_dep_name",    std::string("__builtin_eco_manifest_dep_name__"));
+        environment->define("eco_manifest_dep_range",   std::string("__builtin_eco_manifest_dep_range__"));
+        environment->define("eco_manifest_to_toml",     std::string("__builtin_eco_manifest_to_toml__"));
+        // Registry
+        environment->define("eco_registry_reset",       std::string("__builtin_eco_registry_reset__"));
+        environment->define("eco_registry_publish",     std::string("__builtin_eco_registry_publish__"));
+        environment->define("eco_registry_pkg_destroy", std::string("__builtin_eco_registry_pkg_destroy__"));
+        environment->define("eco_registry_exists",      std::string("__builtin_eco_registry_exists__"));
+        environment->define("eco_registry_get",         std::string("__builtin_eco_registry_get__"));
+        environment->define("eco_registry_pkg_name",    std::string("__builtin_eco_registry_pkg_name__"));
+        environment->define("eco_registry_pkg_latest",  std::string("__builtin_eco_registry_pkg_latest__"));
+        environment->define("eco_registry_pkg_description", std::string("__builtin_eco_registry_pkg_description__"));
+        environment->define("eco_registry_pkg_author",  std::string("__builtin_eco_registry_pkg_author__"));
+        environment->define("eco_registry_pkg_downloads", std::string("__builtin_eco_registry_pkg_downloads__"));
+        environment->define("eco_registry_package_count", std::string("__builtin_eco_registry_package_count__"));
+        environment->define("eco_registry_search",      std::string("__builtin_eco_registry_search__"));
+        environment->define("eco_registry_list_all",    std::string("__builtin_eco_registry_list_all__"));
+        // StrVec
+        environment->define("eco_strvec_destroy",       std::string("__builtin_eco_strvec_destroy__"));
+        environment->define("eco_strvec_count",         std::string("__builtin_eco_strvec_count__"));
+        environment->define("eco_strvec_get",           std::string("__builtin_eco_strvec_get__"));
+        // Package manager
+        environment->define("eco_pkgmgr_reset",         std::string("__builtin_eco_pkgmgr_reset__"));
+        environment->define("eco_pkgmgr_install",       std::string("__builtin_eco_pkgmgr_install__"));
+        environment->define("eco_pkgmgr_install_message", std::string("__builtin_eco_pkgmgr_install_message__"));
+        environment->define("eco_pkgmgr_install_manifest", std::string("__builtin_eco_pkgmgr_install_manifest__"));
+        environment->define("eco_pkgmgr_is_installed",  std::string("__builtin_eco_pkgmgr_is_installed__"));
+        environment->define("eco_pkgmgr_installed_version", std::string("__builtin_eco_pkgmgr_installed_version__"));
+        environment->define("eco_pkgmgr_list_installed",std::string("__builtin_eco_pkgmgr_list_installed__"));
+        environment->define("eco_pkgmgr_uninstall",     std::string("__builtin_eco_pkgmgr_uninstall__"));
+        environment->define("eco_pkgmgr_lockfile",      std::string("__builtin_eco_pkgmgr_lockfile__"));
+        // Template engine
+        environment->define("eco_tmpl_vars_create",     std::string("__builtin_eco_tmpl_vars_create__"));
+        environment->define("eco_tmpl_vars_destroy",    std::string("__builtin_eco_tmpl_vars_destroy__"));
+        environment->define("eco_tmpl_vars_set",        std::string("__builtin_eco_tmpl_vars_set__"));
+        environment->define("eco_tmpl_render",          std::string("__builtin_eco_tmpl_render__"));
+        // Formatter
+        environment->define("eco_fmt_indent",           std::string("__builtin_eco_fmt_indent__"));
+        environment->define("eco_fmt_trim",             std::string("__builtin_eco_fmt_trim__"));
+        environment->define("eco_fmt_normalize",        std::string("__builtin_eco_fmt_normalize__"));
+        environment->define("eco_fmt_count_lines",      std::string("__builtin_eco_fmt_count_lines__"));
+        environment->define("eco_fmt_count_chars",      std::string("__builtin_eco_fmt_count_chars__"));
+        return;
+    }
+
+    // Milestone 19: Database & Storage
+    if (mod == "database") {
+        // DB core
+        environment->define("db_open",                  std::string("__builtin_db_open__"));
+        environment->define("db_close",                 std::string("__builtin_db_close__"));
+        environment->define("db_exec",                  std::string("__builtin_db_exec__"));
+        environment->define("db_result_destroy",        std::string("__builtin_db_result_destroy__"));
+        environment->define("db_result_ok",             std::string("__builtin_db_result_ok__"));
+        environment->define("db_result_error",          std::string("__builtin_db_result_error__"));
+        environment->define("db_result_row_count",      std::string("__builtin_db_result_row_count__"));
+        environment->define("db_result_col_count",      std::string("__builtin_db_result_col_count__"));
+        environment->define("db_result_col_name",       std::string("__builtin_db_result_col_name__"));
+        environment->define("db_result_get",            std::string("__builtin_db_result_get__"));
+        environment->define("db_result_rows_affected",  std::string("__builtin_db_result_rows_affected__"));
+        environment->define("db_begin",                 std::string("__builtin_db_begin__"));
+        environment->define("db_commit",                std::string("__builtin_db_commit__"));
+        environment->define("db_rollback",              std::string("__builtin_db_rollback__"));
+        // Query builder
+        environment->define("db_qb_select",             std::string("__builtin_db_qb_select__"));
+        environment->define("db_qb_insert",             std::string("__builtin_db_qb_insert__"));
+        environment->define("db_qb_update",             std::string("__builtin_db_qb_update__"));
+        environment->define("db_qb_delete",             std::string("__builtin_db_qb_delete__"));
+        environment->define("db_qb_create_table",       std::string("__builtin_db_qb_create_table__"));
+        environment->define("db_qb_destroy",            std::string("__builtin_db_qb_destroy__"));
+        environment->define("db_qb_cols",               std::string("__builtin_db_qb_cols__"));
+        environment->define("db_qb_where",              std::string("__builtin_db_qb_where__"));
+        environment->define("db_qb_order",              std::string("__builtin_db_qb_order__"));
+        environment->define("db_qb_limit",              std::string("__builtin_db_qb_limit__"));
+        environment->define("db_qb_offset",             std::string("__builtin_db_qb_offset__"));
+        environment->define("db_qb_set",                std::string("__builtin_db_qb_set__"));
+        environment->define("db_qb_value",              std::string("__builtin_db_qb_value__"));
+        environment->define("db_qb_add_col",            std::string("__builtin_db_qb_add_col__"));
+        environment->define("db_qb_exec",               std::string("__builtin_db_qb_exec__"));
+        environment->define("db_qb_sql",                std::string("__builtin_db_qb_sql__"));
+        // KV Store
+        environment->define("kv_open",                  std::string("__builtin_kv_open__"));
+        environment->define("kv_close",                 std::string("__builtin_kv_close__"));
+        environment->define("kv_set",                   std::string("__builtin_kv_set__"));
+        environment->define("kv_setex",                 std::string("__builtin_kv_setex__"));
+        environment->define("kv_get",                   std::string("__builtin_kv_get__"));
+        environment->define("kv_exists",                std::string("__builtin_kv_exists__"));
+        environment->define("kv_del",                   std::string("__builtin_kv_del__"));
+        environment->define("kv_incr",                  std::string("__builtin_kv_incr__"));
+        environment->define("kv_decr",                  std::string("__builtin_kv_decr__"));
+        environment->define("kv_keys",                  std::string("__builtin_kv_keys__"));
+        environment->define("kv_flush",                 std::string("__builtin_kv_flush__"));
+        environment->define("kv_count",                 std::string("__builtin_kv_count__"));
+        environment->define("kv_lpush",                 std::string("__builtin_kv_lpush__"));
+        environment->define("kv_rpush",                 std::string("__builtin_kv_rpush__"));
+        environment->define("kv_lpop",                  std::string("__builtin_kv_lpop__"));
+        environment->define("kv_rpop",                  std::string("__builtin_kv_rpop__"));
+        environment->define("kv_llen",                  std::string("__builtin_kv_llen__"));
+        environment->define("kv_lindex",                std::string("__builtin_kv_lindex__"));
+        environment->define("kv_hset",                  std::string("__builtin_kv_hset__"));
+        environment->define("kv_hget",                  std::string("__builtin_kv_hget__"));
+        environment->define("kv_hexists",               std::string("__builtin_kv_hexists__"));
+        environment->define("kv_hlen",                  std::string("__builtin_kv_hlen__"));
+        environment->define("kv_hkeys",                 std::string("__builtin_kv_hkeys__"));
+        environment->define("db_strvec_destroy",        std::string("__builtin_db_strvec_destroy__"));
+        environment->define("db_strvec_count",          std::string("__builtin_db_strvec_count__"));
+        environment->define("db_strvec_get",            std::string("__builtin_db_strvec_get__"));
+        // Document store
+        environment->define("doc_open",                 std::string("__builtin_doc_open__"));
+        environment->define("doc_close",                std::string("__builtin_doc_close__"));
+        environment->define("doc_map_create",           std::string("__builtin_doc_map_create__"));
+        environment->define("doc_map_destroy",          std::string("__builtin_doc_map_destroy__"));
+        environment->define("doc_map_set",              std::string("__builtin_doc_map_set__"));
+        environment->define("doc_map_get",              std::string("__builtin_doc_map_get__"));
+        environment->define("doc_map_keys",             std::string("__builtin_doc_map_keys__"));
+        environment->define("doc_insert",               std::string("__builtin_doc_insert__"));
+        environment->define("doc_find",                 std::string("__builtin_doc_find__"));
+        environment->define("doc_find_all",             std::string("__builtin_doc_find_all__"));
+        environment->define("doc_update",               std::string("__builtin_doc_update__"));
+        environment->define("doc_delete",               std::string("__builtin_doc_delete__"));
+        environment->define("doc_count",                std::string("__builtin_doc_count__"));
+        environment->define("doc_list_destroy",         std::string("__builtin_doc_list_destroy__"));
+        environment->define("doc_list_count",           std::string("__builtin_doc_list_count__"));
+        environment->define("doc_list_get_map",         std::string("__builtin_doc_list_get_map__"));
+        // ORM
+        environment->define("orm_create",               std::string("__builtin_orm_create__"));
+        environment->define("orm_destroy",              std::string("__builtin_orm_destroy__"));
+        environment->define("orm_fields_create",        std::string("__builtin_orm_fields_create__"));
+        environment->define("orm_fields_destroy",       std::string("__builtin_orm_fields_destroy__"));
+        environment->define("orm_fields_add",           std::string("__builtin_orm_fields_add__"));
+        environment->define("orm_register",             std::string("__builtin_orm_register__"));
+        environment->define("orm_migrate",              std::string("__builtin_orm_migrate__"));
+        environment->define("orm_find_all",             std::string("__builtin_orm_find_all__"));
+        environment->define("orm_find_by",              std::string("__builtin_orm_find_by__"));
+        environment->define("orm_insert",               std::string("__builtin_orm_insert__"));
+        environment->define("orm_update",               std::string("__builtin_orm_update__"));
+        environment->define("orm_delete",               std::string("__builtin_orm_delete__"));
         return;
     }
 

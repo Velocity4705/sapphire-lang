@@ -1,0 +1,34 @@
+import texture
+
+# ── Texture loading ──────────────────────────────────────────────────────────
+print("Testing texture module...")
+
+# Try loading a PNG (will fail gracefully if file doesn't exist)
+tex = texture_load("examples/graphics_tests/test.png")
+if tex == 0:
+    print("No test PNG found: " + texture_error())
+else:
+    print("Loaded texture: " + texture_width(tex) + "x" + texture_height(tex))
+    texture_bind(tex, 0)
+    texture_destroy(tex)
+
+# ── Sprite sheet ─────────────────────────────────────────────────────────────
+# Load a sprite sheet (4x4 grid of 16x16 frames)
+sheet_tex = texture_load("examples/graphics_tests/spritesheet.png")
+if sheet_tex == 0:
+    print("No spritesheet found, skipping UV demo.")
+else:
+    ss = spritesheet_create(sheet_tex, 16, 16, 16)
+    uv = spritesheet_frame_uv(ss, 0)
+    print("Frame 0 UV: " + uv)
+    uv2 = spritesheet_frame_uv(ss, 3)
+    print("Frame 3 UV: " + uv2)
+    spritesheet_destroy(ss)
+    texture_destroy(sheet_tex)
+
+# ── Error handling ────────────────────────────────────────────────────────────
+bad = texture_load("nonexistent_file.png")
+if bad == 0:
+    print("Expected error: " + texture_error())
+
+print("Texture demo complete.")

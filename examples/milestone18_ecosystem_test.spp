@@ -1,0 +1,157 @@
+// Milestone 18: Community & Ecosystem
+import ecosystem
+
+// ===== Semver =====
+print("=== Semver ===")
+
+let v1 = eco_semver_parse("1.2.3")
+let v2 = eco_semver_parse("2.0.0")
+let v3 = eco_semver_parse("1.2.4-alpha.1")
+
+print("v1:", eco_semver_to_string(v1))
+print("v1 major:", eco_semver_major(v1))
+print("v1 minor:", eco_semver_minor(v1))
+print("v1 patch:", eco_semver_patch(v1))
+print("v3 pre:", eco_semver_pre(v3))
+print("v3 is_prerelease:", eco_semver_is_prerelease(v3))
+
+print("compare(v1, v2):", eco_semver_compare(v1, v2))
+print("compare(v2, v1):", eco_semver_compare(v2, v1))
+print("compare(v1, v1):", eco_semver_compare(v1, v1))
+
+print("v1 satisfies ^1.0.0:", eco_semver_satisfies(v1, "^1.0.0"))
+print("v1 satisfies ^2.0.0:", eco_semver_satisfies(v1, "^2.0.0"))
+print("v1 satisfies ~1.2.0:", eco_semver_satisfies(v1, "~1.2.0"))
+print("v1 satisfies >=1.0.0 <2.0.0:", eco_semver_satisfies(v1, ">=1.0.0 <2.0.0"))
+print("v2 satisfies >=1.0.0 <2.0.0:", eco_semver_satisfies(v2, ">=1.0.0 <2.0.0"))
+
+let v_bumped = eco_semver_bump_minor(v1)
+print("bump_minor(1.2.3):", eco_semver_to_string(v_bumped))
+let v_major = eco_semver_bump_major(v1)
+print("bump_major(1.2.3):", eco_semver_to_string(v_major))
+let v_patch = eco_semver_bump_patch(v1)
+print("bump_patch(1.2.3):", eco_semver_to_string(v_patch))
+
+print("is_valid('1.2.3'):", eco_semver_is_valid("1.2.3"))
+print("is_valid('bad'):", eco_semver_is_valid("bad"))
+
+eco_semver_destroy(v1)
+eco_semver_destroy(v2)
+eco_semver_destroy(v3)
+eco_semver_destroy(v_bumped)
+eco_semver_destroy(v_major)
+eco_semver_destroy(v_patch)
+
+// ===== Manifest =====
+print("")
+print("=== Manifest ===")
+
+let m = eco_manifest_create("my-package", "1.0.0")
+eco_manifest_set_description(m, "A great Sapphire package")
+eco_manifest_set_author(m, "Dev Team")
+eco_manifest_set_license(m, "MIT")
+eco_manifest_add_dep(m, "mathx", "^1.0.0")
+eco_manifest_add_dep(m, "polish", ">=1.0.0 <2.0.0")
+eco_manifest_add_keyword(m, "math")
+eco_manifest_add_keyword(m, "utils")
+
+print("Name:", eco_manifest_name(m))
+print("Version:", eco_manifest_version(m))
+print("Description:", eco_manifest_description(m))
+print("Dep count:", eco_manifest_dep_count(m))
+print("Dep 0:", eco_manifest_dep_name(m, 0), eco_manifest_dep_range(m, 0))
+print("Dep 1:", eco_manifest_dep_name(m, 1), eco_manifest_dep_range(m, 1))
+print("TOML:")
+print(eco_manifest_to_toml(m))
+
+// ===== Registry =====
+print("=== Registry ===")
+
+eco_registry_reset()
+eco_registry_publish("mathx", "1.2.0", "Mathematical computing library", "Sapphire Team", "MIT", 5420)
+eco_registry_publish("polish", "1.0.1", "Profiling and optimization tools", "Sapphire Team", "MIT", 3100)
+eco_registry_publish("webx", "0.9.0", "Web framework for Sapphire", "Community", "Apache-2.0", 1200)
+eco_registry_publish("dataframe", "2.1.0", "Data analysis library", "Data Team", "MIT", 8900)
+
+print("Registry count:", eco_registry_package_count())
+print("mathx exists:", eco_registry_exists("mathx"))
+print("unknown exists:", eco_registry_exists("unknown"))
+
+let pkg = eco_registry_get("mathx")
+print("mathx latest:", eco_registry_pkg_latest(pkg))
+print("mathx author:", eco_registry_pkg_author(pkg))
+print("mathx downloads:", eco_registry_pkg_downloads(pkg))
+eco_registry_pkg_destroy(pkg)
+
+let results = eco_registry_search("math")
+print("Search 'math' results:", eco_strvec_count(results))
+print("Result 0:", eco_strvec_get(results, 0))
+eco_strvec_destroy(results)
+
+let all = eco_registry_list_all()
+print("All packages:", eco_strvec_count(all))
+eco_strvec_destroy(all)
+
+// ===== Package Manager =====
+print("")
+print("=== Package Manager ===")
+
+eco_pkgmgr_reset()
+let ok1 = eco_pkgmgr_install("mathx", "^1.0.0")
+print("Install mathx:", ok1)
+let ok2 = eco_pkgmgr_install("polish", ">=1.0.0")
+print("Install polish:", ok2)
+let ok3 = eco_pkgmgr_install("unknown", "*")
+print("Install unknown (should fail):", ok3)
+
+print("mathx installed:", eco_pkgmgr_is_installed("mathx"))
+print("mathx version:", eco_pkgmgr_installed_version("mathx"))
+print("unknown installed:", eco_pkgmgr_is_installed("unknown"))
+
+let installed = eco_pkgmgr_list_installed()
+print("Installed count:", eco_strvec_count(installed))
+eco_strvec_destroy(installed)
+
+print("Install from manifest:")
+let ok4 = eco_pkgmgr_install_manifest(m)
+print("Manifest install success:", ok4)
+
+print("Lockfile:")
+print(eco_pkgmgr_lockfile(m))
+
+eco_pkgmgr_uninstall("mathx")
+print("After uninstall, mathx installed:", eco_pkgmgr_is_installed("mathx"))
+
+// ===== Template Engine =====
+print("=== Template Engine ===")
+
+let vars = eco_tmpl_vars_create()
+eco_tmpl_vars_set(vars, "name", "my-package")
+eco_tmpl_vars_set(vars, "version", "1.0.0")
+eco_tmpl_vars_set(vars, "author", "Dev Team")
+eco_tmpl_vars_set(vars, "has_tests", "true")
+
+let tmpl = "Package: {{name}} v{{version}}\nAuthor: {{author}}\n{{#if has_tests}}Tests: enabled{{/if}}\n"
+let rendered = eco_tmpl_render(tmpl, vars)
+print(rendered)
+
+eco_tmpl_vars_destroy(vars)
+
+// ===== Formatter =====
+print("=== Formatter ===")
+
+let code = "fn hello():    \n    print('hi')   \n    return 42   \n"
+print("Original lines:", eco_fmt_count_lines(code))
+print("Original chars:", eco_fmt_count_chars(code))
+
+let trimmed = eco_fmt_trim(code)
+print("Trimmed:")
+print(trimmed)
+
+let indented = eco_fmt_indent("line one\nline two\n", 4)
+print("Indented:")
+print(indented)
+
+eco_manifest_destroy(m)
+
+print("=== M18 Community & Ecosystem: ALL TESTS PASSED ===")

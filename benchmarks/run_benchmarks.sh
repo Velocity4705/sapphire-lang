@@ -12,7 +12,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║         SAPPHIRE 1.0.0 PERFORMANCE BENCHMARKS                ║"
+echo "║         SAPPHIRE 1.0-beta.6 PERFORMANCE BENCHMARKS           ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""
 

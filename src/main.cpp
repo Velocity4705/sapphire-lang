@@ -30,7 +30,7 @@ void checkForUpdates() {
     std::cout << "Checking for updates...\n";
     
     // Read current version
-    std::string current_version = "1.0-beta.5";
+    std::string current_version = "1.0-beta.6";
     std::ifstream version_file("VERSION");
     if (version_file.is_open()) {
         std::getline(version_file, current_version);
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
     std::string arg = argv[1];
     
     if (arg == "--version") {
-        std::cout << "Sapphire v1.0-beta.5 (Web Development Foundation)\n";
+        std::cout << "Sapphire v1.0-beta.6 (Web Development Foundation)\n";
         return 0;
     }
     

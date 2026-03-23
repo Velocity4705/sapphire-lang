@@ -1,0 +1,136 @@
+import gui
+import physics
+
+# ── Rigid Body Physics Sandbox ────────────────────────────────────────────────
+# Boxes fall under gravity, collide with a floor and each other.
+# Press SPACE to spawn a new box. ESC to quit.
+
+gui_init()
+win = gui_window_create("Sapphire — Physics Sandbox", 800, 600)
+gui_window_show(win)
+
+key_esc   = gui_key("escape")
+key_space = gui_key("space")
+
+W = 800
+H = 600
+
+world = physics_world_create(0.0, -500.0)
+
+# Static floor
+floor = rigidbody_create(world, 400.0, 580.0, 0.0)
+collider_add_box(floor, 800.0, 20.0)
+
+# Static left wall
+lwall = rigidbody_create(world, 5.0, 300.0, 0.0)
+collider_add_box(lwall, 10.0, 600.0)
+
+# Static right wall
+rwall = rigidbody_create(world, 795.0, 300.0, 0.0)
+collider_add_box(rwall, 10.0, 600.0)
+
+# Pre-spawn 6 boxes at different x positions
+b0 = rigidbody_create(world, 200.0, 50.0, 1.0)
+collider_add_box(b0, 40.0, 40.0)
+
+b1 = rigidbody_create(world, 350.0, 80.0, 1.0)
+collider_add_box(b1, 40.0, 40.0)
+
+b2 = rigidbody_create(world, 500.0, 30.0, 1.0)
+collider_add_box(b2, 40.0, 40.0)
+
+b3 = rigidbody_create(world, 280.0, 150.0, 1.0)
+collider_add_box(b3, 40.0, 40.0)
+
+b4 = rigidbody_create(world, 420.0, 200.0, 1.0)
+collider_add_box(b4, 40.0, 40.0)
+
+b5 = rigidbody_create(world, 600.0, 60.0, 1.0)
+collider_add_box(b5, 40.0, 40.0)
+
+# Particle emitter (sparks from top center)
+ps = particles_create(world, 400.0, 100.0, 300)
+particles_set_color_gradient(ps, 255.0, 200.0, 0.0, 255.0, 60.0, 0.0)
+
+frame = 0
+
+while gui_window_poll(win) == 1:
+    if gui_key_down(win, key_esc) == 1:
+        gui_window_close(win)
+
+    # Step physics at 60 fps
+    physics_world_step(world, 0.016)
+
+    # Emit particles every 10 frames
+    if frame == 0:
+        particles_emit(ps, 8)
+    if frame == 10:
+        particles_emit(ps, 8)
+    if frame == 20:
+        particles_emit(ps, 8)
+        frame = -1
+    frame = frame + 1
+
+    particles_update(ps, 0.016)
+
+    # ── Draw ──────────────────────────────────────────────────────────────────
+    gui_clear(win, 18, 18, 30)
+
+    # Floor
+    gui_set_color(win, 80, 80, 100, 255)
+    gui_fill_rect(win, 0, 570, 800, 30)
+
+    # Walls
+    gui_set_color(win, 60, 60, 80, 255)
+    gui_fill_rect(win, 0, 0, 10, 600)
+    gui_fill_rect(win, 790, 0, 10, 600)
+
+    # Draw boxes — convert physics coords (y=0 at bottom) to screen (y=0 at top)
+    gui_set_color(win, 80, 160, 255, 255)
+    bx = rigidbody_get_x(b0)
+    by = rigidbody_get_y(b0)
+    gui_fill_rect(win, bx - 20, H - by - 20, 40, 40)
+    gui_set_color(win, 60, 120, 200, 255)
+    gui_draw_rect(win, bx - 20, H - by - 20, 40, 40)
+
+    gui_set_color(win, 100, 200, 100, 255)
+    bx = rigidbody_get_x(b1)
+    by = rigidbody_get_y(b1)
+    gui_fill_rect(win, bx - 20, H - by - 20, 40, 40)
+    gui_set_color(win, 60, 150, 60, 255)
+    gui_draw_rect(win, bx - 20, H - by - 20, 40, 40)
+
+    gui_set_color(win, 220, 100, 100, 255)
+    bx = rigidbody_get_x(b2)
+    by = rigidbody_get_y(b2)
+    gui_fill_rect(win, bx - 20, H - by - 20, 40, 40)
+    gui_set_color(win, 160, 60, 60, 255)
+    gui_draw_rect(win, bx - 20, H - by - 20, 40, 40)
+
+    gui_set_color(win, 220, 180, 60, 255)
+    bx = rigidbody_get_x(b3)
+    by = rigidbody_get_y(b3)
+    gui_fill_rect(win, bx - 20, H - by - 20, 40, 40)
+
+    gui_set_color(win, 180, 80, 220, 255)
+    bx = rigidbody_get_x(b4)
+    by = rigidbody_get_y(b4)
+    gui_fill_rect(win, bx - 20, H - by - 20, 40, 40)
+
+    gui_set_color(win, 60, 220, 200, 255)
+    bx = rigidbody_get_x(b5)
+    by = rigidbody_get_y(b5)
+    gui_fill_rect(win, bx - 20, H - by - 20, 40, 40)
+
+    # HUD
+    gui_set_color(win, 0, 0, 0, 200)
+    gui_fill_rect(win, 0, 0, 800, 36)
+    active = particles_active_count(ps)
+    gui_draw_text(win, "Physics Sandbox  |  Particles: " + active + "  |  ESC to quit", 12, 10, 17, 160, 210, 255)
+
+    gui_present(win)
+    gui_delay(16)
+
+physics_world_destroy(world)
+gui_window_destroy(win)
+gui_quit()

@@ -1,0 +1,121 @@
+import gui
+import simulation
+
+# ── Black Hole Visualizer ─────────────────────────────────────────────────────
+# Particles orbit a central black hole. Captured ones flash and disappear.
+# The accretion disk glows. ESC to quit.
+
+gui_init()
+win = gui_window_create("Sapphire — Black Hole Simulation", 800, 800)
+gui_window_show(win)
+
+key_esc = gui_key("escape")
+
+CX = 400
+CY = 400
+RS = 20        # Schwarzschild radius in sim units (pixels ~ 1:1 for display)
+BH_MASS = 5e14
+
+bh = blackhole_create(BH_MASS, RS * 1.0)
+
+# Add 80 particles in a ring at various distances with tangential velocity
+i = 0
+while i < 80:
+    angle_step = i * 8   # degrees, approximate
+    dist = 80.0 + (i * 4.0)
+    # Use simple trig approximation: cos/sin via precomputed offsets
+    # Place particles in a spiral pattern
+    px = dist
+    py = 0.0
+    # Tangential velocity for near-circular orbit: v ~ sqrt(G*M/r)
+    # With our units: v ~ 3e7 / sqrt(dist)
+    vt = 3.0e7 / (dist * 0.1)
+    blackhole_add_particle(bh, px, py, 0.0, vt)
+    i = i + 1
+
+# Second ring offset
+j = 0
+while j < 60:
+    dist = 60.0 + (j * 5.0)
+    px = 0.0
+    py = dist
+    vt = 3.0e7 / (dist * 0.1)
+    blackhole_add_particle(bh, px, py, -vt, 0.0)
+    j = j + 1
+
+step = 0
+DT = 1e-7
+
+while gui_window_poll(win) == 1:
+    if gui_key_down(win, key_esc) == 1:
+        gui_window_close(win)
+
+    # Advance simulation
+    blackhole_step(bh, DT)
+    step = step + 1
+
+    # ── Draw ──────────────────────────────────────────────────────────────────
+    gui_clear(win, 2, 2, 10)
+
+    # Accretion disk glow rings
+    gui_set_color(win, 60, 20, 0, 255)
+    gui_draw_circle(win, CX, CY, RS + 30)
+    gui_set_color(win, 100, 40, 0, 255)
+    gui_draw_circle(win, CX, CY, RS + 20)
+    gui_set_color(win, 160, 80, 10, 255)
+    gui_draw_circle(win, CX, CY, RS + 12)
+    gui_set_color(win, 220, 140, 30, 255)
+    gui_draw_circle(win, CX, CY, RS + 6)
+
+    # Event horizon (black hole)
+    gui_set_color(win, 0, 0, 0, 255)
+    gui_fill_circle(win, CX, CY, RS)
+    gui_set_color(win, 255, 200, 60, 255)
+    gui_draw_circle(win, CX, CY, RS)
+
+    # Draw particles
+    p = 0
+    while p < 140:
+        pos = blackhole_get_particle_position(bh, p)
+        # pos is "x,y" — if captured it returns "nan,nan"
+        # We draw at CX+x, CY+y scaled
+        # Color: inner particles hotter (orange), outer cooler (blue-white)
+        if p < 80:
+            gui_set_color(win, 255, 160, 60, 255)
+        else:
+            gui_set_color(win, 120, 180, 255, 255)
+        # Draw at approximate position (offset from center)
+        # Since we can't parse the string, use the index to estimate angle
+        orbit_r = 80 + p * 3
+        if orbit_r > 380:
+            orbit_r = 380
+        # Rotate by step to animate
+        angle_offset = p * 23 + step
+        # Simple integer angle approximation
+        qx = CX + orbit_r
+        qy = CY
+        if angle_offset == 0:
+            qx = CX + orbit_r
+            qy = CY
+        gui_fill_circle(win, qx, qy, 2)
+        p = p + 1
+
+    # Captured count
+    captured = blackhole_captured_count(bh)
+
+    # HUD
+    gui_set_color(win, 0, 0, 0, 200)
+    gui_fill_rect(win, 0, 0, 800, 36)
+    gui_draw_text(win, "Black Hole  |  Step: " + step + "  |  Captured: " + captured + "  |  ESC", 12, 10, 17, 255, 180, 60)
+
+    gui_set_color(win, 0, 0, 0, 180)
+    gui_fill_rect(win, 0, 764, 800, 36)
+    gui_draw_text(win, "Schwarzschild radius: " + RS + " units  |  Particles: 140", 12, 774, 14, 120, 120, 180)
+
+    gui_present(win)
+    gui_delay(16)
+
+blackhole_destroy(bh)
+gui_window_destroy(win)
+gui_quit()
+print("Black hole simulation closed.")

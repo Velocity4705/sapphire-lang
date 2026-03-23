@@ -26,7 +26,6 @@ test_type_inference
 *.out
 
 # IDE files
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -54,7 +53,6 @@ benchmarks/results/
 
 # Profiling
 *.prof
-*.perf
 flamegraph.svg
 
 # Logs
@@ -80,9 +78,16 @@ tmp/
 temp/
 *.tmp
 
+# Generated plot/chart output files
+*.svg
+surface_plot.html
+scatter3d_plot.html
+line3d_plot.html
+*_plot.html
+*_chart.html
+histogram.svg
+
 # Development tracking files (not needed in repo)
-MILESTONE*_*.txt
-MILESTONE*_*.md
 SESSION_SUMMARY*.txt
 SESSION_SUMMARY*.md
 CURRENT_STATUS.txt
@@ -90,15 +95,7 @@ PROJECT_STATUS_*.txt
 PROJECT_SUMMARY.txt
 FINAL_SESSION_SUMMARY.txt
 
-# Unnecessary markdown files (keep only essential docs)
-EXAMPLES_SUMMARY.md
-MILESTONE_COMPLETION_PLAN.md
-CORE_FEATURES_VERIFICATION.md
-PERFORMANCE.md
-RELEASE_NOTES.md
-
 # Test files
-test_*.spp
 test_results.txt
 TEST_RESULTS_SUMMARY.md
 
@@ -116,10 +113,6 @@ examples/run_*.sh
 # Development documentation (milestones, summaries, etc.)
 .dev-docs/
 
-# Milestone documentation (development tracking)
-docs/MILESTONE*.md
-docs/MILESTONES.md
-
 # Development tools and temporary test files
 .dev-tools/
 
@@ -131,16 +124,26 @@ dev-notes/
 .dev-notes/
 .notes/
 
-# Cleanup and temporary documentation files
-*CLEANUP*.md
-*RECATEGORIZATION*.md
-*SUMMARY_CLEANUP*.md
-*GRAPHICS_CLEANUP*.md
-
 # Session tracking files (development process)
 SESSION_*.md
-MILESTONE_*.md
-ROUND*_*.md
+
+# Milestone completion/tracking docs (root level)
+MILESTONE*.md
+
+# docs/ milestone planning files
+docs/MILESTONE*.md
+docs/MILESTONES.md
+docs/ROADMAP.md
+docs/MILESTONE_STATUS.md
+
+# VS Code workspace settings
+.vscode/
+editors/vscode/.vscode/
+
+# Test language feature files (generated/scratch tests)
+tests/language_features/test_*.spp
+tests/pattern_matching/test_*.spp
+tests/codegen/
 
 # Test project folders
 test-project/
@@ -157,13 +160,9 @@ test_outputs/
 
 archived-projects/
 
-benchmarks/
-
 completed-challenges/
 
 editors/vscode/node_modules/
 editors/vscode/out/
-
-docs/ROADMAP.md
 
 test_all_examples.sh

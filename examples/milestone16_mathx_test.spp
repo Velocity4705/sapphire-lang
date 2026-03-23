@@ -1,0 +1,203 @@
+// Milestone 16: Mathematical Computing
+import mathx
+
+// ===== Number Theory =====
+print("=== Number Theory ===")
+
+// Sieve of Eratosthenes
+let sieve = mathx_sieve(50)
+let count = mathx_sieve_count(sieve)
+print("Primes up to 50: count =", count)
+print("First prime:", mathx_sieve_get(sieve, 0))
+print("Last prime:", mathx_sieve_get(sieve, count - 1))
+mathx_sieve_destroy(sieve)
+
+// Primality
+print("Is 97 prime?", mathx_is_prime(97))
+print("Is 100 prime?", mathx_is_prime(100))
+
+// Prime factors
+let factors = mathx_prime_factors(360)
+let fc = mathx_vec_count(factors)
+print("Prime factors of 360: count =", fc)
+print("First factor:", mathx_vec_get(factors, 0))
+mathx_vec_destroy(factors)
+
+// GCD / LCM
+print("GCD(48, 18) =", mathx_gcd(48, 18))
+print("LCM(4, 6) =", mathx_lcm(4, 6))
+
+// Modular arithmetic
+print("mod_pow(2, 10, 1000) =", mathx_mod_pow(2, 10, 1000))
+print("mod_inverse(3, 7) =", mathx_mod_inverse(3, 7))
+print("euler_totient(12) =", mathx_euler_totient(12))
+
+// Number properties
+print("Is 6 perfect?", mathx_is_perfect(6))
+print("Is 12 abundant?", mathx_is_abundant(12))
+print("sum_divisors(6) =", mathx_sum_divisors(6))
+print("nth_prime(10) =", mathx_nth_prime(10))
+print("collatz_length(27) =", mathx_collatz_length(27))
+print("digital_root(493) =", mathx_digital_root(493))
+print("is_palindrome(121) =", mathx_is_palindrome_num(121))
+print("reverse_num(12345) =", mathx_reverse_num(12345))
+print("sum_digits(9875) =", mathx_sum_digits(9875))
+print("is_pandigital(123, 3) =", mathx_is_pandigital(123, 3))
+
+// ===== Linear Algebra =====
+print("")
+print("=== Linear Algebra ===")
+
+// Create 3x3 matrix
+let A = mathx_mat_create(3, 3)
+mathx_mat_set(A, 0, 0, 1.0)
+mathx_mat_set(A, 0, 1, 2.0)
+mathx_mat_set(A, 0, 2, 3.0)
+mathx_mat_set(A, 1, 0, 0.0)
+mathx_mat_set(A, 1, 1, 4.0)
+mathx_mat_set(A, 1, 2, 5.0)
+mathx_mat_set(A, 2, 0, 1.0)
+mathx_mat_set(A, 2, 1, 0.0)
+mathx_mat_set(A, 2, 2, 6.0)
+
+print("Matrix A rows:", mathx_mat_rows(A))
+print("Matrix A cols:", mathx_mat_cols(A))
+print("A[1][1] =", mathx_mat_get(A, 1, 1))
+print("det(A) =", mathx_mat_det(A))
+print("trace(A) =", mathx_mat_trace(A))
+
+// Identity matrix
+let I = mathx_mat_identity(3)
+let AI = mathx_mat_mul(A, I)
+print("A * I == A? A*I[0][0] =", mathx_mat_get(AI, 0, 0))
+
+// Transpose
+let At = mathx_mat_transpose(A)
+print("A^T[0][1] =", mathx_mat_get(At, 0, 1))
+
+// Inverse
+let Ainv = mathx_mat_inverse(A)
+print("A_inv[0][0] =", mathx_mat_get(Ainv, 0, 0))
+
+// Eigenvalue
+let E = mathx_mat_create(2, 2)
+mathx_mat_set(E, 0, 0, 4.0)
+mathx_mat_set(E, 0, 1, 1.0)
+mathx_mat_set(E, 1, 0, 2.0)
+mathx_mat_set(E, 1, 1, 3.0)
+print("Dominant eigenvalue of [[4,1],[2,3]] =", mathx_mat_dominant_eigenvalue(E, 100))
+
+mathx_mat_destroy(A)
+mathx_mat_destroy(I)
+mathx_mat_destroy(AI)
+mathx_mat_destroy(At)
+mathx_mat_destroy(Ainv)
+mathx_mat_destroy(E)
+
+// ===== Symbolic Math =====
+print("")
+print("=== Symbolic Math ===")
+
+// Build expression: x^2 + 3*x + 2
+let x = mathx_sym_var("x")
+let two = mathx_sym_num(2.0)
+let three = mathx_sym_num(3.0)
+let x2 = mathx_sym_pow(x, two)
+let three_x = mathx_sym_mul(three, x)
+let two2 = mathx_sym_num(2.0)
+let expr = mathx_sym_add(mathx_sym_add(x2, three_x), two2)
+
+print("Expression:", mathx_sym_to_string(expr))
+print("eval at x=2:", mathx_sym_eval(expr, "x", 2.0))
+print("eval at x=0:", mathx_sym_eval(expr, "x", 0.0))
+
+// Differentiate: d/dx (x^2 + 3x + 2) = 2x + 3
+let dexpr = mathx_sym_diff(expr, "x")
+print("Derivative:", mathx_sym_to_string(dexpr))
+print("d/dx at x=1:", mathx_sym_eval(dexpr, "x", 1.0))
+
+// Simplify
+let s = mathx_sym_simplify(expr)
+print("Simplified:", mathx_sym_to_string(s))
+
+// Integrate x^2 from 0 to 3 = 9
+let xv = mathx_sym_var("x")
+let two3 = mathx_sym_num(2.0)
+let x2v = mathx_sym_pow(xv, two3)
+let integral = mathx_integrate_expr(x2v, "x", 0.0, 3.0, 1000)
+print("Integral of x^2 from 0 to 3 =", integral)
+
+// Find root of x^2 - 4 = 0 near x=1 -> should be 2
+let xr = mathx_sym_var("x")
+let two4 = mathx_sym_num(2.0)
+let x2r = mathx_sym_pow(xr, two4)
+let four = mathx_sym_num(4.0)
+let f_root = mathx_sym_sub(x2r, four)
+let root = mathx_find_root(f_root, "x", 1.0, 100)
+print("Root of x^2-4 near x=1:", root)
+
+mathx_sym_destroy(x)
+mathx_sym_destroy(two)
+mathx_sym_destroy(three)
+mathx_sym_destroy(x2)
+mathx_sym_destroy(three_x)
+mathx_sym_destroy(two2)
+mathx_sym_destroy(expr)
+mathx_sym_destroy(dexpr)
+mathx_sym_destroy(s)
+mathx_sym_destroy(xv)
+mathx_sym_destroy(two3)
+mathx_sym_destroy(x2v)
+mathx_sym_destroy(xr)
+mathx_sym_destroy(two4)
+mathx_sym_destroy(x2r)
+mathx_sym_destroy(four)
+mathx_sym_destroy(f_root)
+
+// ===== Statistics =====
+print("")
+print("=== Statistics ===")
+
+let data = mathx_dvec_create()
+mathx_dvec_push(data, 2.0)
+mathx_dvec_push(data, 4.0)
+mathx_dvec_push(data, 4.0)
+mathx_dvec_push(data, 4.0)
+mathx_dvec_push(data, 5.0)
+mathx_dvec_push(data, 5.0)
+mathx_dvec_push(data, 7.0)
+mathx_dvec_push(data, 9.0)
+
+print("Count:", mathx_dvec_count(data))
+print("Mean:", mathx_stat_mean(data))
+print("Variance:", mathx_stat_variance(data))
+print("Stddev:", mathx_stat_stddev(data))
+print("Median:", mathx_stat_median(data))
+
+// Correlation
+let xs = mathx_dvec_create()
+let ys = mathx_dvec_create()
+mathx_dvec_push(xs, 1.0)
+mathx_dvec_push(xs, 2.0)
+mathx_dvec_push(xs, 3.0)
+mathx_dvec_push(xs, 4.0)
+mathx_dvec_push(xs, 5.0)
+mathx_dvec_push(ys, 2.0)
+mathx_dvec_push(ys, 4.0)
+mathx_dvec_push(ys, 5.0)
+mathx_dvec_push(ys, 4.0)
+mathx_dvec_push(ys, 5.0)
+
+print("Correlation(x,y):", mathx_stat_correlation(xs, ys))
+
+let reg = mathx_stat_linear_regression(xs, ys)
+print("Linear regression slope:", mathx_dvec_get(reg, 0))
+print("Linear regression intercept:", mathx_dvec_get(reg, 1))
+
+mathx_dvec_destroy(data)
+mathx_dvec_destroy(xs)
+mathx_dvec_destroy(ys)
+mathx_dvec_destroy(reg)
+
+print("")
+print("=== M16 Mathematical Computing: ALL TESTS PASSED ===")

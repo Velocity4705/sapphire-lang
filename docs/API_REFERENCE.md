@@ -1006,3 +1006,728 @@ int main() {
 - [Language Features](LANGUAGE_FEATURES.md) - Language syntax
 - [Getting Started](GETTING_STARTED.md) - Quick start guide
 - [Examples](../examples/) - Example programs
+
+---
+
+## Blockchain (M6)
+
+**Import:** `import Blockchain from "stdlib/blockchain"`
+
+Full blockchain implementation with PoW/PoS consensus, transactions, Merkle trees, and P2P networking.
+
+### Chain
+
+```sapphire
+import Blockchain from "stdlib/blockchain"
+
+let chain = Blockchain.Chain(difficulty: 3, consensus: "PoW")
+chain.add_transaction("Alice", "Bob", 50.0)
+chain.mine_block("miner1")
+println(chain.get_balance("Bob"))   # 50.0
+println(chain.is_valid())           # true
+println(chain.stats())
+```
+
+**Methods:**
+- `Chain(difficulty, consensus)` — create chain ("PoW" or "PoS")
+- `add_transaction(sender, receiver, amount, data?)` — queue a transaction
+- `mine_block(miner)` — mine pending transactions into a new block
+- `get_balance(address)` — get address balance
+- `block_count()` — number of blocks
+- `is_valid()` — validate entire chain
+- `get_block(index)` — get block by index
+- `add_validator(address, stake)` — add PoS validator
+- `stats()` — chain statistics
+
+### MerkleTree
+
+- `add_leaf(data)` — add leaf node
+- `build()` — compute Merkle root
+- `root()` — get root hash
+- `verify(leaf, proof)` — verify inclusion proof
+
+### P2PNetwork
+
+- `add_node(address, port)` — add peer node
+- `connect(node_id)` — connect to peer
+- `broadcast_block(node_id, hash)` — broadcast block
+- `broadcast_tx(node_id, tx_id)` — broadcast transaction
+- `network_status()` — network summary
+
+### Crypto (M6)
+
+**Import:** `import Crypto from "stdlib/crypto"`
+
+- `sha256(data)` — SHA-256 hash
+- `sha256_double(data)` — double SHA-256 (Bitcoin-style)
+
+---
+
+## Security (M7)
+
+**Import:** `import Security from "stdlib/security"`
+
+Four-phase security toolkit: vulnerability scanning, web security testing, malware analysis, and CTF educational platform.
+
+### VulnScanner
+
+```sapphire
+import Security from "stdlib/security"
+
+let scanner = Security.VulnScanner()
+let result = scanner.scan_host("192.168.1.1", ports: "22,80,443")
+println(result.open_ports())
+println(result.vuln_count())
+println(result.to_json())
+```
+
+**Methods:**
+- `scan_host(target, ports?)` — scan host for open ports and vulnerabilities
+- `vuln_db_size()` — number of known vulnerabilities in DB
+
+**ScanResult fields:**
+- `open_ports()`, `vuln_count()`, `reachable()`, `to_json()`
+- `port_service(i)`, `port_number(i)` — port details
+- `vuln_name(i)`, `vuln_severity(i)`, `vuln_remediation(i)` — vuln details
+
+### WebSecurityTester
+
+- `scan(url)` — full web vulnerability scan
+- `test_sql_injection(url, param)` — test for SQLi
+- `test_xss(url, param)` — test for XSS
+- `test_csrf(url)` — test for CSRF
+- `test_auth_bypass(url)` — test for auth bypass
+- `test_path_traversal(url, param)` — test for path traversal
+- `encode_payload(payload, encoding)` — encode attack payload
+- `get_payloads(vuln_type)` — get payload list for a vuln type
+
+### MalwareAnalyzer
+
+- `static_analysis(filepath, content_hex?)` — static file analysis (entropy, strings, hashes, YARA)
+- `dynamic_analysis(filepath, timeout_ms?)` — behavioral analysis (file/network IOCs)
+- `add_yara_rule(name, pattern)` — add custom YARA rule
+
+### EducationalPlatform (CTF)
+
+- `challenge_count()` — number of challenges
+- `challenge_name(i)`, `challenge_category(i)`, `challenge_points(i)` — challenge info
+- `create_session(player)` — start a CTF session
+- `session_submit(session, challenge_id, flag)` — submit a flag
+- `session_score(session)` — current score
+- `leaderboard()` — scoreboard
+- `get_tutorial(topic)` — get tutorial text
+
+---
+
+## Network (M12)
+
+**Import:** `import Network from "stdlib/network"`
+
+Full networking stack: TCP/UDP sockets, DNS, SMTP, FTP, SSH, packet capture, monitoring, and async networking.
+
+### TCP
+
+```sapphire
+import Network from "stdlib/network"
+
+let sock = Network.tcp_socket()
+sock.connect("example.com", 80)
+sock.send("GET / HTTP/1.0\r\n\r\n")
+let data = sock.recv(4096)
+println(data)
+sock.close()
+```
+
+**Functions:**
+- `tcp_connect(host, port)`, `tcp_bind(port)`, `tcp_listen(backlog)`, `tcp_accept()`
+- `tcp_send(data)`, `tcp_recv(max_len)`, `tcp_close()`
+- `tcp_set_nonblocking(enabled)`, `tcp_set_timeout(ms)`
+
+### UDP
+
+- `udp_bind(port)`, `udp_send_to(data, host, port)`, `udp_recv_from(max_len)`
+- `udp_set_broadcast(enabled)`, `udp_close()`
+
+### DNS Client
+
+- `dns_lookup(hostname)` — resolve hostname to IP
+- `dns_reverse(ip)` — reverse DNS lookup
+- `dns_set_server(server)` — set DNS server
+
+### SMTP Client
+
+- `smtp_connect()`, `smtp_auth(user, pass)`, `smtp_send_mail(from, to, subject, body)`
+- `smtp_set_tls(enabled)`, `smtp_disconnect()`
+
+### FTP Client
+
+- `ftp_connect()`, `ftp_login(user, pass)`, `ftp_list(path)`
+- `ftp_download(remote, local)`, `ftp_upload(local, remote)`
+- `ftp_mkdir(path)`, `ftp_delete(path)`, `ftp_disconnect()`
+
+### SSH Client
+
+- `ssh_connect()`, `ssh_auth_password(user, pass)`, `ssh_auth_key(user, key_path)`
+- `ssh_exec(command)`, `ssh_output()`, `ssh_exit_code()`
+- `ssh_upload(local, remote)`, `ssh_download(remote, local)`
+
+### Network Utilities
+
+- `ping_host(host, count)` — ping with min/max/avg/jitter/packet_loss
+- `capture_start(interface)`, `capture_stop()`, `capture_packet_count()` — packet capture
+- `monitor_sample()`, `monitor_bytes_sent(i)`, `monitor_bytes_recv(i)` — interface monitoring
+- `bandwidth_test_upload(host, port, bytes)`, `bandwidth_test_download(...)` — bandwidth test
+
+### Async Networking
+
+- `async_get(url)`, `async_post(url, body)`, `async_is_done()`, `async_response()`
+- `event_loop_run(max_iterations)`, `event_loop_add_socket(sock, event, callback_id)`
+- `pool_acquire()`, `pool_release(conn)`, `pool_active()`, `pool_idle()` — connection pool
+- `lb_add_backend(host, port, weight)`, `lb_next_host()`, `lb_strategy()` — load balancer
+
+---
+
+## OS Development (M14)
+
+**Import:** `import OS from "stdlib/os"`
+
+Full OS development toolkit: bootloader, kernel, memory management, scheduler, syscalls, and device drivers.
+
+### Bootloader
+
+```sapphire
+import OS from "stdlib/os"
+
+let boot = OS.Bootloader("disk.img")
+boot.load_mbr()
+boot.load_kernel(lba: 2048, size: 65536)
+boot.enter_long_mode()
+println(boot.mode())   # "long"
+```
+
+**Methods:**
+- `load_mbr()`, `load_stage2(lba, sectors)`, `load_kernel(lba, size)`
+- `enter_protected_mode()`, `enter_long_mode()`, `mode()`
+- `get_memory_map_count()`, `get_memory_map_entry(i)`
+
+### Kernel
+
+- `init_idt()`, `init_gdt()`, `init_pic()`, `init_pit(hz)`
+- `register_isr(vector, name)`, `trigger_interrupt(vector)`, `interrupt_count(vector)`
+- `vga_write(row, col, text, color)`, `vga_read(row, col)`, `vga_clear()`
+
+### Physical Memory Manager
+
+- `pmm_mark_free(base, length)`, `pmm_mark_used(base, length)`
+- `pmm_alloc_page()`, `pmm_free_page(addr)`, `pmm_alloc_pages(count)`
+- `pmm_free_pages_count()`, `pmm_used_pages_count()`, `pmm_total_pages()`
+
+### Virtual Memory / Paging
+
+- `vmm_map(virt, phys, flags)`, `vmm_unmap(virt)`, `vmm_translate(virt)`
+- `vmm_is_mapped(virt)`, `vmm_page_fault_count()`, `vmm_dump_table()`
+
+### Heap Allocator
+
+- `heap_alloc(size)`, `heap_free(addr)`, `heap_used()`, `heap_free_space()`, `heap_block_count()`
+
+### Scheduler
+
+- `add_process(name, priority, stack_size)` — add process, returns PID
+- `tick()` — advance scheduler, returns current PID
+- `block(pid)`, `unblock(pid)`, `terminate(pid)`
+- `process_state(pid)`, `process_ticks(pid)`, `process_priority(pid)`
+- Policies: `"round_robin"`, `"priority"`, `"fifo"`
+
+### System Calls
+
+- `syscall_register(num, name, arg_count)` — register syscall handler
+- `syscall_invoke(num, args)` — invoke syscall, returns result string
+- `syscall_count()`, `syscall_name(num)`
+
+### Device Drivers
+
+- `driver_create(name, type)` — type: `"char"`, `"block"`, `"net"`
+- `driver_write(addr, value, width)`, `driver_read(addr, width)`
+- `driver_irq_fire()`, `driver_irq_count()`, `driver_is_ready()`
+
+---
+
+## MathX (M16)
+
+**Import:** `import MathX from "stdlib/mathx"`
+
+Advanced mathematics: number theory, linear algebra, symbolic math, and statistics.
+
+### Number Theory
+
+```sapphire
+import MathX from "stdlib/mathx"
+
+println(MathX.is_prime(97))                    # true
+println(MathX.prime_factors(360))              # [2, 2, 2, 3, 3, 5]
+println(MathX.gcd(48, 18))                     # 6
+println(MathX.mod_pow(2, 10, 1000))            # 24
+println(MathX.nth_prime(10))                   # 29
+println(MathX.sieve(50))                       # primes up to 50
+```
+
+**Functions:**
+- `is_prime(n)`, `prime_factors(n)`, `nth_prime(n)`, `sieve(limit)`
+- `gcd(a, b)`, `lcm(a, b)`, `euler_totient(n)`
+- `mod_pow(base, exp, mod)`, `mod_inverse(a, mod)`, `extended_gcd(a, b)`
+- `divisors(n)`, `sum_divisors(n)`, `is_perfect(n)`, `is_abundant(n)`
+- `collatz_length(n)`, `digital_root(n)`, `sum_digits(n)`
+- `is_palindrome_num(n)`, `reverse_num(n)`, `is_pandigital(n, digits)`
+
+### Linear Algebra
+
+```sapphire
+let a = MathX.mat_identity(3)
+let b = MathX.mat_create(3, 3)
+MathX.mat_set(b, 0, 0, 2.0)
+let c = MathX.mat_mul(a, b)
+println(MathX.mat_det(c))
+println(MathX.mat_to_string(c))
+```
+
+**Functions:**
+- `mat_create(rows, cols)`, `mat_identity(n)`, `mat_from_vec(data, rows, cols)`
+- `mat_get(m, r, c)`, `mat_set(m, r, c, v)`
+- `mat_add(a, b)`, `mat_sub(a, b)`, `mat_mul(a, b)`, `mat_scale(m, s)`
+- `mat_transpose(m)`, `mat_det(m)`, `mat_inverse(m)`, `mat_trace(m)`
+- `mat_solve(A, b)` — solve Ax=b
+- `mat_dominant_eigenvalue(m)`, `mat_dominant_eigenvector(m)`
+- `mat_svd(m)` — singular value decomposition
+
+### Symbolic Math
+
+```sapphire
+let x = MathX.sym_var("x")
+let expr = MathX.sym_add(MathX.sym_mul(x, x), MathX.sym_num(3.0))  # x^2 + 3
+let deriv = MathX.sym_diff(expr, "x")   # 2x
+println(MathX.sym_to_string(deriv))
+println(MathX.sym_eval(deriv, "x", 5.0))  # 10.0
+```
+
+**Functions:**
+- `sym_num(v)`, `sym_var(name)` — create leaf nodes
+- `sym_add(a,b)`, `sym_sub(a,b)`, `sym_mul(a,b)`, `sym_div(a,b)`, `sym_pow(base,exp)`
+- `sym_neg(a)`, `sym_sin(a)`, `sym_cos(a)`, `sym_exp(a)`, `sym_ln(a)`
+- `sym_simplify(e)`, `sym_diff(e, var)`, `sym_eval(e, var, val)`, `sym_to_string(e)`
+- `integrate_expr(e, var, a, b, steps?)` — numerical integration (Simpson's rule)
+- `find_root(f, var, x0)` — Newton-Raphson root finding
+
+### Statistics
+
+- `stat_mean(v)`, `stat_variance(v)`, `stat_stddev(v)`, `stat_median(v)`
+- `stat_correlation(x, y)`, `stat_linear_regression(x, y)` — returns `[slope, intercept]`
+
+---
+
+## Polish (M17)
+
+**Import:** `import Polish from "stdlib/polish"`
+
+Developer tooling: profiler, benchmarking, structured logging, stack traces, and memory tracking.
+
+### Profiler
+
+```sapphire
+import Polish from "stdlib/polish"
+
+Polish.profiler_start("render")
+# ... code ...
+Polish.profiler_stop("render")
+println(Polish.profiler_report())
+```
+
+**Functions:**
+- `profiler_start(name)`, `profiler_stop(name)`, `profiler_reset()`
+- `profiler_entry_count()`, `profiler_entry_name(i)`, `profiler_entry_calls(i)`
+- `profiler_entry_total_ms(i)`, `profiler_entry_mean_ms(i)`, `profiler_report()`
+
+### Benchmark
+
+```sapphire
+let bench = Polish.bench_create("sort", iterations: 1000)
+for _ in 0..1000 {
+    bench.iter_start()
+    # ... code to benchmark ...
+    bench.iter_stop()
+}
+println(bench.report())
+```
+
+**Functions:**
+- `bench_create(name, iterations)`, `bench_iter_start()`, `bench_iter_stop()`
+- `bench_mean_ms()`, `bench_min_ms()`, `bench_max_ms()`, `bench_ops_per_sec()`, `bench_report()`
+
+### Logger
+
+```sapphire
+Polish.logger_set_level(2)   # INFO
+Polish.logger_enable_timestamps(true)
+Polish.logger_log(2, "app", "Server started")
+Polish.logger_log(3, "db", "Slow query detected")
+```
+
+**Log levels:** `0=TRACE`, `1=DEBUG`, `2=INFO`, `3=WARN`, `4=ERROR`, `5=FATAL`
+
+**Functions:**
+- `logger_set_level(level)`, `logger_set_file(path)`, `logger_close_file()`
+- `logger_log(level, tag, msg)`, `logger_enable_timestamps(on)`, `logger_enable_colors(on)`
+- `logger_message_count()`, `logger_get_message(i)`, `logger_clear()`
+
+### Stack Trace
+
+- `stacktrace_capture()` — capture current stack
+- `stacktrace_depth(st)`, `stacktrace_frame_function(st, i)`, `stacktrace_frame_file(st, i)`
+- `stacktrace_frame_line(st, i)`, `stacktrace_to_string(st)`
+
+### Memory Tracker
+
+- `memtrack_alloc(tag, bytes)`, `memtrack_free(tag, bytes)`, `memtrack_reset()`
+- `memtrack_current_bytes()`, `memtrack_peak_bytes()`, `memtrack_alloc_count()`, `memtrack_report()`
+
+---
+
+## Ecosystem (M18)
+
+**Import:** `import Ecosystem from "stdlib/ecosystem"`
+
+Package management toolchain: semantic versioning, manifests, registry, package manager, template engine, and code formatter.
+
+### Semver
+
+```sapphire
+import Ecosystem from "stdlib/ecosystem"
+
+let v = Ecosystem.semver_parse("1.4.2-beta.1")
+println(v.major())   # 1
+println(v.minor())   # 4
+println(Ecosystem.semver_satisfies(v, "^1.0"))  # true
+let next = Ecosystem.semver_bump_minor(v)
+println(next.to_string())   # "1.5.0"
+```
+
+**Functions:**
+- `semver_parse(s)`, `semver_to_string(v)`, `semver_is_valid(s)`
+- `semver_compare(a, b)` — returns -1, 0, or 1
+- `semver_satisfies(v, range)` — supports `^`, `~`, `>=`, `<`
+- `semver_bump_major(v)`, `semver_bump_minor(v)`, `semver_bump_patch(v)`
+- `semver_is_prerelease(v)`
+
+### Manifest
+
+- `manifest_create(name, version)`, `manifest_set_description(m, desc)`
+- `manifest_set_author(m, author)`, `manifest_set_license(m, lic)`
+- `manifest_add_dep(m, name, range)`, `manifest_add_keyword(m, kw)`
+- `manifest_to_toml(m)`, `manifest_from_toml(toml)`
+
+### Registry
+
+- `registry_publish(name, version, desc, author, license, downloads)`
+- `registry_exists(name)`, `registry_get(name)`, `registry_search(query)`
+- `registry_list_all()`, `registry_package_count()`
+
+### Package Manager
+
+- `pkgmgr_install(name, version_range)` — install package
+- `pkgmgr_install_manifest(manifest)` — install all deps from manifest
+- `pkgmgr_is_installed(name)`, `pkgmgr_installed_version(name)`
+- `pkgmgr_list_installed()`, `pkgmgr_uninstall(name)`
+- `pkgmgr_lockfile(manifest)` — generate lockfile
+
+### Template Engine
+
+```sapphire
+let vars = Ecosystem.tmpl_vars()
+vars.set("name", "Alice")
+vars.set("lang", "Sapphire")
+let out = Ecosystem.tmpl_render("Hello {{name}}, welcome to {{lang}}!", vars)
+println(out)   # "Hello Alice, welcome to Sapphire!"
+```
+
+- `tmpl_render(template, vars)` — `{{variable}}` substitution
+- Supports `{{#if var}}...{{/if}}` and `{{#each list}}...{{/each}}`
+
+### Formatter
+
+- `fmt_indent(code, spaces)`, `fmt_trim(code)`, `fmt_normalize(code)`
+- `fmt_count_lines(code)`, `fmt_count_chars(code)`
+
+---
+
+## Database (M19)
+
+**Import:** `import Database from "stdlib/database"`
+
+First-class connectors to real databases. Supports MySQL, PostgreSQL, SQLite, Microsoft SQL Server, Oracle, MongoDB, and Supabase — all behind a unified API.
+
+### Supported Drivers
+
+| Driver string | Database |
+|---|---|
+| `"sqlite"` | SQLite 3 (embedded, file or `:memory:`) |
+| `"mysql"` | MySQL 8 / MariaDB |
+| `"postgresql"` | PostgreSQL 16 |
+| `"mssql"` | Microsoft SQL Server 2022 |
+| `"oracle"` | Oracle Database 21c |
+| `"mongodb"` | MongoDB 7 |
+| `"supabase"` | Supabase (PostgreSQL 15 + PostgREST) |
+
+### Connecting
+
+```sapphire
+import Database from "stdlib/database"
+
+# Option 1: config struct
+let conn = Database.connect({
+    driver:   "postgresql",
+    host:     "localhost",
+    port:     5432,
+    database: "myapp",
+    username: "admin",
+    password: "secret",
+    ssl:      true,
+})
+
+# Option 2: connection URL
+let conn = Database.connect_url("mysql://root:pass@localhost:3306/myapp")
+let conn = Database.connect_url("sqlite:///app.db")
+let conn = Database.connect_url("mongodb://user:pass@localhost:27017/myapp")
+let conn = Database.connect_url("postgresql://user:pass@db.supabase.co:5432/postgres")
+
+conn.disconnect()
+```
+
+### Raw SQL
+
+```sapphire
+# Query (returns rows)
+let result = conn.query("SELECT * FROM users WHERE active = ?", [true])
+println(result.row_count())
+println(result.col_name(0))
+println(result.get_string(0, 1))
+println(result.get_int(0, 2))
+
+# Execute (INSERT / UPDATE / DELETE)
+let r = conn.exec("INSERT INTO users (name, email) VALUES (?, ?)", ["Alice", "alice@example.com"])
+println(r.rows_affected)
+println(r.last_insert_id)
+```
+
+**ResultSet methods:**
+- `row_count()`, `col_count()`, `col_name(c)`
+- `get_string(row, col)`, `get_int(row, col)`, `get_real(row, col)`, `get_bool(row, col)`, `is_null(row, col)`
+- `rows_affected`, `last_insert_id`, `ok`, `error`
+
+### Transactions
+
+```sapphire
+conn.begin()
+try {
+    conn.exec("UPDATE accounts SET balance = balance - 100 WHERE id = ?", [1])
+    conn.exec("UPDATE accounts SET balance = balance + 100 WHERE id = ?", [2])
+    conn.commit()
+} catch e {
+    conn.rollback()
+    println("Transaction failed:", e)
+}
+```
+
+### Query Builder
+
+```sapphire
+let users = Database.table(conn, "users")
+    .select(["id", "name", "email"])
+    .where("active = ?", [true])
+    .and_where("age > ?", [18])
+    .order_by("name")
+    .limit(20)
+    .offset(0)
+    .get()
+
+# INSERT
+Database.table(conn, "users")
+    .values({name: "Bob", email: "bob@example.com", active: true})
+    .insert()
+
+# UPDATE
+Database.table(conn, "users")
+    .set("active", false)
+    .where("id = ?", [42])
+    .update()
+
+# DELETE
+Database.table(conn, "users")
+    .where("id = ?", [42])
+    .remove()
+
+# Aggregates
+let total = Database.table(conn, "users").where("active = ?", [true]).count()
+let exists = Database.table(conn, "users").where("email = ?", ["alice@example.com"]).exists()
+```
+
+**QueryBuilder methods:**
+- `select(cols?)`, `where(expr, params?)`, `and_where(...)`, `or_where(...)`
+- `order_by(col, asc?)`, `limit(n)`, `offset(n)`
+- `join(table, on)`, `left_join(table, on)`, `group_by(col)`, `having(expr)`
+- `set(col, val)`, `values(map)`
+- `get()`, `first()`, `insert()`, `update()`, `remove()`, `count()`, `exists()`
+- `to_sql()` — inspect generated SQL
+
+### ORM
+
+```sapphire
+let orm = Database.ORM(conn)
+
+orm.define({
+    name:  "User",
+    table: "users",
+    fields: [
+        {name: "id",         type: "int",    primary_key: true, auto_increment: true},
+        {name: "name",       type: "string", nullable: false},
+        {name: "email",      type: "string", nullable: false, unique: true},
+        {name: "password",   type: "string", nullable: false},
+        {name: "created_at", type: "datetime"},
+    ]
+})
+
+orm.migrate()   # CREATE TABLE IF NOT EXISTS users (...)
+
+# Create
+orm.create("User", {name: "Alice", email: "alice@example.com", password: "hashed"})
+
+# Read
+let all   = orm.find_all("User")
+let alice = orm.find_by_id("User", 1)
+let found = orm.find_where("User", field: "email", value: "alice@example.com")
+
+# Update
+orm.update_by_id("User", 1, {name: "Alice Smith"})
+
+# Delete
+orm.delete_by_id("User", 1)
+
+# Count
+println(orm.count("User"))
+
+# Fluent query via ORM
+let active = orm.query("User").where("active = ?", [true]).order_by("name").get()
+```
+
+### Connection Pool
+
+```sapphire
+let pool = Database.pool({
+    driver:   "postgresql",
+    host:     "localhost",
+    database: "myapp",
+    username: "admin",
+    password: "secret",
+}, size: 10)
+
+let conn = pool.acquire()
+conn.exec("INSERT INTO logs (msg) VALUES (?)", ["hello"])
+pool.release(conn)
+
+println(pool.active())
+println(pool.idle())
+pool.destroy()
+```
+
+### MongoDB / Document style
+
+```sapphire
+let conn = Database.connect_url("mongodb://localhost:27017/myapp")
+let users = Database.collection(conn, "users")
+
+let id = users.insert_one({name: "Alice", role: "admin"})
+let results = users.find(field: "role", value: "admin")
+println(results[0].fields["name"])   # "Alice"
+
+users.update_one(id, field: "role", value: "superadmin")
+users.delete_one(id)
+println(users.count())
+```
+
+### Real-world example: Login & Registration
+
+```sapphire
+import Database from "stdlib/database"
+import HTTP from "stdlib/http"
+import Crypto from "stdlib/crypto"
+
+# Connect to PostgreSQL
+let db = Database.connect_url("postgresql://admin:secret@localhost:5432/myapp")
+
+# Define User model
+let orm = Database.ORM(db)
+orm.define({
+    name: "User", table: "users",
+    fields: [
+        {name: "id",       type: "int",    primary_key: true, auto_increment: true},
+        {name: "email",    type: "string", nullable: false, unique: true},
+        {name: "password", type: "string", nullable: false},
+        {name: "name",     type: "string", nullable: false},
+    ]
+})
+orm.migrate()
+
+# HTTP server
+let server = HTTP.Server(8080)
+
+# POST /register
+server.post("/register", fn(req, res) {
+    let email    = req.body["email"]
+    let password = req.body["password"]
+    let name     = req.body["name"]
+
+    # Check if email already exists
+    let existing = orm.find_where("User", field: "email", value: email)
+    if existing.row_count() > 0 {
+        res.status = 409
+        res.json({error: "Email already registered"})
+        return
+    }
+
+    # Hash password
+    let hashed = Crypto.sha256(password)
+
+    # Create user
+    let r = orm.create("User", {email: email, password: hashed, name: name})
+    res.status = 201
+    res.json({message: "Registered successfully", id: r.last_insert_id})
+})
+
+# POST /login
+server.post("/login", fn(req, res) {
+    let email    = req.body["email"]
+    let password = req.body["password"]
+    let hashed   = Crypto.sha256(password)
+
+    let result = Database.table(db, "users")
+        .where("email = ?", [email])
+        .and_where("password = ?", [hashed])
+        .first()
+
+    if result.row_count() == 0 {
+        res.status = 401
+        res.json({error: "Invalid credentials"})
+        return
+    }
+
+    res.json({
+        message: "Login successful",
+        user: {
+            id:    result.get_int(0, 0),
+            name:  result.get_string(0, 3),
+            email: result.get_string(0, 1),
+        }
+    })
+})
+
+server.start()
+```

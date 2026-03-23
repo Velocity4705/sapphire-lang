@@ -1,0 +1,22 @@
+// Test SDL2 import system
+import graphics.sdl2
+
+fn main() {
+    print("Testing SDL2 import...")
+    
+    // Create a window using imported SDL2 functions
+    let window = sapphire_sdl2_create_window("SDL2 Import Test", 800, 600)
+    sapphire_sdl2_show_window(window)
+    
+    // Clear to blue
+    sapphire_sdl2_clear(window, 0, 0, 255)
+    sapphire_sdl2_present(window)
+    
+    // Wait a bit
+    sapphire_sdl2_delay(2000)
+    
+    // Clean up
+    sapphire_sdl2_destroy_window(window)
+    
+    print("SDL2 import test complete!")
+}

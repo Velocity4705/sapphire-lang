@@ -1,5 +1,5 @@
 # Object-Oriented Programming Test
-# Tests all OOP features for Sapphire v1.0.0
+# Tests all OOP features for Sapphire v1.0-beta.6
 
 print("=== Object-Oriented Programming Tests ===")
 print()

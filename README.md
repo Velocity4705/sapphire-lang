@@ -288,14 +288,14 @@ spm-registry search query   # Search for packages
 
 Install:
 ```bash
-ln -s $(pwd)/editors/vscode ~/.vscode/extensions/sapphire-lang-1.0-beta.5
+ln -s $(pwd)/editors/vscode ~/.vscode/extensions/sapphire-lang-1.0-beta.6
 ```
 
 ---
 
 ## Status
 
-**Version:** 1.0-beta.5  
+**Version:** 1.0-beta.6  
 **Tests:** 34/34 passing (100%)  
 **Libraries:** 18/18 complete  
 **Status:** Production ready ✅

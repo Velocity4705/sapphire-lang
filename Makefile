@@ -72,7 +72,23 @@ SOURCES = $(SRCDIR)/main.cpp \
           stdlib/system/sysprog.cpp \
           stdlib/gui/gui.cpp \
           stdlib/gui/gui_capi.cpp \
-          stdlib/network/network.cpp
+          stdlib/network/network.cpp \
+          stdlib/texture/texture.cpp \
+          stdlib/shader/shader.cpp \
+          stdlib/model/model.cpp \
+          stdlib/physics/physics.cpp \
+          stdlib/simulation/simulation.cpp \
+          stdlib/os/os.cpp \
+          stdlib/advancedcrypto/advancedcrypto.cpp \
+          stdlib/advancedcrypto/advancedcrypto_capi.cpp \
+          stdlib/mathx/mathx.cpp \
+          stdlib/mathx/mathx_capi.cpp \
+          stdlib/polish/polish.cpp \
+          stdlib/polish/polish_capi.cpp \
+          stdlib/ecosystem/ecosystem.cpp \
+          stdlib/ecosystem/ecosystem_capi.cpp \
+          stdlib/database/database.cpp \
+          stdlib/database/database_capi.cpp
 
 # Add codegen if LLVM is available
 ifdef LLVM_CONFIG

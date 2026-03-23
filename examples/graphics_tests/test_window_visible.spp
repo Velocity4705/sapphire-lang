@@ -1,0 +1,37 @@
+# Test Window Visibility
+# Creates a window with colored rectangles for 5 seconds
+
+print("Creating visible window test...")
+
+let window = window_create("Visible Window Test", 800, 600)
+window_show(window)
+
+print("Window created and shown")
+print("Displaying colored rectangles for 5 seconds...")
+
+# Draw for 5 seconds (300 frames at 60 FPS)
+let frame = 0
+while frame < 300:
+    window_poll_events(window)
+    
+    # Clear to black
+    window_clear(window, 0, 0, 0)
+    
+    # Draw colored rectangles
+    window_fill_rect(window, 100, 100, 100, 100, 255, 0, 0)    # Red
+    window_fill_rect(window, 250, 100, 100, 100, 0, 255, 0)    # Green
+    window_fill_rect(window, 400, 100, 100, 100, 0, 0, 255)    # Blue
+    window_fill_rect(window, 550, 100, 100, 100, 255, 255, 0)  # Yellow
+    
+    # Draw white text area
+    window_fill_rect(window, 200, 300, 400, 100, 255, 255, 255)
+    
+    window_present(window)
+    delay(16)
+    
+    frame = frame + 1
+
+window_destroy(window)
+
+print("Test complete!")
+print("If you saw a window with colored rectangles, the system is working!")

@@ -2,7 +2,7 @@
 
 This directory contains example programs demonstrating Sapphire's features.
 
-## ✅ Working Examples (Current v1.0.0)
+## ✅ Working Examples (Current v1.0-beta.6)
 
 These examples work with the current parser and have been verified:
 
@@ -157,7 +157,7 @@ These are documentation examples showing the vision for Sapphire's future capabi
 
 ## Current Parser Limitations
 
-The current parser (v1.0.0) supports:
+The current parser (v1.0-beta.6) supports:
 
 ✅ Variables (`let x = 10`)  
 ✅ Arithmetic (`+`, `-`, `*`, `/`)  
@@ -168,7 +168,7 @@ The current parser (v1.0.0) supports:
 
 ## Coming Soon
 
-Features being implemented for v1.0.0:
+Features being implemented for v1.0-beta.6:
 
 ### Control Flow
 - 🔄 if/else statements

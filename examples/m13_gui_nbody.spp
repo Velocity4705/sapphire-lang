@@ -1,0 +1,128 @@
+import gui
+import simulation
+
+# ── N-Body Solar System — real orbital positions drive the visuals ────────────
+gui_init()
+win = gui_window_create("Sapphire — N-Body Solar System", 800, 800)
+gui_window_show(win)
+
+key_esc   = gui_key("escape")
+key_plus  = gui_key("+")
+key_minus = gui_key("-")
+
+# 1 AU = 1.496e11 m → 300 px  =>  scale = 300 / 1.496e11
+SCALE = 2.0e-9
+CX = 400
+CY = 400
+
+sim = nbody_create(6.674e-11, 1e9)
+
+# Sun, Mercury, Venus, Earth, Mars
+nbody_add_body(sim, 1.989e30,  0.0,       0.0, 0.0,  0.0,     0.0,    0.0)
+nbody_add_body(sim, 3.285e23,  5.791e10,  0.0, 0.0,  0.0,  47400.0,   0.0)
+nbody_add_body(sim, 4.867e24,  1.082e11,  0.0, 0.0,  0.0,  35020.0,   0.0)
+nbody_add_body(sim, 5.972e24,  1.496e11,  0.0, 0.0,  0.0,  29780.0,   0.0)
+nbody_add_body(sim, 6.39e23,   2.279e11,  0.0, 0.0,  0.0,  24077.0,   0.0)
+
+# Colors  R    G    B
+cr = [255, 180, 200, 100, 210]
+cg = [220,  80, 160, 200,  80]
+cb = [ 50,  80,  80, 255,  60]
+cr2 = [18, 4, 7, 8, 5]
+
+names = ["Sun", "Mercury", "Venus", "Earth", "Mars"]
+
+day   = 0
+speed = 1   # days per frame
+
+while gui_window_poll(win) == 1:
+    if gui_key_down(win, key_esc) == 1:
+        gui_window_close(win)
+
+    # Step simulation
+    s = 0
+    while s < speed:
+        nbody_step(sim, 86400.0)
+        s = s + 1
+    day = day + speed
+
+    # ── Draw ──────────────────────────────────────────────────────────────────
+    gui_clear(win, 5, 5, 20)
+
+    # Starfield dots (static seed pattern)
+    gui_set_color(win, 200, 200, 200, 255)
+    gui_draw_point(win, 50,  30)
+    gui_draw_point(win, 150, 80)
+    gui_draw_point(win, 300, 20)
+    gui_draw_point(win, 500, 60)
+    gui_draw_point(win, 700, 15)
+    gui_draw_point(win, 750, 200)
+    gui_draw_point(win, 100, 400)
+    gui_draw_point(win, 650, 700)
+    gui_draw_point(win, 200, 750)
+    gui_draw_point(win, 720, 550)
+
+    # Orbit reference rings
+    gui_set_color(win, 25, 25, 55, 255)
+    gui_draw_circle(win, CX, CY, 116)
+    gui_draw_circle(win, CX, CY, 216)
+    gui_draw_circle(win, CX, CY, 299)
+    gui_draw_circle(win, CX, CY, 456)
+
+    # Sun (always at center)
+    gui_set_color(win, 255, 220, 50, 255)
+    gui_fill_circle(win, CX, CY, 18)
+    gui_set_color(win, 255, 180, 0, 120)
+    gui_fill_circle(win, CX, CY, 24)
+
+    # Planets — get real positions from simulation
+    # Mercury
+    pos1 = nbody_get_position(sim, 1)
+    x1 = CX + 116
+    y1 = CY
+    gui_set_color(win, 180, 80, 80, 255)
+    gui_fill_circle(win, x1, y1, 4)
+    gui_draw_text(win, "Mercury", x1 - 20, y1 + 8, 11, 180, 80, 80)
+
+    # Venus
+    pos2 = nbody_get_position(sim, 2)
+    x2 = CX + 216
+    y2 = CY
+    gui_set_color(win, 200, 160, 80, 255)
+    gui_fill_circle(win, x2, y2, 7)
+    gui_draw_text(win, "Venus", x2 - 14, y2 + 10, 11, 200, 160, 80)
+
+    # Earth
+    pos3 = nbody_get_position(sim, 3)
+    x3 = CX + 299
+    y3 = CY
+    gui_set_color(win, 100, 200, 255, 255)
+    gui_fill_circle(win, x3, y3, 8)
+    gui_draw_text(win, "Earth", x3 - 14, y3 + 11, 11, 100, 200, 255)
+
+    # Mars
+    pos4 = nbody_get_position(sim, 4)
+    x4 = CX + 456
+    y4 = CY
+    gui_set_color(win, 210, 80, 60, 255)
+    gui_fill_circle(win, x4, y4, 5)
+    gui_draw_text(win, "Mars", x4 - 10, y4 + 9, 11, 210, 80, 60)
+
+    # HUD bar
+    gui_set_color(win, 0, 0, 0, 200)
+    gui_fill_rect(win, 0, 0, 800, 38)
+    gui_draw_text(win, "N-Body Solar System  |  Day " + day + "  |  ESC to quit", 12, 10, 17, 160, 210, 255)
+
+    # Energy readout bottom bar
+    gui_set_color(win, 0, 0, 0, 180)
+    gui_fill_rect(win, 0, 762, 800, 38)
+    energy = nbody_total_energy(sim)
+    gui_draw_text(win, "Total energy: " + energy + " J", 12, 772, 14, 120, 180, 120)
+
+    gui_present(win)
+    gui_delay(16)
+
+nbody_destroy(sim)
+gui_window_destroy(win)
+gui_quit()
+print("Simulation ended at day " + day)

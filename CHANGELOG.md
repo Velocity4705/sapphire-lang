@@ -2,6 +2,14 @@
 
 All notable changes to Sapphire will be documented in this file.
 
+## [1.0-beta.6] - 2026-03-23
+
+### 🚀 v1.0-beta.6 - Database & 3D Visualization (Milestones 6-19)
+
+Complete database platform (MySQL, PostgreSQL, SQLite, MSSQL, Oracle, MongoDB, Supabase) with unified driver interface, connection pool, query builder, ORM, KV store, and document store. 3D plots now generate fully self-contained HTML with inlined Plotly.js.
+
+---
+
 ## [1.0-beta.5] - 2026-03-13
 
 ### 🚀 v1.0-beta.5 - Web Development Foundation Complete (Milestone 4)

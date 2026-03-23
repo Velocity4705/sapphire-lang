@@ -1,0 +1,105 @@
+// Milestone 17: Polish & Optimization
+import polish
+
+// ===== Profiler =====
+print("=== Profiler ===")
+
+polish_profiler_reset()
+
+polish_profiler_start("sort_work")
+let sum = 0
+for x in range(10000):
+    sum = sum + x
+polish_profiler_stop("sort_work")
+
+polish_profiler_start("string_work")
+for x in range(5000):
+    sum = sum + 1
+polish_profiler_stop("string_work")
+
+polish_profiler_start("sort_work")
+for x in range(10000):
+    sum = sum + 1
+polish_profiler_stop("sort_work")
+
+let ec = polish_profiler_entry_count()
+print("Profiler entries:", ec)
+print("Entry 0 name:", polish_profiler_entry_name(0))
+print("Entry 0 calls:", polish_profiler_entry_calls(0))
+print("Entry 0 total_ms > 0:", polish_profiler_entry_total_ms(0) >= 0.0)
+print("Entry 0 mean_ms >= 0:", polish_profiler_entry_mean_ms(0) >= 0.0)
+print("Entry 1 name:", polish_profiler_entry_name(1))
+print("Entry 1 calls:", polish_profiler_entry_calls(1))
+print(polish_profiler_report())
+
+// ===== Benchmark =====
+print("=== Benchmark ===")
+
+let bench = polish_bench_create("fibonacci_loop", 5)
+for iter in range(5):
+    polish_bench_iter_start(bench)
+    let a = 0
+    let b = 1
+    for n in range(1000):
+        let tmp = a + b
+        a = b
+        b = tmp
+    polish_bench_iter_stop(bench)
+
+print("Benchmark iterations:", polish_bench_iterations(bench))
+print("Mean ms >= 0:", polish_bench_mean_ms(bench) >= 0.0)
+print("Ops/sec >= 0:", polish_bench_ops_per_sec(bench) >= 0.0)
+print(polish_bench_report(bench))
+polish_bench_destroy(bench)
+
+// ===== Logger =====
+print("=== Logger ===")
+
+polish_logger_enable_timestamps(0)
+polish_logger_enable_colors(0)
+polish_logger_set_level(0)
+polish_logger_clear()
+
+polish_logger_log(0, "app", "trace message")
+polish_logger_log(1, "app", "debug message")
+polish_logger_log(2, "app", "info message")
+polish_logger_log(3, "app", "warn message")
+polish_logger_log(4, "app", "error message")
+
+print("Log message count:", polish_logger_message_count())
+print("Message 2:", polish_logger_get_message(2))
+print("Message 4:", polish_logger_get_message(4))
+
+polish_logger_set_level(3)
+polish_logger_clear()
+polish_logger_log(2, "filtered", "this should be filtered")
+polish_logger_log(3, "filtered", "this should appear")
+print("After level filter, count:", polish_logger_message_count())
+
+// ===== Stack Trace =====
+print("")
+print("=== Stack Trace ===")
+
+let st = polish_stacktrace_capture()
+print("Stack depth:", polish_stacktrace_depth(st))
+print("Frame 0:", polish_stacktrace_frame_function(st, 0))
+print("Frame 1:", polish_stacktrace_frame_function(st, 1))
+print(polish_stacktrace_to_string(st))
+polish_stacktrace_destroy(st)
+
+// ===== Memory Tracker =====
+print("=== Memory Tracker ===")
+
+polish_memtrack_reset()
+polish_memtrack_alloc("buffer", 1024)
+polish_memtrack_alloc("texture", 4096)
+polish_memtrack_alloc("buffer", 512)
+print("Current bytes:", polish_memtrack_current_bytes())
+print("Peak bytes:", polish_memtrack_peak_bytes())
+print("Alloc count:", polish_memtrack_alloc_count())
+
+polish_memtrack_free("buffer", 512)
+print("After free, current:", polish_memtrack_current_bytes())
+print(polish_memtrack_report())
+
+print("=== M17 Polish & Optimization: ALL TESTS PASSED ===")

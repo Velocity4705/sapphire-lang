@@ -1,0 +1,34 @@
+import simulation
+
+# ── N-body gravitational simulation ─────────────────────────────────────────
+# Solar system: Sun + 4 inner planets
+G = 6.674e-11
+sim = nbody_create(G, 1e6)
+
+# Sun
+nbody_add_body(sim, 1.989e30, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+# Mercury
+nbody_add_body(sim, 3.285e23, 5.791e10, 0.0, 0.0, 0.0, 47400.0, 0.0)
+# Venus
+nbody_add_body(sim, 4.867e24, 1.082e11, 0.0, 0.0, 0.0, 35020.0, 0.0)
+# Earth
+nbody_add_body(sim, 5.972e24, 1.496e11, 0.0, 0.0, 0.0, 29780.0, 0.0)
+# Mars
+nbody_add_body(sim, 6.39e23, 2.279e11, 0.0, 0.0, 0.0, 24077.0, 0.0)
+
+print("Running 365-day inner solar system simulation...")
+
+day = 0
+while day < 365:
+    nbody_step(sim, 86400.0)
+    day = day + 1
+
+print("After 1 year:")
+print("  Mercury pos: " + nbody_get_position(sim, 1))
+print("  Venus pos:   " + nbody_get_position(sim, 2))
+print("  Earth pos:   " + nbody_get_position(sim, 3))
+print("  Mars pos:    " + nbody_get_position(sim, 4))
+print("  Total energy: " + nbody_total_energy(sim))
+
+nbody_destroy(sim)
+print("N-body simulation complete.")

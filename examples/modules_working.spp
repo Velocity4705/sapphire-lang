@@ -1,5 +1,5 @@
 # Module System Test
-# Tests basic import functionality for Sapphire v1.0.0
+# Tests basic import functionality for Sapphire v1.0-beta.6
 
 print("=== Module System Tests ===")
 print()

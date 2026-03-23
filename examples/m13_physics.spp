@@ -1,0 +1,55 @@
+import physics
+
+# ── Rigid body dynamics ──────────────────────────────────────────────────────
+# Create a world with downward gravity
+world = physics_world_create(0.0, -9.81)
+
+# Static floor at y=0
+floor = rigidbody_create(world, 0.0, 0.0, 0.0)
+collider_add_box(floor, 200.0, 1.0)
+
+# Dynamic box dropped from y=20
+box = rigidbody_create(world, 0.0, 20.0, 1.0)
+collider_add_box(box, 2.0, 2.0)
+
+# Simulate 3 seconds at 60 fps
+step = 0
+while step < 180:
+    physics_world_step(world, 0.016)
+    step = step + 1
+
+print("Box resting y: " + rigidbody_get_y(box))
+
+# ── Particle system ──────────────────────────────────────────────────────────
+ps = particles_create(world, 0.0, 5.0, 500)
+particles_set_color_gradient(ps, 1.0, 0.5, 0.0, 1.0, 0.0, 0.0)
+particles_emit(ps, 100)
+
+t = 0
+while t < 60:
+    particles_update(ps, 0.016)
+    t = t + 1
+
+print("Active particles after 1s: " + particles_active_count(ps))
+
+# ── Spring constraint ────────────────────────────────────────────────────────
+anchor = rigidbody_create(world, 0.0, 15.0, 0.0)
+bob    = rigidbody_create(world, 0.0, 10.0, 0.5)
+spring = constraint_add_spring(world, anchor, bob, 5.0, 50.0)
+
+s2 = 0
+while s2 < 120:
+    physics_world_step(world, 0.016)
+    s2 = s2 + 1
+
+print("Spring bob y after 2s: " + rigidbody_get_y(bob))
+
+# ── Collision query ──────────────────────────────────────────────────────────
+a = rigidbody_create(world, 0.0, 50.0, 1.0)
+collider_add_circle(a, 2.0)
+b = rigidbody_create(world, 1.0, 50.0, 1.0)
+collider_add_circle(b, 2.0)
+print("Circles overlapping: " + collision_query_pair(a, b))
+
+physics_world_destroy(world)
+print("Physics demo complete.")

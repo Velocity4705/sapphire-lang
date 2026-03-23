@@ -1,0 +1,332 @@
+/* Playground page styles */
+
+.playground-page {
+    min-height: calc(100vh - 80px);
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.playground-header {
+    text-align: center;
+    padding: 2rem 0 2.5rem;
+}
+
+.playground-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.playground-subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Layout */
+.playground-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1.5rem;
+    height: calc(100vh - 280px);
+    min-height: 500px;
+}
+
+/* Sidebar */
+.playground-sidebar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-label {
+    padding: 0.875rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    background: var(--dark);
+}
+
+.example-list {
+    list-style: none;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.example-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--text-dim);
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.example-item:hover {
+    background: rgba(42, 79, 138, 0.08);
+    color: var(--text);
+}
+
+.example-item.active {
+    background: rgba(42, 79, 138, 0.15);
+    border-left-color: var(--cyan);
+    color: var(--cyan);
+}
+
+/* Main editor area */
+.playground-main {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 1rem;
+    min-height: 0;
+}
+
+/* Panes */
+.editor-pane,
+.output-pane {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.pane-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--dark);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.pane-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.dot-red    { background: #ff5f57; }
+.dot-yellow { background: #febc2e; }
+.dot-green  { background: #28c840; }
+
+.editor-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-icon {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-icon:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+
+.btn-run {
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    border: none;
+    color: white;
+    padding: 0.4rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-run:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(42, 79, 138, 0.5);
+}
+
+.btn-run:active {
+    transform: translateY(0);
+}
+
+.btn-run.running {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* CodeMirror overrides */
+#editor-container {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.CodeMirror {
+    height: 100% !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.9rem !important;
+    line-height: 1.6 !important;
+    background: #1a1f2e !important;
+    color: #f8f8f2 !important;
+}
+
+.CodeMirror-scroll {
+    height: 100% !important;
+}
+
+.CodeMirror-gutters {
+    background: #151a28 !important;
+    border-right: 1px solid var(--border) !important;
+}
+
+.CodeMirror-linenumber {
+    color: #4a5568 !important;
+}
+
+/* Output */
+.output-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: #a8ff78;
+    background: #0d1117;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.output-hint {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.output-error {
+    color: #ff6b6b;
+}
+
+.output-status {
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+}
+
+.output-status.ok {
+    background: rgba(40, 200, 64, 0.15);
+    color: #28c840;
+}
+
+.output-status.err {
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+}
+
+.output-status.running {
+    background: rgba(42, 79, 138, 0.2);
+    color: var(--cyan);
+}
+
+/* Note bar */
+.playground-note {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding: 0.875rem 1.25rem;
+    background: rgba(42, 79, 138, 0.08);
+    border: 1px solid rgba(123, 159, 212, 0.2);
+    border-radius: 10px;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.playground-note a {
+    color: var(--cyan);
+    text-decoration: none;
+}
+
+.playground-note a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .playground-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: auto;
+    }
+
+    .playground-sidebar {
+        max-height: 160px;
+    }
+
+    .example-list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        padding: 0.5rem;
+    }
+
+    .example-item {
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        border-radius: 6px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .example-item.active {
+        border-bottom-color: var(--cyan);
+        background: rgba(42, 79, 138, 0.15);
+    }
+
+    .playground-main {
+        height: 700px;
+    }
+}
+
+@media (max-width: 600px) {
+    .playground-page {
+        padding: 1rem;
+    }
+
+    .playground-title {
+        font-size: 1.75rem;
+    }
+
+    .playground-main {
+        height: 600px;
+    }
+}

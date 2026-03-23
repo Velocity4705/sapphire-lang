@@ -185,7 +185,7 @@ while cycle_count < 25:
 ```
 === IoT Sensor Node - Embedded System ===
 
-[BOOT] IoT Sensor Node v1.0-beta.5
+[BOOT] IoT Sensor Node v1.0-beta.6
 [BOOT] CPU: x86_64
 [BOOT] Cores: 4
 

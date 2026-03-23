@@ -1,0 +1,18 @@
+# Test Window Creation
+# Simple test to verify window creation works
+
+print("Testing window creation...")
+
+let window = window_create("Test Window", 800, 600)
+print("Window created")
+
+window_show(window)
+print("Window shown")
+
+# Show window for 2 seconds
+delay(2000)
+
+window_destroy(window)
+print("Window destroyed")
+
+print("Test complete!")

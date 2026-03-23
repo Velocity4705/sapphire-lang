@@ -1,0 +1,40 @@
+import simulation
+
+# ── Black hole simulation ────────────────────────────────────────────────────
+# Black hole with mass 1e30 kg, Schwarzschild radius 1000 m
+bh = blackhole_create(1e30, 1000.0)
+
+# Add 100 photon-like particles at various distances and angles
+i = 0
+while i < 100:
+    # Particles at distances 500 to 50000 from center
+    dist = 500.0 + i * 495.0
+    # Tangential velocity (orbit-like)
+    vt = 2.0e8
+    blackhole_add_particle(bh, dist, 0.0, 0.0, vt)
+    i = i + 1
+
+print("Simulating 100 particles around black hole for 1000 steps...")
+
+step = 0
+while step < 1000:
+    blackhole_step(bh, 1e-6)
+    step = step + 1
+
+captured = blackhole_captured_count(bh)
+print("Particles captured: " + captured)
+print("Particles escaped:  " + (100 - captured))
+
+# Show positions of first 5 surviving particles
+print("First 5 particle positions:")
+j = 0
+shown = 0
+while j < 100:
+    pos = blackhole_get_particle_position(bh, j)
+    if shown < 5:
+        print("  particle " + j + ": " + pos)
+        shown = shown + 1
+    j = j + 1
+
+blackhole_destroy(bh)
+print("Black hole simulation complete.")

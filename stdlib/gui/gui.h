@@ -220,6 +220,9 @@ int   gui_key(const char* name);  // "up","down","left","right","space","escape"
 int   gui_mouse_x(void* win);
 int   gui_mouse_y(void* win);
 int   gui_mouse_button(void* win, int btn);  // btn: 1=left,2=middle,3=right
+int   gui_scroll_y(void* win);   // scroll wheel delta this frame (+up, -down)
+int   gui_mouse_dx(void* win);   // mouse X delta since last poll
+int   gui_mouse_dy(void* win);   // mouse Y delta since last poll
 
 // Rendering — 2D drawing API
 void  gui_clear(void* win, int r, int g, int b);

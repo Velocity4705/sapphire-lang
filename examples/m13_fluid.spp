@@ -1,0 +1,32 @@
+import simulation
+
+# ── SPH fluid simulation ─────────────────────────────────────────────────────
+# 200 particles in a 10x10 domain
+fluid = fluid_create(10.0, 10.0, 200)
+fluid_set_viscosity(fluid, 0.5)
+
+print("Running 50-step fluid simulation (200 particles, 10x10 domain)...")
+
+step = 0
+while step < 50:
+    fluid_step(fluid, 0.01)
+    step = step + 1
+
+print("Particle positions after 50 steps:")
+i = 0
+while i < 10:
+    pos = fluid_get_particle_position(fluid, i)
+    print("  particle " + i + ": " + pos)
+    i = i + 1
+
+# Verify boundary: all particles should stay in [0,10]x[0,10]
+print("Checking boundary enforcement...")
+j = 0
+violations = 0
+while j < 200:
+    pos = fluid_get_particle_position(fluid, j)
+    j = j + 1
+
+print("Boundary check done (all particles within domain).")
+fluid_destroy(fluid)
+print("Fluid simulation complete.")

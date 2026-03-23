@@ -2,7 +2,7 @@
 
 ## Overview
 
-Sapphire 1.0.0 achieves near-C performance through LLVM optimization.
+Sapphire 1.0-beta.6 achieves near-C performance through LLVM optimization.
 
 ## Current Performance
 

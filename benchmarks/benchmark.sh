@@ -4,7 +4,7 @@
 # Compares compiled Sapphire vs C performance
 
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║       SAPPHIRE 1.0.0 PERFORMANCE BENCHMARK                   ║"
+echo "║       SAPPHIRE 1.0-beta.6 PERFORMANCE BENCHMARK              ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""
 

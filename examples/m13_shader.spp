@@ -1,0 +1,28 @@
+import shader
+
+# ── Shader compilation ───────────────────────────────────────────────────────
+print("Testing shader module...")
+
+vert_src = "void main() { gl_Position = vec4(0.0); }"
+frag_src  = "void main() { gl_FragColor = vec4(1.0); }"
+
+prog = shader_create(vert_src, frag_src)
+if prog == 0:
+    print("Shader compile failed: " + shader_error())
+else:
+    print("Shader compiled successfully.")
+    shader_use(prog)
+
+    # Set uniforms
+    shader_set_uniform_float(prog, "time", 1.5)
+    shader_set_uniform_vec3(prog, "lightDir", 0.0, 1.0, 0.0)
+    print("Uniforms set: time=1.5, lightDir=(0,1,0)")
+
+    shader_destroy(prog)
+
+# ── Error case: empty source ──────────────────────────────────────────────────
+bad = shader_create("", frag_src)
+if bad == 0:
+    print("Expected error on empty vert: " + shader_error())
+
+print("Shader demo complete.")
