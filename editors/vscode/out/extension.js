@@ -12,7 +12,7 @@ function activate(context) {
     const lspEnabled = config.get('lsp.enabled', true);
     if (lspEnabled) {
         // Path to LSP server executable
-        const lspPath = config.get('lsp.path', 'sapphire-lsp');
+        const lspPath = config.get('lsp.path', '/usr/local/bin/sapphire-lsp');
         // Server options
         const serverOptions = {
             command: lspPath,

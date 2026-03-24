@@ -1,4 +1,4 @@
-#define STB_IMAGE_IMPLEMENTATION
+// STB_IMAGE_IMPLEMENTATION is defined in gl3d.cpp
 #include "stb_image.h"
 #include "texture.h"
 #include <string>

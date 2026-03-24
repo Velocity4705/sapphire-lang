@@ -1,9 +1,13 @@
 #include "parser.h"
+#include "../error/error_reporter.h"
 #include <iostream>
 
 namespace sapphire {
 
-Parser::Parser(const std::vector<Token>& tokens) : tokens(tokens), current(0) {}
+Parser::Parser(const std::vector<Token>& tokens,
+               const std::string& source_text,
+               const std::string& filename)
+    : tokens(tokens), current(0), source_text(source_text), filename(filename) {}
 
 std::vector<std::unique_ptr<Stmt>> Parser::parse() {
     std::vector<std::unique_ptr<Stmt>> statements;
@@ -15,7 +19,18 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
                 statements.push_back(declaration());
             }
         } catch (const ParseError& e) {
-            std::cerr << "Parse error: " << e.what() << std::endl;
+            // Map message to the most specific error code
+            std::string msg = e.what();
+            std::string code = "E1A0";
+            if (msg.find("indented block") != std::string::npos)
+                code = "E1A7";
+            else if (msg.find("indentation") != std::string::npos || msg.find("indent") != std::string::npos)
+                code = "E1A2";
+            else if (msg.find("Expected expression") != std::string::npos || msg.find("expected expression") != std::string::npos)
+                code = "E1A1";
+            else if (msg.find("':'") != std::string::npos || msg.find("colon") != std::string::npos)
+                code = "E1A5";
+            ErrorFormatter::print(code, msg, filename, e.line, e.col, source_text);
             synchronize();
         }
     }
@@ -75,8 +90,7 @@ void Parser::skipNewlines() {
 }
 
 ParseError Parser::error(const Token& token, const std::string& message) {
-    std::string error_msg = "Line " + std::to_string(token.line) + ": " + message;
-    return ParseError(error_msg);
+    return ParseError(message, token.line, token.column);
 }
 
 void Parser::synchronize() {
@@ -207,15 +221,33 @@ std::unique_ptr<Stmt> Parser::functionDeclaration(std::vector<Decorator> decorat
         Token type = consumeToken(TokenType::IDENTIFIER, "Expected return type");
         return_type = type.lexeme;
     }
-    
+
+    // Parse optional where clause: where T: Trait1 + Trait2, U: Trait3
+    std::vector<std::pair<std::string, std::vector<std::string>>> where_clauses;
+    if (match({TokenType::WHERE})) {
+        do {
+            Token type_param = consumeToken(TokenType::IDENTIFIER, "Expected type parameter in where clause");
+            consume(TokenType::COLON, "Expected ':' after type parameter in where clause");
+            std::vector<std::string> bounds;
+            bounds.push_back(consumeToken(TokenType::IDENTIFIER, "Expected trait bound").lexeme);
+            while (check(TokenType::PLUS)) {
+                advance(); // consume '+'
+                bounds.push_back(consumeToken(TokenType::IDENTIFIER, "Expected trait bound after '+'").lexeme);
+            }
+            where_clauses.push_back({type_param.lexeme, std::move(bounds)});
+        } while (match({TokenType::COMMA}) && !check(TokenType::COLON) && !check(TokenType::NEWLINE));
+    }
+
     consume(TokenType::COLON, "Expected ':' before function body");
     skipNewlines();
     consume(TokenType::INDENT, "Expected indented block");
     
     auto body = block();
     
-    return std::make_unique<FunctionDecl>(std::move(decorators), name.lexeme, std::move(parameters),
-                                          return_type, std::move(body), is_async);
+    auto decl = std::make_unique<FunctionDecl>(std::move(decorators), name.lexeme, std::move(parameters),
+                                               return_type, std::move(body), is_async);
+    decl->where_clauses = std::move(where_clauses);
+    return decl;
 }
 
 std::unique_ptr<Stmt> Parser::macroDeclaration() {

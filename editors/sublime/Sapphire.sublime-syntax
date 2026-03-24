@@ -1,0 +1,178 @@
+%YAML 1.2
+---
+name: Sapphire
+file_extensions: [spp]
+scope: source.sapphire
+
+contexts:
+  main:
+    - include: doc-comments
+    - include: comments
+    - include: decorators
+    - include: keywords
+    - include: fstrings
+    - include: strings
+    - include: numbers
+    - include: class-names
+    - include: functions
+    - include: operators
+    - include: constants
+
+  # ── Doc comments ──────────────────────────────────────────────────────
+  doc-comments:
+    - match: '///.*$'
+      scope: comment.line.documentation.sapphire
+    - match: '#!.*$'
+      scope: comment.line.documentation.sapphire
+
+  # ── Comments ──────────────────────────────────────────────────────────
+  comments:
+    - match: '#(?!!)[^\n]*$'
+      scope: comment.line.number-sign.sapphire
+
+  # ── Decorators ────────────────────────────────────────────────────────
+  decorators:
+    - match: '@[a-zA-Z_][a-zA-Z0-9_]*'
+      scope: entity.name.function.decorator.sapphire
+
+  # ── Keywords ──────────────────────────────────────────────────────────
+  keywords:
+    - match: \b(if|else|elif|for|while|break|continue|return|match|case|default|in|pass|del)\b
+      scope: keyword.control.sapphire
+    - match: \b(fn|class|trait|impl|macro|enum)\b
+      scope: keyword.declaration.sapphire
+    - match: \b(import|from|as|let|var|const)\b
+      scope: keyword.other.sapphire
+    - match: \b(async|await|chan|go|select)\b
+      scope: keyword.control.async.sapphire
+    - match: \b(try|catch|finally|throw|raise)\b
+      scope: keyword.control.exception.sapphire
+    - match: \b(pub|priv|static|mut|owned|where|dyn|Self)\b
+      scope: storage.modifier.sapphire
+    - match: \b(int|float|double|str|bool|void|any|list|dict|tuple|set|bytes|char)\b
+      scope: storage.type.sapphire
+
+  # ── Constants ─────────────────────────────────────────────────────────
+  constants:
+    - match: \b(true|false|none|None|Some|Ok|Err)\b
+      scope: constant.language.sapphire
+
+  # ── F-strings ─────────────────────────────────────────────────────────
+  fstrings:
+    - match: 'f"'
+      scope: string.interpolated.sapphire punctuation.definition.string.begin.sapphire
+      push: fstring-double-body
+    - match: "f'"
+      scope: string.interpolated.sapphire punctuation.definition.string.begin.sapphire
+      push: fstring-single-body
+
+  fstring-double-body:
+    - meta_scope: string.interpolated.sapphire
+    - match: '"'
+      scope: punctuation.definition.string.end.sapphire
+      pop: true
+    - match: '\{'
+      scope: punctuation.section.interpolation.begin.sapphire
+      push: interpolation
+    - match: '\\.'
+      scope: constant.character.escape.sapphire
+
+  fstring-single-body:
+    - meta_scope: string.interpolated.sapphire
+    - match: "'"
+      scope: punctuation.definition.string.end.sapphire
+      pop: true
+    - match: '\{'
+      scope: punctuation.section.interpolation.begin.sapphire
+      push: interpolation
+    - match: '\\.'
+      scope: constant.character.escape.sapphire
+
+  interpolation:
+    - meta_scope: meta.interpolation.sapphire
+    - match: '\}'
+      scope: punctuation.section.interpolation.end.sapphire
+      pop: true
+    - include: main
+
+  # ── Strings ───────────────────────────────────────────────────────────
+  strings:
+    - match: '"""'
+      scope: punctuation.definition.string.begin.sapphire
+      push: triple-string-body
+    - match: '"'
+      scope: punctuation.definition.string.begin.sapphire
+      push: double-string-body
+    - match: "'"
+      scope: punctuation.definition.string.begin.sapphire
+      push: single-string-body
+
+  triple-string-body:
+    - meta_scope: string.quoted.triple.sapphire
+    - match: '"""'
+      scope: punctuation.definition.string.end.sapphire
+      pop: true
+    - match: '\\.'
+      scope: constant.character.escape.sapphire
+
+  double-string-body:
+    - meta_scope: string.quoted.double.sapphire
+    - match: '"'
+      scope: punctuation.definition.string.end.sapphire
+      pop: true
+    - match: '\\.'
+      scope: constant.character.escape.sapphire
+
+  single-string-body:
+    - meta_scope: string.quoted.single.sapphire
+    - match: "'"
+      scope: punctuation.definition.string.end.sapphire
+      pop: true
+    - match: '\\.'
+      scope: constant.character.escape.sapphire
+
+  # ── Numbers ───────────────────────────────────────────────────────────
+  numbers:
+    - match: '\b0[xX][0-9a-fA-F_]+\b'
+      scope: constant.numeric.hex.sapphire
+    - match: '\b0[bB][01_]+\b'
+      scope: constant.numeric.binary.sapphire
+    - match: '\b0[oO][0-7_]+\b'
+      scope: constant.numeric.octal.sapphire
+    - match: '\b[0-9][0-9_]*\.[0-9][0-9_]*([eE][+-]?[0-9]+)?\b'
+      scope: constant.numeric.float.sapphire
+    - match: '\b[0-9][0-9_]*\b'
+      scope: constant.numeric.integer.sapphire
+
+  # ── Class / type names ────────────────────────────────────────────────
+  class-names:
+    - match: '\b(class|trait|impl|enum)\s+([A-Za-z_][A-Za-z0-9_]*)'
+      captures:
+        1: keyword.declaration.sapphire
+        2: entity.name.type.sapphire
+    - match: '\b[A-Z][a-zA-Z0-9_]*\b'
+      scope: entity.name.type.sapphire
+
+  # ── Functions ─────────────────────────────────────────────────────────
+  functions:
+    - match: '\b(fn)\s+([a-zA-Z_][a-zA-Z0-9_]*)'
+      captures:
+        1: keyword.declaration.sapphire
+        2: entity.name.function.sapphire
+    - match: '\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()'
+      scope: entity.name.function.sapphire
+
+  # ── Operators ─────────────────────────────────────────────────────────
+  operators:
+    - match: '=>'
+      scope: keyword.operator.arrow.sapphire
+    - match: '->'
+      scope: keyword.operator.arrow.sapphire
+    - match: '<-'
+      scope: keyword.operator.channel.sapphire
+    - match: '\*\*'
+      scope: keyword.operator.sapphire
+    - match: '==|!=|<=|>=|&&|\|\||\+=|-=|\*=|/=|%='
+      scope: keyword.operator.sapphire
+    - match: '[+\-*/%<>!&|^~=?]'
+      scope: keyword.operator.sapphire

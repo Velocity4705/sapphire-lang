@@ -12,14 +12,19 @@ namespace sapphire {
 
 class ParseError : public std::runtime_error {
 public:
-    explicit ParseError(const std::string& msg) : std::runtime_error(msg) {}
+    int line = -1;
+    int col  = -1;
+    explicit ParseError(const std::string& msg, int line = -1, int col = -1)
+        : std::runtime_error(msg), line(line), col(col) {}
 };
 
 class Parser {
 private:
     std::vector<Token> tokens;
     size_t current;
-    
+    std::string source_text;   // full source for error display
+    std::string filename;      // for error display
+
     Token peek() const;
     Token previous() const;
     Token advance();
@@ -78,7 +83,9 @@ private:
     std::vector<Decorator> parseDecorators();
 
 public:
-    explicit Parser(const std::vector<Token>& tokens);
+    explicit Parser(const std::vector<Token>& tokens,
+                    const std::string& source_text = "",
+                    const std::string& filename = "");
     std::vector<std::unique_ptr<Stmt>> parse();
 };
 

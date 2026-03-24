@@ -30,8 +30,10 @@ void REPL::run() {
                 continue;
             }
             
-            // Add to history
-            history.push_back(line);
+            // Add to history (skip duplicates and empty)
+            if (!line.empty() && (history.empty() || history.back() != line)) {
+                history.push_back(line);
+            }
             
             // Check for commands
             if (handleCommand(line)) {
@@ -153,7 +155,7 @@ void REPL::executeCode(const std::string& code) {
         auto tokens = lexer.tokenize();
         
         // Parser
-        Parser parser(tokens);
+        Parser parser(tokens, code, "<repl>");
         auto statements = parser.parse();
         
         // Execute
@@ -175,7 +177,7 @@ void REPL::executeCode(const std::string& code) {
 
 void REPL::printWelcome() {
     std::cout << "╔══════════════════════════════════════════════════════════════╗\n";
-    std::cout << "║         Sapphire REPL v1.0-beta.6                          ║\n";
+    std::cout << "║         Sapphire REPL v1.0-beta.7                          ║\n";
     std::cout << "║         Interactive Programming Environment                   ║\n";
     std::cout << "╚══════════════════════════════════════════════════════════════╝\n";
     std::cout << "\n";
@@ -283,7 +285,7 @@ void REPL::reloadFile(const std::string& filename) {
         auto tokens = lexer.tokenize();
         
         // Parser
-        Parser parser(tokens);
+        Parser parser(tokens, code, "<repl>");
         auto statements = parser.parse();
         
         // Execute in current environment (preserves state)
@@ -301,17 +303,142 @@ std::string REPL::getPrompt() const {
 }
 
 std::string REPL::readLine(const std::string& prompt) {
+#ifdef __unix__
+    // Raw-mode readline with arrow-key history and multi-line support
+    struct termios old_term, raw;
+    bool is_tty = isatty(fileno(stdin));
+
+    if (is_tty) {
+        tcgetattr(fileno(stdin), &old_term);
+        raw = old_term;
+        raw.c_lflag &= ~(ICANON | ECHO);
+        raw.c_cc[VMIN]  = 1;
+        raw.c_cc[VTIME] = 0;
+        tcsetattr(fileno(stdin), TCSAFLUSH, &raw);
+    }
+
+    std::string line;
+    int cursor = 0;                  // cursor position within line
+    int hist_idx = (int)history.size(); // points past end = "current" input
+
+    auto redraw = [&]() {
+        // Move to start of line, clear it, reprint
+        std::cout << "\r\033[K" << prompt << line;
+        // Reposition cursor
+        int back = (int)line.size() - cursor;
+        if (back > 0) std::cout << "\033[" << back << "D";
+        std::cout.flush();
+    };
+
+    std::cout << prompt;
+    std::cout.flush();
+
+    while (true) {
+        char c;
+        if (read(fileno(stdin), &c, 1) <= 0) {
+            if (is_tty) tcsetattr(fileno(stdin), TCSAFLUSH, &old_term);
+            running = false;
+            std::cout << "\n";
+            return "";
+        }
+
+        if (c == '\n' || c == '\r') {
+            std::cout << "\n";
+            break;
+        }
+
+        if (c == 4) { // Ctrl+D — EOF
+            if (is_tty) tcsetattr(fileno(stdin), TCSAFLUSH, &old_term);
+            if (line.empty()) { running = false; std::cout << "\n"; return ""; }
+            break;
+        }
+
+        if (c == 3) { // Ctrl+C
+            std::cout << "\n";
+            line.clear(); cursor = 0;
+            redraw();
+            continue;
+        }
+
+        if (c == 127 || c == 8) { // Backspace
+            if (cursor > 0) {
+                line.erase(cursor - 1, 1);
+                cursor--;
+                redraw();
+            }
+            continue;
+        }
+
+        if (c == 27) { // Escape sequence
+            char seq[3] = {};
+            if (read(fileno(stdin), &seq[0], 1) <= 0) continue;
+            if (read(fileno(stdin), &seq[1], 1) <= 0) continue;
+            if (seq[0] == '[') {
+                if (seq[1] == 'A') { // Up arrow — history back
+                    if (hist_idx > 0) {
+                        if (hist_idx == (int)history.size()) history_tmp_ = line;
+                        hist_idx--;
+                        line   = history[hist_idx];
+                        cursor = (int)line.size();
+                        redraw();
+                    }
+                } else if (seq[1] == 'B') { // Down arrow — history forward
+                    if (hist_idx < (int)history.size()) {
+                        hist_idx++;
+                        line   = (hist_idx == (int)history.size()) ? history_tmp_ : history[hist_idx];
+                        cursor = (int)line.size();
+                        redraw();
+                    }
+                } else if (seq[1] == 'C') { // Right arrow
+                    if (cursor < (int)line.size()) { cursor++; redraw(); }
+                } else if (seq[1] == 'D') { // Left arrow
+                    if (cursor > 0) { cursor--; redraw(); }
+                } else if (seq[1] == 'H' || seq[1] == '1') { // Home
+                    cursor = 0; redraw();
+                } else if (seq[1] == 'F' || seq[1] == '4') { // End
+                    cursor = (int)line.size(); redraw();
+                } else if (seq[1] == '3') { // Delete key (ESC[3~)
+                    char tilde; read(fileno(stdin), &tilde, 1);
+                    if (cursor < (int)line.size()) {
+                        line.erase(cursor, 1);
+                        redraw();
+                    }
+                }
+            }
+            continue;
+        }
+
+        // Printable character — insert at cursor
+        if (c >= 32 && c < 127) {
+            line.insert(cursor, 1, c);
+            cursor++;
+            redraw();
+        }
+    }
+
+    if (is_tty) tcsetattr(fileno(stdin), TCSAFLUSH, &old_term);
+
+    // Multi-line: if line ends with ':' or '\', keep reading with continuation prompt
+    if (!line.empty() && (line.back() == ':' || line.back() == '\\')) {
+        std::string full = line;
+        while (true) {
+            std::string cont = readLine("...       ");
+            if (cont.empty()) break;
+            full += "\n" + cont;
+            if (!cont.empty() && cont.back() != ':' && cont.back() != '\\') break;
+        }
+        return full;
+    }
+
+    return line;
+#else
+    // Fallback for non-unix
     std::cout << prompt;
     std::string line;
     std::getline(std::cin, line);
-    
-    // Check for EOF (Ctrl+D)
-    if (std::cin.eof()) {
-        running = false;
-        return "";
-    }
-    
+    if (std::cin.eof()) { running = false; return ""; }
     return line;
+#endif
 }
 
 void REPL::watchFile(const std::string& filename) {

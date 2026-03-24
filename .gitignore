@@ -166,3 +166,6 @@ editors/vscode/node_modules/
 editors/vscode/out/
 
 test_all_examples.sh
+
+# VSCode extension package (binary artifact, built on demand)
+*.vsix

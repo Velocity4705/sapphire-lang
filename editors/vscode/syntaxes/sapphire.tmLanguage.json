@@ -2,19 +2,48 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sapphire",
   "patterns": [
+    { "include": "#doc-comments" },
     { "include": "#comments" },
+    { "include": "#decorators" },
     { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#constants" },
+    { "include": "#fstrings" },
     { "include": "#strings" },
     { "include": "#numbers" },
+    { "include": "#class-names" },
     { "include": "#functions" },
     { "include": "#operators" }
   ],
   "repository": {
+    "doc-comments": {
+      "patterns": [
+        {
+          "name": "comment.line.documentation.sapphire",
+          "match": "///.*$"
+        },
+        {
+          "name": "comment.line.documentation.sapphire",
+          "match": "#!.*$"
+        }
+      ]
+    },
     "comments": {
       "patterns": [
         {
           "name": "comment.line.number-sign.sapphire",
-          "match": "#.*$"
+          "match": "#(?!!)[^\\n]*$"
+        }
+      ]
+    },
+    "decorators": {
+      "patterns": [
+        {
+          "name": "meta.decorator.sapphire",
+          "match": "(@[a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "entity.name.function.decorator.sapphire" }
+          }
         }
       ]
     },
@@ -22,11 +51,15 @@
       "patterns": [
         {
           "name": "keyword.control.sapphire",
-          "match": "\\b(if|else|elif|for|while|break|continue|return|match|case|default)\\b"
+          "match": "\\b(if|else|elif|for|while|break|continue|return|match|case|default|in|pass)\\b"
+        },
+        {
+          "name": "keyword.declaration.sapphire",
+          "match": "\\b(fn|class|trait|impl|macro|enum)\\b"
         },
         {
           "name": "keyword.other.sapphire",
-          "match": "\\b(fn|class|trait|impl|import|from|as|let|var|const)\\b"
+          "match": "\\b(import|from|as|let|var|const|del)\\b"
         },
         {
           "name": "keyword.control.async.sapphire",
@@ -34,33 +67,109 @@
         },
         {
           "name": "keyword.control.exception.sapphire",
-          "match": "\\b(try|catch|finally|throw)\\b"
-        },
-        {
-          "name": "storage.type.sapphire",
-          "match": "\\b(int|float|double|str|bool|void)\\b"
-        },
-        {
-          "name": "constant.language.sapphire",
-          "match": "\\b(true|false|none|None|Some|Ok|Err|Self)\\b"
+          "match": "\\b(try|catch|finally|throw|raise)\\b"
         },
         {
           "name": "storage.modifier.sapphire",
-          "match": "\\b(pub|priv|static|mut|owned)\\b"
+          "match": "\\b(pub|priv|static|mut|owned|where|dyn|Self)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.sapphire",
+          "match": "\\b(int|float|double|str|bool|void|any|list|dict|tuple|set|bytes|char)\\b"
+        },
+        {
+          "comment": "Generic type parameters e.g. Vec<T>, Option<T>",
+          "match": "\\b([A-Z][a-zA-Z0-9_]*)\\s*(?=<)",
+          "captures": {
+            "1": { "name": "entity.name.type.sapphire" }
+          }
+        },
+        {
+          "comment": "Type annotation after colon e.g. x: int",
+          "match": "(?<=:\\s{0,10})([A-Z][a-zA-Z0-9_]*|int|float|str|bool|void|any)\\b",
+          "captures": {
+            "1": { "name": "storage.type.sapphire" }
+          }
+        },
+        {
+          "comment": "Return type annotation e.g. -> int",
+          "match": "(?<=->\\s{0,10})([A-Z][a-zA-Z0-9_]*|int|float|str|bool|void|any)\\b",
+          "captures": {
+            "1": { "name": "storage.type.sapphire" }
+          }
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.sapphire",
+          "match": "\\b(true|false|none|None|Some|Ok|Err)\\b"
+        }
+      ]
+    },
+    "fstrings": {
+      "patterns": [
+        {
+          "name": "string.interpolated.sapphire",
+          "begin": "f\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "meta.interpolation.sapphire",
+              "begin": "\\{",
+              "end": "\\}",
+              "patterns": [
+                { "include": "$self" }
+              ]
+            },
+            {
+              "name": "constant.character.escape.sapphire",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.interpolated.sapphire",
+          "begin": "f'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "meta.interpolation.sapphire",
+              "begin": "\\{",
+              "end": "\\}",
+              "patterns": [
+                { "include": "$self" }
+              ]
+            },
+            {
+              "name": "constant.character.escape.sapphire",
+              "match": "\\\\."
+            }
+          ]
         }
       ]
     },
     "strings": {
       "patterns": [
         {
+          "name": "string.quoted.triple.sapphire",
+          "begin": "\"\"\"",
+          "end": "\"\"\"",
+          "patterns": [
+            { "name": "constant.character.escape.sapphire", "match": "\\\\." }
+          ]
+        },
+        {
           "name": "string.quoted.double.sapphire",
           "begin": "\"",
           "end": "\"",
           "patterns": [
-            {
-              "name": "constant.character.escape.sapphire",
-              "match": "\\\\."
-            }
+            { "name": "constant.character.escape.sapphire", "match": "\\\\." }
           ]
         },
         {
@@ -68,10 +177,7 @@
           "begin": "'",
           "end": "'",
           "patterns": [
-            {
-              "name": "constant.character.escape.sapphire",
-              "match": "\\\\."
-            }
+            { "name": "constant.character.escape.sapphire", "match": "\\\\." }
           ]
         }
       ]
@@ -79,32 +185,97 @@
     "numbers": {
       "patterns": [
         {
-          "name": "constant.numeric.sapphire",
-          "match": "\\b\\d+\\.\\d+\\b"
+          "name": "constant.numeric.hex.sapphire",
+          "match": "\\b0[xX][0-9a-fA-F_]+\\b"
         },
         {
-          "name": "constant.numeric.sapphire",
-          "match": "\\b\\d+\\b"
+          "name": "constant.numeric.binary.sapphire",
+          "match": "\\b0[bB][01_]+\\b"
+        },
+        {
+          "name": "constant.numeric.octal.sapphire",
+          "match": "\\b0[oO][0-7_]+\\b"
+        },
+        {
+          "name": "constant.numeric.float.sapphire",
+          "match": "\\b\\d[\\d_]*\\.\\d[\\d_]*([eE][+-]?\\d+)?\\b"
+        },
+        {
+          "name": "constant.numeric.integer.sapphire",
+          "match": "\\b\\d[\\d_]*\\b"
+        }
+      ]
+    },
+    "class-names": {
+      "patterns": [
+        {
+          "comment": "Class/trait name after declaration keyword",
+          "match": "\\b(class|trait|impl|enum)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.declaration.sapphire" },
+            "2": { "name": "entity.name.type.sapphire" }
+          }
+        },
+        {
+          "comment": "Uppercase identifiers used as types",
+          "name": "entity.name.type.sapphire",
+          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b"
         }
       ]
     },
     "functions": {
       "patterns": [
         {
-          "name": "entity.name.function.sapphire",
-          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()"
+          "comment": "Function declaration name",
+          "match": "\\b(fn)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.declaration.sapphire" },
+            "2": { "name": "entity.name.function.sapphire" }
+          }
         },
         {
-          "name": "entity.name.function.decorator.sapphire",
-          "match": "@[a-zA-Z_][a-zA-Z0-9_]*"
+          "comment": "Function call",
+          "name": "entity.name.function.sapphire",
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()"
         }
       ]
     },
     "operators": {
       "patterns": [
         {
+          "comment": "Match arm arrow",
+          "name": "keyword.operator.arrow.sapphire",
+          "match": "=>"
+        },
+        {
+          "comment": "Return type / lambda arrow",
+          "name": "keyword.operator.arrow.sapphire",
+          "match": "->"
+        },
+        {
+          "comment": "Channel send/receive",
+          "name": "keyword.operator.channel.sapphire",
+          "match": "<-"
+        },
+        {
+          "comment": "Error propagation",
           "name": "keyword.operator.sapphire",
-          "match": "(\\+|\\-|\\*|\\/|%|==|!=|<|>|<=|>=|&&|\\|\\||!|=|\\+=|\\-=|\\*=|\\/=|%=|->|<-|\\?)"
+          "match": "\\?"
+        },
+        {
+          "comment": "Power operator",
+          "name": "keyword.operator.sapphire",
+          "match": "\\*\\*"
+        },
+        {
+          "comment": "Comparison and assignment operators",
+          "name": "keyword.operator.sapphire",
+          "match": "(==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|//=|\\*\\*=)"
+        },
+        {
+          "comment": "Arithmetic and single-char operators",
+          "name": "keyword.operator.sapphire",
+          "match": "[+\\-*/%<>!&|^~=]"
         }
       ]
     }

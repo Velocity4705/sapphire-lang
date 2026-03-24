@@ -27,6 +27,7 @@
 #include "../stdlib/websocket/websocket.h"
 #include "../stdlib/template/template.h"
 #include "../stdlib/database/database.h"
+#include "../stdlib/database/database_capi.h"
 
 // Milestone 5 Libraries
 #include "../stdlib/orm/orm.h"
@@ -46,6 +47,7 @@
 #include "../stdlib/game/game.h"
 #include "../stdlib/system/sysprog.h"
 #include "../stdlib/gui/gui.h"
+#include "../stdlib/gl3d/gl3d.h"
 
 // Milestone 15 Libraries
 #include "../stdlib/advancedcrypto/advancedcrypto.h"
@@ -53,7 +55,6 @@
 #include "../stdlib/mathx/mathx.h"
 #include "../stdlib/polish/polish.h"
 #include "../stdlib/ecosystem/ecosystem.h"
-#include "../stdlib/database/database.h"
 
 // Stubs for legacy database dispatch (old M4-era placeholders, never called at runtime)
 inline void* sapphire_postgresql_create() { return nullptr; }
@@ -160,6 +161,7 @@ Interpreter::Interpreter() {
     environment->define("deprecated", std::string("__builtin_deprecated__"));
     environment->define("dataclass", std::string("__builtin_dataclass__"));
     environment->define("singleton", std::string("__builtin_singleton__"));
+    environment->define("constexpr", std::string("__builtin_constexpr__"));
     environment->define("staticmethod", std::string("__builtin_staticmethod__"));
     environment->define("classmethod", std::string("__builtin_classmethod__"));
     environment->define("property", std::string("__builtin_property__"));
@@ -420,7 +422,16 @@ void Interpreter::visitBinaryExpr(BinaryExpr& expr) {
     
     // Arithmetic operations
     if (expr.op == "+") {
-        if (std::holds_alternative<int>(left) && std::holds_alternative<int>(right)) {
+        // Array concatenation
+        if (std::holds_alternative<std::shared_ptr<ArrayValue>>(left) &&
+            std::holds_alternative<std::shared_ptr<ArrayValue>>(right)) {
+            auto result = std::make_shared<ArrayValue>();
+            auto& la = std::get<std::shared_ptr<ArrayValue>>(left)->elements;
+            auto& ra = std::get<std::shared_ptr<ArrayValue>>(right)->elements;
+            result->elements.insert(result->elements.end(), la.begin(), la.end());
+            result->elements.insert(result->elements.end(), ra.begin(), ra.end());
+            last_value = result;
+        } else if (std::holds_alternative<int>(left) && std::holds_alternative<int>(right)) {
             last_value = std::get<int>(left) + std::get<int>(right);
         } else if (std::holds_alternative<std::string>(left) || std::holds_alternative<std::string>(right)) {
             // String concatenation: coerce either side to string
@@ -761,6 +772,19 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
                 func_name = func_name.substr(14);
             }
         }
+
+        // Check for @singleton decorator — return cached instance if already created
+        bool is_singleton = false;
+        if (func_name.find("__singleton__") == 0) {
+            is_singleton = true;
+            func_name = func_name.substr(13);
+            std::string cache_key = "__singleton_instance__" + func_name;
+            auto cached_it = function_cache.find({cache_key, ""});
+            if (cached_it != function_cache.end()) {
+                last_value = cached_it->second;
+                return;
+            }
+        }
         
         original_name = func_name;
         
@@ -837,6 +861,12 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
             }
             auto cache_key = std::make_pair(original_name, args_str);
             function_cache[cache_key] = last_value;
+        }
+
+        // Store singleton instance if @singleton decorator is applied
+        if (is_singleton) {
+            std::string cache_key = "__singleton_instance__" + func_name;
+            function_cache[{cache_key, ""}] = last_value;
         }
         
         // Print timing if @timing decorator is applied
@@ -2082,7 +2112,7 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
             }
             double x = std::holds_alternative<int>(arguments[0]) ? 
                       std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
-            last_value = sapphire_math_floor(x);
+            last_value = static_cast<int>(sapphire_math_floor(x));
             return;
             
         } else if (func_name == "__builtin_math_ceil__") {
@@ -2106,6 +2136,31 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
                 throw TypeError("math_e() requires 0 arguments");
             }
             last_value = sapphire_math_e();
+            return;
+
+        } else if (func_name == "__builtin_math_atan2__") {
+            double y = std::holds_alternative<int>(arguments[0]) ? std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            double x = std::holds_alternative<int>(arguments[1]) ? std::get<int>(arguments[1]) : std::get<double>(arguments[1]);
+            last_value = std::atan2(y, x);
+            return;
+
+        } else if (func_name == "__builtin_math_clamp__") {
+            double v   = std::holds_alternative<int>(arguments[0]) ? std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            double lo  = std::holds_alternative<int>(arguments[1]) ? std::get<int>(arguments[1]) : std::get<double>(arguments[1]);
+            double hi  = std::holds_alternative<int>(arguments[2]) ? std::get<int>(arguments[2]) : std::get<double>(arguments[2]);
+            last_value = v < lo ? lo : (v > hi ? hi : v);
+            return;
+
+        } else if (func_name == "__builtin_math_min__") {
+            double a = std::holds_alternative<int>(arguments[0]) ? std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            double b = std::holds_alternative<int>(arguments[1]) ? std::get<int>(arguments[1]) : std::get<double>(arguments[1]);
+            last_value = a < b ? a : b;
+            return;
+
+        } else if (func_name == "__builtin_math_max__") {
+            double a = std::holds_alternative<int>(arguments[0]) ? std::get<int>(arguments[0]) : std::get<double>(arguments[0]);
+            double b = std::holds_alternative<int>(arguments[1]) ? std::get<int>(arguments[1]) : std::get<double>(arguments[1]);
+            last_value = a > b ? a : b;
             return;
             
         // ===== MILESTONE 1: CSV I/O =====
@@ -6773,6 +6828,251 @@ void Interpreter::visitCallExpr(CallExpr& expr) {
         }
     }
 
+    // gl3d: OpenGL 3D engine builtins
+    if (std::holds_alternative<std::string>(callee) &&
+        std::get<std::string>(callee).rfind("__builtin_gl3d_", 0) == 0) {
+        std::string fn = std::get<std::string>(callee);
+        auto _gp = [&](int i) { return reinterpret_cast<void*>(static_cast<intptr_t>(std::get<int>(arguments[i]))); };
+        auto _gi = [&](int i) -> int { return std::get<int>(arguments[i]); };
+        auto _gf = [&](int i) -> float {
+            if (std::holds_alternative<double>(arguments[i])) return (float)std::get<double>(arguments[i]);
+            if (std::holds_alternative<int>(arguments[i])) return (float)std::get<int>(arguments[i]);
+            return 0.f;
+        };
+        auto _gs = [&](int i) -> std::string { return std::get<std::string>(arguments[i]); };
+        // Window
+        if (fn == "__builtin_gl3d_window_create__") {
+            void* h = gl3d_window_create(_gs(0).c_str(), _gi(1), _gi(2));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_window_destroy__") {
+            gl3d_window_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_window_poll__") {
+            last_value = gl3d_window_poll(_gp(0)); return;
+        } else if (fn == "__builtin_gl3d_window_swap__") {
+            gl3d_window_swap(_gp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_window_set_title__") {
+            gl3d_window_set_title(_gp(0), _gs(1).c_str()); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_window_width__") {
+            last_value = gl3d_window_width(_gp(0)); return;
+        } else if (fn == "__builtin_gl3d_window_height__") {
+            last_value = gl3d_window_height(_gp(0)); return;
+        // Input
+        } else if (fn == "__builtin_gl3d_key__") {
+            last_value = gl3d_key(_gp(0), _gs(1).c_str()); return;
+        } else if (fn == "__builtin_gl3d_key_pressed__") {
+            last_value = gl3d_key_pressed(_gp(0), _gs(1).c_str()); return;
+        } else if (fn == "__builtin_gl3d_mouse_dx__") {
+            last_value = (double)gl3d_mouse_dx(_gp(0)); return;
+        } else if (fn == "__builtin_gl3d_mouse_dy__") {
+            last_value = (double)gl3d_mouse_dy(_gp(0)); return;
+        } else if (fn == "__builtin_gl3d_mouse_capture__") {
+            gl3d_mouse_capture(_gp(0), _gi(1)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_delta__") {
+            last_value = (double)gl3d_delta(_gp(0)); return;
+        } else if (fn == "__builtin_gl3d_time__") {
+            last_value = (double)gl3d_time(_gp(0)); return;
+        // Mesh
+        } else if (fn == "__builtin_gl3d_mesh_destroy__") {
+            gl3d_mesh_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_mesh_draw__") {
+            gl3d_mesh_draw(_gp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_mesh_box__") {
+            void* h = gl3d_mesh_box(_gf(0), _gf(1), _gf(2));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_mesh_plane__") {
+            void* h = gl3d_mesh_plane(_gf(0), _gf(1), _gi(2));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_mesh_sphere__") {
+            void* h = gl3d_mesh_sphere(_gf(0), _gi(1), _gi(2));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_mesh_cylinder__") {
+            void* h = gl3d_mesh_cylinder(_gf(0), _gf(1), _gi(2));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_mesh_terrain__") {
+            // arg0 = Sapphire list of floats, arg1 = subdiv, arg2 = size, arg3 = hscale
+            std::vector<float> hdata;
+            if (std::holds_alternative<std::shared_ptr<ArrayValue>>(arguments[0])) {
+                auto& arr = std::get<std::shared_ptr<ArrayValue>>(arguments[0])->elements;
+                for (auto& v : arr) {
+                    if (std::holds_alternative<double>(v)) hdata.push_back((float)std::get<double>(v));
+                    else if (std::holds_alternative<int>(v)) hdata.push_back((float)std::get<int>(v));
+                    else hdata.push_back(0.f);
+                }
+            }
+            void* h = gl3d_mesh_terrain(hdata.data(), _gi(1), _gf(2), _gf(3));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        // Line mesh
+        } else if (fn == "__builtin_gl3d_mesh_lines_create__") {
+            std::vector<float> vdata;
+            if (std::holds_alternative<std::shared_ptr<ArrayValue>>(arguments[0])) {
+                auto& arr = std::get<std::shared_ptr<ArrayValue>>(arguments[0])->elements;
+                for (auto& v : arr) {
+                    if (std::holds_alternative<double>(v)) vdata.push_back((float)std::get<double>(v));
+                    else if (std::holds_alternative<int>(v)) vdata.push_back((float)std::get<int>(v));
+                    else vdata.push_back(0.f);
+                }
+            }
+            int vc = (int)(vdata.size() / 3);
+            void* h = gl3d_mesh_lines_create(vdata.data(), vc);
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_mesh_lines_update__") {
+            std::vector<float> vdata;
+            if (std::holds_alternative<std::shared_ptr<ArrayValue>>(arguments[1])) {
+                auto& arr = std::get<std::shared_ptr<ArrayValue>>(arguments[1])->elements;
+                for (auto& v : arr) {
+                    if (std::holds_alternative<double>(v)) vdata.push_back((float)std::get<double>(v));
+                    else if (std::holds_alternative<int>(v)) vdata.push_back((float)std::get<int>(v));
+                    else vdata.push_back(0.f);
+                }
+            }
+            int vc = (int)(vdata.size() / 3);
+            gl3d_mesh_lines_update(_gp(0), vdata.data(), vc); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_mesh_lines_draw__") {
+            gl3d_mesh_lines_draw(_gp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_mesh_lines_destroy__") {
+            gl3d_mesh_lines_destroy(_gp(0)); last_value = nullptr; return;
+        // Shader
+        } else if (fn == "__builtin_gl3d_shader_create__") {
+            void* h = gl3d_shader_create(_gs(0).c_str(), _gs(1).c_str());
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_shader_destroy__") {
+            gl3d_shader_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_shader_use__") {
+            gl3d_shader_use(_gp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_shader_set_float__") {
+            gl3d_shader_set_float(_gp(0), _gs(1).c_str(), _gf(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_shader_set_vec3__") {
+            gl3d_shader_set_vec3(_gp(0), _gs(1).c_str(), _gf(2), _gf(3), _gf(4)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_shader_set_vec4__") {
+            gl3d_shader_set_vec4(_gp(0), _gs(1).c_str(), _gf(2), _gf(3), _gf(4), _gf(5)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_shader_set_mat4__") {
+            // mat4 passed as int handle (pointer to float[16])
+            float* m = reinterpret_cast<float*>(static_cast<intptr_t>(_gi(2)));
+            gl3d_shader_set_mat4(_gp(0), _gs(1).c_str(), m); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_shader_set_int__") {
+            gl3d_shader_set_int(_gp(0), _gs(1).c_str(), _gi(2)); last_value = nullptr; return;
+        // Texture
+        } else if (fn == "__builtin_gl3d_texture_load__") {
+            void* h = gl3d_texture_load(_gs(0).c_str());
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_texture_solid__") {
+            void* h = gl3d_texture_solid((unsigned char)_gi(0),(unsigned char)_gi(1),(unsigned char)_gi(2));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_texture_destroy__") {
+            gl3d_texture_destroy(_gp(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_texture_bind__") {
+            gl3d_texture_bind(_gp(0), _gi(1)); last_value = nullptr; return;
+        // Math
+        } else if (fn == "__builtin_gl3d_mat4_identity__") {
+            float* m = gl3d_mat4_identity();
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+        } else if (fn == "__builtin_gl3d_mat4_perspective__") {
+            float* m = gl3d_mat4_perspective(_gf(0), _gf(1), _gf(2), _gf(3));
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+        } else if (fn == "__builtin_gl3d_mat4_lookat__") {
+            float* m = gl3d_mat4_lookat(_gf(0),_gf(1),_gf(2),_gf(3),_gf(4),_gf(5),_gf(6),_gf(7),_gf(8));
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+        } else if (fn == "__builtin_gl3d_mat4_translate__") {
+            float* m = gl3d_mat4_translate(_gf(0), _gf(1), _gf(2));
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+        } else if (fn == "__builtin_gl3d_mat4_scale__") {
+            float* m = gl3d_mat4_scale(_gf(0), _gf(1), _gf(2));
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+        } else if (fn == "__builtin_gl3d_mat4_rotate_y__") {
+            float* m = gl3d_mat4_rotate_y(_gf(0));
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+        } else if (fn == "__builtin_gl3d_mat4_rotate_x__") {
+            float* m = gl3d_mat4_rotate_x(_gf(0));
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+        } else if (fn == "__builtin_gl3d_mat4_rotate_z__") {
+            float* m = gl3d_mat4_rotate_z(_gf(0));
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+        } else if (fn == "__builtin_gl3d_mat4_mul__") {
+            float* a = reinterpret_cast<float*>(static_cast<intptr_t>(_gi(0)));
+            float* b = reinterpret_cast<float*>(static_cast<intptr_t>(_gi(1)));
+            float* m = gl3d_mat4_mul(a, b);
+            last_value = static_cast<int>(reinterpret_cast<intptr_t>(m)); return;
+        } else if (fn == "__builtin_gl3d_mat4_free__") {
+            float* m = reinterpret_cast<float*>(static_cast<intptr_t>(_gi(0)));
+            gl3d_mat4_free(m); last_value = nullptr; return;
+        // Render state
+        } else if (fn == "__builtin_gl3d_clear__") {
+            gl3d_clear(_gf(0), _gf(1), _gf(2)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_depth_test__") {
+            gl3d_depth_test(_gi(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_wireframe__") {
+            gl3d_wireframe(_gi(0)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_viewport__") {
+            gl3d_viewport(_gi(0), _gi(1), _gi(2), _gi(3)); last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_error__") {
+            last_value = std::string(gl3d_error()); return;
+        } else if (fn == "__builtin_gl3d_world4d_build__") {
+            // arg0: cam list (20 floats), arg1: cells list (ncells*4 floats), arg2: w_dist
+            std::vector<float> cam_data, cell_data;
+            auto list_to_floats = [](const Value& v, std::vector<float>& out) {
+                if (std::holds_alternative<std::shared_ptr<ArrayValue>>(v)) {
+                    for (auto& e : std::get<std::shared_ptr<ArrayValue>>(v)->elements) {
+                        if (std::holds_alternative<double>(e)) out.push_back((float)std::get<double>(e));
+                        else if (std::holds_alternative<int>(e)) out.push_back((float)std::get<int>(e));
+                        else out.push_back(0.f);
+                    }
+                }
+            };
+            list_to_floats(arguments[0], cam_data);
+            list_to_floats(arguments[1], cell_data);
+            while (cam_data.size() < 20) cam_data.push_back(0.f);
+            int ncells = (int)(cell_data.size() / 4);
+            void* h = gl3d_world4d_build(cam_data.data(), cell_data.data(), ncells, _gf(2));
+            last_value = h ? static_cast<int>(reinterpret_cast<intptr_t>(h)) : 0; return;
+        } else if (fn == "__builtin_gl3d_world4d_update__") {
+            std::vector<float> cam_data, cell_data;
+            auto list_to_floats = [](const Value& v, std::vector<float>& out) {
+                if (std::holds_alternative<std::shared_ptr<ArrayValue>>(v)) {
+                    for (auto& e : std::get<std::shared_ptr<ArrayValue>>(v)->elements) {
+                        if (std::holds_alternative<double>(e)) out.push_back((float)std::get<double>(e));
+                        else if (std::holds_alternative<int>(e)) out.push_back((float)std::get<int>(e));
+                        else out.push_back(0.f);
+                    }
+                }
+            };
+            list_to_floats(arguments[1], cam_data);
+            list_to_floats(arguments[2], cell_data);
+            while (cam_data.size() < 20) cam_data.push_back(0.f);
+            int ncells = (int)(cell_data.size() / 4);
+            gl3d_world4d_update(_gp(0), cam_data.data(), cell_data.data(), ncells, _gf(3));
+            last_value = nullptr; return;
+        } else if (fn == "__builtin_gl3d_car_step__") {
+            // args: state_list, input_list, heights_list, subdiv, tsize, hscale,
+            //       tree_xs_list, tree_zs_list, dt
+            auto lf = [](const Value& v, std::vector<float>& out) {
+                if (std::holds_alternative<std::shared_ptr<ArrayValue>>(v)) {
+                    for (auto& e : std::get<std::shared_ptr<ArrayValue>>(v)->elements) {
+                        if (std::holds_alternative<double>(e)) out.push_back((float)std::get<double>(e));
+                        else if (std::holds_alternative<int>(e)) out.push_back((float)std::get<int>(e));
+                        else out.push_back(0.f);
+                    }
+                }
+            };
+            std::vector<float> state, inp, hts, txs, tzs;
+            lf(arguments[0], state); while(state.size()<12) state.push_back(0.f);
+            lf(arguments[1], inp);   while(inp.size()<5)    inp.push_back(0.f);
+            lf(arguments[2], hts);
+            lf(arguments[6], txs);
+            lf(arguments[7], tzs);
+            int subdiv = std::holds_alternative<int>(arguments[3]) ? std::get<int>(arguments[3]) : (int)std::get<double>(arguments[3]);
+            float tsize  = std::holds_alternative<int>(arguments[4]) ? (float)std::get<int>(arguments[4]) : (float)std::get<double>(arguments[4]);
+            float hscale = std::holds_alternative<int>(arguments[5]) ? (float)std::get<int>(arguments[5]) : (float)std::get<double>(arguments[5]);
+            float dt_val = std::holds_alternative<int>(arguments[8]) ? (float)std::get<int>(arguments[8]) : (float)std::get<double>(arguments[8]);
+            int ntrees = (int)txs.size();
+            float out_state[12] = {};
+            gl3d_car_step(state.data(), inp.data(), hts.data(), subdiv, tsize, hscale,
+                          txs.data(), tzs.data(), ntrees, dt_val, out_state);
+            auto result = std::make_shared<ArrayValue>();
+            for (int i = 0; i < 12; i++) result->elements.push_back((double)out_state[i]);
+            last_value = result; return;
+        }
+    }
+
     // Milestone 14: OS Development
     if (std::holds_alternative<std::string>(callee) && (
         std::get<std::string>(callee).rfind("__builtin_boot_", 0) == 0 ||
@@ -7994,6 +8294,11 @@ void Interpreter::visitIndexExpr(IndexExpr& expr) {
     if (std::holds_alternative<std::shared_ptr<ArrayValue>>(object)) {
         auto array = std::get<std::shared_ptr<ArrayValue>>(object);
         
+        // Auto-coerce whole-number doubles to int (e.g. from math_floor result)
+        if (std::holds_alternative<double>(index)) {
+            double d = std::get<double>(index);
+            index = static_cast<int>(d);
+        }
         if (!std::holds_alternative<int>(index)) {
             throw TypeError("Array index must be an integer");
         }
@@ -8251,6 +8556,10 @@ void Interpreter::visitIndexAssignExpr(IndexAssignExpr& expr) {
     if (std::holds_alternative<std::shared_ptr<ArrayValue>>(object)) {
         auto array = std::get<std::shared_ptr<ArrayValue>>(object);
         
+        // Auto-coerce whole-number doubles to int
+        if (std::holds_alternative<double>(index)) {
+            index = static_cast<int>(std::get<double>(index));
+        }
         if (std::holds_alternative<int>(index)) {
             int idx = std::get<int>(index);
             if (idx >= 0 && idx < static_cast<int>(array->elements.size())) {
@@ -8373,6 +8682,38 @@ void Interpreter::visitFunctionDecl(FunctionDecl& stmt) {
                 
                 // Mark function as deprecated
                 f->name = "__deprecated__" + f->name + "__" + message;
+                continue;
+            }
+
+            if (builtin_name == "__builtin_constexpr__") {
+                // Evaluate the function immediately with no arguments and store the result value.
+                // The name is then bound to the computed value, not the function.
+                if (!std::holds_alternative<std::shared_ptr<Function>>(decorated_func)) {
+                    throw RuntimeError("@constexpr can only be applied to functions");
+                }
+                auto f = std::get<std::shared_ptr<Function>>(decorated_func);
+                auto fn_env = std::make_shared<Environment>(f->closure);
+                auto saved_env = environment;
+                environment = fn_env;
+                Value result = nullptr;
+                try {
+                    for (auto& s : *f->getBody()) s->accept(*this);
+                } catch (const ReturnException& ret) {
+                    result = ret.value;
+                }
+                environment = saved_env;
+                // Replace the function with its computed value
+                decorated_func = result;
+                continue;
+            }
+
+            if (builtin_name == "__builtin_singleton__") {
+                // Wrap the function so it only ever creates one instance.
+                if (!std::holds_alternative<std::shared_ptr<Function>>(decorated_func)) {
+                    throw RuntimeError("@singleton can only be applied to functions");
+                }
+                auto f = std::get<std::shared_ptr<Function>>(decorated_func);
+                f->name = "__singleton__" + f->name;
                 continue;
             }
         }
@@ -8583,9 +8924,9 @@ void Interpreter::visitClassDecl(ClassDecl& stmt) {
         }
     }
     
-    // For @singleton, print note
+    // For @singleton on a class, note it — instance caching is handled at call site
     if (is_singleton) {
-        std::cout << "Note: @singleton on '" << stmt.name << "' - requires advanced memory management (deferred)" << std::endl;
+        // No-op here; the __singleton__ prefix on the constructor handles it
     }
     
     // Map methods by name
@@ -8673,6 +9014,10 @@ void Interpreter::visitImportStmt(ImportStmt& stmt) {
         environment->define("math_round", std::string("__builtin_math_round__"));
         environment->define("math_pi", std::string("__builtin_math_pi__"));
         environment->define("math_e", std::string("__builtin_math_e__"));
+        environment->define("math_atan2", std::string("__builtin_math_atan2__"));
+        environment->define("math_clamp", std::string("__builtin_math_clamp__"));
+        environment->define("math_min",   std::string("__builtin_math_min__"));
+        environment->define("math_max",   std::string("__builtin_math_max__"));
     }
 
     // Milestone 1: CSV I/O
@@ -10010,6 +10355,67 @@ void Interpreter::visitImportStmt(ImportStmt& stmt) {
         return;
     }
 
+    // gl3d: OpenGL 3D engine
+    if (mod == "gl3d") {
+        environment->define("gl3d_window_create",       std::string("__builtin_gl3d_window_create__"));
+        environment->define("gl3d_window_destroy",      std::string("__builtin_gl3d_window_destroy__"));
+        environment->define("gl3d_window_poll",         std::string("__builtin_gl3d_window_poll__"));
+        environment->define("gl3d_window_swap",         std::string("__builtin_gl3d_window_swap__"));
+        environment->define("gl3d_window_set_title",    std::string("__builtin_gl3d_window_set_title__"));
+        environment->define("gl3d_window_width",        std::string("__builtin_gl3d_window_width__"));
+        environment->define("gl3d_window_height",       std::string("__builtin_gl3d_window_height__"));
+        environment->define("gl3d_key",                 std::string("__builtin_gl3d_key__"));
+        environment->define("gl3d_key_pressed",         std::string("__builtin_gl3d_key_pressed__"));
+        environment->define("gl3d_mouse_dx",            std::string("__builtin_gl3d_mouse_dx__"));
+        environment->define("gl3d_mouse_dy",            std::string("__builtin_gl3d_mouse_dy__"));
+        environment->define("gl3d_mouse_capture",       std::string("__builtin_gl3d_mouse_capture__"));
+        environment->define("gl3d_delta",               std::string("__builtin_gl3d_delta__"));
+        environment->define("gl3d_time",                std::string("__builtin_gl3d_time__"));
+        environment->define("gl3d_mesh_create",         std::string("__builtin_gl3d_mesh_create__"));
+        environment->define("gl3d_mesh_destroy",        std::string("__builtin_gl3d_mesh_destroy__"));
+        environment->define("gl3d_mesh_draw",           std::string("__builtin_gl3d_mesh_draw__"));
+        environment->define("gl3d_mesh_box",            std::string("__builtin_gl3d_mesh_box__"));
+        environment->define("gl3d_mesh_plane",          std::string("__builtin_gl3d_mesh_plane__"));
+        environment->define("gl3d_mesh_sphere",         std::string("__builtin_gl3d_mesh_sphere__"));
+        environment->define("gl3d_mesh_cylinder",       std::string("__builtin_gl3d_mesh_cylinder__"));
+        environment->define("gl3d_mesh_terrain",        std::string("__builtin_gl3d_mesh_terrain__"));
+        environment->define("gl3d_mesh_lines_create",   std::string("__builtin_gl3d_mesh_lines_create__"));
+        environment->define("gl3d_mesh_lines_update",   std::string("__builtin_gl3d_mesh_lines_update__"));
+        environment->define("gl3d_mesh_lines_draw",     std::string("__builtin_gl3d_mesh_lines_draw__"));
+        environment->define("gl3d_mesh_lines_destroy",  std::string("__builtin_gl3d_mesh_lines_destroy__"));
+        environment->define("gl3d_shader_create",       std::string("__builtin_gl3d_shader_create__"));
+        environment->define("gl3d_shader_destroy",      std::string("__builtin_gl3d_shader_destroy__"));
+        environment->define("gl3d_shader_use",          std::string("__builtin_gl3d_shader_use__"));
+        environment->define("gl3d_shader_set_float",    std::string("__builtin_gl3d_shader_set_float__"));
+        environment->define("gl3d_shader_set_vec3",     std::string("__builtin_gl3d_shader_set_vec3__"));
+        environment->define("gl3d_shader_set_vec4",     std::string("__builtin_gl3d_shader_set_vec4__"));
+        environment->define("gl3d_shader_set_mat4",     std::string("__builtin_gl3d_shader_set_mat4__"));
+        environment->define("gl3d_shader_set_int",      std::string("__builtin_gl3d_shader_set_int__"));
+        environment->define("gl3d_texture_load",        std::string("__builtin_gl3d_texture_load__"));
+        environment->define("gl3d_texture_solid",       std::string("__builtin_gl3d_texture_solid__"));
+        environment->define("gl3d_texture_destroy",     std::string("__builtin_gl3d_texture_destroy__"));
+        environment->define("gl3d_texture_bind",        std::string("__builtin_gl3d_texture_bind__"));
+        environment->define("gl3d_mat4_identity",       std::string("__builtin_gl3d_mat4_identity__"));
+        environment->define("gl3d_mat4_perspective",    std::string("__builtin_gl3d_mat4_perspective__"));
+        environment->define("gl3d_mat4_lookat",         std::string("__builtin_gl3d_mat4_lookat__"));
+        environment->define("gl3d_mat4_translate",      std::string("__builtin_gl3d_mat4_translate__"));
+        environment->define("gl3d_mat4_scale",          std::string("__builtin_gl3d_mat4_scale__"));
+        environment->define("gl3d_mat4_rotate_y",       std::string("__builtin_gl3d_mat4_rotate_y__"));
+        environment->define("gl3d_mat4_rotate_x",       std::string("__builtin_gl3d_mat4_rotate_x__"));
+        environment->define("gl3d_mat4_rotate_z",       std::string("__builtin_gl3d_mat4_rotate_z__"));
+        environment->define("gl3d_mat4_mul",            std::string("__builtin_gl3d_mat4_mul__"));
+        environment->define("gl3d_mat4_free",           std::string("__builtin_gl3d_mat4_free__"));
+        environment->define("gl3d_clear",               std::string("__builtin_gl3d_clear__"));
+        environment->define("gl3d_depth_test",          std::string("__builtin_gl3d_depth_test__"));
+        environment->define("gl3d_wireframe",           std::string("__builtin_gl3d_wireframe__"));
+        environment->define("gl3d_viewport",            std::string("__builtin_gl3d_viewport__"));
+        environment->define("gl3d_error",               std::string("__builtin_gl3d_error__"));
+        environment->define("gl3d_world4d_build",       std::string("__builtin_gl3d_world4d_build__"));
+        environment->define("gl3d_world4d_update",      std::string("__builtin_gl3d_world4d_update__"));
+        environment->define("gl3d_car_step",            std::string("__builtin_gl3d_car_step__"));
+        return;
+    }
+
     // Milestone 13: shader
     if (mod == "shader") {
         environment->define("shader_create",                std::string("__builtin_shader_create__"));
@@ -10771,16 +11177,46 @@ void Interpreter::visitSelectStmt(SelectStmt& stmt) {
     }
 }
 
-// Go statement implementation: spawn a goroutine
+// Go statement implementation: spawn a real goroutine thread
 void Interpreter::visitGoStmt(GoStmt& stmt) {
-    // For now, execute immediately (synchronous)
-    // In a full implementation, this would spawn a real thread or add to a thread pool
-    
-    // Execute the function call immediately
-    stmt.call->accept(*this);
-    
-    // Alternative: Add to task queue for later execution
-    // This would require a more sophisticated scheduler
+    // Capture the call expression arguments eagerly (evaluate in current thread)
+    // then dispatch to a new thread
+    std::string func_name;
+    std::vector<Value> arg_values;
+
+    // Evaluate callee name
+    if (auto* var = dynamic_cast<VariableExpr*>(stmt.call->callee.get())) {
+        func_name = var->name;
+    }
+
+    // Evaluate arguments in the calling thread
+    for (auto& arg : stmt.call->arguments) {
+        arg_values.push_back(evaluateExpr(*arg));
+    }
+
+    // Capture what we need for the thread
+    auto env_snapshot = environment;
+    auto self = this;
+
+    std::lock_guard<std::mutex> lock(goroutine_mutex_);
+    goroutine_threads_.emplace_back([self, func_name, arg_values, env_snapshot]() mutable {
+        try {
+            Value callee = env_snapshot->get(func_name);
+            if (std::holds_alternative<std::shared_ptr<Function>>(callee)) {
+                auto fn = std::get<std::shared_ptr<Function>>(callee);
+                auto fn_env = std::make_shared<Environment>(fn->closure);
+                for (size_t i = 0; i < fn->params.size() && i < arg_values.size(); i++) {
+                    fn_env->define(fn->params[i], arg_values[i]);
+                }
+                // Create a lightweight interpreter for this goroutine
+                Interpreter goroutine_interp;
+                goroutine_interp.environment = fn_env;
+                goroutine_interp.interpret(*fn->getBody());
+            }
+        } catch (...) {
+            // Goroutine errors are silently swallowed (like Go)
+        }
+    });
 }
 
 // Execute all pending tasks
@@ -10789,6 +11225,14 @@ void Interpreter::executePendingTasks() {
         auto task = std::move(pending_tasks.front());
         pending_tasks.erase(pending_tasks.begin());
         task();
+    }
+}
+
+// Destructor — join all goroutine threads
+Interpreter::~Interpreter() {
+    std::lock_guard<std::mutex> lock(goroutine_mutex_);
+    for (auto& t : goroutine_threads_) {
+        if (t.joinable()) t.join();
     }
 }
 
@@ -10852,7 +11296,21 @@ void Interpreter::visitMatchExpr(MatchExpr& expr) {
         return;
     }
     
-    // No pattern matched
+    // No pattern matched — check if any arm had a wildcard (exhaustiveness check)
+    bool has_wildcard = false;
+    for (auto& arm : expr.arms) {
+        for (auto& pat : arm.patterns) {
+            if (pat->type == Pattern::Type::WILDCARD ||
+                pat->type == Pattern::Type::VARIABLE) {
+                has_wildcard = true;
+                break;
+            }
+        }
+        if (has_wildcard) break;
+    }
+    if (!has_wildcard) {
+        std::cerr << "warning[W001]: non-exhaustive match — add a wildcard arm '_ => ...' to handle all cases\n";
+    }
     throw std::runtime_error("Non-exhaustive pattern match");
 }
 

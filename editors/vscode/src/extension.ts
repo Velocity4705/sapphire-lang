@@ -18,7 +18,7 @@ export function activate(context: ExtensionContext) {
     
     if (lspEnabled) {
         // Path to LSP server executable
-        const lspPath = config.get<string>('lsp.path', 'sapphire-lsp');
+    const lspPath = config.get<string>('lsp.path', '/usr/local/bin/sapphire-lsp');
         
         // Server options
         const serverOptions: ServerOptions = {

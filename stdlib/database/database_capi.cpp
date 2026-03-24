@@ -20,16 +20,48 @@ struct FieldList { std::vector<ModelField> fields; };
 extern "C" {
 
 // ===== Connection =====
-void* db_open_c(const char* driver, const char* database,
-                const char* host, const char* user,
-                int port, const char* password) {
+// Accepts a connection string: "driver://user:pass@host:port/database" or just "sqlite::memory:"
+void* db_open_c(const char* conn_string) {
     ConnConfig cfg;
-    cfg.driver   = driver   ? driver   : "sqlite";
-    cfg.database = database ? database : ":memory:";
-    cfg.host     = host     ? host     : "localhost";
-    cfg.username = user     ? user     : "";
-    cfg.password = password ? password : "";
-    cfg.port     = port;
+    std::string cs = conn_string ? conn_string : "sqlite::memory:";
+    // Parse driver prefix
+    auto sep = cs.find("://");
+    if (sep != std::string::npos) {
+        cfg.driver = cs.substr(0, sep);
+        std::string rest = cs.substr(sep + 3);
+        // user:pass@host:port/database
+        auto at = rest.find('@');
+        if (at != std::string::npos) {
+            std::string userpass = rest.substr(0, at);
+            rest = rest.substr(at + 1);
+            auto colon = userpass.find(':');
+            if (colon != std::string::npos) {
+                cfg.username = userpass.substr(0, colon);
+                cfg.password = userpass.substr(colon + 1);
+            } else {
+                cfg.username = userpass;
+            }
+        }
+        auto slash = rest.find('/');
+        if (slash != std::string::npos) {
+            std::string hostport = rest.substr(0, slash);
+            cfg.database = rest.substr(slash + 1);
+            auto colon = hostport.find(':');
+            if (colon != std::string::npos) {
+                cfg.host = hostport.substr(0, colon);
+                try { cfg.port = std::stoi(hostport.substr(colon + 1)); } catch(...) {}
+            } else {
+                cfg.host = hostport;
+            }
+        } else {
+            cfg.database = rest;
+        }
+    } else {
+        // Plain path — treat as sqlite file
+        cfg.driver = "sqlite";
+        cfg.database = cs;
+    }
+    if (cfg.host.empty()) cfg.host = "localhost";
     return db_connect(cfg);
 }
 void db_close_c(void* db) { db_disconnect(static_cast<Connection*>(db)); }

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Reference — Sapphire 💎</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #4d9fff;
+            --blue: #1a56db;
+            --blue-deep: #0f2d8a;
+            --dark: #050a18;
+            --darker: #020510;
+            --card: #070d1f;
+            --text: #e8f0ff;
+            --text-dim: #90b8ff;
+            --text-muted: #3a5899;
+            --border: #0f1e4a;
+            --red: #ff4d6a;
+            --green: #4dffb4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        /* ── Nav ── */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(2,5,16,0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+        .nav-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: flex; align-items: center; gap: 1.5rem;
+            height: 56px;
+        }
+        .nav-inner a { color: var(--text-dim); text-decoration: none; font-size: .9rem; }
+        .nav-inner a:hover { color: var(--cyan); }
+        .nav-home { display: flex; align-items: center; gap: .5rem; font-weight: 600; color: var(--text) !important; }
+        .nav-home img { width: 22px; height: 22px; }
+        .nav-sep { color: var(--text-muted); }
+        .nav-title { color: var(--cyan) !important; font-weight: 600; }
+        /* ── Layout ── */
+        .layout {
+            max-width: 1100px; margin: 0 auto;
+            display: grid; grid-template-columns: 220px 1fr;
+            gap: 2.5rem; padding: 2.5rem 2rem 4rem;
+        }
+        /* ── Sidebar ── */
+        .sidebar { position: sticky; top: 72px; align-self: start; }
+        .sidebar h3 {
+            font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted);
+            margin-bottom: .75rem; padding-bottom: .4rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar ul { list-style: none; margin-bottom: 1.5rem; }
+        .sidebar ul li a {
+            display: flex; align-items: center; gap: .5rem;
+            padding: .3rem .5rem; border-radius: 6px;
+            color: var(--text-dim); text-decoration: none; font-size: .85rem;
+            transition: background .15s, color .15s;
+        }
+        .sidebar ul li a:hover { background: rgba(77,159,255,.08); color: var(--cyan); }
+        .sidebar ul li a .badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .72rem; color: var(--cyan);
+            background: rgba(77,159,255,.1); border-radius: 4px;
+            padding: 1px 5px;
+        }
+        /* ── Main content ── */
+        .content h1 {
+            font-size: 2rem; font-weight: 800;
+            background: linear-gradient(90deg, var(--cyan), var(--blue));
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: .5rem;
+        }
+        .content .subtitle {
+            color: var(--text-dim); font-size: 1rem; margin-bottom: 2rem;
+        }
+        .tip {
+            background: rgba(77,159,255,.07); border: 1px solid rgba(77,159,255,.2);
+            border-radius: 8px; padding: .75rem 1rem;
+            font-size: .85rem; color: var(--text-dim); margin-bottom: 2.5rem;
+        }
+        .tip code {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--cyan); background: rgba(77,159,255,.1);
+            padding: 1px 6px; border-radius: 4px;
+        }
+        /* ── Category header ── */
+        .cat-header {
+            display: flex; align-items: center; gap: .75rem;
+            margin: 2.5rem 0 1.25rem;
+        }
+        .cat-header h2 { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+        .cat-tag {
+            font-family: 'JetBrains Mono', monospace; font-size: .8rem;
+            background: rgba(77,159,255,.12); color: var(--cyan);
+            border: 1px solid rgba(77,159,255,.25); border-radius: 6px;
+            padding: 2px 8px;
+        }
+        /* ── Error card ── */
+        .error-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem; scroll-margin-top: 80px;
+        }
+        .error-card:hover { border-color: rgba(77,159,255,.3); }
+        .error-card .ec-head {
+            display: flex; align-items: center; gap: .75rem; margin-bottom: .6rem;
+        }
+        .ec-code {
+            font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+            font-weight: 600; color: var(--cyan);
+            background: rgba(77,159,255,.1); border-radius: 6px;
+            padding: 2px 8px; border: 1px solid rgba(77,159,255,.2);
+        }
+        .ec-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+        .ec-note {
+            font-size: .85rem; color: var(--text-dim);
+            background: rgba(77,159,255,.05); border-left: 3px solid var(--blue);
+            padding: .4rem .75rem; border-radius: 0 6px 6px 0;
+            margin-bottom: .75rem;
+        }
+        .ec-note strong { color: var(--cyan); }
+        pre {
+            background: #030814; border: 1px solid var(--border);
+            border-radius: 8px; padding: .9rem 1rem;
+            font-family: 'JetBrains Mono', monospace; font-size: .8rem;
+            color: #c8d8ff; overflow-x: auto; margin-bottom: .5rem;
+        }
+        pre .comment { color: var(--text-muted); }
+        pre .bad { color: var(--red); }
+        pre .good { color: var(--green); }
+        /* ── Table ── */
+        .range-table {
+            width: 100%; border-collapse: collapse;
+            font-size: .85rem; margin-bottom: 2rem;
+        }
+        .range-table th {
+            text-align: left; padding: .5rem .75rem;
+            color: var(--text-muted); font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+        .range-table td { padding: .45rem .75rem; border-bottom: 1px solid rgba(15,30,74,.5); }
+        .range-table td:first-child {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--cyan); font-size: .8rem;
+        }
+        @media (max-width: 700px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <div class="nav-inner">
+        <a href="../index.html" class="nav-home">
+            <img src="../sapphire-icon.svg" alt="Sapphire">
+            Sapphire
+        </a>
+        <span class="nav-sep">/</span>
+        <span class="nav-title">Error Reference</span>
+    </div>
+</nav>
+
+<div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h3>Categories</h3>
+        <ul>
+            <li><a href="#E1xx"><span class="badge">E1xx</span> Syntax</a></li>
+            <li><a href="#E2xx"><span class="badge">E2xx</span> Name</a></li>
+            <li><a href="#E3xx"><span class="badge">E3xx</span> Type</a></li>
+            <li><a href="#E4xx"><span class="badge">E4xx</span> Runtime</a></li>
+            <li><a href="#E5xx"><span class="badge">E5xx</span> Import</a></li>
+            <li><a href="#E6xx"><span class="badge">E6xx</span> IO</a></li>
+            <li><a href="#E7xx"><span class="badge">E7xx</span> Value</a></li>
+        </ul>
+        <h3>All Codes</h3>
+        <ul>
+            <li><a href="#E1A0"><span class="badge">E1A0</span> unexpected token</a></li>
+            <li><a href="#E1A1"><span class="badge">E1A1</span> expected expression</a></li>
+            <li><a href="#E1A2"><span class="badge">E1A2</span> invalid indentation</a></li>
+            <li><a href="#E1A3"><span class="badge">E1A3</span> unterminated string</a></li>
+            <li><a href="#E1A4"><span class="badge">E1A4</span> invalid decorator</a></li>
+            <li><a href="#E1A5"><span class="badge">E1A5</span> missing colon</a></li>
+            <li><a href="#E1A6"><span class="badge">E1A6</span> invalid assignment</a></li>
+            <li><a href="#E1A7"><span class="badge">E1A7</span> body not indented</a></li>
+            <li><a href="#E2A0"><span class="badge">E2A0</span> undefined variable</a></li>
+            <li><a href="#E2A1"><span class="badge">E2A1</span> undefined function</a></li>
+            <li><a href="#E2A2"><span class="badge">E2A2</span> undefined module</a></li>
+            <li><a href="#E2A3"><span class="badge">E2A3</span> attribute not found</a></li>
+            <li><a href="#E3A0"><span class="badge">E3A0</span> type mismatch</a></li>
+            <li><a href="#E3A1"><span class="badge">E3A1</span> unsupported operands</a></li>
+            <li><a href="#E3A2"><span class="badge">E3A2</span> not callable</a></li>
+            <li><a href="#E3A3"><span class="badge">E3A3</span> not iterable</a></li>
+            <li><a href="#E3A4"><span class="badge">E3A4</span> not subscriptable</a></li>
+            <li><a href="#E4A0"><span class="badge">E4A0</span> index out of bounds</a></li>
+            <li><a href="#E4A1"><span class="badge">E4A1</span> division by zero</a></li>
+            <li><a href="#E4A2"><span class="badge">E4A2</span> assertion failed</a></li>
+            <li><a href="#E4A3"><span class="badge">E4A3</span> null dereference</a></li>
+            <li><a href="#E4A4"><span class="badge">E4A4</span> stack overflow</a></li>
+            <li><a href="#E5A0"><span class="badge">E5A0</span> module not found</a></li>
+            <li><a href="#E5A1"><span class="badge">E5A1</span> circular import</a></li>
+            <li><a href="#E6A0"><span class="badge">E6A0</span> file not found</a></li>
+            <li><a href="#E6A1"><span class="badge">E6A1</span> permission denied</a></li>
+            <li><a href="#E7A0"><span class="badge">E7A0</span> invalid argument</a></li>
+            <li><a href="#E7A1"><span class="badge">E7A1</span> argument count</a></li>
+            <li><a href="#E7A2"><span class="badge">E7A2</span> value out of range</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main -->
+    <main class="content">
+        <h1>Error Reference</h1>
+        <p class="subtitle">All 28 Sapphire error codes with causes, examples, and fixes.</p>
+        <div class="tip">
+            Run <code>sapp --explain &lt;code&gt;</code> in your terminal for a quick inline summary of any error.
+        </div>
+
+        <table class="range-table">
+            <tr><th>Range</th><th>Category</th><th>Codes</th></tr>
+            <tr><td>E1xx</td><td>Syntax</td><td>E1A0 – E1A7 (8 codes)</td></tr>
+            <tr><td>E2xx</td><td>Name</td><td>E2A0 – E2A3 (4 codes)</td></tr>
+            <tr><td>E3xx</td><td>Type</td><td>E3A0 – E3A4 (5 codes)</td></tr>
+            <tr><td>E4xx</td><td>Runtime</td><td>E4A0 – E4A4 (5 codes)</td></tr>
+            <tr><td>E5xx</td><td>Import</td><td>E5A0 – E5A1 (2 codes)</td></tr>
+            <tr><td>E6xx</td><td>IO</td><td>E6A0 – E6A1 (2 codes)</td></tr>
+            <tr><td>E7xx</td><td>Value</td><td>E7A0 – E7A2 (3 codes)</td></tr>
+        </table>
+
+        <!-- ── E1xx Syntax ── -->
+        <div class="cat-header" id="E1xx">
+            <span class="cat-tag">E1xx</span>
+            <h2>Syntax</h2>
+        </div>
+
+        <div class="error-card" id="E1A0">
+            <div class="ec-head"><span class="ec-code">E1A0</span><span class="ec-title">unexpected token</span></div>
+            <div class="ec-note"><strong>note:</strong> check for missing colons, parentheses, or mismatched brackets</div>
+            <pre><span class="comment"># bad</span>
+<span class="bad">if x > 0</span>
+    print("yes")
+
+<span class="comment"># fix</span>
+<span class="good">if x > 0:</span>
+    print("yes")</pre>
+        </div>
+
+        <div class="error-card" id="E1A1">
+            <div class="ec-head"><span class="ec-code">E1A1</span><span class="ec-title">expected expression</span></div>
+            <div class="ec-note"><strong>note:</strong> an expression (value, variable, or function call) was expected here</div>
+            <pre><span class="comment"># bad</span>
+<span class="bad">x = +</span>
+
+<span class="comment"># fix</span>
+<span class="good">x = 1 + 2</span></pre>
+        </div>
+
+        <div class="error-card" id="E1A2">
+            <div class="ec-head"><span class="ec-code">E1A2</span><span class="ec-title">invalid indentation</span></div>
+            <div class="ec-note"><strong>note:</strong> Sapphire uses 4-space indentation — check for mixed tabs/spaces</div>
+            <pre><span class="comment"># bad — tab used</span>
+fn greet():
+<span class="bad">	print("hi")</span>
+
+<span class="comment"># fix — 4 spaces</span>
+fn greet():
+<span class="good">    print("hi")</span></pre>
+        </div>
+
+        <div class="error-card" id="E1A3">
+            <div class="ec-head"><span class="ec-code">E1A3</span><span class="ec-title">unterminated string</span></div>
+            <div class="ec-note"><strong>note:</strong> add a closing quote to end the string literal</div>
+            <pre><span class="bad">name = "Alice</span>   <span class="comment"># missing closing "</span>
+<span class="good">name = "Alice"</span></pre>
+        </div>
+
+        <div class="error-card" id="E1A4">
+            <div class="ec-head"><span class="ec-code">E1A4</span><span class="ec-title">invalid decorator placement</span></div>
+            <div class="ec-note"><strong>note:</strong> decorators can only be applied to functions and classes</div>
+            <pre><span class="bad">@cached
+x = 10</span>
+
+<span class="comment"># fix</span>
+<span class="good">@cached
+fn compute():
+    ...</span></pre>
+        </div>
+
+        <div class="error-card" id="E1A5">
+            <div class="ec-head"><span class="ec-code">E1A5</span><span class="ec-title">missing colon</span></div>
+            <div class="ec-note"><strong>note:</strong> fn, class, if, for, and while bodies must end with ':'</div>
+            <pre><span class="bad">fn add(a, b)</span>
+    return a + b
+
+<span class="good">fn add(a, b):</span>
+    return a + b</pre>
+        </div>
+
+        <div class="error-card" id="E1A6">
+            <div class="ec-head"><span class="ec-code">E1A6</span><span class="ec-title">invalid assignment target</span></div>
+            <div class="ec-note"><strong>note:</strong> only variables and subscript expressions can be assigned to</div>
+            <pre><span class="bad">1 = x</span>
+<span class="good">x = 1</span></pre>
+        </div>
+
+        <div class="error-card" id="E1A7">
+            <div class="ec-head"><span class="ec-code">E1A7</span><span class="ec-title">body must be indented on the next line</span></div>
+            <div class="ec-note"><strong>note:</strong> Sapphire does not allow single-line bodies — put the body on the next line, indented. Applies to <code>fn</code>, <code>class</code>, <code>if</code>, <code>while</code>, and <code>for</code>.</div>
+            <pre><span class="bad">if x > 0: print("yes")</span>
+
+<span class="good">if x > 0:
+    print("yes")</span></pre>
+        </div>
+
+        <!-- ── E2xx Name ── -->
+        <div class="cat-header" id="E2xx">
+            <span class="cat-tag">E2xx</span>
+            <h2>Name</h2>
+        </div>
+
+        <div class="error-card" id="E2A0">
+            <div class="ec-head"><span class="ec-code">E2A0</span><span class="ec-title">undefined variable</span></div>
+            <div class="ec-note"><strong>note:</strong> check the spelling, or make sure the variable is defined before use</div>
+            <pre><span class="bad">print(count)</span>   <span class="comment"># count not defined</span>
+
+<span class="good">count = 0
+print(count)</span></pre>
+        </div>
+
+        <div class="error-card" id="E2A1">
+            <div class="ec-head"><span class="ec-code">E2A1</span><span class="ec-title">undefined function</span></div>
+            <div class="ec-note"><strong>note:</strong> check the function name, or make sure the module is imported</div>
+            <pre><span class="bad">result = sqrt(16)</span>
+
+<span class="good">import math
+result = math.sqrt(16)</span></pre>
+        </div>
+
+        <div class="error-card" id="E2A2">
+            <div class="ec-head"><span class="ec-code">E2A2</span><span class="ec-title">undefined module</span></div>
+            <div class="ec-note"><strong>note:</strong> check the module name — use 'import &lt;module&gt;' at the top of the file</div>
+            <pre><span class="bad">import mathz</span>   <span class="comment"># typo</span>
+<span class="good">import math</span></pre>
+        </div>
+
+        <div class="error-card" id="E2A3">
+            <div class="ec-head"><span class="ec-code">E2A3</span><span class="ec-title">attribute not found</span></div>
+            <div class="ec-note"><strong>note:</strong> check the attribute name, or verify the object type</div>
+            <pre><span class="bad">x = 42
+x.append(1)</span>   <span class="comment"># int has no append</span>
+
+<span class="good">items = []
+items.append(1)</span></pre>
+        </div>
+
+        <!-- ── E3xx Type ── -->
+        <div class="cat-header" id="E3xx">
+            <span class="cat-tag">E3xx</span>
+            <h2>Type</h2>
+        </div>
+
+        <div class="error-card" id="E3A0">
+            <div class="ec-head"><span class="ec-code">E3A0</span><span class="ec-title">type mismatch</span></div>
+            <div class="ec-note"><strong>note:</strong> the value type does not match what was expected</div>
+            <pre><span class="bad">x = "hello" + 5</span>
+<span class="good">x = "hello" + str(5)</span></pre>
+        </div>
+
+        <div class="error-card" id="E3A1">
+            <div class="ec-head"><span class="ec-code">E3A1</span><span class="ec-title">unsupported operand types</span></div>
+            <div class="ec-note"><strong>note:</strong> this operator cannot be used with these types</div>
+            <pre><span class="bad">result = [1, 2] * [3, 4]</span>
+<span class="good">result = [1, 2] + [3, 4]</span>   <span class="comment"># concatenation</span></pre>
+        </div>
+
+        <div class="error-card" id="E3A2">
+            <div class="ec-head"><span class="ec-code">E3A2</span><span class="ec-title">not callable</span></div>
+            <div class="ec-note"><strong>note:</strong> only functions and classes can be called with ()</div>
+            <pre><span class="bad">x = 42
+x()</span>
+
+<span class="good">fn greet():
+    print("hi")
+greet()</span></pre>
+        </div>
+
+        <div class="error-card" id="E3A3">
+            <div class="ec-head"><span class="ec-code">E3A3</span><span class="ec-title">not iterable</span></div>
+            <div class="ec-note"><strong>note:</strong> for loops require a list, string, range, or other iterable</div>
+            <pre><span class="bad">for i in 42:</span>
+    print(i)
+
+<span class="good">for i in range(42):</span>
+    print(i)</pre>
+        </div>
+
+        <div class="error-card" id="E3A4">
+            <div class="ec-head"><span class="ec-code">E3A4</span><span class="ec-title">not subscriptable</span></div>
+            <div class="ec-note"><strong>note:</strong> only lists, strings, and dicts support [] indexing</div>
+            <pre><span class="bad">x = 42
+print(x[0])</span>
+
+<span class="good">items = [42]
+print(items[0])</span></pre>
+        </div>
+
+        <!-- ── E4xx Runtime ── -->
+        <div class="cat-header" id="E4xx">
+            <span class="cat-tag">E4xx</span>
+            <h2>Runtime</h2>
+        </div>
+
+        <div class="error-card" id="E4A0">
+            <div class="ec-head"><span class="ec-code">E4A0</span><span class="ec-title">index out of bounds</span></div>
+            <div class="ec-note"><strong>note:</strong> the index is outside the valid range — check the list length first</div>
+            <pre><span class="bad">items = [1, 2, 3]
+print(items[5])</span>
+
+<span class="good">if 5 &lt; len(items):
+    print(items[5])</span></pre>
+        </div>
+
+        <div class="error-card" id="E4A1">
+            <div class="ec-head"><span class="ec-code">E4A1</span><span class="ec-title">division by zero</span></div>
+            <div class="ec-note"><strong>note:</strong> the divisor evaluated to zero — add a check before dividing</div>
+            <pre><span class="bad">result = 10 / 0</span>
+
+<span class="good">divisor = 4
+if divisor != 0:
+    result = 10 / divisor</span></pre>
+        </div>
+
+        <div class="error-card" id="E4A2">
+            <div class="ec-head"><span class="ec-code">E4A2</span><span class="ec-title">assertion failed</span></div>
+            <div class="ec-note"><strong>note:</strong> an assert() condition was false — check the logic being asserted</div>
+            <pre><span class="bad">assert(1 == 2)</span>
+<span class="good">assert(len(items) > 0)</span></pre>
+        </div>
+
+        <div class="error-card" id="E4A3">
+            <div class="ec-head"><span class="ec-code">E4A3</span><span class="ec-title">null dereference</span></div>
+            <div class="ec-note"><strong>note:</strong> the value is 'none' — check for none before accessing it</div>
+            <pre><span class="bad">x = none
+print(x.name)</span>
+
+<span class="good">if x != none:
+    print(x.name)</span></pre>
+        </div>
+
+        <div class="error-card" id="E4A4">
+            <div class="ec-head"><span class="ec-code">E4A4</span><span class="ec-title">stack overflow</span></div>
+            <div class="ec-note"><strong>note:</strong> infinite or deeply recursive function — check your base case</div>
+            <pre><span class="bad">fn count(n):
+    return count(n - 1)</span>   <span class="comment"># no base case</span>
+
+<span class="good">fn count(n):
+    if n &lt;= 0:
+        return 0
+    return count(n - 1)</span></pre>
+        </div>
+
+        <!-- ── E5xx Import ── -->
+        <div class="cat-header" id="E5xx">
+            <span class="cat-tag">E5xx</span>
+            <h2>Import</h2>
+        </div>
+
+        <div class="error-card" id="E5A0">
+            <div class="ec-head"><span class="ec-code">E5A0</span><span class="ec-title">module not found</span></div>
+            <div class="ec-note"><strong>note:</strong> check the module name spelling and that it is installed</div>
+            <pre><span class="bad">import nonexistent_module</span>
+
+<span class="good">import math
+import json
+import http</span></pre>
+        </div>
+
+        <div class="error-card" id="E5A1">
+            <div class="ec-head"><span class="ec-code">E5A1</span><span class="ec-title">circular import</span></div>
+            <div class="ec-note"><strong>note:</strong> two modules are importing each other — restructure to break the cycle</div>
+            <pre><span class="comment"># a.spp imports b.spp
+# b.spp imports a.spp  ← cycle
+
+# fix: extract shared code into c.spp
+# both a.spp and b.spp import c.spp</span></pre>
+        </div>
+
+        <!-- ── E6xx IO ── -->
+        <div class="cat-header" id="E6xx">
+            <span class="cat-tag">E6xx</span>
+            <h2>IO</h2>
+        </div>
+
+        <div class="error-card" id="E6A0">
+            <div class="ec-head"><span class="ec-code">E6A0</span><span class="ec-title">file not found</span></div>
+            <div class="ec-note"><strong>note:</strong> check the file path and that the file exists</div>
+            <pre><span class="bad">content = fs.read("data.txt")</span>   <span class="comment"># file missing</span>
+
+<span class="good">import fs
+if fs.exists("data.txt"):
+    content = fs.read("data.txt")</span></pre>
+        </div>
+
+        <div class="error-card" id="E6A1">
+            <div class="ec-head"><span class="ec-code">E6A1</span><span class="ec-title">permission denied</span></div>
+            <div class="ec-note"><strong>note:</strong> the process does not have permission to access this file</div>
+            <pre><span class="comment"># Linux/macOS — fix file permissions:
+# chmod 644 file.txt</span></pre>
+        </div>
+
+        <!-- ── E7xx Value ── -->
+        <div class="cat-header" id="E7xx">
+            <span class="cat-tag">E7xx</span>
+            <h2>Value</h2>
+        </div>
+
+        <div class="error-card" id="E7A0">
+            <div class="ec-head"><span class="ec-code">E7A0</span><span class="ec-title">invalid argument</span></div>
+            <div class="ec-note"><strong>note:</strong> a function received an argument with an unexpected value</div>
+            <pre><span class="bad">import math
+math.sqrt(-1)</span>
+
+<span class="good">import math
+math.sqrt(abs(-1))</span></pre>
+        </div>
+
+        <div class="error-card" id="E7A1">
+            <div class="ec-head"><span class="ec-code">E7A1</span><span class="ec-title">argument count mismatch</span></div>
+            <div class="ec-note"><strong>note:</strong> check the number of arguments the function expects</div>
+            <pre>fn add(a, b):
+    return a + b
+
+<span class="bad">add(1)        # too few
+add(1, 2, 3)  # too many</span>
+<span class="good">add(1, 2)     # correct</span></pre>
+        </div>
+
+        <div class="error-card" id="E7A2">
+            <div class="ec-head"><span class="ec-code">E7A2</span><span class="ec-title">value out of range</span></div>
+            <div class="ec-note"><strong>note:</strong> the value exceeds the allowed range for this operation</div>
+            <pre><span class="bad">import time
+time.sleep(-5)</span>
+<span class="good">time.sleep(1)</span></pre>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

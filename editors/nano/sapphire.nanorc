@@ -1,0 +1,60 @@
+## Nano syntax highlighting for Sapphire (.spp)
+## Copy to ~/.config/nano/sapphire.nanorc and add:
+##   include "~/.config/nano/sapphire.nanorc"
+## to your ~/.nanorc
+
+syntax "sapphire" "\.spp$"
+
+## Doc comments (bright cyan)
+color brightcyan "///.*$"
+color brightcyan "#!.*$"
+
+## Comments (cyan)
+color cyan "#[^!][^$]*$"
+color cyan "#$"
+
+## Strings (yellow) — double and single quoted
+color yellow ""[^"]*""
+color yellow "'[^']*'"
+
+## F-strings (bright yellow)
+color brightyellow "f"[^"]*""
+color brightyellow "f'[^']*'"
+
+## Keywords — control flow (bright blue)
+color brightblue "\b(if|else|elif|for|while|break|continue|return|match|case|default|in|pass|del)\b"
+
+## Keywords — declarations (bright magenta)
+color brightmagenta "\b(fn|class|trait|impl|macro|enum)\b"
+
+## Keywords — modifiers / other (blue)
+color blue "\b(import|from|as|let|var|const|pub|priv|static|mut|owned|where|dyn|Self)\b"
+
+## Async keywords (bright blue)
+color brightblue "\b(async|await|chan|go|select)\b"
+
+## Exception keywords (bright red)
+color brightred "\b(try|catch|finally|throw|raise)\b"
+
+## Built-in types (green)
+color green "\b(int|float|double|str|bool|void|any|list|dict|tuple|set|bytes|char)\b"
+
+## Constants / literals (bright green)
+color brightgreen "\b(true|false|none|None|Some|Ok|Err)\b"
+
+## Numbers — hex, binary, octal, float, int (bright yellow)
+color brightyellow "\b0[xX][0-9a-fA-F_]+\b"
+color brightyellow "\b0[bB][01_]+\b"
+color brightyellow "\b0[oO][0-7_]+\b"
+color brightyellow "\b[0-9][0-9_]*\.[0-9][0-9_]*\b"
+color brightyellow "\b[0-9][0-9_]*\b"
+
+## Decorators (bright magenta)
+color brightmagenta "@[a-zA-Z_][a-zA-Z0-9_]*"
+
+## Type names / PascalCase (bright green)
+color brightgreen "\b[A-Z][a-zA-Z0-9_]*\b"
+
+## Operators
+color brightwhite "=>|->"
+color white "[+\-*/%<>!=&|^~?]"

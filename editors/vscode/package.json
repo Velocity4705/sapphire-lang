@@ -2,8 +2,12 @@
   "name": "sapphire-lang",
   "displayName": "Sapphire Language Support",
   "description": "Language support for Sapphire programming language",
-  "version": "1.0-beta.5",
+  "version": "1.0.0-beta.7",
   "publisher": "sapphire-lang",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/velo4705/sapphire-lang"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -102,7 +106,7 @@
         },
         "sapphire.lsp.path": {
           "type": "string",
-          "default": "sapphire-lsp",
+          "default": "/usr/local/bin/sapphire-lsp",
           "description": "Path to sapphire-lsp executable"
         },
         "sapphire.debug.path": {

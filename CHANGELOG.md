@@ -2,6 +2,14 @@
 
 All notable changes to Sapphire will be documented in this file.
 
+## [1.0-beta.7] - 2026-03-24
+
+### 🚀 v1.0-beta.7 - Input & Editor Polish
+
+Fixed SDL2 keyboard input on Linux: window now asserts focus on creation and before mouse capture, preventing WASD/key events from being silently dropped when relative mouse mode is enabled. Added syntax highlighting for all major editors (VSCode, Vim, Sublime Text, nano, Emacs). Rust-style hex error codes (`E1A0`–`E7A2`) with colored source-line output, caret diagnostics, and `--explain` flag. Parse errors now carry line+col and render through the same formatter.
+
+---
+
 ## [1.0-beta.6] - 2026-03-23
 
 ### 🚀 v1.0-beta.6 - Database & 3D Visualization (Milestones 6-19)

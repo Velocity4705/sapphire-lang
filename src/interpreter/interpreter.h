@@ -12,6 +12,8 @@
 #include <queue>
 #include <stdexcept>
 #include <functional>
+#include <thread>
+#include <mutex>
 
 namespace sapphire {
 
@@ -423,6 +425,8 @@ private:
     
     // Task queue for goroutines
     std::vector<std::function<void()>> pending_tasks;
+    std::mutex goroutine_mutex_;
+    std::vector<std::thread> goroutine_threads_;
     
     // Cache for @cache decorator: maps (function_name, args_string) -> result
     std::map<std::pair<std::string, std::string>, Value> function_cache;
@@ -439,6 +443,7 @@ private:
 
 public:
     Interpreter();
+    ~Interpreter();
     void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
     
     // REPL support methods

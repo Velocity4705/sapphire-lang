@@ -11,6 +11,8 @@
 #include "codegen/llvm_codegen.h"
 #include "repl/repl.h"
 #include "error/exception.h"
+#include "error/error_codes.h"
+#include "error/error_reporter.h"
 
 void printUsage(const char* program) {
     (void)program;
@@ -30,7 +32,7 @@ void checkForUpdates() {
     std::cout << "Checking for updates...\n";
     
     // Read current version
-    std::string current_version = "1.0-beta.6";
+    std::string current_version = "1.0-beta.7";
     std::ifstream version_file("VERSION");
     if (version_file.is_open()) {
         std::getline(version_file, current_version);
@@ -79,7 +81,7 @@ int main(int argc, char* argv[]) {
     std::string arg = argv[1];
     
     if (arg == "--version") {
-        std::cout << "Sapphire v1.0-beta.6 (Web Development Foundation)\n";
+        std::cout << "Sapphire v1.0-beta.7\n";
         return 0;
     }
     
@@ -95,6 +97,29 @@ int main(int argc, char* argv[]) {
     
     if (arg == "--help") {
         printUsage(argv[0]);
+        return 0;
+    }
+
+    // sapp --explain E201  →  print full error book entry
+    if (arg == "--explain") {
+        if (argc < 3) {
+            std::cerr << "Usage: sapp --explain <error-code>  e.g. sapp --explain E201\n";
+            return 1;
+        }
+        std::string code = argv[2];
+        const sapphire::ErrorCode* ec = sapphire::lookup_error_code(code);
+        if (!ec) {
+            sapphire::ErrorFormatter::print_simple("",
+                "unknown error code '" + code + "' — valid range: E1A0–E1A7, E2A0–E2A3, E3A0–E3A4, E4A0–E4A4, E5A0–E5A1, E6A0–E6A1, E7A0–E7A2");
+            return 1;
+        }
+        // Print a formatted explanation using the error formatter
+        sapphire::ErrorFormatter::print(
+            code,
+            std::string(ec->title),
+            "", -1, -1, "",
+            std::string(ec->note)
+        );
         return 0;
     }
 
@@ -129,7 +154,9 @@ int main(int argc, char* argv[]) {
     // Read source file
     std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file '" << filename << "'\n";
+        sapphire::ErrorFormatter::print("E6A0",
+            "could not open file '" + filename + "'",
+            filename, -1, -1, "");
         return 1;
     }
 
@@ -143,7 +170,7 @@ int main(int argc, char* argv[]) {
         auto tokens = lexer.tokenize();
         
         // Parser - build AST
-        sapphire::Parser parser(tokens);
+        sapphire::Parser parser(tokens, source, filename);
         auto statements = parser.parse();
         
         if (compile_mode) {
@@ -178,10 +205,27 @@ int main(int argc, char* argv[]) {
         }
         
     } catch (const sapphire::SapphireException& e) {
-        std::cerr << e.getFullErrorMessage() << std::endl;
+        // Map exception type to error code
+        std::string code;
+        const std::string& t = e.getTypeName();
+        if      (t == "IndexError")          code = "E4A0";
+        else if (t == "DivisionByZeroError") code = "E4A1";
+        else if (t == "FileNotFoundError")   code = "E6A0";
+        else if (t == "PermissionError")     code = "E6A1";
+        else if (t == "ValueError")          code = "E7A0";
+        else if (t == "TypeError")           code = "E3A0";
+
+        sapphire::ErrorFormatter::print(
+            code,
+            e.getMessage(),
+            e.getFileName().empty() ? filename : e.getFileName(),
+            e.getLineNumber(),
+            e.getColumnNumber(),
+            source
+        );
         return 1;
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        sapphire::ErrorFormatter::print_simple("", e.what());
         return 1;
     }
     

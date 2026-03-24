@@ -1,0 +1,290 @@
+import gl3d
+import math
+
+# ══════════════════════════════════════════════════════════════════════════
+#  FPP 4D — First-Person Perspective inside a 4D world
+#
+#  You are a 4D being walking through a lattice of hypercube rooms.
+#  The world has 4 spatial axes: X, Y, Z (familiar) and W (the 4th).
+#  Projection pipeline: 4D world → 4D camera space → W-perspective → 3D
+#
+#  Controls:
+#    WASD        — move in XZ
+#    Space / C   — move up / down (Y)
+#    Q / E       — move along W axis (into/out of 4th dimension)
+#    Mouse       — look (yaw/pitch in 3D subspace)
+#    [ / ]       — rotate view into W axis (look into 4th dimension)
+#    R           — reset
+#    ESC         — quit
+#
+#  Colors:
+#    Cyan   = your W layer
+#    Orange = one W layer ahead
+#    Purple = one W layer behind
+# ══════════════════════════════════════════════════════════════════════════
+
+PI = 3.14159265358979
+
+win = gl3d_window_create("Sapphire FPP 4D World", 1280, 720)
+gl3d_mouse_capture(win, 1)
+
+vert_src = "#version 330 core
+layout(location=0) in vec3 aPos;
+uniform mat4 uVP;
+void main(){ gl_Position = uVP * vec4(aPos, 1.0); }"
+
+frag_src = "#version 330 core
+uniform vec4 uColor;
+out vec4 FragColor;
+void main(){ FragColor = uColor; }"
+
+sh = gl3d_shader_create(vert_src, frag_src)
+
+# ── 4D camera state ───────────────────────────────────────────────────────
+cam_x = 0.5
+cam_y = 0.5
+cam_z = 0.5
+cam_w = 0.5
+
+# 4 orthonormal basis vectors [x,y,z,w]
+r4 = [1.0, 0.0, 0.0, 0.0]
+u4 = [0.0, 1.0, 0.0, 0.0]
+f4 = [0.0, 0.0, 1.0, 0.0]
+a4 = [0.0, 0.0, 0.0, 1.0]
+
+# ── 4D vector math ────────────────────────────────────────────────────────
+fn dot4(a, b):
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3]
+
+fn norm4(a):
+    l = math_sqrt(dot4(a, a))
+    if l < 0.00001:
+        return [1.0, 0.0, 0.0, 0.0]
+    return [a[0]/l, a[1]/l, a[2]/l, a[3]/l]
+
+fn scale4(a, s):
+    return [a[0]*s, a[1]*s, a[2]*s, a[3]*s]
+
+fn add4(a, b):
+    return [a[0]+b[0], a[1]+b[1], a[2]+b[2], a[3]+b[3]]
+
+fn sub4(a, b):
+    return [a[0]-b[0], a[1]-b[1], a[2]-b[2], a[3]-b[3]]
+
+# Rotate vector v in the plane (axis_a, axis_b) by angle radians
+fn rot_plane(v, aa, ab, angle):
+    c = math_cos(angle)
+    s = math_sin(angle)
+    da = dot4(v, aa)
+    db = dot4(v, ab)
+    nda = da*c - db*s
+    ndb = da*s + db*c
+    return add4(v, add4(scale4(aa, nda-da), scale4(ab, ndb-db)))
+
+# Gram-Schmidt orthonormalize 4 basis vectors
+fn ortho4(r, u, f, a):
+    r2 = norm4(r)
+    u2 = norm4(sub4(u, scale4(r2, dot4(u, r2))))
+    f2 = sub4(f, scale4(r2, dot4(f, r2)))
+    f2 = norm4(sub4(f2, scale4(u2, dot4(f2, u2))))
+    a2 = sub4(a, scale4(r2, dot4(a, r2)))
+    a2 = sub4(a2, scale4(u2, dot4(a2, u2)))
+    a2 = norm4(sub4(a2, scale4(f2, dot4(a2, f2))))
+    return [r2, u2, f2, a2]
+
+# Pack camera into flat list for C++ builtin:
+# [px,py,pz,pw, rx,ry,rz,rw, ux,uy,uz,uw, fx,fy,fz,fw, ax,ay,az,aw]
+fn pack_cam():
+    return [cam_x, cam_y, cam_z, cam_w, r4[0], r4[1], r4[2], r4[3], u4[0], u4[1], u4[2], u4[3], f4[0], f4[1], f4[2], f4[3], a4[0], a4[1], a4[2], a4[3]]
+
+# ── World grid parameters ─────────────────────────────────────────────────
+DRAW_R = 3    # XZ radius (7×7 = 49 cells per layer)
+DRAW_Y = 1    # Y radius
+DRAW_W = 1    # W radius
+
+# Build flat cell-center list for a given W layer
+fn cells_for_w(base_ix, base_iy, base_iz, base_iw, dw):
+    cells = []
+    iy = base_iy - DRAW_Y
+    while iy <= base_iy + DRAW_Y:
+        ix = base_ix - DRAW_R
+        while ix <= base_ix + DRAW_R:
+            iz = base_iz - DRAW_R
+            while iz <= base_iz + DRAW_R:
+                cells = cells + [ix + 0.5, iy + 0.5, iz + 0.5, base_iw + dw + 0.5]
+                iz = iz + 1
+            ix = ix + 1
+        iy = iy + 1
+    return cells
+
+# Pre-allocate one mesh per W layer (3 layers: -1, 0, +1)
+dummy_cells = []
+ncells = (DRAW_R*2+1) * (DRAW_R*2+1) * (DRAW_Y*2+1)
+di = 0
+while di < ncells:
+    dummy_cells = dummy_cells + [0.0, 0.0, 0.0, 0.0]
+    di = di + 1
+
+mesh_wm1 = gl3d_world4d_build(pack_cam(), dummy_cells, 3.0)
+mesh_w0  = gl3d_world4d_build(pack_cam(), dummy_cells, 3.0)
+mesh_wp1 = gl3d_world4d_build(pack_cam(), dummy_cells, 3.0)
+
+# ── Crosshair mesh (static) ───────────────────────────────────────────────
+cross_buf = [-0.018, 0.0, -0.5, 0.018, 0.0, -0.5, 0.0, -0.018, -0.5, 0.0, 0.018, -0.5]
+cross_mesh = gl3d_mesh_lines_create(cross_buf)
+
+# ── Constants ─────────────────────────────────────────────────────────────
+MOVE_SPEED = 4.0
+LOOK_SPEED = 0.18
+ANA_SPEED  = 1.2
+W_DIST     = 3.0
+
+# ══════════════════════════════════════════════════════════════════════════
+#  Main loop
+# ══════════════════════════════════════════════════════════════════════════
+while gl3d_window_poll(win) == 1:
+    dt = gl3d_delta(win)
+
+    # ── Mouse look ─────────────────────────────────────────────────────
+    mdx = gl3d_mouse_dx(win)
+    mdy = gl3d_mouse_dy(win)
+
+    if mdx != 0.0:
+        ang = -mdx * LOOK_SPEED * PI / 180.0
+        r4 = rot_plane(r4, r4, f4, ang)
+        f4 = rot_plane(f4, r4, f4, ang)
+        b = ortho4(r4, u4, f4, a4)
+        r4 = b[0]
+        u4 = b[1]
+        f4 = b[2]
+        a4 = b[3]
+
+    if mdy != 0.0:
+        ang = -mdy * LOOK_SPEED * PI / 180.0
+        f4 = rot_plane(f4, f4, u4, ang)
+        u4 = rot_plane(u4, f4, u4, ang)
+        b = ortho4(r4, u4, f4, a4)
+        r4 = b[0]
+        u4 = b[1]
+        f4 = b[2]
+        a4 = b[3]
+
+    # ── Ana-look ([/]) — rotate forward into W ─────────────────────────
+    ana_rot = 0.0
+    if gl3d_key(win, "[") == 1:
+        ana_rot = ANA_SPEED * dt
+    if gl3d_key(win, "]") == 1:
+        ana_rot = -ANA_SPEED * dt
+    if ana_rot != 0.0:
+        f4 = rot_plane(f4, f4, a4, ana_rot)
+        a4 = rot_plane(a4, f4, a4, ana_rot)
+        b = ortho4(r4, u4, f4, a4)
+        r4 = b[0]
+        u4 = b[1]
+        f4 = b[2]
+        a4 = b[3]
+
+    # ── Movement ───────────────────────────────────────────────────────
+    mf = 0.0
+    mr = 0.0
+    mu = 0.0
+    ma = 0.0
+    if gl3d_key(win, "w") == 1:
+        mf = 1.0
+    if gl3d_key(win, "s") == 1:
+        mf = -1.0
+    if gl3d_key(win, "a") == 1:
+        mr = -1.0
+    if gl3d_key(win, "d") == 1:
+        mr = 1.0
+    if gl3d_key(win, "space") == 1:
+        mu = 1.0
+    if gl3d_key(win, "c") == 1:
+        mu = -1.0
+    if gl3d_key(win, "q") == 1:
+        ma = 1.0
+    if gl3d_key(win, "e") == 1:
+        ma = -1.0
+
+    if gl3d_key(win, "r") == 1:
+        cam_x = 0.5
+        cam_y = 0.5
+        cam_z = 0.5
+        cam_w = 0.5
+        r4 = [1.0, 0.0, 0.0, 0.0]
+        u4 = [0.0, 1.0, 0.0, 0.0]
+        f4 = [0.0, 0.0, 1.0, 0.0]
+        a4 = [0.0, 0.0, 0.0, 1.0]
+
+    spd = MOVE_SPEED * dt
+    cam_x = cam_x + (f4[0]*mf + r4[0]*mr + u4[0]*mu + a4[0]*ma) * spd
+    cam_y = cam_y + (f4[1]*mf + r4[1]*mr + u4[1]*mu + a4[1]*ma) * spd
+    cam_z = cam_z + (f4[2]*mf + r4[2]*mr + u4[2]*mu + a4[2]*ma) * spd
+    cam_w = cam_w + (f4[3]*mf + r4[3]*mr + u4[3]*mu + a4[3]*ma) * spd
+
+    # ── Update 4D world geometry (one C++ call per W layer) ────────────
+    base_ix = math_floor(cam_x)
+    base_iy = math_floor(cam_y)
+    base_iz = math_floor(cam_z)
+    base_iw = math_floor(cam_w)
+
+    cam_packed = pack_cam()
+
+    cells_m1 = cells_for_w(base_ix, base_iy, base_iz, base_iw, -1)
+    cells_0  = cells_for_w(base_ix, base_iy, base_iz, base_iw,  0)
+    cells_p1 = cells_for_w(base_ix, base_iy, base_iz, base_iw,  1)
+
+    gl3d_world4d_update(mesh_wm1, cam_packed, cells_m1, W_DIST)
+    gl3d_world4d_update(mesh_w0,  cam_packed, cells_0,  W_DIST)
+    gl3d_world4d_update(mesh_wp1, cam_packed, cells_p1, W_DIST)
+
+    # ── Camera matrices ─────────────────────────────────────────────────
+    fwd_len = math_sqrt(f4[0]*f4[0] + f4[1]*f4[1] + f4[2]*f4[2])
+    if fwd_len < 0.01:
+        fwd_len = 0.01
+    lx = f4[0] / fwd_len
+    ly = f4[1] / fwd_len
+    lz = f4[2] / fwd_len
+
+    proj = gl3d_mat4_perspective(80.0, 1280.0 / 720.0, 0.05, 60.0)
+    view = gl3d_mat4_lookat(0.0, 0.0, 0.0, lx, ly, lz, u4[0], u4[1], u4[2])
+    vp   = gl3d_mat4_mul(proj, view)
+
+    # ── Render ─────────────────────────────────────────────────────────
+    gl3d_clear(0.02, 0.02, 0.05)
+    gl3d_shader_use(sh)
+    gl3d_shader_set_mat4(sh, "uVP", vp)
+
+    # W-1 layer: purple
+    gl3d_shader_set_vec4(sh, "uColor", 0.75, 0.2, 1.0, 1.0)
+    gl3d_mesh_lines_draw(mesh_wm1)
+
+    # W+1 layer: orange
+    gl3d_shader_set_vec4(sh, "uColor", 1.0, 0.5, 0.1, 1.0)
+    gl3d_mesh_lines_draw(mesh_wp1)
+
+    # W=0 layer: cyan (drawn last = on top)
+    gl3d_shader_set_vec4(sh, "uColor", 0.2, 0.85, 1.0, 1.0)
+    gl3d_mesh_lines_draw(mesh_w0)
+
+    # Crosshair (identity VP = clip space)
+    ident = gl3d_mat4_identity()
+    gl3d_shader_set_mat4(sh, "uVP", ident)
+    gl3d_shader_set_vec4(sh, "uColor", 1.0, 1.0, 1.0, 0.8)
+    gl3d_mesh_lines_draw(cross_mesh)
+    gl3d_mat4_free(ident)
+
+    gl3d_mat4_free(proj)
+    gl3d_mat4_free(view)
+    gl3d_mat4_free(vp)
+
+    gl3d_window_set_title(win, "4D World  (" + cam_x + ", " + cam_y + ", " + cam_z + ", " + cam_w + ")  WASD move  QE=W  []=look4D  Mouse look  R=reset")
+    gl3d_window_swap(win)
+
+# ── Cleanup ───────────────────────────────────────────────────────────────
+gl3d_mesh_lines_destroy(mesh_wm1)
+gl3d_mesh_lines_destroy(mesh_w0)
+gl3d_mesh_lines_destroy(mesh_wp1)
+gl3d_mesh_lines_destroy(cross_mesh)
+gl3d_shader_destroy(sh)
+gl3d_window_destroy(win)

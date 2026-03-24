@@ -1,0 +1,286 @@
+import gl3d
+import math
+
+# ── Car Simulator ─────────────────────────────────────────────────────────
+# Physics: rigid-body with suspension springs, gravity, slope forces,
+#          lateral tire friction, tree collision, pitch/roll from terrain.
+#
+# W/S = throttle/brake   A/D = steer   SPACE = handbrake
+# R = reset   Mouse = orbit camera   ESC = quit
+
+win = gl3d_window_create("Sapphire Car Simulator", 1280, 720)
+gl3d_mouse_capture(win, 1)
+
+# ── Shaders ───────────────────────────────────────────────────────────────
+vert = "#version 330 core
+layout(location=0) in vec3 aPos;
+layout(location=1) in vec3 aNorm;
+layout(location=2) in vec2 aUV;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProj;
+out vec3 vNorm;
+out vec3 vPos;
+void main(){
+    vec4 world = uModel * vec4(aPos,1.0);
+    vPos  = world.xyz;
+    vNorm = mat3(transpose(inverse(uModel))) * aNorm;
+    gl_Position = uProj * uView * world;
+}"
+
+frag = "#version 330 core
+in vec3 vNorm;
+in vec3 vPos;
+uniform vec3  uColor;
+uniform vec3  uLightDir;
+uniform float uAmbient;
+out vec4 FragColor;
+void main(){
+    vec3 n = normalize(vNorm);
+    float diff = max(dot(n, normalize(-uLightDir)), 0.0);
+    float light = uAmbient + diff * (1.0 - uAmbient);
+    FragColor = vec4(uColor * light, 1.0);
+}"
+
+sh = gl3d_shader_create(vert, frag)
+
+# ── Terrain ───────────────────────────────────────────────────────────────
+SUBDIV = 60
+TSIZE  = 200.0
+HSCALE = 12.0
+N = SUBDIV + 1
+
+heights = []
+zi = 0
+while zi < N:
+    xi = 0
+    while xi < N:
+        fx = xi * 1.0 / SUBDIV
+        fz = zi * 1.0 / SUBDIV
+        h  = math_sin(fx * 6.28 * 2.0) * math_cos(fz * 6.28 * 1.5) * 0.5
+        h  = h + math_sin(fx * 6.28 * 5.0 + 1.2) * math_cos(fz * 6.28 * 4.0) * 0.25
+        h  = h + math_sin(fx * 6.28 * 11.0 + 2.4) * math_cos(fz * 6.28 * 9.0) * 0.125
+        road_dist = fz - 0.5
+        if road_dist < 0.0:
+            road_dist = -road_dist
+        road_blend = road_dist * 20.0
+        if road_blend > 1.0:
+            road_blend = 1.0
+        h = h * road_blend
+        heights = heights + [h]
+        xi = xi + 1
+    zi = zi + 1
+
+terrain_mesh = gl3d_mesh_terrain(heights, SUBDIV, TSIZE, HSCALE)
+
+# ── Meshes ────────────────────────────────────────────────────────────────
+body_mesh  = gl3d_mesh_box(2.0, 0.6, 4.2)
+cabin_mesh = gl3d_mesh_box(1.7, 0.55, 2.2)
+wheel_mesh = gl3d_mesh_cylinder(0.35, 0.28, 16)
+trunk_mesh = gl3d_mesh_cylinder(0.15, 1.2, 8)
+crown_mesh = gl3d_mesh_sphere(0.9, 8, 6)
+
+# ── Tree positions ────────────────────────────────────────────────────────
+tree_xs = [-30.0, 25.0, -45.0, 50.0, -20.0, 35.0, -60.0, 55.0, 10.0, -10.0, -70.0, 70.0, 40.0, -40.0, 15.0, -15.0, 60.0, -55.0, 80.0, -80.0]
+tree_zs = [-20.0, -35.0, 10.0, 20.0, -60.0, 55.0, -40.0, -70.0, 80.0, -80.0, 30.0, -30.0, 70.0, -65.0, 45.0, -45.0, -10.0, 15.0, 50.0, -50.0]
+
+# ── Terrain height sampler (for tree placement) ───────────────────────────
+fn terrain_height(wx, wz):
+    half = TSIZE * 0.5
+    fx = (wx + half) / TSIZE
+    fz = (wz + half) / TSIZE
+    if fx < 0.0:
+        fx = 0.0
+    if fx > 1.0:
+        fx = 1.0
+    if fz < 0.0:
+        fz = 0.0
+    if fz > 1.0:
+        fz = 1.0
+    xi = math_floor(fx * SUBDIV)
+    zi = math_floor(fz * SUBDIV)
+    if xi > SUBDIV - 1:
+        xi = SUBDIV - 1
+    if zi > SUBDIV - 1:
+        zi = SUBDIV - 1
+    return heights[zi * N + xi] * HSCALE
+
+# ── Physics state: [x,y,z,yaw, vx,vy,vz,vyaw, pitch,roll,wheel_rot,steer_ang]
+car_state = [0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+# ── Camera ────────────────────────────────────────────────────────────────
+cam_dist  = 9.0
+cam_pitch = 18.0
+cam_yaw   = 0.0
+
+# ── Main loop ─────────────────────────────────────────────────────────────
+while gl3d_window_poll(win) == 1:
+    dt = gl3d_delta(win)
+
+    # ── Input ──────────────────────────────────────────────────────────
+    throttle  = 0.0
+    brake     = 0.0
+    steer     = 0.0
+    handbrake = 0.0
+    do_reset  = 0.0
+
+    if gl3d_key(win, "w") == 1:
+        throttle = 1.0
+    if gl3d_key(win, "s") == 1:
+        brake = 1.0
+    if gl3d_key(win, "a") == 1:
+        steer = -1.0
+    if gl3d_key(win, "d") == 1:
+        steer = 1.0
+    if gl3d_key(win, "space") == 1:
+        handbrake = 1.0
+    if gl3d_key(win, "r") == 1:
+        do_reset = 1.0
+
+    car_input = [throttle, brake, steer, handbrake, do_reset]
+
+    # ── Physics step (C++ engine) ───────────────────────────────────────
+    car_state = gl3d_car_step(car_state, car_input, heights, SUBDIV, TSIZE, HSCALE, tree_xs, tree_zs, dt)
+
+    # Unpack state
+    car_x   = car_state[0]
+    car_y   = car_state[1]
+    car_z   = car_state[2]
+    car_yaw = car_state[3]
+    car_vx  = car_state[4]
+    car_vz  = car_state[6]
+    pitch   = car_state[8]
+    roll    = car_state[9]
+    wrot    = car_state[10]
+    sang    = car_state[11]
+
+    speed_fwd = car_vx * math_sin(car_yaw * 3.14159 / 180.0) - car_vz * math_cos(car_yaw * 3.14159 / 180.0)
+
+    # ── Camera orbit ───────────────────────────────────────────────────
+    mdx = gl3d_mouse_dx(win)
+    mdy = gl3d_mouse_dy(win)
+    cam_yaw   = cam_yaw   + mdx * 0.25
+    cam_pitch = cam_pitch - mdy * 0.25
+    if cam_pitch < 5.0:
+        cam_pitch = 5.0
+    if cam_pitch > 80.0:
+        cam_pitch = 80.0
+
+    total_yaw = car_yaw + cam_yaw
+    yaw_r     = total_yaw * 3.14159 / 180.0
+    pitch_r   = cam_pitch * 3.14159 / 180.0
+
+    cx = car_x + math_sin(yaw_r) * math_cos(pitch_r) * cam_dist
+    cy = car_y + math_sin(pitch_r) * cam_dist + 1.0
+    cz = car_z - math_cos(yaw_r) * math_cos(pitch_r) * cam_dist
+
+    proj = gl3d_mat4_perspective(60.0, 1280.0 / 720.0, 0.1, 500.0)
+    view = gl3d_mat4_lookat(cx, cy, cz, car_x, car_y + 0.8, car_z, 0.0, 1.0, 0.0)
+
+    # ── Render ─────────────────────────────────────────────────────────
+    gl3d_clear(0.45, 0.65, 0.85)
+    gl3d_shader_use(sh)
+    gl3d_shader_set_mat4(sh, "uProj", proj)
+    gl3d_shader_set_mat4(sh, "uView", view)
+    gl3d_shader_set_vec3(sh, "uLightDir", 0.4, -0.8, 0.3)
+    gl3d_shader_set_float(sh, "uAmbient", 0.25)
+
+    # Terrain
+    tm = gl3d_mat4_identity()
+    gl3d_shader_set_mat4(sh, "uModel", tm)
+    gl3d_shader_set_vec3(sh, "uColor", 0.28, 0.55, 0.22)
+    gl3d_mesh_draw(terrain_mesh)
+    gl3d_mat4_free(tm)
+
+    # Trees
+    ti = 0
+    while ti < 20:
+        tx = tree_xs[ti]
+        tz = tree_zs[ti]
+        ty = terrain_height(tx, tz)
+        trm = gl3d_mat4_translate(tx, ty + 0.6, tz)
+        gl3d_shader_set_mat4(sh, "uModel", trm)
+        gl3d_shader_set_vec3(sh, "uColor", 0.45, 0.28, 0.12)
+        gl3d_mesh_draw(trunk_mesh)
+        gl3d_mat4_free(trm)
+        crm = gl3d_mat4_translate(tx, ty + 1.8, tz)
+        gl3d_shader_set_mat4(sh, "uModel", crm)
+        gl3d_shader_set_vec3(sh, "uColor", 0.15, 0.48, 0.18)
+        gl3d_mesh_draw(crown_mesh)
+        gl3d_mat4_free(crm)
+        ti = ti + 1
+
+    # ── Car body with pitch + roll ──────────────────────────────────────
+    # Build transform: translate → yaw → pitch → roll
+    t_car  = gl3d_mat4_translate(car_x, car_y, car_z)
+    r_yaw  = gl3d_mat4_rotate_y(car_yaw)
+    r_pitch = gl3d_mat4_rotate_x(pitch)
+    r_roll  = gl3d_mat4_rotate_z(roll)
+
+    rpr    = gl3d_mat4_mul(r_pitch, r_roll)
+    yr_rpr = gl3d_mat4_mul(r_yaw, rpr)
+    body_model = gl3d_mat4_mul(t_car, yr_rpr)
+
+    gl3d_shader_set_mat4(sh, "uModel", body_model)
+    gl3d_shader_set_vec3(sh, "uColor", 0.85, 0.12, 0.12)
+    gl3d_mesh_draw(body_mesh)
+
+    cabin_off   = gl3d_mat4_translate(0.0, 0.58, -0.3)
+    cabin_model = gl3d_mat4_mul(body_model, cabin_off)
+    gl3d_shader_set_mat4(sh, "uModel", cabin_model)
+    gl3d_shader_set_vec3(sh, "uColor", 0.7, 0.85, 0.95)
+    gl3d_mesh_draw(cabin_mesh)
+    gl3d_mat4_free(cabin_off)
+    gl3d_mat4_free(cabin_model)
+
+    # Wheels
+    wheel_positions_x = [-0.95, 0.95, -0.95, 0.95]
+    wheel_positions_z = [1.5, 1.5, -1.5, -1.5]
+
+    wi = 0
+    while wi < 4:
+        wpx = wheel_positions_x[wi]
+        wpz = wheel_positions_z[wi]
+        steer_r = 0.0
+        if wi < 2:
+            steer_r = sang
+        wspin  = gl3d_mat4_rotate_x(wrot)
+        wsteer = gl3d_mat4_rotate_y(steer_r)
+        woff   = gl3d_mat4_translate(wpx, -0.22, wpz)
+        ws1    = gl3d_mat4_mul(wsteer, wspin)
+        ws2    = gl3d_mat4_mul(woff, ws1)
+        wmodel = gl3d_mat4_mul(body_model, ws2)
+        gl3d_shader_set_mat4(sh, "uModel", wmodel)
+        gl3d_shader_set_vec3(sh, "uColor", 0.15, 0.15, 0.15)
+        gl3d_mesh_draw(wheel_mesh)
+        gl3d_mat4_free(wspin)
+        gl3d_mat4_free(wsteer)
+        gl3d_mat4_free(woff)
+        gl3d_mat4_free(ws1)
+        gl3d_mat4_free(ws2)
+        gl3d_mat4_free(wmodel)
+        wi = wi + 1
+
+    gl3d_mat4_free(r_pitch)
+    gl3d_mat4_free(r_roll)
+    gl3d_mat4_free(rpr)
+    gl3d_mat4_free(yr_rpr)
+    gl3d_mat4_free(r_yaw)
+    gl3d_mat4_free(t_car)
+    gl3d_mat4_free(body_model)
+    gl3d_mat4_free(proj)
+    gl3d_mat4_free(view)
+
+    kmh = speed_fwd * 3.6
+    gl3d_window_set_title(win, "Car Simulator  |  " + kmh + " km/h  |  WASD drive  SPACE handbrake  R reset  Mouse look  ESC quit")
+    gl3d_window_swap(win)
+
+# ── Cleanup ───────────────────────────────────────────────────────────────
+gl3d_mesh_destroy(terrain_mesh)
+gl3d_mesh_destroy(body_mesh)
+gl3d_mesh_destroy(cabin_mesh)
+gl3d_mesh_destroy(wheel_mesh)
+gl3d_mesh_destroy(trunk_mesh)
+gl3d_mesh_destroy(crown_mesh)
+gl3d_shader_destroy(sh)
+gl3d_window_destroy(win)

@@ -21,6 +21,7 @@ public:
 private:
     std::shared_ptr<Interpreter> interpreter;
     std::vector<std::string> history;
+    std::string history_tmp_;   // saves current input when navigating history
     bool running;
     
     // File watching

@@ -3,7 +3,7 @@
 
 CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -O2 -I./src
-LDFLAGS = -lpthread -lssl -lcrypto $(shell pkg-config --libs sdl2 SDL2_ttf 2>/dev/null)
+LDFLAGS = -lpthread -lssl -lcrypto -lGL $(shell pkg-config --libs sdl2 SDL2_ttf 2>/dev/null)
 CXXFLAGS += $(shell pkg-config --cflags sdl2 SDL2_ttf 2>/dev/null)
 
 # Check for LLVM (optional for now)
@@ -78,6 +78,7 @@ SOURCES = $(SRCDIR)/main.cpp \
           stdlib/model/model.cpp \
           stdlib/physics/physics.cpp \
           stdlib/simulation/simulation.cpp \
+          stdlib/gl3d/gl3d.cpp \
           stdlib/os/os.cpp \
           stdlib/advancedcrypto/advancedcrypto.cpp \
           stdlib/advancedcrypto/advancedcrypto_capi.cpp \

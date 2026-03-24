@@ -1,0 +1,324 @@
+import gl3d
+import math
+
+# ══════════════════════════════════════════════════════════════════════════
+#  4D Simulation — Sapphire
+#  Visualizes 4D polytopes projected into 3D via W-perspective, then
+#  rendered as wireframes with OpenGL.
+#
+#  Controls:
+#    1/2/3     — switch object (Tesseract / 16-cell / 5-cell)
+#    Q/E       — rotate in XW plane (spin into 4th dimension)
+#    A/D       — rotate in YW plane
+#    W/S       — rotate in ZW plane
+#    Z/X       — rotate in XY plane (3D yaw)
+#    Mouse     — orbit 3D camera
+#    ESC       — quit
+# ══════════════════════════════════════════════════════════════════════════
+
+win = gl3d_window_create("Sapphire 4D Simulation", 1280, 720)
+gl3d_mouse_capture(win, 1)
+
+# ── Shaders (position-only, no normals needed for lines) ──────────────────
+vert_src = "#version 330 core
+layout(location=0) in vec3 aPos;
+uniform mat4 uMVP;
+void main(){ gl_Position = uMVP * vec4(aPos, 1.0); }"
+
+frag_src = "#version 330 core
+uniform vec4 uColor;
+out vec4 FragColor;
+void main(){ FragColor = uColor; }"
+
+sh = gl3d_shader_create(vert_src, frag_src)
+
+# ══════════════════════════════════════════════════════════════════════════
+#  4D Math helpers (pure Sapphire)
+#  All 4D points stored as flat list: [x0,y0,z0,w0, x1,y1,z1,w1, ...]
+# ══════════════════════════════════════════════════════════════════════════
+
+# Rotate a single 4D point in a given plane by angle (radians)
+# plane: "XY","XZ","XW","YZ","YW","ZW"
+fn rot4(px, py, pz, pw, plane, angle):
+    c = math_cos(angle)
+    s = math_sin(angle)
+    if plane == "XW":
+        nx = px * c - pw * s
+        nw = px * s + pw * c
+        return [nx, py, pz, nw]
+    if plane == "YW":
+        ny = py * c - pw * s
+        nw = py * s + pw * c
+        return [px, ny, pz, nw]
+    if plane == "ZW":
+        nz = pz * c - pw * s
+        nw = pz * s + pw * c
+        return [px, py, nz, nw]
+    if plane == "XY":
+        nx = px * c - py * s
+        ny = px * s + py * c
+        return [nx, ny, pz, pw]
+    if plane == "XZ":
+        nx = px * c - pz * s
+        nz = px * s + pz * c
+        return [nx, py, nz, pw]
+    if plane == "YZ":
+        ny = py * c - pz * s
+        nz = py * s + pz * c
+        return [px, ny, nz, pw]
+    return [px, py, pz, pw]
+
+# Project a 4D point to 3D via W-perspective
+# W_DIST = viewer distance along W axis
+fn proj4to3(px, py, pz, pw):
+    W_DIST = 2.5
+    denom = W_DIST - pw
+    if denom < 0.001:
+        denom = 0.001
+    scale = 1.0 / denom
+    return [px * scale, py * scale, pz * scale]
+
+# Apply all current rotations to a 4D point
+fn apply_rotations(px, py, pz, pw, axw, ayw, azw, axy):
+    p = rot4(px, py, pz, pw, "XW", axw)
+    p = rot4(p[0], p[1], p[2], p[3], "YW", ayw)
+    p = rot4(p[0], p[1], p[2], p[3], "ZW", azw)
+    p = rot4(p[0], p[1], p[2], p[3], "XY", axy)
+    return p
+
+# ══════════════════════════════════════════════════════════════════════════
+#  Polytope definitions
+#  Each polytope: list of 4D vertices + list of edge pairs (indices)
+# ══════════════════════════════════════════════════════════════════════════
+
+# ── Tesseract (hypercube): 16 vertices, 32 edges ──────────────────────────
+# Vertices: all combinations of (±1, ±1, ±1, ±1)
+tess_verts = [-1.0,-1.0,-1.0,-1.0, 1.0,-1.0,-1.0,-1.0, -1.0,1.0,-1.0,-1.0, 1.0,1.0,-1.0,-1.0, -1.0,-1.0,1.0,-1.0, 1.0,-1.0,1.0,-1.0, -1.0,1.0,1.0,-1.0, 1.0,1.0,1.0,-1.0, -1.0,-1.0,-1.0,1.0, 1.0,-1.0,-1.0,1.0, -1.0,1.0,-1.0,1.0, 1.0,1.0,-1.0,1.0, -1.0,-1.0,1.0,1.0, 1.0,-1.0,1.0,1.0, -1.0,1.0,1.0,1.0, 1.0,1.0,1.0,1.0]
+# Edges: connect vertices that differ in exactly one coordinate
+tess_edges = [0,1, 0,2, 0,4, 0,8, 1,3, 1,5, 1,9, 2,3, 2,6, 2,10, 3,7, 3,11, 4,5, 4,6, 4,12, 5,7, 5,13, 6,7, 6,14, 7,15, 8,9, 8,10, 8,12, 9,11, 9,13, 10,11, 10,14, 11,15, 12,13, 12,14, 13,15, 14,15]
+
+# ── 16-cell (hyperoctahedron): 8 vertices, 24 edges ──────────────────────
+# Vertices: (±1,0,0,0) and permutations
+cell16_verts = [1.4,0.0,0.0,0.0, -1.4,0.0,0.0,0.0, 0.0,1.4,0.0,0.0, 0.0,-1.4,0.0,0.0, 0.0,0.0,1.4,0.0, 0.0,0.0,-1.4,0.0, 0.0,0.0,0.0,1.4, 0.0,0.0,0.0,-1.4]
+# Every pair except antipodal pairs (0,1), (2,3), (4,5), (6,7)
+cell16_edges = [0,2, 0,3, 0,4, 0,5, 0,6, 0,7, 1,2, 1,3, 1,4, 1,5, 1,6, 1,7, 2,4, 2,5, 2,6, 2,7, 3,4, 3,5, 3,6, 3,7, 4,6, 4,7, 5,6, 5,7]
+
+# ── 5-cell (4-simplex): 5 vertices, 10 edges ─────────────────────────────
+# Vertices: regular simplex in 4D
+s5 = 1.0 / math_sqrt(10.0)
+s5b = math_sqrt(5.0 / 8.0)
+cell5_verts = [1.0, 0.0, -s5b, -s5, -1.0, 0.0, -s5b, -s5, 0.0, 1.0, s5b, -s5, 0.0, -1.0, s5b, -s5, 0.0, 0.0, 0.0, 4.0*s5]
+# All 10 pairs of 5 vertices
+cell5_edges = [0,1, 0,2, 0,3, 0,4, 1,2, 1,3, 1,4, 2,3, 2,4, 3,4]
+
+# ── Active object ─────────────────────────────────────────────────────────
+obj_id = 0   # 0=tesseract, 1=16-cell, 2=5-cell
+
+fn get_verts(id):
+    if id == 0:
+        return tess_verts
+    if id == 1:
+        return cell16_verts
+    return cell5_verts
+
+fn get_edges(id):
+    if id == 0:
+        return tess_edges
+    if id == 1:
+        return cell16_edges
+    return cell5_edges
+
+fn get_name(id):
+    if id == 0:
+        return "Tesseract (8-cell)"
+    if id == 1:
+        return "16-cell (Hyperoctahedron)"
+    return "5-cell (4-Simplex)"
+
+# ── Build initial line buffer ─────────────────────────────────────────────
+fn build_line_verts(verts4, edges, axw, ayw, azw, axy):
+    line_buf = []
+    ei = 0
+    while ei < edges.length:
+        a = edges[ei]
+        b = edges[ei + 1]
+        # Extract 4D vertex a
+        ax = verts4[a * 4]
+        ay = verts4[a * 4 + 1]
+        az = verts4[a * 4 + 2]
+        aw = verts4[a * 4 + 3]
+        # Extract 4D vertex b
+        bx = verts4[b * 4]
+        by = verts4[b * 4 + 1]
+        bz = verts4[b * 4 + 2]
+        bw = verts4[b * 4 + 3]
+        # Rotate both
+        pa = apply_rotations(ax, ay, az, aw, axw, ayw, azw, axy)
+        pb = apply_rotations(bx, by, bz, bw, axw, ayw, azw, axy)
+        # Project to 3D
+        p3a = proj4to3(pa[0], pa[1], pa[2], pa[3])
+        p3b = proj4to3(pb[0], pb[1], pb[2], pb[3])
+        # Append both endpoints
+        line_buf = line_buf + [p3a[0], p3a[1], p3a[2], p3b[0], p3b[1], p3b[2]]
+        ei = ei + 2
+    return line_buf
+
+# Create initial GPU line mesh
+init_buf = build_line_verts(get_verts(obj_id), get_edges(obj_id), 0.0, 0.0, 0.0, 0.0)
+line_mesh = gl3d_mesh_lines_create(init_buf)
+
+# ── Rotation accumulators ─────────────────────────────────────────────────
+ang_xw = 0.0
+ang_yw = 0.0
+ang_zw = 0.0
+ang_xy = 0.0
+
+# Auto-rotation speeds (radians/sec)
+auto_xw = 0.31
+auto_yw = 0.19
+auto_zw = 0.13
+auto_xy = 0.07
+
+# ── Camera orbit ──────────────────────────────────────────────────────────
+cam_yaw   = 30.0
+cam_pitch = 20.0
+cam_dist  = 4.5
+
+# ── Key debounce ──────────────────────────────────────────────────────────
+prev_1 = 0
+prev_2 = 0
+prev_3 = 0
+
+# ── Object colors (RGBA) ──────────────────────────────────────────────────
+obj_colors_r = [0.3, 0.2, 0.9]
+obj_colors_g = [0.7, 0.9, 0.3]
+obj_colors_b = [1.0, 0.4, 0.5]
+
+# ══════════════════════════════════════════════════════════════════════════
+#  Main loop
+# ══════════════════════════════════════════════════════════════════════════
+while gl3d_window_poll(win) == 1:
+    dt = gl3d_delta(win)
+
+    # ── Object switching ───────────────────────────────────────────────
+    k1 = gl3d_key(win, "1")
+    k2 = gl3d_key(win, "2")
+    k3 = gl3d_key(win, "3")
+
+    if k1 == 1 and prev_1 == 0:
+        obj_id = 0
+        ang_xw = 0.0
+        ang_yw = 0.0
+        ang_zw = 0.0
+        ang_xy = 0.0
+    if k2 == 1 and prev_2 == 0:
+        obj_id = 1
+        ang_xw = 0.0
+        ang_yw = 0.0
+        ang_zw = 0.0
+        ang_xy = 0.0
+    if k3 == 1 and prev_3 == 0:
+        obj_id = 2
+        ang_xw = 0.0
+        ang_yw = 0.0
+        ang_zw = 0.0
+        ang_xy = 0.0
+
+    prev_1 = k1
+    prev_2 = k2
+    prev_3 = k3
+
+    # ── Manual rotation input ──────────────────────────────────────────
+    ROT_SPEED = 1.8
+    if gl3d_key(win, "q") == 1:
+        ang_xw = ang_xw + ROT_SPEED * dt
+    if gl3d_key(win, "e") == 1:
+        ang_xw = ang_xw - ROT_SPEED * dt
+    if gl3d_key(win, "a") == 1:
+        ang_yw = ang_yw + ROT_SPEED * dt
+    if gl3d_key(win, "d") == 1:
+        ang_yw = ang_yw - ROT_SPEED * dt
+    if gl3d_key(win, "w") == 1:
+        ang_zw = ang_zw + ROT_SPEED * dt
+    if gl3d_key(win, "s") == 1:
+        ang_zw = ang_zw - ROT_SPEED * dt
+    if gl3d_key(win, "z") == 1:
+        ang_xy = ang_xy + ROT_SPEED * dt
+    if gl3d_key(win, "x") == 1:
+        ang_xy = ang_xy - ROT_SPEED * dt
+
+    # ── Auto-rotation (always on) ──────────────────────────────────────
+    ang_xw = ang_xw + auto_xw * dt
+    ang_yw = ang_yw + auto_yw * dt
+    ang_zw = ang_zw + auto_zw * dt
+    ang_xy = ang_xy + auto_xy * dt
+
+    # ── Camera orbit ───────────────────────────────────────────────────
+    mdx = gl3d_mouse_dx(win)
+    mdy = gl3d_mouse_dy(win)
+    cam_yaw   = cam_yaw   + mdx * 0.3
+    cam_pitch = cam_pitch - mdy * 0.3
+    if cam_pitch < -80.0:
+        cam_pitch = -80.0
+    if cam_pitch > 80.0:
+        cam_pitch = 80.0
+
+    # ── Project 4D → 3D and update GPU buffer ─────────────────────────
+    verts4 = get_verts(obj_id)
+    edges  = get_edges(obj_id)
+    line_buf = build_line_verts(verts4, edges, ang_xw, ang_yw, ang_zw, ang_xy)
+    gl3d_mesh_lines_update(line_mesh, line_buf)
+
+    # ── Camera matrices ────────────────────────────────────────────────
+    yaw_r   = cam_yaw   * 3.14159 / 180.0
+    pitch_r = cam_pitch * 3.14159 / 180.0
+    cx = math_sin(yaw_r) * math_cos(pitch_r) * cam_dist
+    cy = math_sin(pitch_r) * cam_dist
+    cz = math_cos(yaw_r) * math_cos(pitch_r) * cam_dist
+
+    proj = gl3d_mat4_perspective(55.0, 1280.0 / 720.0, 0.01, 100.0)
+    view = gl3d_mat4_lookat(cx, cy, cz, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    mvp  = gl3d_mat4_mul(proj, view)
+
+    # ── Render ─────────────────────────────────────────────────────────
+    gl3d_clear(0.03, 0.03, 0.08)
+
+    gl3d_shader_use(sh)
+    gl3d_shader_set_mat4(sh, "uMVP", mvp)
+
+    # Draw main object
+    cr = obj_colors_r[obj_id]
+    cg = obj_colors_g[obj_id]
+    cb = obj_colors_b[obj_id]
+    gl3d_shader_set_vec4(sh, "uColor", cr, cg, cb, 1.0)
+    gl3d_mesh_lines_draw(line_mesh)
+
+    # Draw a faint reference grid (XZ plane)
+    grid_buf = [-3.0,0.0,-3.0, 3.0,0.0,-3.0, -3.0,0.0,-2.0, 3.0,0.0,-2.0, -3.0,0.0,-1.0, 3.0,0.0,-1.0, -3.0,0.0,0.0, 3.0,0.0,0.0, -3.0,0.0,1.0, 3.0,0.0,1.0, -3.0,0.0,2.0, 3.0,0.0,2.0, -3.0,0.0,3.0, 3.0,0.0,3.0, -3.0,0.0,-3.0, -3.0,0.0,3.0, -2.0,0.0,-3.0, -2.0,0.0,3.0, -1.0,0.0,-3.0, -1.0,0.0,3.0, 0.0,0.0,-3.0, 0.0,0.0,3.0, 1.0,0.0,-3.0, 1.0,0.0,3.0, 2.0,0.0,-3.0, 2.0,0.0,3.0, 3.0,0.0,-3.0, 3.0,0.0,3.0]
+    grid_mesh = gl3d_mesh_lines_create(grid_buf)
+    gl3d_shader_set_vec4(sh, "uColor", 0.12, 0.12, 0.18, 1.0)
+    gl3d_mesh_lines_draw(grid_mesh)
+    gl3d_mesh_lines_destroy(grid_mesh)
+
+    # Draw W-axis indicator (shows current W rotation as a pulsing line)
+    w_pulse = math_sin(ang_xw * 3.0) * 0.5 + 0.5
+    axis_buf = [0.0, 0.0, 0.0, 0.0, w_pulse * 1.5, 0.0]
+    axis_mesh = gl3d_mesh_lines_create(axis_buf)
+    gl3d_shader_set_vec4(sh, "uColor", 1.0, 0.4, 0.1, 1.0)
+    gl3d_mesh_lines_draw(axis_mesh)
+    gl3d_mesh_lines_destroy(axis_mesh)
+
+    gl3d_mat4_free(proj)
+    gl3d_mat4_free(view)
+    gl3d_mat4_free(mvp)
+
+    # ── HUD title ──────────────────────────────────────────────────────
+    name = get_name(obj_id)
+    gl3d_window_set_title(win, "4D Simulation  |  " + name + "  |  1/2/3 switch  Q/E/A/D/W/S rotate 4D  Mouse orbit  ESC quit")
+
+    gl3d_window_swap(win)
+
+# ── Cleanup ───────────────────────────────────────────────────────────────
+gl3d_mesh_lines_destroy(line_mesh)
+gl3d_shader_destroy(sh)
+gl3d_window_destroy(win)

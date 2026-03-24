@@ -65,6 +65,8 @@ public:
     std::string return_type;
     std::vector<std::unique_ptr<Stmt>> body;
     bool is_async;
+    // where T: Trait, U: Trait1 + Trait2
+    std::vector<std::pair<std::string, std::vector<std::string>>> where_clauses;
     
     FunctionDecl(std::vector<Decorator> decs,
                  const std::string& n,
